@@ -119,17 +119,47 @@ if (preg_match('#^/release/(\d+)#', $uri, $m)) {
     exit;
 }
 
-// Home grid
+// Home grid with sorting
 $page = max(1, (int)($_GET['page'] ?? 1));
 $perPage = max(1, min(60, (int)($_GET['per_page'] ?? 24)));
+$sort = (string)($_GET['sort'] ?? 'added_desc');
+
+// Whitelist of ORDER BY clauses to prevent SQL injection
+$sorts = [
+    'added_desc'   => 'added_at DESC, r.id DESC',
+    'added_asc'    => 'added_at ASC, r.id ASC',
+    'artist_asc'   => 'r.artist COLLATE NOCASE ASC, r.title COLLATE NOCASE ASC, r.id ASC',
+    'artist_desc'  => 'r.artist COLLATE NOCASE DESC, r.title COLLATE NOCASE ASC, r.id ASC',
+    'title_asc'    => 'r.title COLLATE NOCASE ASC, r.artist COLLATE NOCASE ASC, r.id ASC',
+    'title_desc'   => 'r.title COLLATE NOCASE DESC, r.artist COLLATE NOCASE ASC, r.id ASC',
+    'year_desc'    => 'r.year DESC, r.artist COLLATE NOCASE ASC, r.title COLLATE NOCASE ASC, r.id ASC',
+    'year_asc'     => 'r.year ASC, r.artist COLLATE NOCASE ASC, r.title COLLATE NOCASE ASC, r.id ASC',
+    'rating_desc'  => 'rating DESC, added_at DESC, r.id DESC',
+    'rating_asc'   => 'rating ASC, added_at DESC, r.id DESC',
+    'imported_desc'=> 'COALESCE(r.imported_at, r.updated_at) DESC, r.id DESC',
+    'imported_asc' => 'COALESCE(r.imported_at, r.updated_at) ASC, r.id ASC',
+    // Advanced (kept for future UI exposure)
+    'label_asc'    => "json_extract(r.labels, '$[0].name') COLLATE NOCASE ASC, r.artist COLLATE NOCASE ASC, r.title COLLATE NOCASE ASC",
+    'format_asc'   => "json_extract(r.formats, '$[0].name') COLLATE NOCASE ASC, r.artist COLLATE NOCASE ASC, r.title COLLATE NOCASE ASC",
+];
+$orderBy = $sorts[$sort] ?? $sorts['added_desc'];
+
 $total = (int)$pdo->query('SELECT COUNT(*) FROM releases')->fetchColumn();
 $totalPages = $total > 0 ? (int)ceil($total / $perPage) : 1;
 $offset = ($page - 1) * $perPage;
 
-$stmt = $pdo->prepare("SELECT r.id, r.title, r.artist, r.year, r.thumb_url, r.cover_url,
+$sql = "SELECT r.id, r.title, r.artist, r.year, r.thumb_url, r.cover_url,
     (SELECT local_path FROM images i WHERE i.release_id = r.id AND i.source_url = r.cover_url ORDER BY id ASC LIMIT 1) AS primary_local_path,
-    (SELECT local_path FROM images i WHERE i.release_id = r.id ORDER BY id ASC LIMIT 1) AS any_local_path
-FROM releases r ORDER BY COALESCE(r.imported_at, r.updated_at) DESC, r.id DESC LIMIT :limit OFFSET :offset");
+    (SELECT local_path FROM images i WHERE i.release_id = r.id ORDER BY id ASC LIMIT 1) AS any_local_path,
+    MAX(ci.added) AS added_at,
+    MAX(ci.rating) AS rating
+FROM releases r
+LEFT JOIN collection_items ci ON ci.release_id = r.id
+GROUP BY r.id
+ORDER BY $orderBy
+LIMIT :limit OFFSET :offset";
+
+$stmt = $pdo->prepare($sql);
 $stmt->bindValue(':limit', $perPage, \PDO::PARAM_INT);
 $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
 $stmt->execute();
@@ -175,4 +205,5 @@ echo $twig->render('home.html.twig', [
     'per_page' => $perPage,
     'total_pages' => $totalPages,
     'total' => $total,
+    'sort' => $sort,
 ]);

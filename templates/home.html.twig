@@ -26,7 +26,30 @@
   <div class="wrap">
     <header>
       <h1>{{ title }}</h1>
-      <div class="muted">{{ total|default(0) }} items</div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="muted">{{ total|default(0) }} items</div>
+        <form method="get" action="/" style="display:flex;gap:8px;align-items:center;margin:0">
+          <input type="hidden" name="page" value="{{ page }}" />
+          <input type="hidden" name="per_page" value="{{ per_page }}" />
+          <label for="sort" class="muted" style="font-size:.9rem">Sort</label>
+          <select id="sort" name="sort" onchange="this.form.submit()" style="background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:6px 8px">
+            <optgroup label="Collection">
+              <option value="added_desc" {{ sort=='added_desc'?'selected':'' }}>Added (newest)</option>
+              <option value="added_asc" {{ sort=='added_asc'?'selected':'' }}>Added (oldest)</option>
+              <option value="rating_desc" {{ sort=='rating_desc'?'selected':'' }}>Rating (high→low)</option>
+              <option value="rating_asc" {{ sort=='rating_asc'?'selected':'' }}>Rating (low→high)</option>
+            </optgroup>
+            <optgroup label="Release">
+              <option value="year_desc" {{ sort=='year_desc'?'selected':'' }}>Year (newest)</option>
+              <option value="year_asc" {{ sort=='year_asc'?'selected':'' }}>Year (oldest)</option>
+              <option value="artist_asc" {{ sort=='artist_asc'?'selected':'' }}>Artist (A→Z)</option>
+              <option value="artist_desc" {{ sort=='artist_desc'?'selected':'' }}>Artist (Z→A)</option>
+              <option value="title_asc" {{ sort=='title_asc'?'selected':'' }}>Title (A→Z)</option>
+              <option value="title_desc" {{ sort=='title_desc'?'selected':'' }}>Title (Z→A)</option>
+            </optgroup>
+          </select>
+        </form>
+      </div>
     </header>
 
     {% if items is not defined or items|length == 0 %}
@@ -52,9 +75,9 @@
         <nav>
           {% set prev = page - 1 %}
           {% set next = page + 1 %}
-          {% if page > 1 %}<a href="/?page={{ prev }}&per_page={{ per_page }}">← Prev</a>{% endif %}
+          {% if page > 1 %}<a href="/?page={{ prev }}&per_page={{ per_page }}&sort={{ sort }}">← Prev</a>{% endif %}
           <span class="muted">Page {{ page }} / {{ total_pages }}</span>
-          {% if page < total_pages %}<a href="/?page={{ next }}&per_page={{ per_page }}">Next →</a>{% endif %}
+          {% if page < total_pages %}<a href="/?page={{ next }}&per_page={{ per_page }}&sort={{ sort }}">Next →</a>{% endif %}
         </nav>
       {% endif %}
     {% endif %}
