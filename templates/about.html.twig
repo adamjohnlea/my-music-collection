@@ -23,8 +23,97 @@
         <h1 style="margin-top:0">About</h1>
         <p>This app lets you browse your Discogs collection locally, fast — powered by a small SQLite database and cached images. It honors Discogs API rate limits and avoids live calls during normal browsing.</p>
         <p class="muted">Data provided by Discogs. Discogs® is a trademark of Zink Media, LLC. This project is for personal use. If you run it publicly, ensure your data is refreshed at least every 6 hours and include proper attribution.</p>
-        <hr style="border:0;border-top:1px solid #2a2b2f" />
-        <p>Commands you can run:</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="meta">
+        <h2 style="margin:0 0 8px 0; font-size:1.2rem;">How it works</h2>
+        <ol style="margin:0 0 0 20px; padding:0;">
+          <li>Initial sync: we call the Discogs API <code>/users/{username}/collection/folders/0/releases</code> to import your collection into a local SQLite database.</li>
+          <li>Local-first UI: the web app reads only from your database and local images for fast, offline‑friendly browsing.</li>
+          <li>Optional enrichment: when you choose, we fetch full release details from <code>/releases/{id}</code> (tracklist, genres/styles, credits, companies, identifiers, notes, videos) and store them locally.</li>
+          <li>Image cache: cover and gallery images are downloaded to <code>public/images/</code> with a conservative throttle (≈1 req/sec, ≤1000/day).</li>
+          <li>Incremental refresh: an optional job updates only items added/changed since your last run.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="meta">
+        <h2 style="margin:0 0 8px 0; font-size:1.2rem;">Key features</h2>
+        <ul style="margin:0 0 0 20px; padding:0;">
+          <li>Fast, local browsing from SQLite + cached images (no live API calls during normal use).</li>
+          <li>Smart rate limiting and retries that respect Discogs headers and Retry‑After.</li>
+          <li>Full release details (optional) including tracklist, credits, companies, identifiers, videos, and notes.</li>
+          <li>Image gallery with a lightbox viewer; collection grid prefers the original cover image.</li>
+          <li>Powerful search (SQLite FTS5): search by artist, title, label, format, genre/style, country, year, identifiers (barcode/catno/matrix), credits/companies, and notes.</li>
+          <li>Useful sorts: Added date, Year, Artist, Title, Rating (with stable tie‑breakers).</li>
+          <li>Incremental refresh with a stored cursor so you can safely run it anytime.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="meta">
+        <h2 style="margin:0 0 8px 0; font-size:1.2rem;">Search tips</h2>
+        <p class="muted" style="margin-top:0">Use the header search box on the collection page. Examples:</p>
+        <ul style="margin:0 0 0 20px; padding:0;">
+          <li><code>miles davis kind of blue</code> — free text across artist/title/tracklist/etc.</li>
+          <li><code>artist:"duran duran"</code> — quoted phrase matches.</li>
+          <li><code>year:1980</code> or <code>year:1980..1989</code> — single year or range.</li>
+          <li><code>label:"blue note" catno:BST-84003</code> — label + catalog number.</li>
+          <li><code>barcode:0602527</code> — identifier search (also matrix/runout, ASIN, etc.).</li>
+          <li><code>notes:"first press"</code> — matches release notes and your personal notes.</li>
+        </ul>
+        <p class="muted" style="margin-top:8px">Tip: field prefixes accept a space after the colon (e.g., <code>year: 1980</code>).</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="meta">
+        <h2 style="margin:0 0 8px 0; font-size:1.2rem;">Sorting</h2>
+        <ul style="margin:0 0 0 20px; padding:0;">
+          <li>Default: Added (newest first).</li>
+          <li>Other options: Year, Artist, Title, Rating. Advanced sorts (Label/Format) are wired server‑side and may appear later.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="meta">
+        <h2 style="margin:0 0 8px 0; font-size:1.2rem;">Rate limits & quotas</h2>
+        <ul style="margin:0 0 0 20px; padding:0;">
+          <li>Core API: header‑aware limiter based on <code>X-Discogs-Ratelimit*</code>; automatic backoff on 429/5xx with <code>Retry-After</code>.</li>
+          <li>Images: separate throttle ~1 request/sec and a persisted daily cap of 1000/day (UTC reset).</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="meta">
+        <h2 style="margin:0 0 8px 0; font-size:1.2rem;">Data storage</h2>
+        <ul style="margin:0 0 0 20px; padding:0;">
+          <li>SQLite DB: <code>var/app.db</code> at the project root (never under <code>public/</code>).</li>
+          <li>Images: <code>public/images/&lt;release_id&gt;/&lt;sha1&gt;.jpg</code>; the UI prefers local files and falls back to Discogs URLs.</li>
+          <li>State: lightweight <code>kv_store</code> table keeps limiter counters, cursors, and schema version.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="meta">
+        <h2 style="margin:0 0 8px 0; font-size:1.2rem;">Privacy & usage</h2>
+        <ul style="margin:0 0 0 20px; padding:0;">
+          <li>Personal/local by default: browsing does not hit the Discogs API.</li>
+          <li>If you self‑host publicly: add a scheduled refresh (≤6h) and an attribution banner. Respect Discogs ToU.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="meta">
+        <h2 style="margin:0 0 8px 0; font-size:1.2rem;">Commands</h2>
         <ul>
           <li><code>php bin/console sync:initial</code> — initial import</li>
           <li><code>php bin/console sync:refresh</code> — incremental refresh (new/changed items)</li>
@@ -32,6 +121,19 @@
           <li><code>php bin/console images:backfill --limit=200</code> — download covers to local cache</li>
           <li><code>php bin/console search:rebuild</code> — rebuild search index</li>
         </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="meta">
+        <h2 style="margin:0 0 8px 0; font-size:1.2rem;">Troubleshooting</h2>
+        <ul style="margin:0 0 0 20px; padding:0;">
+          <li>No items on home page? Ensure both CLI and web use the same DB path (<code>var/app.db</code>) and run <code>sync:initial</code>.</li>
+          <li>Images not local? Run <code>images:backfill</code>; the UI will switch to local files automatically.</li>
+          <li>Missing notes/credits? Run <code>sync:enrich</code> again; it now targets releases missing notes as well.</li>
+          <li>Search feels off? Try <code>search:rebuild</code> to repopulate the FTS index.</li>
+        </ul>
+        <p class="muted" style="margin-top:8px">We’ll keep this page updated as features evolve.</p>
       </div>
     </div>
   </div>
