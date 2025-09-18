@@ -41,9 +41,28 @@ class MigrationRunner
             if ($version === '3') {
                 $this->migrateToV4();
                 $this->setVersion('4');
+                $version = '4';
+            }
+            if ($version === '4') {
+                $this->migrateToV5();
+                $this->setVersion('5');
+                $version = '5';
             }
 
             $this->pdo->commit();
+
+            // Ensure FTS schema/triggers are healthy (idempotent). To avoid web-request contention,
+            // only perform the heavy rebuilds from CLI commands, and run them in a short, separate transaction.
+            if (PHP_SAPI === 'cli') {
+                $this->pdo->beginTransaction();
+                try {
+                    $this->ensureFtsHealthy();
+                    $this->pdo->commit();
+                } catch (\Throwable $e) {
+                    $this->pdo->rollBack();
+                    throw $e;
+                }
+            }
         } catch (\Throwable $e) {
             $this->pdo->rollBack();
             throw $e;
@@ -144,11 +163,10 @@ class MigrationRunner
 
     private function migrateToV4(): void
     {
-        // Create FTS5 virtual table for full-text search across release data
+        // Create FTS5 virtual table (contentless). We manage content via our own triggers.
         $this->pdo->exec("CREATE VIRTUAL TABLE IF NOT EXISTS releases_fts USING fts5(
             artist, title, label_text, format_text, genre_style_text, country,
-            track_text, credit_text, company_text, identifier_text, release_notes, user_notes,
-            content='releases', content_rowid='id'
+            track_text, credit_text, company_text, identifier_text, release_notes, user_notes
         )");
 
         // Trigger after insert on releases to populate FTS
@@ -221,5 +239,94 @@ class MigrationRunner
                 (SELECT ci.notes FROM collection_items ci WHERE ci.release_id = r.id ORDER BY ci.added DESC LIMIT 1)
             FROM releases r"
         );
+    }
+
+    private function migrateToV5(): void
+    {
+        // Delegate to the idempotent FTS health check to keep logic in one place
+        $this->ensureFtsHealthy();
+    }
+
+    private function ensureFtsHealthy(): void
+    {
+        // Detect and repair FTS schema drift (e.g., missing label_text column)
+        $hasFts = (bool)$this->pdo->query("SELECT name FROM sqlite_master WHERE type='table' AND name='releases_fts'")->fetchColumn();
+        $needsRebuild = false;
+        if ($hasFts) {
+            $cols = $this->pdo->query("PRAGMA table_info('releases_fts')")->fetchAll(PDO::FETCH_ASSOC);
+            $colNames = array_map(fn($r) => strtolower((string)$r['name']), $cols);
+            $expected = ['artist','title','label_text','format_text','genre_style_text','country','track_text','credit_text','company_text','identifier_text','release_notes','user_notes'];
+            foreach ($expected as $name) {
+                if (!in_array($name, $colNames, true)) { $needsRebuild = true; break; }
+            }
+            // If there are extra/missing columns, also rebuild
+            if (!$needsRebuild && count($colNames) !== count($expected)) {
+                $needsRebuild = true;
+            }
+        } else {
+            $needsRebuild = true;
+        }
+
+        // Also rebuild if the FTS was created with a content= option (we want contentless)
+        if (!$needsRebuild && $hasFts) {
+            $sql = (string)$this->pdo->query("SELECT sql FROM sqlite_master WHERE type='table' AND name='releases_fts'")->fetchColumn();
+            if (stripos($sql, "content='") !== false) {
+                $needsRebuild = true;
+            }
+        }
+
+        if ($needsRebuild) {
+            // Drop triggers if present
+            $this->pdo->exec("DROP TRIGGER IF EXISTS releases_ai");
+            $this->pdo->exec("DROP TRIGGER IF EXISTS releases_au");
+            // Drop FTS table (drops shadow tables too)
+            $this->pdo->exec("DROP TABLE IF EXISTS releases_fts");
+
+            // Recreate FTS and triggers and backfill
+            $this->migrateToV4();
+            return; // nothing else to do; triggers are freshly recreated
+        }
+
+        // Ensure triggers exist even if FTS table matches and did not require rebuild
+        $triggerCount = (int)$this->pdo
+            ->query("SELECT COUNT(1) FROM sqlite_master WHERE type='trigger' AND name IN ('releases_ai','releases_au')")
+            ->fetchColumn();
+        if ($triggerCount < 2) {
+            // Recreate the triggers without dropping the FTS table
+            $this->pdo->exec("CREATE TRIGGER IF NOT EXISTS releases_ai AFTER INSERT ON releases BEGIN
+                INSERT INTO releases_fts(rowid, artist, title, label_text, format_text, genre_style_text, country, track_text, credit_text, company_text, identifier_text, release_notes, user_notes)
+                VALUES (new.id,
+                    new.artist, new.title,
+                    json_extract(new.labels, '$[0].name') || ' ' || COALESCE(json_extract(new.labels, '$[0].catno'), ''),
+                    (SELECT group_concat(json_extract(v.value, '$.name'), ' ') FROM json_each(COALESCE(new.formats, '[]')) v),
+                    (SELECT (SELECT group_concat(value, ' ') FROM json_each(COALESCE(new.genres, '[]'))) || ' ' || (SELECT group_concat(value, ' ') FROM json_each(COALESCE(new.styles, '[]')))),
+                    COALESCE(new.country, ''),
+                    (SELECT group_concat(json_extract(t.value, '$.title'), ' ') FROM json_each(COALESCE(new.tracklist, '[]')) t),
+                    (SELECT group_concat(json_extract(a.value, '$.name') || ' ' || COALESCE(json_extract(a.value, '$.role'), ''), ' ') FROM json_each(COALESCE(new.extraartists, '[]')) a),
+                    (SELECT group_concat(json_extract(c.value, '$.name') || ' ' || COALESCE(json_extract(c.value, '$.entity_type_name'), ''), ' ') FROM json_each(COALESCE(new.companies, '[]')) c),
+                    (SELECT group_concat(json_extract(i.value, '$.value'), ' ') FROM json_each(COALESCE(new.identifiers, '[]')) i),
+                    COALESCE(new.notes, ''),
+                    ''
+                );
+            END");
+
+            $this->pdo->exec("CREATE TRIGGER IF NOT EXISTS releases_au AFTER UPDATE ON releases BEGIN
+                DELETE FROM releases_fts WHERE rowid = new.id;
+                INSERT INTO releases_fts(rowid, artist, title, label_text, format_text, genre_style_text, country, track_text, credit_text, company_text, identifier_text, release_notes, user_notes)
+                VALUES (new.id,
+                    new.artist, new.title,
+                    json_extract(new.labels, '$[0].name') || ' ' || COALESCE(json_extract(new.labels, '$[0].catno'), ''),
+                    (SELECT group_concat(json_extract(v.value, '$.name'), ' ') FROM json_each(COALESCE(new.formats, '[]')) v),
+                    (SELECT (SELECT group_concat(value, ' ') FROM json_each(COALESCE(new.genres, '[]'))) || ' ' || (SELECT group_concat(value, ' ') FROM json_each(COALESCE(new.styles, '[]')))),
+                    COALESCE(new.country, ''),
+                    (SELECT group_concat(json_extract(t.value, '$.title'), ' ') FROM json_each(COALESCE(new.tracklist, '[]')) t),
+                    (SELECT group_concat(json_extract(a.value, '$.name') || ' ' || COALESCE(json_extract(a.value, '$.role'), ''), ' ') FROM json_each(COALESCE(new.extraartists, '[]')) a),
+                    (SELECT group_concat(json_extract(c.value, '$.name') || ' ' || COALESCE(json_extract(c.value, '$.entity_type_name'), ''), ' ') FROM json_each(COALESCE(new.companies, '[]')) c),
+                    (SELECT group_concat(json_extract(i.value, '$.value'), ' ') FROM json_each(COALESCE(new.identifiers, '[]')) i),
+                    COALESCE(new.notes, ''),
+                    (SELECT ci.notes FROM collection_items ci WHERE ci.release_id = new.id ORDER BY ci.added DESC LIMIT 1)
+                );
+            END");
+        }
     }
 }

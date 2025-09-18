@@ -21,6 +21,8 @@
 /var/app.db
 /var/*.db
 /var/*.sqlite
+/var/*.db-wal
+/var/*.db-shm
 /var/*.log
 /var/cache/
 /var/tmp/

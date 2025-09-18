@@ -25,6 +25,10 @@ class Storage
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES => false,
         ]);
+        // Improve concurrency and reduce lock errors during migrations and heavy writes
+        $this->pdo->exec('PRAGMA journal_mode=WAL');
+        $this->pdo->exec('PRAGMA synchronous=NORMAL');
+        $this->pdo->exec('PRAGMA busy_timeout=10000');
     }
 
     public function pdo(): PDO
