@@ -79,12 +79,22 @@ class SyncRefreshCommand extends Command
 
         $stop = false;
         for ($page = 1; $page <= $maxPages && !$stop; $page++) {
-            [$count, $pageNewestAdded, $stop] = $this->importPageDescending($http, $pdo, $imgDir, $username, $page, 100, $sinceIso);
-            if ($page === 1 && $pageNewestAdded) {
-                $newSince = $pageNewestAdded; // newest at top of first page
+            try {
+                [$count, $pageNewestAdded, $stop] = $this->importPageDescending($http, $pdo, $imgDir, $username, $page, 100, $sinceIso);
+                if ($page === 1 && $pageNewestAdded) {
+                    $newSince = $pageNewestAdded; // newest at top of first page
+                }
+                $totalTouched += $count;
+                $output->writeln(sprintf('  - Page %d: %d items%s', $page, $count, $stop ? ' (reached cursor)' : ''));
+            } catch (\RuntimeException $e) {
+                $msg = $e->getMessage();
+                // Discogs returns 404 if the requested page is beyond total pages. Treat it as end-of-list.
+                if (str_contains($msg, 'HTTP 404') && str_contains($msg, 'outside of valid range')) {
+                    $output->writeln(sprintf('  - Page %d: (no more pages)', $page));
+                    break;
+                }
+                throw $e;
             }
-            $totalTouched += $count;
-            $output->writeln(sprintf('  - Page %d: %d items%s', $page, $count, $stop ? ' (reached cursor)' : ''));
         }
 
         if ($newSince) {
@@ -127,8 +137,8 @@ class SyncRefreshCommand extends Command
 
         $pdo->beginTransaction();
         try {
-            $cItems = $pdo->prepare('INSERT OR REPLACE INTO collection_items (instance_id, username, folder_id, release_id, added, notes, rating, raw_json) VALUES (:instance_id, :username, :folder_id, :release_id, :added, :notes, :rating, :raw_json)');
-            $cReleases = $pdo->prepare('INSERT OR REPLACE INTO releases (id, title, artist, year, formats, labels, country, thumb_url, cover_url, imported_at, updated_at, raw_json) VALUES (:id, :title, :artist, :year, :formats, :labels, :country, :thumb_url, :cover_url, :imported_at, :updated_at, :raw_json)');
+            $cItems = $pdo->prepare('INSERT INTO collection_items (instance_id, username, folder_id, release_id, added, notes, rating, raw_json) VALUES (:instance_id, :username, :folder_id, :release_id, :added, :notes, :rating, :raw_json) ON CONFLICT(instance_id) DO UPDATE SET username = excluded.username, folder_id = excluded.folder_id, release_id = excluded.release_id, added = excluded.added, notes = excluded.notes, rating = excluded.rating, raw_json = excluded.raw_json');
+            $cReleases = $pdo->prepare('INSERT INTO releases (id, title, artist, year, formats, labels, country, thumb_url, cover_url, imported_at, updated_at, raw_json) VALUES (:id, :title, :artist, :year, :formats, :labels, :country, :thumb_url, :cover_url, :imported_at, :updated_at, :raw_json) ON CONFLICT(id) DO UPDATE SET title = COALESCE(excluded.title, releases.title), artist = COALESCE(excluded.artist, releases.artist), year = COALESCE(excluded.year, releases.year), formats = COALESCE(excluded.formats, releases.formats), labels = COALESCE(excluded.labels, releases.labels), country = COALESCE(excluded.country, releases.country), thumb_url = COALESCE(excluded.thumb_url, releases.thumb_url), cover_url = COALESCE(excluded.cover_url, releases.cover_url), updated_at = excluded.updated_at, raw_json = COALESCE(excluded.raw_json, releases.raw_json)');
             $cImage = $pdo->prepare('INSERT OR IGNORE INTO images (release_id, source_url, local_path, etag, last_modified, bytes, fetched_at) VALUES (:release_id, :source_url, :local_path, NULL, NULL, NULL, NULL)');
 
             foreach ($releases as $idx => $item) {
