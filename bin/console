@@ -25,5 +25,6 @@ $app->add(new ImagesBackfillCommand());
 $app->add(new SyncEnrichCommand());
 $app->add(new \App\Console\SyncRefreshCommand());
 $app->add(new \App\Console\SearchRebuildCommand());
+$app->add(new \App\Console\SyncPushCommand());
 
 $app->run();

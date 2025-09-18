@@ -91,6 +91,7 @@ One search box with field prefixes and ranges. Examples:
 - php bin/console sync:enrich [--limit=N | --id=RELEASE_ID] — full details
 - php bin/console images:backfill [--limit=N] — download covers to local cache
 - php bin/console search:rebuild — rebuild FTS index
+- php bin/console sync:push — push queued rating/notes changes to Discogs
 
 ## FAQ
 - Do I need to clear the DB to see enriched data?
@@ -99,6 +100,8 @@ One search box with field prefixes and ranges. Examples:
   - Yes. The app only uses `var/app.db` at the project root. Any `public/var` database is ignored.
 - Where are images stored?
   - public/images/<release_id>/<sha1>.jpg. The UI prefers local files and falls back to Discogs URLs.
+- Where do my personal notes show up on Discogs?
+  - Notes you edit here and push with `sync:push` are saved on your personal collection entry (your copy/instance) on Discogs. They are private to your account and do not appear on the public release page.
 
 ## Troubleshooting
 - No items on home? Ensure both CLI and web use the same DB (`var/app.db`) and run `sync:initial`.
@@ -114,3 +117,16 @@ Data provided by Discogs. Discogs® is a trademark of Zink Media, LLC. If you de
 
 ## License
 MIT
+
+
+## Push to Discogs: ratings vs notes
+- By default, only ratings are pushed with `php bin/console sync:push`.
+- Notes are NOT pushed by default. To opt in, set `PUSH_NOTES=1` in your `.env`, then run `sync:push` again. Example:
+  
+  ```
+  # .env
+  PUSH_NOTES=1
+  ```
+  
+  Notes are saved to your personal Discogs collection entry (your copy/instance) and generally appear in your collection views on Discogs, not on the public release page. API behavior can vary; failures will be recorded in the `push_queue.last_error` column and printed by `sync:push`. If unsure, leave notes push disabled.
+- You can always pull the latest values from Discogs with `php bin/console sync:refresh` to see your rating/notes locally.

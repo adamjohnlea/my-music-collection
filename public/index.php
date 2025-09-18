@@ -156,6 +156,54 @@ if ($uri === '/about') {
     exit;
 }
 
+if ($uri === '/release/save' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
+    // Handle enqueueing a push job to Discogs for rating/notes
+    $rid = (int)($_POST['release_id'] ?? 0);
+    $rating = isset($_POST['rating']) && $_POST['rating'] !== '' ? max(0, min(5, (int)$_POST['rating'])) : null;
+    $notes = isset($_POST['notes']) ? trim((string)$_POST['notes']) : null;
+    $username = $_ENV['DISCOGS_USERNAME'] ?? $_SERVER['DISCOGS_USERNAME'] ?? getenv('DISCOGS_USERNAME') ?: null;
+    $ok = false; $msg = 'queued';
+    if ($rid > 0 && $username) {
+        // Find latest instance for this release
+        $ci = $pdo->prepare('SELECT instance_id FROM collection_items WHERE release_id = :rid AND username = :u ORDER BY added DESC LIMIT 1');
+        $ci->execute([':rid' => $rid, ':u' => $username]);
+        $iid = (int)($ci->fetchColumn() ?: 0);
+        if ($iid > 0) {
+            // Upsert logic: if there is a pending job for same instance, update it; else insert new
+            $pdo->beginTransaction();
+            try {
+                $sel = $pdo->prepare('SELECT id FROM push_queue WHERE status = "pending" AND instance_id = :iid LIMIT 1');
+                $sel->execute([':iid' => $iid]);
+                $jobId = $sel->fetchColumn();
+                if ($jobId) {
+                    $upd = $pdo->prepare('UPDATE push_queue SET rating = :rating, notes = :notes, attempts = 0, last_error = NULL, created_at = strftime("%Y-%m-%dT%H:%M:%fZ", "now") WHERE id = :id');
+                    $upd->execute([':rating' => $rating, ':notes' => $notes, ':id' => $jobId]);
+                } else {
+                    $ins = $pdo->prepare('INSERT INTO push_queue (instance_id, release_id, username, rating, notes) VALUES (:iid, :rid, :u, :rating, :notes)');
+                    $ins->execute([':iid' => $iid, ':rid' => $rid, ':u' => $username, ':rating' => $rating, ':notes' => $notes]);
+                }
+                $pdo->commit();
+                $ok = true;
+            } catch (\Throwable $e) {
+                $pdo->rollBack();
+                $ok = false; $msg = 'error';
+            }
+        } else {
+            $msg = 'no_instance';
+        }
+    } else {
+        $msg = 'invalid';
+    }
+    // pass through the submitted values so the detail view can show them immediately
+    $qs = http_build_query([
+        'saved' => ($ok ? $msg : $msg),
+        'sr' => $rating,
+        'sn' => $notes,
+    ]);
+    header('Location: /release/' . $rid . '?' . $qs);
+    exit;
+}
+
 if (preg_match('#^/release/(\d+)#', $uri, $m)) {
     $rid = (int)$m[1];
     $stmt = $pdo->prepare("SELECT r.* FROM releases r WHERE r.id = :id");
@@ -256,6 +304,15 @@ if (preg_match('#^/release/(\d+)#', $uri, $m)) {
                 $details['user_notes'] = $userNotes ?: null;
                 $details['user_rating'] = isset($ciRow['rating']) ? (int)$ciRow['rating'] : null;
             }
+            // If pending values were just submitted (sr/sn), override for display so the user sees their edits immediately
+            if (isset($_GET['sr']) && $_GET['sr'] !== '') {
+                $details['user_rating'] = (int)$_GET['sr'];
+            }
+            if (array_key_exists('sn', $_GET)) {
+                $sn = (string)$_GET['sn'];
+                // Accept empty string to allow clearing notes
+                $details['user_notes'] = $sn;
+            }
         }
     }
 
@@ -265,6 +322,7 @@ if (preg_match('#^/release/(\d+)#', $uri, $m)) {
         'image_url' => $imageUrl,
         'images' => $images,
         'details' => $details,
+        'saved' => $_GET['saved'] ?? null,
     ]);
     exit;
 }

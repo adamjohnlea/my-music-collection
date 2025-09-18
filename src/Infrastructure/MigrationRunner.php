@@ -48,6 +48,11 @@ class MigrationRunner
                 $this->setVersion('5');
                 $version = '5';
             }
+            if ($version === '5') {
+                $this->migrateToV6();
+                $this->setVersion('6');
+                $version = '6';
+            }
 
             $this->pdo->commit();
 
@@ -245,6 +250,25 @@ class MigrationRunner
     {
         // Delegate to the idempotent FTS health check to keep logic in one place
         $this->ensureFtsHealthy();
+    }
+
+    private function migrateToV6(): void
+    {
+        // Queue table for push-to-Discogs jobs (rating/notes updates)
+        $this->pdo->exec('CREATE TABLE IF NOT EXISTS push_queue (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            instance_id INTEGER NOT NULL,
+            release_id INTEGER NOT NULL,
+            username TEXT NOT NULL,
+            rating INTEGER,
+            notes TEXT,
+            status TEXT NOT NULL DEFAULT "pending", -- pending|done|failed
+            attempts INTEGER NOT NULL DEFAULT 0,
+            last_error TEXT,
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )');
+        $this->pdo->exec('CREATE INDEX IF NOT EXISTS idx_push_queue_status_created ON push_queue(status, created_at)');
+        $this->pdo->exec('CREATE INDEX IF NOT EXISTS idx_push_queue_instance ON push_queue(instance_id)');
     }
 
     private function ensureFtsHealthy(): void
