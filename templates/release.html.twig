@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ title }}</title>
+  <style>
+    :root { --bg:#0b0b0c; --card:#16171a; --text:#e7e7ea; --muted:#a0a3aa; --accent:#67e8f9; }
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif}
+    .wrap{max-width:1000px;margin:40px auto;padding:0 20px}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .layout{display:grid;grid-template-columns:280px 1fr;gap:24px}
+    .card{background:var(--card);border-radius:12px;overflow:hidden}
+    .cover{width:100%;aspect-ratio:1/1;object-fit:cover;background:#222}
+    .meta{padding:16px}
+    .muted{color:var(--muted)}
+    h1{margin:0 0 8px 0;font-size:1.6rem}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <p><a href="/">← Back</a></p>
+    {% if release %}
+      <div class="layout">
+        <div class="card">
+          {% if image_url %}
+            <img class="cover" src="{{ image_url }}" alt="{{ release.title }} cover" />
+          {% else %}
+            <div class="cover"></div>
+          {% endif %}
+        </div>
+        <div>
+          <h1>{{ release.title }}</h1>
+          <p class="muted">{{ release.artist }}{% if release.year %} • {{ release.year }}{% endif %}</p>
+          {% if release.country %}<p class="muted">{{ release.country }}</p>{% endif %}
+          {% if release.formats %}
+            <p class="muted">Formats: {{ release.formats }}</p>
+          {% endif %}
+        </div>
+      </div>
+    {% else %}
+      <p class="muted">Release not found.</p>
+    {% endif %}
+  </div>
+</body>
+</html>

@@ -1,0 +1,36 @@
+{
+  "name": "adamlea/my-music-collection",
+  "description": "Discogs Collection App (PHP 8.4) — MVP scaffold per design doc",
+  "type": "project",
+  "license": "MIT",
+  "require": {
+    "php": "^8.4",
+    "guzzlehttp/guzzle": "^7.9",
+    "symfony/console": "^7.1",
+    "twig/twig": "^3.10",
+    "monolog/monolog": "^3.7",
+    "vlucas/phpdotenv": "^5.6",
+    "league/flysystem": "^3.24"
+  },
+  "require-dev": {
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/"
+    }
+  },
+  "config": {
+    "platform": {
+      "php": "8.4"
+    },
+    "sort-packages": true
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "@php bin/post-install"
+    ],
+    "post-update-cmd": [
+      "@php bin/post-install"
+    ]
+  }
+}

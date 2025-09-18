@@ -1,0 +1,25 @@
+#!/usr/bin/env php
+<?php
+declare(strict_types=1);
+
+use App\Console\SyncInitialCommand;
+use App\Console\ImagesBackfillCommand;
+use Dotenv\Dotenv;
+use Symfony\Component\Console\Application;
+
+// Composer autoload
+require __DIR__ . '/../vendor/autoload.php';
+
+// Load environment
+$envPath = dirname(__DIR__);
+if (file_exists($envPath.'/.env')) {
+    Dotenv::createImmutable($envPath)->load();
+} elseif (file_exists($envPath.'/.env.example')) {
+    Dotenv::createImmutable($envPath, '.env.example')->load();
+}
+
+$app = new Application('My Music Collection', '0.1.0');
+$app->add(new SyncInitialCommand());
+$app->add(new ImagesBackfillCommand());
+
+$app->run();

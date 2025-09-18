@@ -1,0 +1,6 @@
+#!/usr/bin/env php
+<?php
+$base = dirname(__DIR__);
+@mkdir($base.'/var', 0777, true);
+@mkdir($base.'/public/images', 0777, true);
+file_put_contents($base.'/.env', file_exists($base.'/.env') ? file_get_contents($base.'/.env') : file_get_contents($base.'/.env.example'));
