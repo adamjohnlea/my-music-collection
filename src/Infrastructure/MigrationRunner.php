@@ -31,6 +31,11 @@ class MigrationRunner
             if ($version === '1') {
                 $this->migrateToV2();
                 $this->setVersion('2');
+                $version = '2';
+            }
+            if ($version === '2') {
+                $this->migrateToV3();
+                $this->setVersion('3');
             }
 
             $this->pdo->commit();
@@ -124,5 +129,11 @@ class MigrationRunner
         $this->pdo->exec("ALTER TABLE releases ADD COLUMN extraartists TEXT");
         $this->pdo->exec("ALTER TABLE releases ADD COLUMN companies TEXT");
         $this->pdo->exec("ALTER TABLE releases ADD COLUMN identifiers TEXT");
+    }
+
+    private function migrateToV3(): void
+    {
+        // Add release-level notes field
+        $this->pdo->exec("ALTER TABLE releases ADD COLUMN notes TEXT");
     }
 }

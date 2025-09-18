@@ -108,6 +108,85 @@
               </div>
             </div>
           {% endif %}
+
+          {% if details.notes %}
+            <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Release Notes</strong>
+                <div style="white-space:pre-wrap" class="muted">{{ details.notes }}</div>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if details.user_notes or details.user_rating is not null %}
+            <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>My Notes</strong>
+                {% if details.user_rating is not null %}
+                  <div class="muted" style="margin-bottom:6px">Rating: {{ details.user_rating }}/5</div>
+                {% endif %}
+                {% if details.user_notes %}
+                  <div style="white-space:pre-wrap" class="muted">{{ details.user_notes }}</div>
+                {% else %}
+                  <div class="muted">(none)</div>
+                {% endif %}
+              </div>
+            </div>
+          {% endif %}
+
+          {% if details.extraartists %}
+            <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Credits</strong>
+                <ul>
+                  {% for a in details.extraartists %}
+                    <li>
+                      {{ a.name }}
+                      {% if a.role %}<span class="muted">— {{ a.role }}</span>{% endif %}
+                      {% if a.tracks %}<span class="muted"> (tracks: {{ a.tracks }})</span>{% endif %}
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if details.companies %}
+            <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Companies</strong>
+                <ul>
+                  {% for c in details.companies %}
+                    <li>
+                      {{ c.name }}
+                      {% if c.entity_type_name %}<span class="muted"> — {{ c.entity_type_name }}</span>{% endif %}
+                      {% if c.role %}<span class="muted"> ({{ c.role }})</span>{% endif %}
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if details.barcodes is defined and details.barcodes %}
+            <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Barcodes</strong>
+                <ul>
+                  {% for b in details.barcodes %}
+                    <li>{{ b.value }}{% if b.description %} <span class="muted">({{ b.description }})</span>{% endif %}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if details.other_identifiers is defined and details.other_identifiers %}
+            <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Identifiers</strong>
+                <ul>
+                  {% for idf in details.other_identifiers %}
+                    <li>{{ idf.type }}: {{ idf.value }}{% if idf.description %} <span class="muted">({{ idf.description }})</span>{% endif %}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          {% endif %}
         </div>
       </div>
 

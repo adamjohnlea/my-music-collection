@@ -39,6 +39,7 @@ class ReleaseEnricher
         $identifiers = isset($data['identifiers']) ? json_encode($data['identifiers'], JSON_UNESCAPED_SLASHES) : null;
         $masterId = isset($data['master_id']) ? (int)$data['master_id'] : null;
         $dataQuality = $data['data_quality'] ?? null;
+        $notes = isset($data['notes']) ? (string)$data['notes'] : null;
 
         // Artist summary if present
         $artists = $data['artists'] ?? null;
@@ -52,7 +53,7 @@ class ReleaseEnricher
             if ($names) $artistSummary = implode(', ', $names);
         }
 
-        $stmt = $this->pdo->prepare('UPDATE releases SET title = COALESCE(:title, title), artist = COALESCE(:artist, artist), year = COALESCE(:year, year), formats = COALESCE(:formats, formats), labels = COALESCE(:labels, labels), country = COALESCE(:country, country), genres = :genres, styles = :styles, tracklist = :tracklist, master_id = :master_id, data_quality = :data_quality, videos = :videos, extraartists = :extraartists, companies = :companies, identifiers = :identifiers, updated_at = :updated_at, raw_json = :raw_json WHERE id = :id');
+        $stmt = $this->pdo->prepare('UPDATE releases SET title = COALESCE(:title, title), artist = COALESCE(:artist, artist), year = COALESCE(:year, year), formats = COALESCE(:formats, formats), labels = COALESCE(:labels, labels), country = COALESCE(:country, country), genres = :genres, styles = :styles, tracklist = :tracklist, master_id = :master_id, data_quality = :data_quality, videos = :videos, extraartists = :extraartists, companies = :companies, identifiers = :identifiers, notes = :notes, updated_at = :updated_at, raw_json = :raw_json WHERE id = :id');
         $stmt->execute([
             ':id' => $releaseId,
             ':title' => $title,
@@ -70,6 +71,7 @@ class ReleaseEnricher
             ':extraartists' => $extraArtists,
             ':companies' => $companies,
             ':identifiers' => $identifiers,
+            ':notes' => $notes,
             ':updated_at' => $now,
             ':raw_json' => json_encode($data, JSON_UNESCAPED_SLASHES),
         ]);
@@ -92,8 +94,8 @@ class ReleaseEnricher
 
     public function enrichMissing(int $limit = 100): int
     {
-        // Find releases with no tracklist (not yet enriched)
-        $stmt = $this->pdo->query('SELECT id FROM releases WHERE tracklist IS NULL OR tracklist = "" ORDER BY imported_at ASC LIMIT ' . (int)$limit);
+        // Find releases missing details (no tracklist or no notes)
+        $stmt = $this->pdo->query('SELECT id FROM releases WHERE (tracklist IS NULL OR tracklist = "") OR (notes IS NULL OR notes = "") ORDER BY imported_at ASC LIMIT ' . (int)$limit);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $n = 0;
         foreach ($rows as $r) {

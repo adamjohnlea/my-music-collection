@@ -60,6 +60,11 @@ if (preg_match('#^/release/(\d+)#', $uri, $m)) {
         'extraartists' => [],
         'companies' => [],
         'identifiers' => [],
+        'notes' => null,
+        'user_notes' => null,
+        'user_rating' => null,
+        'barcodes' => [],
+        'other_identifiers' => [],
     ];
 
     if ($release) {
@@ -105,6 +110,37 @@ if (preg_match('#^/release/(\d+)#', $uri, $m)) {
                 if (is_array($decoded)) {
                     $details[$k] = $decoded;
                 }
+            }
+        }
+        // plain text release notes
+        if (!empty($release['notes'])) {
+            $details['notes'] = (string)$release['notes'];
+        }
+
+        // Split identifiers into barcodes and others for easier rendering
+        if (!empty($details['identifiers'])) {
+            foreach ($details['identifiers'] as $idf) {
+                $type = isset($idf['type']) ? (string)$idf['type'] : '';
+                if (strcasecmp($type, 'Barcode') === 0) $details['barcodes'][] = $idf; else $details['other_identifiers'][] = $idf;
+            }
+        }
+
+        // Fetch my collection notes/rating for this release (current configured username)
+        $username = $_ENV['DISCOGS_USERNAME'] ?? $_SERVER['DISCOGS_USERNAME'] ?? getenv('DISCOGS_USERNAME') ?: null;
+        if ($username) {
+            $ci = $pdo->prepare('SELECT notes, rating FROM collection_items WHERE release_id = :rid AND username = :u ORDER BY added DESC LIMIT 1');
+            $ci->execute([':rid' => $rid, ':u' => $username]);
+            $ciRow = $ci->fetch();
+            if ($ciRow) {
+                $userNotes = $ciRow['notes'] ?? null;
+                if ($userNotes && is_string($userNotes) && str_starts_with($userNotes, '[')) {
+                    $maybe = json_decode($userNotes, true);
+                    if (is_array($maybe)) {
+                        $userNotes = implode("\n\n", array_map(function($n){ return is_array($n) && isset($n['value']) ? (string)$n['value'] : (is_string($n) ? $n : ''); }, $maybe));
+                    }
+                }
+                $details['user_notes'] = $userNotes ?: null;
+                $details['user_rating'] = isset($ciRow['rating']) ? (int)$ciRow['rating'] : null;
             }
         }
     }
