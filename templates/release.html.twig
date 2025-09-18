@@ -5,17 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{{ title }}</title>
   <style>
-    :root { --bg:#0b0b0c; --card:#16171a; --text:#e7e7ea; --muted:#a0a3aa; --accent:#67e8f9; }
+    :root { --bg:#0b0b0c; --card:#16171a; --text:#e7e7ea; --muted:#a0a3aa; --accent:#67e8f9; --overlay: rgba(0,0,0,.9); }
     html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif}
     .wrap{max-width:1000px;margin:40px auto;padding:0 20px}
     a{color:var(--accent);text-decoration:none}
     a:hover{text-decoration:underline}
     .layout{display:grid;grid-template-columns:280px 1fr;gap:24px}
     .card{background:var(--card);border-radius:12px;overflow:hidden}
-    .cover{width:100%;aspect-ratio:1/1;object-fit:cover;background:#222}
+    .cover{width:100%;aspect-ratio:1/1;object-fit:cover;background:#222;cursor:zoom-in}
     .meta{padding:16px}
     .muted{color:var(--muted)}
     h1{margin:0 0 8px 0;font-size:1.6rem}
+
+    /* Lightbox */
+    .lightbox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--overlay);z-index:1000}
+    .lightbox.open{display:flex}
+    .lb-inner{position:relative;max-width:95vw;max-height:95vh;display:flex;align-items:center;justify-content:center}
+    .lb-img{max-width:95vw;max-height:95vh;object-fit:contain;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+    .lb-close{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:999px;width:40px;height:40px;cursor:pointer;font-size:20px}
+    .lb-nav{position:absolute;top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center}
+    .lb-prev,.lb-next{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:999px;width:44px;height:44px;cursor:pointer;font-size:20px}
+    .lb-prev{left:-60px}
+    .lb-next{right:-60px}
+    .lb-counter{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);color:#fff;background:rgba(0,0,0,.5);padding:4px 10px;border-radius:999px;font-size:.9rem}
+
+    @media (max-width: 800px){
+      .layout{grid-template-columns:1fr}
+      .lb-prev{left:10px}
+      .lb-next{right:10px}
+    }
   </style>
 </head>
 <body>
@@ -23,22 +41,172 @@
     <p><a href="/">← Back</a></p>
     {% if release %}
       <div class="layout">
-        <div class="card">
-          {% if image_url %}
-            <img class="cover" src="{{ image_url }}" alt="{{ release.title }} cover" />
-          {% else %}
-            <div class="cover"></div>
+        <div>
+          <div class="card">
+            {% if image_url %}
+              <img id="main-cover" class="cover" src="{{ image_url }}" alt="{{ release.title }} cover" data-idx="{% set currentIdx = 0 %}{% for img in images %}{% if img.url == image_url %}{% set currentIdx = loop.index0 %}{% endif %}{% endfor %}{{ currentIdx }}" />
+            {% else %}
+              <div class="cover"></div>
+            {% endif %}
+          </div>
+          {% if images is defined and images|length > 0 %}
+            <div class="thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+              {% for img in images %}
+                <button class="thumb" data-url="{{ img.url }}" data-idx="{{ loop.index0 }}" title="Image {{ loop.index }}" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="{{ img.url }}" alt="thumb {{ loop.index }}" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:{% if img.is_primary %}1{% else %}.85{% endif %}" />
+                </button>
+              {% endfor %}
+            </div>
           {% endif %}
         </div>
         <div>
           <h1>{{ release.title }}</h1>
           <p class="muted">{{ release.artist }}{% if release.year %} • {{ release.year }}{% endif %}</p>
           {% if release.country %}<p class="muted">{{ release.country }}</p>{% endif %}
-          {% if release.formats %}
-            <p class="muted">Formats: {{ release.formats }}</p>
+
+          {% if details.genres or details.styles %}
+            <p style="margin:8px 0;">
+              {% for g in details.genres %}<span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">{{ g }}</span>{% endfor %}
+              {% for s in details.styles %}<span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">{{ s }}</span>{% endfor %}
+            </p>
+          {% endif %}
+
+          {% if details.formats %}
+            <p class="muted">Formats:
+              {% for f in details.formats %}
+                {{ f.name }}{% if f.text %} ({{ f.text }}){% endif %}{% if not loop.last %}, {% endif %}
+              {% endfor %}
+            </p>
+          {% endif %}
+
+          {% if details.labels %}
+            <p class="muted">Labels:
+              {% for l in details.labels %}{{ l.name }}{% if l.catno %} ({{ l.catno }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+            </p>
+          {% endif %}
+
+          {% if details.tracklist %}
+            <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Tracklist</strong>
+                <ol>
+                  {% for t in details.tracklist %}
+                    <li>{{ t.position }} — {{ t.title }}{% if t.duration %} <span class="muted">({{ t.duration }})</span>{% endif %}</li>
+                  {% endfor %}
+                </ol>
+              </div>
+            </div>
+          {% endif %}
+
+          {% if details.videos %}
+            <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Videos</strong>
+                <ul>
+                  {% for v in details.videos %}
+                    <li><a href="{{ v.uri }}" target="_blank" rel="noopener">{{ v.title }}</a></li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
           {% endif %}
         </div>
       </div>
+
+      {% if images is defined and images|length > 0 %}
+      <!-- Lightbox overlay -->
+      <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog">
+        <div class="lb-inner">
+          <button class="lb-close" aria-label="Close">✕</button>
+          <button class="lb-prev" aria-label="Previous">◀</button>
+          <img class="lb-img" src="" alt="Full-size image" />
+          <button class="lb-next" aria-label="Next">▶</button>
+          <div class="lb-counter">1 / {{ images|length }}</div>
+        </div>
+      </div>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', function(){
+          const images = [
+            {% for img in images %}'{{ img.url|e('js') }}'{% if not loop.last %}, {% endif %}{% endfor %}
+          ];
+          const main = document.getElementById('main-cover');
+          const thumbs = document.querySelectorAll('.thumb');
+          const lb = document.getElementById('lightbox');
+          const lbImg = lb ? lb.querySelector('.lb-img') : null;
+          const lbClose = lb ? lb.querySelector('.lb-close') : null;
+          const lbPrev = lb ? lb.querySelector('.lb-prev') : null;
+          const lbNext = lb ? lb.querySelector('.lb-next') : null;
+          const lbCounter = lb ? lb.querySelector('.lb-counter') : null;
+          let idx = parseInt(main?.getAttribute('data-idx') || '0', 10) || 0;
+
+          function updateMain(to){
+            if (!main) return;
+            const i = Math.max(0, Math.min(images.length - 1, to));
+            if (images[i] && main.getAttribute('src') !== images[i]) {
+              main.setAttribute('src', images[i]);
+            }
+            main.setAttribute('data-idx', String(i));
+            idx = i;
+          }
+
+          function openLightbox(startIdx){
+            if (!lb || !lbImg) return;
+            idx = Math.max(0, Math.min(images.length - 1, startIdx));
+            lbImg.src = images[idx];
+            if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length;
+            lb.classList.add('open');
+            lb.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+          }
+          function closeLightbox(){
+            if (!lb) return;
+            lb.classList.remove('open');
+            lb.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+          }
+          function next(){ idx = (idx + 1) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
+          function prev(){ idx = (idx - 1 + images.length) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
+
+          // Thumbnail click: swap main and set index; Shift+Click opens lightbox
+          thumbs.forEach(function(btn){
+            btn.addEventListener('click', function(e){
+              const i = parseInt(this.getAttribute('data-idx') || '0', 10) || 0;
+              if (e.shiftKey) { openLightbox(i); return; }
+              updateMain(i);
+            });
+          });
+
+          // Main cover click: open lightbox on current index
+          if (main) {
+            main.addEventListener('click', function(){
+              const i = parseInt(main.getAttribute('data-idx') || '0', 10) || 0;
+              openLightbox(i);
+            });
+          }
+
+          // Lightbox interactions
+          lbClose?.addEventListener('click', closeLightbox);
+          lbPrev?.addEventListener('click', prev);
+          lbNext?.addEventListener('click', next);
+          lbImg?.addEventListener('click', next); // click image to advance
+          lb?.addEventListener('click', function(e){ if (e.target === lb) closeLightbox(); });
+
+          // Keyboard support
+          document.addEventListener('keydown', function(e){
+            if (!lb || !lb.classList.contains('open')) return;
+            if (e.key === 'Escape') { e.preventDefault(); closeLightbox(); }
+            else if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+          });
+
+          // Ensure initial main index reflects the list
+          if (images.length > 0 && main) {
+            let initial = images.indexOf(main.getAttribute('src'));
+            if (initial < 0) initial = 0;
+            main.setAttribute('data-idx', String(initial));
+          }
+        });
+      </script>
+      {% endif %}
     {% else %}
       <p class="muted">Release not found.</p>
     {% endif %}

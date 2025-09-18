@@ -26,6 +26,11 @@ class MigrationRunner
             if ($version === '0') {
                 $this->migrateToV1();
                 $this->setVersion('1');
+                $version = '1';
+            }
+            if ($version === '1') {
+                $this->migrateToV2();
+                $this->setVersion('2');
             }
 
             $this->pdo->commit();
@@ -104,5 +109,20 @@ class MigrationRunner
         )');
 
         // kv_store keys used by limiter state can be created on demand
+    }
+
+    private function migrateToV2(): void
+    {
+        // Add enrichment columns to releases for detailed metadata
+        // Using ALTER TABLE ADD COLUMN (SQLite adds columns at end; harmless if rerun since we gate by schema_version)
+        $this->pdo->exec("ALTER TABLE releases ADD COLUMN genres TEXT");
+        $this->pdo->exec("ALTER TABLE releases ADD COLUMN styles TEXT");
+        $this->pdo->exec("ALTER TABLE releases ADD COLUMN tracklist TEXT");
+        $this->pdo->exec("ALTER TABLE releases ADD COLUMN master_id INTEGER");
+        $this->pdo->exec("ALTER TABLE releases ADD COLUMN data_quality TEXT");
+        $this->pdo->exec("ALTER TABLE releases ADD COLUMN videos TEXT");
+        $this->pdo->exec("ALTER TABLE releases ADD COLUMN extraartists TEXT");
+        $this->pdo->exec("ALTER TABLE releases ADD COLUMN companies TEXT");
+        $this->pdo->exec("ALTER TABLE releases ADD COLUMN identifiers TEXT");
     }
 }

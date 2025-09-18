@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Console\SyncInitialCommand;
 use App\Console\ImagesBackfillCommand;
+use App\Console\SyncEnrichCommand;
 use Dotenv\Dotenv;
 use Symfony\Component\Console\Application;
 
@@ -21,5 +22,6 @@ if (file_exists($envPath.'/.env')) {
 $app = new Application('My Music Collection', '0.1.0');
 $app->add(new SyncInitialCommand());
 $app->add(new ImagesBackfillCommand());
+$app->add(new SyncEnrichCommand());
 
 $app->run();

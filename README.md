@@ -36,7 +36,15 @@ composer install
 php bin/console sync:initial
 ```
 
-5) Backfill local images (optional but recommended):
+5) Enrich release details (optional, fetches full metadata like tracklist/genres):
+
+```
+php bin/console sync:enrich --limit=100
+# or enrich a single release by id
+php bin/console sync:enrich --id=123456
+```
+
+6) Backfill local images (optional but recommended):
 
 ```
 php bin/console images:backfill --limit=200
@@ -45,13 +53,33 @@ php bin/console images:backfill --limit=200
 - This downloads missing cover images at 1 request/sec and stops at 1000/day.
 - You can run it multiple times; already-downloaded files are skipped.
 
-6) Serve the app:
+7) Serve the app:
 
 ```
 php -S 127.0.0.1:8000 -t public
 ```
 
 Then open http://127.0.0.1:8000/. The UI automatically prefers local images when present and falls back to Discogs thumbnails otherwise.
+
+## FAQ
+
+Q: Do I need to clear the database and start over to get full release details?
+
+A: No. You do not need to reset or delete your database. Migrations are automatic and idempotent, and the enrich command is designed to augment what you already imported.
+
+- If you ran `sync:initial` before, just run:
+  - `php bin/console sync:enrich --limit=100` (repeat as needed or use `--id=123456` for a specific release)
+  - Optionally re-run `php bin/console images:backfill` afterward to fetch any additional images discovered during enrichment.
+- The app will upgrade your schema on the fly (e.g., adding enrichment columns) and will only fill in missing details.
+
+Optional full reset (not required):
+- Stop the app and commands, then delete the SQLite file and images cache:
+  - `rm var/app.db`
+  - `rm -rf public/images/*`
+- Re-run from scratch:
+  - `php bin/console sync:initial`
+  - `php bin/console sync:enrich --limit=100`
+  - `php bin/console images:backfill --limit=200`
 
 ## Next steps (per design doc)
 - Implement header-aware rate limiter middleware with persisted state in `kv_store`.
