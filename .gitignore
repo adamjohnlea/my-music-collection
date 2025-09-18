@@ -30,6 +30,10 @@
 /public/images/*
 !public/images/.gitkeep
 
+# Prevent accidental DBs under web root
+/public/var/
+/public/*.db
+
 # Swap files
 *.swp
 *.swo

@@ -89,3 +89,8 @@ Optional full reset (not required):
 - Build Twig routes `/` (grid from DB) and `/release/{id}`.
 
 Refer to `my-music-collection-design-doc.md` for the full specification.
+
+
+## DB location note
+- The app uses a single SQLite database at `var/app.db` (relative to the project root). Both the CLI and web bootstrap resolve this to an absolute path so they always point to the same file.
+- For safety, the app refuses to create or use any database path under the `public/` web root. If you accidentally have a `public/var/` directory from older runs, it is unused and can be deleted.

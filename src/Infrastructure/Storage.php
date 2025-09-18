@@ -12,6 +12,12 @@ class Storage
 
     public function __construct(string $dbPath)
     {
+        // Safety: never allow DB inside the public web root
+        $norm = str_replace('\\', '/', $dbPath);
+        if (preg_match('#/public/#', $norm)) {
+            throw new PDOException('Invalid DB_PATH: database must not be placed under the public/ directory. Use var/app.db (default).');
+        }
+
         $this->ensureDirectory(dirname($dbPath));
         $dsn = 'sqlite:' . $dbPath;
         $this->pdo = new PDO($dsn, options: [
