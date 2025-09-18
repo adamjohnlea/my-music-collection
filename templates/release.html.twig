@@ -61,7 +61,7 @@
         </div>
         <div>
           <h1>{{ release.title }}</h1>
-          <p class="muted">{{ release.artist }}{% if release.year %} • {{ release.year }}{% endif %}</p>
+          <p class="muted">{{ release.artist|strip_discogs_suffix }}{% if release.year %} • {{ release.year }}{% endif %}</p>
           {% if release.country %}<p class="muted">{{ release.country }}</p>{% endif %}
 
           {% if details.genres or details.styles %}
@@ -81,7 +81,7 @@
 
           {% if details.labels %}
             <p class="muted">Labels:
-              {% for l in details.labels %}{{ l.name }}{% if l.catno %} ({{ l.catno }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
+              {% for l in details.labels %}{{ l.name|strip_discogs_suffix }}{% if l.catno %} ({{ l.catno }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}
             </p>
           {% endif %}
 
@@ -138,7 +138,7 @@
                 <ul>
                   {% for a in details.extraartists %}
                     <li>
-                      {{ a.name }}
+                      {{ a.name|strip_discogs_suffix }}
                       {% if a.role %}<span class="muted">— {{ a.role }}</span>{% endif %}
                       {% if a.tracks %}<span class="muted"> (tracks: {{ a.tracks }})</span>{% endif %}
                     </li>
@@ -154,7 +154,7 @@
                 <ul>
                   {% for c in details.companies %}
                     <li>
-                      {{ c.name }}
+                      {{ c.name|strip_discogs_suffix }}
                       {% if c.entity_type_name %}<span class="muted"> — {{ c.entity_type_name }}</span>{% endif %}
                       {% if c.role %}<span class="muted"> ({{ c.role }})</span>{% endif %}
                     </li>

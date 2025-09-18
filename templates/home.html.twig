@@ -69,7 +69,7 @@
     {% else %}
       <div class="grid">
         {% for it in items %}
-          <a class="card" href="/release/{{ it.id }}" title="{{ it.title }} — {{ it.artist }}">
+          <a class="card" href="/release/{{ it.id }}" title="{{ it.title }} — {{ it.artist|strip_discogs_suffix }}">
             {% if it.image %}
               <img class="cover" src="{{ it.image }}" alt="{{ it.title }} cover" loading="lazy" />
             {% else %}
@@ -77,7 +77,7 @@
             {% endif %}
             <div class="meta">
               <div class="title">{{ it.title }}</div>
-              <div class="artist">{{ it.artist }}{% if it.year %} • {{ it.year }}{% endif %}</div>
+              <div class="artist">{{ it.artist|strip_discogs_suffix }}{% if it.year %} • {{ it.year }}{% endif %}</div>
             </div>
           </a>
         {% endfor %}

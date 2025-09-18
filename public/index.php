@@ -143,6 +143,8 @@ $loader = new FilesystemLoader(__DIR__.'/../templates');
 $twig = new Environment($loader, [
     'cache' => false,
 ]);
+// Register custom Twig filters
+$twig->addExtension(new \App\Presentation\Twig\DiscogsFilters());
 
 // Simple router
 $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
