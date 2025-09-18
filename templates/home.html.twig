@@ -69,17 +69,26 @@
     {% else %}
       <div class="grid">
         {% for it in items %}
-          <a class="card" href="/release/{{ it.id }}" title="{{ it.title }} — {{ it.artist|strip_discogs_suffix }}">
+          <div class="card" title="{{ it.title }} — {{ it.artist|strip_discogs_suffix }}">
             {% if it.image %}
-              <img class="cover" src="{{ it.image }}" alt="{{ it.title }} cover" loading="lazy" />
+              <a href="/release/{{ it.id }}">
+                <img class="cover" src="{{ it.image }}" alt="{{ it.title }} cover" loading="lazy" />
+              </a>
             {% else %}
-              <div class="cover"></div>
+              <a href="/release/{{ it.id }}">
+                <div class="cover"></div>
+              </a>
             {% endif %}
             <div class="meta">
-              <div class="title">{{ it.title }}</div>
-              <div class="artist">{{ it.artist|strip_discogs_suffix }}{% if it.year %} • {{ it.year }}{% endif %}</div>
+              <div class="title"><a href="/release/{{ it.id }}">{{ it.title }}</a></div>
+              <div class="artist">
+                <a href="/?per_page={{ per_page }}&sort={{ sort }}&q={{ ('artist:\"' ~ it.artist ~ '\"')|url_encode }}">{{ it.artist|strip_discogs_suffix }}</a>
+                {% if it.year %}
+                  • <a href="/?per_page={{ per_page }}&sort={{ sort }}&q={{ ('year:' ~ it.year)|url_encode }}">{{ it.year }}</a>
+                {% endif %}
+              </div>
             </div>
-          </a>
+          </div>
         {% endfor %}
       </div>
 
