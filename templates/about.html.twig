@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ title }}</title>
+  <style>
+    :root { --bg:#0b0b0c; --card:#16171a; --text:#e7e7ea; --muted:#a0a3aa; --accent:#67e8f9; }
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif}
+    .wrap{max-width:800px;margin:40px auto;padding:0 20px}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .card{background:var(--card);border-radius:12px;overflow:hidden}
+    .meta{padding:16px}
+    .muted{color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <p><a href="/">← Back</a></p>
+    <div class="card">
+      <div class="meta">
+        <h1 style="margin-top:0">About</h1>
+        <p>This app lets you browse your Discogs collection locally, fast — powered by a small SQLite database and cached images. It honors Discogs API rate limits and avoids live calls during normal browsing.</p>
+        <p class="muted">Data provided by Discogs. Discogs® is a trademark of Zink Media, LLC. This project is for personal use. If you run it publicly, ensure your data is refreshed at least every 6 hours and include proper attribution.</p>
+        <hr style="border:0;border-top:1px solid #2a2b2f" />
+        <p>Commands you can run:</p>
+        <ul>
+          <li><code>php bin/console sync:initial</code> — initial import</li>
+          <li><code>php bin/console sync:refresh</code> — incremental refresh (new/changed items)</li>
+          <li><code>php bin/console sync:enrich --limit=100</code> — fetch full release details</li>
+          <li><code>php bin/console images:backfill --limit=200</code> — download covers to local cache</li>
+          <li><code>php bin/console search:rebuild</code> — rebuild search index</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

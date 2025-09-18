@@ -24,6 +24,111 @@ $env = static function(string $key, ?string $default = null): ?string {
     return $value;
 };
 
+// Simple helper to build advanced FTS MATCH and filters from a query string
+function parse_query(string $q): array {
+    $q = trim($q);
+    // Normalize: remove any whitespace immediately after a field prefix like artist:, year:, label:, etc.
+    // This turns 'year: 1980' into 'year:1980' so parsing is consistent.
+    $q = preg_replace('/(\b\w+):\s+/', '$1:', $q);
+    if ($q === '') return ['match' => '', 'chips' => []];
+
+    $tokens = [];
+    $buf = '';
+    $inQuotes = false;
+    for ($i = 0, $n = strlen($q); $i < $n; $i++) {
+        $ch = $q[$i];
+        if ($ch === '"') { $inQuotes = !$inQuotes; $buf .= $ch; continue; }
+        if (!$inQuotes && ctype_space($ch)) {
+            if ($buf !== '') { $tokens[] = $buf; $buf = ''; }
+            continue;
+        }
+        $buf .= $ch;
+    }
+    if ($buf !== '') $tokens[] = $buf;
+
+    $colMap = [
+        'artist' => 'artist',
+        'title' => 'title',
+        'label' => 'label_text',
+        'format' => 'format_text',
+        'genre' => 'genre_style_text',
+        'style' => 'genre_style_text',
+        'country' => 'country',
+        'credit' => 'credit_text',
+        'company' => 'company_text',
+        'identifier' => 'identifier_text',
+        'barcode' => 'identifier_text',
+        'notes' => 'release_notes', // also search user_notes separately
+    ];
+
+    $ftsParts = [];
+    $chips = [];
+    $yearFrom = null; $yearTo = null;
+    $general = [];
+
+    foreach ($tokens as $tok) {
+        $tok = trim($tok);
+        if ($tok === '') continue;
+
+        // year filter
+        if (str_starts_with(strtolower($tok), 'year:')) {
+            $range = substr($tok, 5);
+            if (preg_match('/^(\d{4})\.\.(\d{4})$/', $range, $m)) {
+                $yearFrom = (int)$m[1]; $yearTo = (int)$m[2];
+                $chips[] = ['label' => 'Year '.$m[1].'–'.$m[2]];
+                continue;
+            } elseif (preg_match('/^(\d{4})$/', $range, $m)) {
+                $yearFrom = (int)$m[1]; $yearTo = (int)$m[1];
+                $chips[] = ['label' => 'Year '.$m[1]];
+                continue;
+            }
+        }
+
+        // fielded token key:"value" or key:value
+        if (preg_match('/^(\w+):(.*)$/', $tok, $m)) {
+            $key = strtolower($m[1]);
+            $val = trim($m[2]);
+            if ($val === '') continue;
+            $quoted = $val;
+            if ($quoted[0] !== '"') {
+                // add prefix wildcard to last term if not quoted
+                if (!str_contains($quoted, ' ') && !str_ends_with($quoted, '*')) $quoted .= '*';
+            }
+            if (isset($colMap[$key])) {
+                $col = $colMap[$key];
+                if ($key === 'notes') {
+                    $ftsParts[] = $col.':'.$quoted;
+                    $ftsParts[] = 'user_notes:'.$quoted;
+                    $chips[] = ['label' => 'Notes: '.trim($val, '"')];
+                } else {
+                    $ftsParts[] = $col.':'.$quoted;
+                    $chips[] = ['label' => ucfirst($key).': '.trim($val, '"')];
+                }
+                continue;
+            }
+        }
+
+        // general term → prefix
+        $t = strtolower($tok);
+        $t = preg_replace('/[^a-z0-9\-\*\s\"]+/', ' ', $t);
+        if ($t === '') continue;
+        if ($t[0] !== '"' && !str_ends_with($t, '*')) $t .= '*';
+        $general[] = $t;
+    }
+
+    if ($general) {
+        $ftsParts = array_merge($general, $ftsParts);
+    }
+
+    $match = implode(' ', $ftsParts);
+    return [
+        'match' => $match,
+        'year_from' => $yearFrom,
+        'year_to' => $yearTo,
+        'chips' => $chips,
+    ];
+}
+
 $dbPath = $env('DB_PATH', 'var/app.db') ?? 'var/app.db';
 // Resolve relative DB path against project root to ensure web and CLI use the same file
 $baseDir = dirname(__DIR__);
@@ -41,6 +146,13 @@ $twig = new Environment($loader, [
 
 // Simple router
 $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+
+if ($uri === '/about') {
+    echo $twig->render('about.html.twig', [
+        'title' => 'About this app',
+    ]);
+    exit;
+}
 
 if (preg_match('#^/release/(\d+)#', $uri, $m)) {
     $rid = (int)$m[1];
@@ -161,6 +273,13 @@ $perPage = max(1, min(60, (int)($_GET['per_page'] ?? 24)));
 $sort = (string)($_GET['sort'] ?? 'added_desc');
 $q = trim((string)($_GET['q'] ?? ''));
 
+// Parse advanced search (field prefixes + year range) into an FTS MATCH and numeric filters
+$parsed = parse_query($q);
+$match = $parsed['match'] ?? '';
+$yearFrom = $parsed['year_from'] ?? null;
+$yearTo = $parsed['year_to'] ?? null;
+$chips = $parsed['chips'] ?? [];
+
 // Whitelist of ORDER BY clauses to prevent SQL injection
 $sorts = [
     'added_desc'   => 'added_at DESC, r.id DESC',
@@ -184,51 +303,76 @@ $orderBy = $sorts[$sort] ?? $sorts['added_desc'];
 $offset = ($page - 1) * $perPage;
 
 if ($q !== '') {
-    // Build a simple prefix MATCH string: split on whitespace, add * to each token, quote if necessary
-    $terms = preg_split('/\s+/', strtolower($q));
-    $safe = [];
-    foreach ($terms as $t) {
-        $t = trim($t);
-        if ($t === '') continue;
-        // allow alnum and a few symbols; strip others
-        $t = preg_replace('/[^a-z0-9:\-*\"]+/i', ' ', $t);
-        // Wrap in quotes if contains special chars except *
-        if (preg_match('/[^a-z0-9]/i', $t) && !str_contains($t, '"')) {
-            $t = '"' . trim(str_replace('"', '', $t)) . '"';
-        }
-        // Add prefix wildcard if not a range/field expression with quotes already ending by *
-        if (!str_contains($t, ':') && !str_ends_with($t, '*') && !str_starts_with($t, '"')) {
-            $t .= '*';
-        }
-        $safe[] = $t;
+    $useFts = ($match !== '');
+
+    if ($useFts) {
+        // Count total matches (with optional year filters)
+        $cntSql = "SELECT COUNT(f.rowid) FROM releases_fts f JOIN releases r ON r.id = f.rowid WHERE releases_fts MATCH :m";
+        if ($yearFrom !== null) $cntSql .= " AND r.year >= :y1";
+        if ($yearTo !== null) $cntSql .= " AND r.year <= :y2";
+        $cnt = $pdo->prepare($cntSql);
+        $cnt->bindValue(':m', $match);
+        if ($yearFrom !== null) $cnt->bindValue(':y1', $yearFrom, \PDO::PARAM_INT);
+        if ($yearTo !== null) $cnt->bindValue(':y2', $yearTo, \PDO::PARAM_INT);
+        $cnt->execute();
+        $total = (int)$cnt->fetchColumn();
+        $totalPages = $total > 0 ? (int)ceil($total / $perPage) : 1;
+
+        $sql = "SELECT r.id, r.title, r.artist, r.year, r.thumb_url, r.cover_url,
+            (SELECT local_path FROM images i WHERE i.release_id = r.id AND i.source_url = r.cover_url ORDER BY id ASC LIMIT 1) AS primary_local_path,
+            (SELECT local_path FROM images i WHERE i.release_id = r.id ORDER BY id ASC LIMIT 1) AS any_local_path,
+            MAX(ci.added) AS added_at,
+            MAX(ci.rating) AS rating
+        FROM releases_fts f
+        JOIN releases r ON r.id = f.rowid
+        LEFT JOIN collection_items ci ON ci.release_id = r.id
+        WHERE releases_fts MATCH :match" .
+        ($yearFrom !== null ? " AND r.year >= :y1" : "") .
+        ($yearTo !== null ? " AND r.year <= :y2" : "") .
+        " GROUP BY r.id
+        ORDER BY r.id DESC
+        LIMIT :limit OFFSET :offset";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindValue(':match', $match);
+        if ($yearFrom !== null) $stmt->bindValue(':y1', $yearFrom, \PDO::PARAM_INT);
+        if ($yearTo !== null) $stmt->bindValue(':y2', $yearTo, \PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $perPage, \PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
+        $stmt->execute();
+        $rows = $stmt->fetchAll();
+    } else {
+        // Year-only (or filters that produced no FTS terms): do non-FTS search with just year filters
+        $cntSql = "SELECT COUNT(*) FROM releases r WHERE 1=1";
+        if ($yearFrom !== null) $cntSql .= " AND r.year >= :y1";
+        if ($yearTo !== null) $cntSql .= " AND r.year <= :y2";
+        $cnt = $pdo->prepare($cntSql);
+        if ($yearFrom !== null) $cnt->bindValue(':y1', $yearFrom, \PDO::PARAM_INT);
+        if ($yearTo !== null) $cnt->bindValue(':y2', $yearTo, \PDO::PARAM_INT);
+        $cnt->execute();
+        $total = (int)$cnt->fetchColumn();
+        $totalPages = $total > 0 ? (int)ceil($total / $perPage) : 1;
+
+        $sql = "SELECT r.id, r.title, r.artist, r.year, r.thumb_url, r.cover_url,
+            (SELECT local_path FROM images i WHERE i.release_id = r.id AND i.source_url = r.cover_url ORDER BY id ASC LIMIT 1) AS primary_local_path,
+            (SELECT local_path FROM images i WHERE i.release_id = r.id ORDER BY id ASC LIMIT 1) AS any_local_path,
+            MAX(ci.added) AS added_at,
+            MAX(ci.rating) AS rating
+        FROM releases r
+        LEFT JOIN collection_items ci ON ci.release_id = r.id
+        WHERE 1=1" .
+        ($yearFrom !== null ? " AND r.year >= :y1" : "") .
+        ($yearTo !== null ? " AND r.year <= :y2" : "") .
+        " GROUP BY r.id
+        ORDER BY r.id DESC
+        LIMIT :limit OFFSET :offset";
+        $stmt = $pdo->prepare($sql);
+        if ($yearFrom !== null) $stmt->bindValue(':y1', $yearFrom, \PDO::PARAM_INT);
+        if ($yearTo !== null) $stmt->bindValue(':y2', $yearTo, \PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $perPage, \PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
+        $stmt->execute();
+        $rows = $stmt->fetchAll();
     }
-    $match = implode(' ', $safe) ?: '*';
-
-    // Count total matches
-    $cnt = $pdo->prepare("SELECT COUNT(rowid) FROM releases_fts WHERE releases_fts MATCH :m");
-    $cnt->bindValue(':m', $match);
-    $cnt->execute();
-    $total = (int)$cnt->fetchColumn();
-    $totalPages = $total > 0 ? (int)ceil($total / $perPage) : 1;
-
-    $sql = "SELECT r.id, r.title, r.artist, r.year, r.thumb_url, r.cover_url,
-        (SELECT local_path FROM images i WHERE i.release_id = r.id AND i.source_url = r.cover_url ORDER BY id ASC LIMIT 1) AS primary_local_path,
-        (SELECT local_path FROM images i WHERE i.release_id = r.id ORDER BY id ASC LIMIT 1) AS any_local_path,
-        MAX(ci.added) AS added_at,
-        MAX(ci.rating) AS rating
-    FROM releases_fts f
-    JOIN releases r ON r.id = f.rowid
-    LEFT JOIN collection_items ci ON ci.release_id = r.id
-    WHERE releases_fts MATCH :match
-    GROUP BY r.id
-    ORDER BY r.id DESC
-    LIMIT :limit OFFSET :offset";
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindValue(':match', $match);
-    $stmt->bindValue(':limit', $perPage, \PDO::PARAM_INT);
-    $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
-    $stmt->execute();
-    $rows = $stmt->fetchAll();
 } else {
     $total = (int)$pdo->query('SELECT COUNT(*) FROM releases')->fetchColumn();
     $totalPages = $total > 0 ? (int)ceil($total / $perPage) : 1;
@@ -293,4 +437,5 @@ echo $twig->render('home.html.twig', [
     'total' => $total,
     'sort' => $sort,
     'q' => $q,
+    'chips' => $chips,
 ]);

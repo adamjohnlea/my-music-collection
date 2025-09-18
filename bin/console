@@ -23,5 +23,7 @@ $app = new Application('My Music Collection', '0.1.0');
 $app->add(new SyncInitialCommand());
 $app->add(new ImagesBackfillCommand());
 $app->add(new SyncEnrichCommand());
+$app->add(new \App\Console\SyncRefreshCommand());
+$app->add(new \App\Console\SearchRebuildCommand());
 
 $app->run();

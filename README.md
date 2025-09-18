@@ -36,7 +36,15 @@ composer install
 php bin/console sync:initial
 ```
 
-5) Enrich release details (optional, fetches full metadata like tracklist/genres):
+5) Incremental refresh (optional; picks up new/changed items since last run):
+
+```
+php bin/console sync:refresh --pages=5
+# optional override
+php bin/console sync:refresh --since=2024-01-01T00:00:00Z
+```
+
+6) Enrich release details (optional, fetches full metadata like tracklist/genres/notes):
 
 ```
 php bin/console sync:enrich --limit=100
@@ -44,10 +52,16 @@ php bin/console sync:enrich --limit=100
 php bin/console sync:enrich --id=123456
 ```
 
-6) Backfill local images (optional but recommended):
+7) Backfill local images (optional but recommended):
 
 ```
 php bin/console images:backfill --limit=200
+```
+
+8) Rebuild search index (maintenance):
+
+```
+php bin/console search:rebuild
 ```
 
 - This downloads missing cover images at 1 request/sec and stops at 1000/day.
