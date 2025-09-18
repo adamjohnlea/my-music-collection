@@ -120,6 +120,32 @@
           <li><code>php bin/console sync:enrich --limit=100</code> — fetch full release details</li>
           <li><code>php bin/console images:backfill --limit=200</code> — download covers to local cache</li>
           <li><code>php bin/console search:rebuild</code> — rebuild search index</li>
+          <li><code>php bin/console sync:push</code> — push queued rating changes to Discogs</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="meta">
+        <h2 style="margin:0 0 8px 0; font-size:1.2rem;">What’s new</h2>
+        <p class="muted" style="margin-top:0">Last updated: 2025-09-18 14:39</p>
+        <ul style="margin:0 0 0 20px; padding:0;">
+          <li>Ratings push to Discogs: edit rating on a release, then run <code>php bin/console sync:push</code> to sync.</li>
+          <li>Personal notes are local-only: editable/searchable in the app; not sent to Discogs.</li>
+          <li>Cleaner release page: single “My Notes” card with inline Edit/Save (no more two stacked sections).</li>
+          <li>Collection grid links: artist name now links to <code>artist:"…"</code> search; year links to <code>year:YYYY</code>.</li>
+          <li>Discogs suffix cleanup: display hides trailing numeric disambiguation like <code>(2)</code> for artists/labels.</li>
+          <li>Push queue and CLI: background job queue with retries and clearer error diagnostics.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="meta">
+        <h2 style="margin:0 0 8px 0; font-size:1.2rem;">Notes and ratings</h2>
+        <ul style="margin:0 0 0 20px; padding:0;">
+          <li>Ratings: editable here and synced to Discogs via <code>sync:push</code>. Use <code>sync:refresh</code> to pull updates.</li>
+          <li>Personal notes: stored locally and searchable here; they do not sync to Discogs.</li>
         </ul>
       </div>
     </div>
