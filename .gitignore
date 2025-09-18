@@ -39,3 +39,7 @@
 # Swap files
 *.swp
 *.swo
+
+
+# Local working status file (intentionally untracked)
+/CURRENTSTATUS.md
