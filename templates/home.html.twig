@@ -27,8 +27,9 @@
     <header>
       <h1>{{ title }}</h1>
       <div style="display:flex;align-items:center;gap:12px">
-        <div class="muted">{{ total|default(0) }} items</div>
+        <div class="muted">{{ total|default(0) }} items{% if q is defined and q %} • Search: “{{ q }}”{% endif %}</div>
         <form method="get" action="/" style="display:flex;gap:8px;align-items:center;margin:0">
+          <input type="text" name="q" value="{{ q|default('')|e }}" placeholder="Search artist, title, label, barcode…" style="background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:6px 10px;width:260px" />
           <input type="hidden" name="page" value="{{ page }}" />
           <input type="hidden" name="per_page" value="{{ per_page }}" />
           <label for="sort" class="muted" style="font-size:.9rem">Sort</label>
@@ -75,9 +76,9 @@
         <nav>
           {% set prev = page - 1 %}
           {% set next = page + 1 %}
-          {% if page > 1 %}<a href="/?page={{ prev }}&per_page={{ per_page }}&sort={{ sort }}">← Prev</a>{% endif %}
+          {% if page > 1 %}<a href="/?page={{ prev }}&per_page={{ per_page }}&sort={{ sort }}{% if q is defined and q %}&q={{ q|url_encode }}{% endif %}">← Prev</a>{% endif %}
           <span class="muted">Page {{ page }} / {{ total_pages }}</span>
-          {% if page < total_pages %}<a href="/?page={{ next }}&per_page={{ per_page }}&sort={{ sort }}">Next →</a>{% endif %}
+          {% if page < total_pages %}<a href="/?page={{ next }}&per_page={{ per_page }}&sort={{ sort }}{% if q is defined and q %}&q={{ q|url_encode }}{% endif %}">Next →</a>{% endif %}
         </nav>
       {% endif %}
     {% endif %}

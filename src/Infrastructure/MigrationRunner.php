@@ -36,6 +36,11 @@ class MigrationRunner
             if ($version === '2') {
                 $this->migrateToV3();
                 $this->setVersion('3');
+                $version = '3';
+            }
+            if ($version === '3') {
+                $this->migrateToV4();
+                $this->setVersion('4');
             }
 
             $this->pdo->commit();
@@ -135,5 +140,86 @@ class MigrationRunner
     {
         // Add release-level notes field
         $this->pdo->exec("ALTER TABLE releases ADD COLUMN notes TEXT");
+    }
+
+    private function migrateToV4(): void
+    {
+        // Create FTS5 virtual table for full-text search across release data
+        $this->pdo->exec("CREATE VIRTUAL TABLE IF NOT EXISTS releases_fts USING fts5(
+            artist, title, label_text, format_text, genre_style_text, country,
+            track_text, credit_text, company_text, identifier_text, release_notes, user_notes,
+            content='releases', content_rowid='id'
+        )");
+
+        // Trigger after insert on releases to populate FTS
+        $this->pdo->exec("CREATE TRIGGER IF NOT EXISTS releases_ai AFTER INSERT ON releases BEGIN
+            INSERT INTO releases_fts(rowid, artist, title, label_text, format_text, genre_style_text, country, track_text, credit_text, company_text, identifier_text, release_notes, user_notes)
+            VALUES (new.id,
+                new.artist, new.title,
+                json_extract(new.labels, '$[0].name') || ' ' || COALESCE(json_extract(new.labels, '$[0].catno'), ''),
+                (SELECT group_concat(json_extract(v.value, '$.name'), ' ')
+                 FROM json_each(COALESCE(new.formats, '[]')) v),
+                (SELECT (SELECT group_concat(value, ' ') FROM json_each(COALESCE(new.genres, '[]'))) || ' ' ||
+                        (SELECT group_concat(value, ' ') FROM json_each(COALESCE(new.styles, '[]')))),
+                COALESCE(new.country, ''),
+                (SELECT group_concat(json_extract(t.value, '$.title'), ' ')
+                 FROM json_each(COALESCE(new.tracklist, '[]')) t),
+                (SELECT group_concat(json_extract(a.value, '$.name') || ' ' || COALESCE(json_extract(a.value, '$.role'), ''), ' ')
+                 FROM json_each(COALESCE(new.extraartists, '[]')) a),
+                (SELECT group_concat(json_extract(c.value, '$.name') || ' ' || COALESCE(json_extract(c.value, '$.entity_type_name'), ''), ' ')
+                 FROM json_each(COALESCE(new.companies, '[]')) c),
+                (SELECT group_concat(json_extract(i.value, '$.value'), ' ')
+                 FROM json_each(COALESCE(new.identifiers, '[]')) i),
+                COALESCE(new.notes, ''),
+                ''
+            );
+        END");
+
+        // Trigger after update on releases to refresh FTS row
+        $this->pdo->exec("CREATE TRIGGER IF NOT EXISTS releases_au AFTER UPDATE ON releases BEGIN
+            DELETE FROM releases_fts WHERE rowid = new.id;
+            INSERT INTO releases_fts(rowid, artist, title, label_text, format_text, genre_style_text, country, track_text, credit_text, company_text, identifier_text, release_notes, user_notes)
+            VALUES (new.id,
+                new.artist, new.title,
+                json_extract(new.labels, '$[0].name') || ' ' || COALESCE(json_extract(new.labels, '$[0].catno'), ''),
+                (SELECT group_concat(json_extract(v.value, '$.name'), ' ') FROM json_each(COALESCE(new.formats, '[]')) v),
+                (SELECT (SELECT group_concat(value, ' ') FROM json_each(COALESCE(new.genres, '[]'))) || ' ' || (SELECT group_concat(value, ' ') FROM json_each(COALESCE(new.styles, '[]')))),
+                COALESCE(new.country, ''),
+                (SELECT group_concat(json_extract(t.value, '$.title'), ' ') FROM json_each(COALESCE(new.tracklist, '[]')) t),
+                (SELECT group_concat(json_extract(a.value, '$.name') || ' ' || COALESCE(json_extract(a.value, '$.role'), ''), ' ') FROM json_each(COALESCE(new.extraartists, '[]')) a),
+                (SELECT group_concat(json_extract(c.value, '$.name') || ' ' || COALESCE(json_extract(c.value, '$.entity_type_name'), ''), ' ') FROM json_each(COALESCE(new.companies, '[]')) c),
+                (SELECT group_concat(json_extract(i.value, '$.value'), ' ') FROM json_each(COALESCE(new.identifiers, '[]')) i),
+                COALESCE(new.notes, ''),
+                (SELECT ci.notes FROM collection_items ci WHERE ci.release_id = new.id ORDER BY ci.added DESC LIMIT 1)
+            );
+        END");
+
+        // Backfill existing rows into FTS using computed text fields (avoid FTS 'rebuild' which expects matching content columns)
+        $this->pdo->exec(
+            "INSERT INTO releases_fts(
+                rowid, artist, title, label_text, format_text, genre_style_text, country, track_text, credit_text, company_text, identifier_text, release_notes, user_notes
+            )
+            SELECT
+                r.id,
+                r.artist,
+                r.title,
+                json_extract(r.labels, '$[0].name') || ' ' || COALESCE(json_extract(r.labels, '$[0].catno'), ''),
+                (SELECT group_concat(json_extract(v.value, '$.name'), ' ')
+                 FROM json_each(COALESCE(r.formats, '[]')) v),
+                (SELECT (SELECT group_concat(value, ' ') FROM json_each(COALESCE(r.genres, '[]'))) || ' ' ||
+                        (SELECT group_concat(value, ' ') FROM json_each(COALESCE(r.styles, '[]')))),
+                COALESCE(r.country, ''),
+                (SELECT group_concat(json_extract(t.value, '$.title'), ' ')
+                 FROM json_each(COALESCE(r.tracklist, '[]')) t),
+                (SELECT group_concat(json_extract(a.value, '$.name') || ' ' || COALESCE(json_extract(a.value, '$.role'), ''), ' ')
+                 FROM json_each(COALESCE(r.extraartists, '[]')) a),
+                (SELECT group_concat(json_extract(c.value, '$.name') || ' ' || COALESCE(json_extract(c.value, '$.entity_type_name'), ''), ' ')
+                 FROM json_each(COALESCE(r.companies, '[]')) c),
+                (SELECT group_concat(json_extract(i.value, '$.value'), ' ')
+                 FROM json_each(COALESCE(r.identifiers, '[]')) i),
+                COALESCE(r.notes, ''),
+                (SELECT ci.notes FROM collection_items ci WHERE ci.release_id = r.id ORDER BY ci.added DESC LIMIT 1)
+            FROM releases r"
+        );
     }
 }

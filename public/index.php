@@ -155,10 +155,11 @@ if (preg_match('#^/release/(\d+)#', $uri, $m)) {
     exit;
 }
 
-// Home grid with sorting
+// Home grid with search and sorting
 $page = max(1, (int)($_GET['page'] ?? 1));
 $perPage = max(1, min(60, (int)($_GET['per_page'] ?? 24)));
 $sort = (string)($_GET['sort'] ?? 'added_desc');
+$q = trim((string)($_GET['q'] ?? ''));
 
 // Whitelist of ORDER BY clauses to prevent SQL injection
 $sorts = [
@@ -180,26 +181,75 @@ $sorts = [
 ];
 $orderBy = $sorts[$sort] ?? $sorts['added_desc'];
 
-$total = (int)$pdo->query('SELECT COUNT(*) FROM releases')->fetchColumn();
-$totalPages = $total > 0 ? (int)ceil($total / $perPage) : 1;
 $offset = ($page - 1) * $perPage;
 
-$sql = "SELECT r.id, r.title, r.artist, r.year, r.thumb_url, r.cover_url,
-    (SELECT local_path FROM images i WHERE i.release_id = r.id AND i.source_url = r.cover_url ORDER BY id ASC LIMIT 1) AS primary_local_path,
-    (SELECT local_path FROM images i WHERE i.release_id = r.id ORDER BY id ASC LIMIT 1) AS any_local_path,
-    MAX(ci.added) AS added_at,
-    MAX(ci.rating) AS rating
-FROM releases r
-LEFT JOIN collection_items ci ON ci.release_id = r.id
-GROUP BY r.id
-ORDER BY $orderBy
-LIMIT :limit OFFSET :offset";
+if ($q !== '') {
+    // Build a simple prefix MATCH string: split on whitespace, add * to each token, quote if necessary
+    $terms = preg_split('/\s+/', strtolower($q));
+    $safe = [];
+    foreach ($terms as $t) {
+        $t = trim($t);
+        if ($t === '') continue;
+        // allow alnum and a few symbols; strip others
+        $t = preg_replace('/[^a-z0-9:\-*\"]+/i', ' ', $t);
+        // Wrap in quotes if contains special chars except *
+        if (preg_match('/[^a-z0-9]/i', $t) && !str_contains($t, '"')) {
+            $t = '"' . trim(str_replace('"', '', $t)) . '"';
+        }
+        // Add prefix wildcard if not a range/field expression with quotes already ending by *
+        if (!str_contains($t, ':') && !str_ends_with($t, '*') && !str_starts_with($t, '"')) {
+            $t .= '*';
+        }
+        $safe[] = $t;
+    }
+    $match = implode(' ', $safe) ?: '*';
 
-$stmt = $pdo->prepare($sql);
-$stmt->bindValue(':limit', $perPage, \PDO::PARAM_INT);
-$stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
-$stmt->execute();
-$rows = $stmt->fetchAll();
+    // Count total matches
+    $cnt = $pdo->prepare("SELECT COUNT(rowid) FROM releases_fts WHERE releases_fts MATCH :m");
+    $cnt->bindValue(':m', $match);
+    $cnt->execute();
+    $total = (int)$cnt->fetchColumn();
+    $totalPages = $total > 0 ? (int)ceil($total / $perPage) : 1;
+
+    $sql = "SELECT r.id, r.title, r.artist, r.year, r.thumb_url, r.cover_url,
+        (SELECT local_path FROM images i WHERE i.release_id = r.id AND i.source_url = r.cover_url ORDER BY id ASC LIMIT 1) AS primary_local_path,
+        (SELECT local_path FROM images i WHERE i.release_id = r.id ORDER BY id ASC LIMIT 1) AS any_local_path,
+        MAX(ci.added) AS added_at,
+        MAX(ci.rating) AS rating
+    FROM releases_fts f
+    JOIN releases r ON r.id = f.rowid
+    LEFT JOIN collection_items ci ON ci.release_id = r.id
+    WHERE releases_fts MATCH :match
+    GROUP BY r.id
+    ORDER BY r.id DESC
+    LIMIT :limit OFFSET :offset";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':match', $match);
+    $stmt->bindValue(':limit', $perPage, \PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
+    $stmt->execute();
+    $rows = $stmt->fetchAll();
+} else {
+    $total = (int)$pdo->query('SELECT COUNT(*) FROM releases')->fetchColumn();
+    $totalPages = $total > 0 ? (int)ceil($total / $perPage) : 1;
+
+    $sql = "SELECT r.id, r.title, r.artist, r.year, r.thumb_url, r.cover_url,
+        (SELECT local_path FROM images i WHERE i.release_id = r.id AND i.source_url = r.cover_url ORDER BY id ASC LIMIT 1) AS primary_local_path,
+        (SELECT local_path FROM images i WHERE i.release_id = r.id ORDER BY id ASC LIMIT 1) AS any_local_path,
+        MAX(ci.added) AS added_at,
+        MAX(ci.rating) AS rating
+    FROM releases r
+    LEFT JOIN collection_items ci ON ci.release_id = r.id
+    GROUP BY r.id
+    ORDER BY $orderBy
+    LIMIT :limit OFFSET :offset";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':limit', $perPage, \PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
+    $stmt->execute();
+    $rows = $stmt->fetchAll();
+}
 
 $items = [];
 $baseDir = dirname(__DIR__);
@@ -242,4 +292,5 @@ echo $twig->render('home.html.twig', [
     'total_pages' => $totalPages,
     'total' => $total,
     'sort' => $sort,
+    'q' => $q,
 ]);
