@@ -1,18 +1,26 @@
-# My Music Collection (Discogs) — MVP Scaffold
+# My Music Collection (Discogs)
 
-This repository is a starting scaffold for the Discogs Collection App per the attached design doc.
+Local‑first Discogs collection viewer written in PHP 8.4. Imports your collection into SQLite, caches cover images to disk, and serves a fast Twig UI with powerful full‑text search and optional release enrichment. All browsing is from your local DB + images — no live API calls while you use the app.
 
-Highlights:
-- PHP 8.4-only project (Herd recommended).
-- SQLite storage with in-app migrations.
-- Symfony Console CLI with `sync:initial` scaffold.
-- Twig minimal web front at `public/`.
-- Guzzle client pre-configured with `User-Agent` and `Authorization` headers.
+• Personal use. If you self‑host publicly, respect Discogs ToU: refresh ≤6h and show attribution (“Data provided by Discogs.” + link/trademark).
 
-## Getting started
+## Features
+- Local‑first: SQLite database + cached images (no API calls during normal browsing)
+- Discogs‑aware HTTP client: header‑driven rate limiting + robust retries
+- Initial sync and incremental refresh
+- Optional enrichment with full release details (tracklist, credits, companies, identifiers, notes, videos)
+- Image cache with 1 req/sec throttle and 1000/day cap (persisted)
+- Search anything (SQLite FTS5) with field prefixes and year ranges
+- Sorting: Added date (default), Year, Artist, Title, Rating
+- Clean, responsive UI with a lightbox gallery and sticky header
 
-1) Ensure PHP 8.4 is active (Herd recommended).
-2) Copy `.env.example` to `.env` and fill values:
+## Prerequisites
+- PHP 8.4 (Herd recommended)
+- Composer
+- A Discogs user token and username
+
+## Quick start
+1) Copy `.env.example` to `.env` and fill values:
 
 ```
 DISCOGS_USER_TOKEN=
@@ -24,87 +32,85 @@ APP_ENV=dev
 APP_DEBUG=1
 ```
 
-3) Install dependencies:
-
+2) Install dependencies
 ```
 composer install
 ```
 
-4) Run initial sync (creates DB schema and imports your collection):
-
+3) Initial sync (creates DB and imports your collection)
 ```
 php bin/console sync:initial
 ```
 
-5) Incremental refresh (optional; picks up new/changed items since last run):
-
-```
-php bin/console sync:refresh --pages=5
-# optional override
-php bin/console sync:refresh --since=2024-01-01T00:00:00Z
-```
-
-6) Enrich release details (optional, fetches full metadata like tracklist/genres/notes):
-
+4) Optional: enrich releases with full details
 ```
 php bin/console sync:enrich --limit=100
-# or enrich a single release by id
+# or a specific release
 php bin/console sync:enrich --id=123456
 ```
 
-7) Backfill local images (optional but recommended):
-
+5) Optional: download missing cover images (respects 1 rps, 1000/day)
 ```
 php bin/console images:backfill --limit=200
 ```
 
-8) Rebuild search index (maintenance):
+6) Optional: incremental refresh (new/changed since last run)
+```
+php bin/console sync:refresh --pages=5
+# override the since cursor
+php bin/console sync:refresh --since=2024-01-01T00:00:00Z
+```
 
+7) Optional: rebuild search index (maintenance)
 ```
 php bin/console search:rebuild
 ```
 
-- This downloads missing cover images at 1 request/sec and stops at 1000/day.
-- You can run it multiple times; already-downloaded files are skipped.
-
-7) Serve the app:
-
+8) Run the web app
 ```
 php -S 127.0.0.1:8000 -t public
 ```
+Open http://127.0.0.1:8000/
 
-Then open http://127.0.0.1:8000/. The UI automatically prefers local images when present and falls back to Discogs thumbnails otherwise.
+## Search tips
+One search box with field prefixes and ranges. Examples:
+- miles davis kind of blue — free text across artist/title/tracklist/etc.
+- artist:"duran duran" — quoted phrase
+- year:1980 or year:1980..1989 — single year or range (space after colon is allowed)
+- label:"blue note" catno:BST-84003
+- barcode:0602527 — identifiers (also matrix/runout, ASIN, etc.)
+- notes:"first press" — searches release notes and your personal notes
+
+## Sorting
+- Default: Added (newest first)
+- Also: Year (newest/oldest), Artist (A→Z/Z→A), Title (A→Z/Z→A), Rating (high→low/low→high)
+
+## Commands overview
+- php bin/console sync:initial — initial import
+- php bin/console sync:refresh [--pages=N | --since=ISO8601] — incremental refresh
+- php bin/console sync:enrich [--limit=N | --id=RELEASE_ID] — full details
+- php bin/console images:backfill [--limit=N] — download covers to local cache
+- php bin/console search:rebuild — rebuild FTS index
 
 ## FAQ
+- Do I need to clear the DB to see enriched data?
+  - No. Migrations run automatically, and `sync:enrich` augments existing rows. Run `images:backfill` afterward for any new images.
+- Can I safely delete a stray public/var/app.db?
+  - Yes. The app only uses `var/app.db` at the project root. Any `public/var` database is ignored.
+- Where are images stored?
+  - public/images/<release_id>/<sha1>.jpg. The UI prefers local files and falls back to Discogs URLs.
 
-Q: Do I need to clear the database and start over to get full release details?
+## Troubleshooting
+- No items on home? Ensure both CLI and web use the same DB (`var/app.db`) and run `sync:initial`.
+- Images not local? Run `images:backfill` and refresh the page.
+- Notes/credits missing? Run `sync:enrich` (it targets releases missing notes/tracklist).
+- Search feels off? Run `search:rebuild` to repopulate the FTS index.
 
-A: No. You do not need to reset or delete your database. Migrations are automatic and idempotent, and the enrich command is designed to augment what you already imported.
+## DB location safety
+- A single SQLite database is used at `var/app.db` (resolved to an absolute path). For safety, the app refuses any DB path under `public/`.
 
-- If you ran `sync:initial` before, just run:
-  - `php bin/console sync:enrich --limit=100` (repeat as needed or use `--id=123456` for a specific release)
-  - Optionally re-run `php bin/console images:backfill` afterward to fetch any additional images discovered during enrichment.
-- The app will upgrade your schema on the fly (e.g., adding enrichment columns) and will only fill in missing details.
+## Attribution
+Data provided by Discogs. Discogs® is a trademark of Zink Media, LLC. If you deploy publicly, refresh data at most every 6 hours and include visible attribution.
 
-Optional full reset (not required):
-- Stop the app and commands, then delete the SQLite file and images cache:
-  - `rm var/app.db`
-  - `rm -rf public/images/*`
-- Re-run from scratch:
-  - `php bin/console sync:initial`
-  - `php bin/console sync:enrich --limit=100`
-  - `php bin/console images:backfill --limit=200`
-
-## Next steps (per design doc)
-- Implement header-aware rate limiter middleware with persisted state in `kv_store`.
-- Implement retry middleware with jitter and `Retry-After` support.
-- Implement `CollectionImporter` to page through `/users/{username}/collection/folders/0/releases?per_page=100&page=N` and upsert rows.
-- Implement `ImageCache` and image throttle (1 rps, 1000/day with UTC reset) and `images:backfill` command.
-- Build Twig routes `/` (grid from DB) and `/release/{id}`.
-
-Refer to `my-music-collection-design-doc.md` for the full specification.
-
-
-## DB location note
-- The app uses a single SQLite database at `var/app.db` (relative to the project root). Both the CLI and web bootstrap resolve this to an absolute path so they always point to the same file.
-- For safety, the app refuses to create or use any database path under the `public/` web root. If you accidentally have a `public/var/` directory from older runs, it is unused and can be deleted.
+## License
+MIT
