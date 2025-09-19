@@ -8,7 +8,7 @@
     :root { --bg:#0b0b0c; --card:#16171a; --text:#e7e7ea; --muted:#a0a3aa; --accent:#67e8f9; }
     html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif}
     .wrap{max-width:1200px;margin:40px auto;padding:0 20px}
-    header{position:sticky;top:0;z-index:10;backdrop-filter:blur(6px);background:rgba(11,11,12,.7);display:flex;align-items:center;justify-content:space-between;margin:-16px -20px 24px -20px;padding:16px 20px}
+    header{position:sticky;top:0;z-index:10;backdrop-filter:blur(6px);background:rgba(11,11,12,.7);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin:-16px -20px 24px -20px;padding:16px 20px}
     h1{font-size:1.5rem;margin:0}
     .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px}
     .card{background:var(--card);border-radius:12px;overflow:hidden}
@@ -22,43 +22,65 @@
     nav{display:flex;justify-content:center;gap:12px;margin-top:20px}
     a{color:var(--accent);text-decoration:none}
     a:hover{text-decoration:underline}
+    /* Toolbar */
+    .toolbar{display:flex;gap:8px;align-items:center;margin:0;flex-wrap:wrap}
+    .search-input{background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:8px 12px;width:360px;max-width:100%}
+    .sort-wrap{display:flex;gap:8px;align-items:center}
+    .sort-select{background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:8px 8px}
     /* Modern pagination */
     .pagination{display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap}
-    .page-btn{display:inline-flex;align-items:center;justify-content:center;min-width:36px;height:36px;padding:0 10px;border-radius:10px;border:1px solid #2a2b2f;background:var(--card);color:var(--text);text-decoration:none;font-weight:600}
+    .page-btn{display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:0 12px;border-radius:12px;border:1px solid #2a2b2f;background:var(--card);color:var(--text);text-decoration:none;font-weight:600}
     .page-btn:hover{background:#1d1f24;text-decoration:none}
     .page-btn.is-current{background:linear-gradient(135deg,#222631,#1a1d24);border-color:#3a3d44;box-shadow:0 0 0 1px rgba(103,232,249,.2) inset;color:#fff}
     .page-btn.is-disabled{opacity:.5;pointer-events:none}
     .page-ellipsis{color:var(--muted);padding:0 6px}
+
+    /* Small screens */
+    @media (max-width: 640px){
+      .wrap{margin:20px auto}
+      header{gap:12px}
+      .muted.stats{width:100%;order:1}
+      .toolbar{width:100%;order:2}
+      .search-input{width:100%}
+      .sort-wrap{width:100%;justify-content:flex-start;margin-top:4px}
+      .about-link{order:3;margin-left:0}
+      /* Make pagination sticky at the bottom with safe-area */
+      .pagination{position:sticky;bottom:calc(8px + env(safe-area-inset-bottom));background:rgba(11,11,12,.8);backdrop-filter:blur(8px);padding:8px 12px;border-radius:14px;border:1px solid #2a2b2f}
+      .page-num,.page-ellipsis{display:none}
+      .page-btn{min-width:64px;height:44px;font-size:1rem}
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
       <h1>{{ title }}</h1>
-      <div style="display:flex;align-items:center;gap:12px">
-        <div class="muted">{{ total|default(0) }} items{% if q is defined and q %} • Search: “{{ q }}”{% endif %}</div>
-        <form method="get" action="/" style="display:flex;gap:8px;align-items:center;margin:0">
-          <input id="search-input" type="text" name="q" value="{{ q|default('')|e }}" placeholder="Search artist:miles year:1980..1989 barcode:…" style="background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:6px 10px;width:320px" />
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div class="muted stats">{{ total|default(0) }} items{% if q is defined and q %} • Search: “{{ q }}”{% endif %}</div>
+        <form id="search-form" class="toolbar" method="get" action="/">
+          <input id="search-input" class="search-input" type="text" name="q" value="{{ q|default('')|e }}" placeholder="Search artist:miles year:1980..1989 barcode:…" />
           <input type="hidden" name="page" value="{{ page }}" />
           <input type="hidden" name="per_page" value="{{ per_page }}" />
-          <label for="sort" class="muted" style="font-size:.9rem">Sort</label>
-          <select id="sort" name="sort" onchange="this.form.submit()" style="background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:6px 8px">
-            <optgroup label="Collection">
-              <option value="added_desc" {{ sort=='added_desc'?'selected':'' }}>Added (newest)</option>
-              <option value="added_asc" {{ sort=='added_asc'?'selected':'' }}>Added (oldest)</option>
-              <option value="rating_desc" {{ sort=='rating_desc'?'selected':'' }}>Rating (high→low)</option>
-              <option value="rating_asc" {{ sort=='rating_asc'?'selected':'' }}>Rating (low→high)</option>
-            </optgroup>
-            <optgroup label="Release">
-              <option value="year_desc" {{ sort=='year_desc'?'selected':'' }}>Year (newest)</option>
-              <option value="year_asc" {{ sort=='year_asc'?'selected':'' }}>Year (oldest)</option>
-              <option value="artist_asc" {{ sort=='artist_asc'?'selected':'' }}>Artist (A→Z)</option>
-              <option value="artist_desc" {{ sort=='artist_desc'?'selected':'' }}>Artist (Z→A)</option>
-              <option value="title_asc" {{ sort=='title_asc'?'selected':'' }}>Title (A→Z)</option>
-              <option value="title_desc" {{ sort=='title_desc'?'selected':'' }}>Title (Z→A)</option>
-            </optgroup>
-          </select>
-          <a href="/about" class="muted" style="margin-left:8px">About</a>
+          <span class="sort-wrap">
+            <label for="sort" class="muted" style="font-size:.9rem">Sort</label>
+            <select id="sort" class="sort-select" name="sort" onchange="this.form.submit()">
+              <optgroup label="Collection">
+                <option value="added_desc" {{ sort=='added_desc'?'selected':'' }}>Added (newest)</option>
+                <option value="added_asc" {{ sort=='added_asc'?'selected':'' }}>Added (oldest)</option>
+                <option value="rating_desc" {{ sort=='rating_desc'?'selected':'' }}>Rating (high→low)</option>
+                <option value="rating_asc" {{ sort=='rating_asc'?'selected':'' }}>Rating (low→high)</option>
+              </optgroup>
+              <optgroup label="Release">
+                <option value="year_desc" {{ sort=='year_desc'?'selected':'' }}>Year (newest)</option>
+                <option value="year_asc" {{ sort=='year_asc'?'selected':'' }}>Year (oldest)</option>
+                <option value="artist_asc" {{ sort=='artist_asc'?'selected':'' }}>Artist (A→Z)</option>
+                <option value="artist_desc" {{ sort=='artist_desc'?'selected':'' }}>Artist (Z→A)</option>
+                <option value="title_asc" {{ sort=='title_asc'?'selected':'' }}>Title (A→Z)</option>
+                <option value="title_desc" {{ sort=='title_desc'?'selected':'' }}>Title (Z→A)</option>
+              </optgroup>
+            </select>
+          </span>
+          <a href="/about" class="muted about-link" style="margin-left:8px">About</a>
         </form>
       </div>
       {% if chips is defined and chips %}
@@ -127,9 +149,9 @@
             {# Middle pages #}
             {% for p in range(start, end) %}
               {% if p == page %}
-                <span class="page-btn is-current" aria-current="page">{{ p }}</span>
+                <span class="page-btn page-num is-current" aria-current="page">{{ p }}</span>
               {% else %}
-                <a class="page-btn" href="{{ base ~ '&page=' ~ p }}">{{ p }}</a>
+                <a class="page-btn page-num" href="{{ base ~ '&page=' ~ p }}">{{ p }}</a>
               {% endif %}
             {% endfor %}
 
