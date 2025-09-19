@@ -22,6 +22,13 @@
     nav{display:flex;justify-content:center;gap:12px;margin-top:20px}
     a{color:var(--accent);text-decoration:none}
     a:hover{text-decoration:underline}
+    /* Modern pagination */
+    .pagination{display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap}
+    .page-btn{display:inline-flex;align-items:center;justify-content:center;min-width:36px;height:36px;padding:0 10px;border-radius:10px;border:1px solid #2a2b2f;background:var(--card);color:var(--text);text-decoration:none;font-weight:600}
+    .page-btn:hover{background:#1d1f24;text-decoration:none}
+    .page-btn.is-current{background:linear-gradient(135deg,#222631,#1a1d24);border-color:#3a3d44;box-shadow:0 0 0 1px rgba(103,232,249,.2) inset;color:#fff}
+    .page-btn.is-disabled{opacity:.5;pointer-events:none}
+    .page-ellipsis{color:var(--muted);padding:0 6px}
   </style>
 </head>
 <body>
@@ -93,12 +100,52 @@
       </div>
 
       {% if total_pages is defined and total_pages > 1 %}
-        <nav>
+        <nav aria-label="Pagination" style="margin-top:28px">
+          {% set base = '/?per_page=' ~ per_page ~ '&sort=' ~ sort ~ (q is defined and q ? '&q=' ~ (q|url_encode) : '') %}
+          {% set hasPrev = page > 1 %}
+          {% set hasNext = page < total_pages %}
           {% set prev = page - 1 %}
           {% set next = page + 1 %}
-          {% if page > 1 %}<a href="/?page={{ prev }}&per_page={{ per_page }}&sort={{ sort }}{% if q is defined and q %}&q={{ q|url_encode }}{% endif %}">← Prev</a>{% endif %}
-          <span class="muted">Page {{ page }} / {{ total_pages }}</span>
-          {% if page < total_pages %}<a href="/?page={{ next }}&per_page={{ per_page }}&sort={{ sort }}{% if q is defined and q %}&q={{ q|url_encode }}{% endif %}">Next →</a>{% endif %}
+
+          <div class="pagination">
+            <a class="page-btn {{ hasPrev ? '' : 'is-disabled' }}" href="{{ hasPrev ? (base ~ '&page=1') : '#' }}" aria-label="First page" aria-disabled="{{ hasPrev ? 'false' : 'true' }}">«</a>
+            <a class="page-btn {{ hasPrev ? '' : 'is-disabled' }}" href="{{ hasPrev ? (base ~ '&page=' ~ prev) : '#' }}" aria-label="Previous page" aria-disabled="{{ hasPrev ? 'false' : 'true' }}">‹</a>
+
+            {# Determine window around current page #}
+            {% set window = 2 %}
+            {% set start = (page - window) > 1 ? (page - window) : 1 %}
+            {% set end = (page + window) < total_pages ? (page + window) : total_pages %}
+
+            {# Leading ellipsis #}
+            {% if start > 1 %}
+              <a class="page-btn" href="{{ base ~ '&page=1' }}">1</a>
+              {% if start > 2 %}
+                <span class="page-ellipsis">…</span>
+              {% endif %}
+            {% endif %}
+
+            {# Middle pages #}
+            {% for p in range(start, end) %}
+              {% if p == page %}
+                <span class="page-btn is-current" aria-current="page">{{ p }}</span>
+              {% else %}
+                <a class="page-btn" href="{{ base ~ '&page=' ~ p }}">{{ p }}</a>
+              {% endif %}
+            {% endfor %}
+
+            {# Trailing ellipsis #}
+            {% if end < total_pages %}
+              {% if end < (total_pages - 1) %}
+                <span class="page-ellipsis">…</span>
+              {% endif %}
+              <a class="page-btn" href="{{ base ~ '&page=' ~ total_pages }}">{{ total_pages }}</a>
+            {% endif %}
+
+            <a class="page-btn {{ hasNext ? '' : 'is-disabled' }}" href="{{ hasNext ? (base ~ '&page=' ~ next) : '#' }}" aria-label="Next page" aria-disabled="{{ hasNext ? 'false' : 'true' }}">›</a>
+            <a class="page-btn {{ hasNext ? '' : 'is-disabled' }}" href="{{ hasNext ? (base ~ '&page=' ~ total_pages) : '#' }}" aria-label="Last page" aria-disabled="{{ hasNext ? 'false' : 'true' }}">»</a>
+          </div>
+
+          <div class="muted" style="text-align:center;margin-top:8px;font-size:.9rem">Page {{ page }} of {{ total_pages }}</div>
         </nav>
       {% endif %}
     {% endif %}
