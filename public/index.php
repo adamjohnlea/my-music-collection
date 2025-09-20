@@ -195,11 +195,17 @@ if ($uri === '/release/save' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST'
         $msg = 'invalid';
     }
     // pass through the submitted values so the detail view can show them immediately
+    $ret = null;
+    if (isset($_POST['return'])) {
+        $r = (string)$_POST['return'];
+        if ($r !== '' && $r[0] === '/') { $ret = $r; }
+    }
     $qs = http_build_query([
         'saved' => ($ok ? $msg : $msg),
         'sr' => $rating,
         'sn' => $notes,
     ]);
+    $qs .= ($ret ? ('&return=' . rawurlencode($ret)) : '');
     header('Location: /release/' . $rid . '?' . $qs);
     exit;
 }
@@ -316,6 +322,26 @@ if (preg_match('#^/release/(\d+)#', $uri, $m)) {
         }
     }
 
+    // Determine back URL to return to the correct collection page
+    $backUrl = null;
+    if (isset($_GET['return'])) {
+        $ret = (string)$_GET['return'];
+        if ($ret !== '' && $ret[0] === '/') {
+            $backUrl = $ret;
+        }
+    }
+    if (!$backUrl) {
+        $ref = $_SERVER['HTTP_REFERER'] ?? '';
+        if ($ref) {
+            $refPath = parse_url($ref, PHP_URL_PATH) ?: '/';
+            $refQuery = parse_url($ref, PHP_URL_QUERY);
+            if ($refPath && $refPath[0] === '/') {
+                $backUrl = $refPath . ($refQuery ? ('?' . $refQuery) : '');
+            }
+        }
+    }
+    if (!$backUrl) { $backUrl = '/'; }
+
     echo $twig->render('release.html.twig', [
         'title' => $release ? ($release['title'] . ' — ' . ($release['artist'] ?? '')) : 'Not found',
         'release' => $release,
@@ -323,6 +349,7 @@ if (preg_match('#^/release/(\d+)#', $uri, $m)) {
         'images' => $images,
         'details' => $details,
         'saved' => $_GET['saved'] ?? null,
+        'back_url' => $backUrl,
     ]);
     exit;
 }

@@ -38,7 +38,7 @@
 </head>
 <body>
   <div class="wrap">
-    <p><a href="/">← Back</a></p>
+    <p><a href="{{ back_url|default('/') }}">← Back</a></p>
     {% if release %}
       <div class="layout">
         <div>
@@ -141,6 +141,7 @@
 
               <form id="notesForm" method="post" action="/release/save" style="display:none; margin-top:8px; flex-direction:column; gap:8px">
                 <input type="hidden" name="release_id" value="{{ release.id }}" />
+                <input type="hidden" name="return" value="{{ back_url|default('/') }}" />
                 <label>Rating
                   <select name="rating" style="background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:6px 8px">
                     <option value="">—</option>

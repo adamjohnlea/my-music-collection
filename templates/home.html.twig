@@ -54,7 +54,7 @@
 <body>
   <div class="wrap">
     <header>
-      <h1>{{ title }}</h1>
+      <h1><a href="/" style="color:inherit;text-decoration:none">{{ title }}</a></h1>
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         <div class="muted stats">{{ total|default(0) }} items{% if q is defined and q %} • Search: “{{ q }}”{% endif %}</div>
         <form id="search-form" class="toolbar" method="get" action="/">
@@ -96,20 +96,21 @@
     {% if items is not defined or items|length == 0 %}
       <p class="muted">No items to display. If you already ran the sync, try refreshing. Otherwise run: <code>php bin/console sync:initial</code>.</p>
     {% else %}
+      {% set return_to = '/?per_page=' ~ per_page ~ '&sort=' ~ sort ~ '&page=' ~ page ~ (q is defined and q ? '&q=' ~ (q|url_encode) : '') %}
       <div class="grid">
         {% for it in items %}
           <div class="card" title="{{ it.title }} — {{ it.artist|strip_discogs_suffix }}">
             {% if it.image %}
-              <a href="/release/{{ it.id }}">
+              <a href="/release/{{ it.id }}?return={{ return_to|url_encode }}">
                 <img class="cover" src="{{ it.image }}" alt="{{ it.title }} cover" loading="lazy" />
               </a>
             {% else %}
-              <a href="/release/{{ it.id }}">
+              <a href="/release/{{ it.id }}?return={{ return_to|url_encode }}">
                 <div class="cover"></div>
               </a>
             {% endif %}
             <div class="meta">
-              <div class="title"><a href="/release/{{ it.id }}">{{ it.title }}</a></div>
+              <div class="title"><a href="/release/{{ it.id }}?return={{ return_to|url_encode }}">{{ it.title }}</a></div>
               <div class="artist">
                 <a href="/?per_page={{ per_page }}&sort={{ sort }}&q={{ ('artist:\"' ~ it.artist ~ '\"')|url_encode }}">{{ it.artist|strip_discogs_suffix }}</a>
                 {% if it.year %}
