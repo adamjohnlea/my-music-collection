@@ -1,9 +1,8 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{{ title }}</title>
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block styles %}
   <style>
     :root { --bg:#0b0b0c; --card:#16171a; --text:#e7e7ea; --muted:#a0a3aa; --accent:#67e8f9; --overlay: rgba(0,0,0,.9); }
     html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif}
@@ -35,8 +34,9 @@
       .lb-next{right:10px}
     }
   </style>
-</head>
-<body>
+{% endblock %}
+
+{% block content %}
   <div class="wrap">
     <p><a href="{{ back_url|default('/') }}">← Back</a></p>
     {% if release %}
@@ -341,5 +341,4 @@
       <p class="muted">Release not found.</p>
     {% endif %}
   </div>
-</body>
-</html>
+{% endblock %}
