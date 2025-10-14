@@ -7,6 +7,7 @@ use App\Images\ImageCache;
 use App\Infrastructure\KvStore;
 use App\Infrastructure\MigrationRunner;
 use App\Infrastructure\Storage;
+use App\Infrastructure\Config;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,22 +17,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand(name: 'images:backfill', description: 'Download missing cover images to the local cache (1 rps, 1000/day).')]
 class ImagesBackfillCommand extends Command
 {
-    private function env($key, $default = null)
-    {
-        $value = isset($_ENV[$key]) ? $_ENV[$key] : (isset($_SERVER[$key]) ? $_SERVER[$key] : getenv($key));
-        if ($value === false || $value === null) {
-            return $default;
-        }
-        return $value;
-    }
-
-    private function isAbsolutePath($path)
-    {
-        if ($path === '') return false;
-        if ($path[0] === DIRECTORY_SEPARATOR) return true;
-        return (bool)preg_match('#^[A-Za-z]:[\\/]#', $path);
-    }
-
     protected function configure()
     {
         $this->addOption('limit', null, InputOption::VALUE_REQUIRED, 'Max images to download in this run', '200');
@@ -39,13 +24,10 @@ class ImagesBackfillCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $dbPath = $this->env('DB_PATH', 'var/app.db');
+        $config = new Config();
         $baseDir = dirname(__DIR__, 2);
-        if (!$this->isAbsolutePath($dbPath)) {
-            $dbPath = $baseDir . '/' . ltrim($dbPath, '/');
-        }
-
-        $userAgent = $this->env('USER_AGENT', 'MyDiscogsApp/0.1 (+images)');
+        $dbPath = $config->getDbPath($baseDir);
+        $userAgent = $config->getUserAgent('MyDiscogsApp/0.1 (+images)');
 
         $storage = new Storage($dbPath);
         (new MigrationRunner($storage->pdo()))->run();

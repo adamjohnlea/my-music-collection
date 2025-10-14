@@ -5,6 +5,7 @@ namespace App\Console;
 
 use App\Infrastructure\MigrationRunner;
 use App\Infrastructure\Storage;
+use App\Infrastructure\Config;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -24,22 +25,12 @@ class ExportStaticCommand extends Command
             ->addOption('chunk-size', null, InputOption::VALUE_REQUIRED, 'Chunk size for releases.json (0 = single file)', '0');
     }
 
-    private function env(string $key, ?string $default = null): ?string
-    {
-        $value = $_ENV[$key] ?? $_SERVER[$key] ?? getenv($key);
-        if ($value === false || $value === null) {
-            return $default;
-        }
-        return $value;
-    }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $baseDir = dirname(__DIR__, 2);
-        $dbPath = $this->env('DB_PATH', 'var/app.db') ?? 'var/app.db';
-        if ($dbPath[0] !== '/' && !preg_match('#^[A-Za-z]:[\\/]#', $dbPath)) {
-            $dbPath = $baseDir . '/' . ltrim($dbPath, '/');
-        }
+        $config = new Config();
+        $dbPath = $config->getDbPath($baseDir);
 
         $outDir = (string)$input->getOption('out');
         if ($outDir[0] !== '/' && !preg_match('#^[A-Za-z]:[\\/]#', $outDir)) {

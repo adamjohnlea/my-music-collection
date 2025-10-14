@@ -7,6 +7,7 @@ use App\Http\DiscogsHttpClient;
 use App\Infrastructure\KvStore;
 use App\Infrastructure\MigrationRunner;
 use App\Infrastructure\Storage;
+use App\Infrastructure\Config;
 use App\Sync\CollectionImporter;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -22,34 +23,12 @@ class SyncInitialCommand extends Command
         $this->addOption('force', null, InputOption::VALUE_NONE, 'Proceed even if the database already has data');
     }
 
-    private function env(string $key, ?string $default = null): ?string
-    {
-        $value = $_ENV[$key] ?? $_SERVER[$key] ?? getenv($key);
-        if ($value === false || $value === null) {
-            return $default;
-        }
-        return $value;
-    }
-
-    private function isAbsolutePath(string $path): bool
-    {
-        if ($path === '') return false;
-        // POSIX absolute
-        if ($path[0] === DIRECTORY_SEPARATOR) return true;
-        // Windows drive letter (e.g., C:\ or C:/)
-        return (bool)preg_match('#^[A-Za-z]:[\\/]#', $path);
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $dbPath = $this->env('DB_PATH', 'var/app.db') ?? 'var/app.db';
-        // Resolve relative DB path against project root to avoid different cwd (e.g., public/ when using built-in server)
+        $config = new Config();
         $baseDir = dirname(__DIR__, 2);
-        if (!$this->isAbsolutePath($dbPath)) {
-            $dbPath = $baseDir . '/' . ltrim($dbPath, '/');
-        }
-
-        $userAgent = $this->env('USER_AGENT', 'MyDiscogsApp/0.1 (+contact: you@example.com)') ?? 'MyDiscogsApp/0.1 (+contact: you@example.com)';
+        $dbPath = $config->getDbPath($baseDir);
+        $userAgent = $config->getUserAgent('MyDiscogsApp/0.1 (+contact: you@example.com)');
 
         // Init DB and run migrations
         $storage = new Storage($dbPath);
@@ -64,7 +43,7 @@ class SyncInitialCommand extends Command
             $output->writeln('<error>No user is logged in. Please sign in via the web app first.</error>');
             return 2;
         }
-        $appKey = $this->env('APP_KEY');
+        $appKey = $config->getAppKey();
         $crypto = new \App\Infrastructure\Crypto($appKey, $baseDir);
         $st = $pdo->prepare('SELECT discogs_username, discogs_token_enc FROM auth_users WHERE id = :id');
         $st->execute([':id' => $uid]);
@@ -110,7 +89,7 @@ class SyncInitialCommand extends Command
         $output->writeln('<comment>HTTP client configured for Discogs API.</comment>');
 
         // Run importer
-        $imgDir = $this->env('IMG_DIR', 'public/images') ?? 'public/images';
+        $imgDir = $config->getImgDir($baseDir);
         $importer = new CollectionImporter($http, $pdo, $kv, $imgDir);
         $output->writeln(sprintf('<info>Starting import for user %s …</info>', $username));
         $totalImported = 0;

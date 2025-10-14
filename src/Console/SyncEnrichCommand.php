@@ -7,6 +7,7 @@ use App\Http\DiscogsHttpClient;
 use App\Infrastructure\KvStore;
 use App\Infrastructure\MigrationRunner;
 use App\Infrastructure\Storage;
+use App\Infrastructure\Config;
 use App\Sync\ReleaseEnricher;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -17,22 +18,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand(name: 'sync:enrich', description: 'Fetch complete release details for your collection (uses /releases/{id}).')]
 class SyncEnrichCommand extends Command
 {
-    private function env(string $key, ?string $default = null): ?string
-    {
-        $value = $_ENV[$key] ?? $_SERVER[$key] ?? getenv($key);
-        if ($value === false || $value === null) {
-            return $default;
-        }
-        return $value;
-    }
-
-    private function isAbsolutePath(string $path): bool
-    {
-        if ($path === '') return false;
-        if ($path[0] === DIRECTORY_SEPARATOR) return true;
-        return (bool)preg_match('#^[A-Za-z]:[\\/]#', $path);
-    }
-
     protected function configure(): void
     {
         $this->addOption('limit', null, InputOption::VALUE_REQUIRED, 'Max releases to enrich in this run', '100');
@@ -41,12 +26,10 @@ class SyncEnrichCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $dbPath = $this->env('DB_PATH', 'var/app.db') ?? 'var/app.db';
+        $config = new Config();
         $baseDir = dirname(__DIR__, 2);
-        if (!$this->isAbsolutePath($dbPath)) {
-            $dbPath = $baseDir . '/' . ltrim($dbPath, '/');
-        }
-        $userAgent = $this->env('USER_AGENT', 'MyDiscogsApp/0.1 (+enrich)') ?? 'MyDiscogsApp/0.1 (+enrich)';
+        $dbPath = $config->getDbPath($baseDir);
+        $userAgent = $config->getUserAgent('MyDiscogsApp/0.1 (+enrich)');
 
         $storage = new Storage($dbPath);
         (new MigrationRunner($storage->pdo()))->run();
@@ -60,7 +43,7 @@ class SyncEnrichCommand extends Command
             $output->writeln('<error>No user is logged in. Please sign in via the web app first.</error>');
             return 2;
         }
-        $appKey = $this->env('APP_KEY');
+        $appKey = $config->getAppKey();
         $crypto = new \App\Infrastructure\Crypto($appKey, $baseDir);
         $st = $pdo->prepare('SELECT discogs_token_enc FROM auth_users WHERE id = :id');
         $st->execute([':id' => $uid]);

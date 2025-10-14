@@ -7,6 +7,7 @@ use App\Http\DiscogsHttpClient;
 use App\Infrastructure\KvStore;
 use App\Infrastructure\MigrationRunner;
 use App\Infrastructure\Storage;
+use App\Infrastructure\Config;
 use GuzzleHttp\ClientInterface;
 use PDO;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -18,22 +19,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand(name: 'sync:refresh', description: 'Incremental refresh: fetch newly added/changed items since last run.')]
 class SyncRefreshCommand extends Command
 {
-    private function env(string $key, ?string $default = null): ?string
-    {
-        $value = $_ENV[$key] ?? $_SERVER[$key] ?? getenv($key);
-        if ($value === false || $value === null) {
-            return $default;
-        }
-        return $value;
-    }
-
-    private function isAbsolutePath(string $path): bool
-    {
-        if ($path === '') return false;
-        if ($path[0] === DIRECTORY_SEPARATOR) return true;
-        return (bool)preg_match('#^[A-Za-z]:[\\/]#', $path);
-    }
-
     protected function configure(): void
     {
         $this->addOption('pages', null, InputOption::VALUE_REQUIRED, 'Max pages to scan this run (safety cap)', '10');
@@ -42,13 +27,11 @@ class SyncRefreshCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $dbPath = $this->env('DB_PATH', 'var/app.db') ?? 'var/app.db';
+        $config = new Config();
         $baseDir = dirname(__DIR__, 2);
-        if (!$this->isAbsolutePath($dbPath)) {
-            $dbPath = $baseDir . '/' . ltrim($dbPath, '/');
-        }
-        $userAgent = $this->env('USER_AGENT', 'MyDiscogsApp/0.1 (+refresh)') ?? 'MyDiscogsApp/0.1 (+refresh)';
-        $imgDir = $this->env('IMG_DIR', 'public/images') ?? 'public/images';
+        $dbPath = $config->getDbPath($baseDir);
+        $userAgent = $config->getUserAgent('MyDiscogsApp/0.1 (+refresh)');
+        $imgDir = $config->getImgDir($baseDir);
 
         $storage = new Storage($dbPath);
         (new MigrationRunner($storage->pdo()))->run();
@@ -62,7 +45,7 @@ class SyncRefreshCommand extends Command
             $output->writeln('<error>No user is logged in. Please sign in via the web app first.</error>');
             return 2;
         }
-        $appKey = $this->env('APP_KEY');
+        $appKey = $config->getAppKey();
         $crypto = new \App\Infrastructure\Crypto($appKey, $baseDir);
         $st = $pdo->prepare('SELECT discogs_username, discogs_token_enc FROM auth_users WHERE id = :id');
         $st->execute([':id' => $uid]);

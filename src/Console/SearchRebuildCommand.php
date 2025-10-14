@@ -5,6 +5,7 @@ namespace App\Console;
 
 use App\Infrastructure\MigrationRunner;
 use App\Infrastructure\Storage;
+use App\Infrastructure\Config;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -13,29 +14,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand(name: 'search:rebuild', description: 'Rebuild the FTS index from current releases and collection_items.')]
 class SearchRebuildCommand extends Command
 {
-    private function env(string $key, ?string $default = null): ?string
-    {
-        $value = $_ENV[$key] ?? $_SERVER[$key] ?? getenv($key);
-        if ($value === false || $value === null) {
-            return $default;
-        }
-        return $value;
-    }
-
-    private function isAbsolutePath(string $path): bool
-    {
-        if ($path === '') return false;
-        if ($path[0] === DIRECTORY_SEPARATOR) return true;
-        return (bool)preg_match('#^[A-Za-z]:[\\/]#', $path);
-    }
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $dbPath = $this->env('DB_PATH', 'var/app.db') ?? 'var/app.db';
+        $config = new Config();
         $baseDir = dirname(__DIR__, 2);
-        if (!$this->isAbsolutePath($dbPath)) {
-            $dbPath = $baseDir . '/' . ltrim($dbPath, '/');
-        }
+        $dbPath = $config->getDbPath($baseDir);
         $storage = new Storage($dbPath);
         (new MigrationRunner($storage->pdo()))->run();
         $pdo = $storage->pdo();
