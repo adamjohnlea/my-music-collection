@@ -46,19 +46,36 @@ class SyncEnrichCommand extends Command
         if (!$this->isAbsolutePath($dbPath)) {
             $dbPath = $baseDir . '/' . ltrim($dbPath, '/');
         }
-        $username = $this->env('DISCOGS_USERNAME', '') ?? '';
-        $token = $this->env('DISCOGS_USER_TOKEN', '') ?? '';
         $userAgent = $this->env('USER_AGENT', 'MyDiscogsApp/0.1 (+enrich)') ?? 'MyDiscogsApp/0.1 (+enrich)';
-
-        if ($username === '' || $token === '') {
-            $output->writeln('<error>DISCOGS_USERNAME and DISCOGS_USER_TOKEN must be set in .env</error>');
-            return 2;
-        }
 
         $storage = new Storage($dbPath);
         (new MigrationRunner($storage->pdo()))->run();
         $pdo = $storage->pdo();
+
+        // Use current logged-in user for token
         $kv = new KvStore($pdo);
+        $uidStr = $kv->get('current_user_id', '');
+        $uid = (int)($uidStr ?: '0');
+        if ($uid <= 0) {
+            $output->writeln('<error>No user is logged in. Please sign in via the web app first.</error>');
+            return 2;
+        }
+        $appKey = $this->env('APP_KEY');
+        $crypto = new \App\Infrastructure\Crypto($appKey, $baseDir);
+        $st = $pdo->prepare('SELECT discogs_token_enc FROM auth_users WHERE id = :id');
+        $st->execute([':id' => $uid]);
+        $row = $st->fetch();
+        $token = '';
+        if ($row && $row['discogs_token_enc']) {
+            $dec = $crypto->decrypt((string)$row['discogs_token_enc']);
+            $token = $dec ?: '';
+        }
+        if ($token === '') {
+            $output->writeln('<error>Your Discogs token is not configured. Go to /settings and save your Discogs user token.</error>');
+            return 2;
+        }
+
+        // Reuse KvStore for rate limiters
         $http = (new DiscogsHttpClient($userAgent, $token, $kv))->client();
         $imgDir = $this->env('IMG_DIR', 'public/images') ?? 'public/images';
         $enricher = new ReleaseEnricher($http, $pdo, $imgDir);
@@ -67,8 +84,12 @@ class SyncEnrichCommand extends Command
         if ($idOpt) {
             $rid = (int)$idOpt;
             $output->writeln("<info>Enriching release $rid …</info>");
-            $enricher->enrichOne($rid);
-            $output->writeln('<info>Done.</info>');
+            try {
+                $enricher->enrichOne($rid);
+                $output->writeln('<info>Done.</info>');
+            } catch (\Throwable $e) {
+                $output->writeln('<error>Failed to enrich release ' . $rid . ': ' . $e->getMessage() . '</error>');
+            }
             return Command::SUCCESS;
         }
 
@@ -76,7 +97,14 @@ class SyncEnrichCommand extends Command
         if ($limit <= 0) $limit = 100;
         $output->writeln("<info>Enriching up to $limit releases missing details…</info>");
         $n = $enricher->enrichMissing($limit);
+        $errors = $enricher->getErrors();
         $output->writeln("<info>Enrichment complete. Updated $n releases.</info>");
+        if (!empty($errors)) {
+            $output->writeln('<comment>Some releases failed:</comment>');
+            foreach ($errors as $err) {
+                $output->writeln('  - id=' . $err['release_id'] . ' — ' . $err['message']);
+            }
+        }
         $output->writeln('<comment>Tip:</comment> run <info>php bin/console images:backfill</info> to fetch any newly discovered images.');
 
         return Command::SUCCESS;

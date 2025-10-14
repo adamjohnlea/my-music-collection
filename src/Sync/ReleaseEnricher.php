@@ -8,11 +8,22 @@ use PDO;
 
 class ReleaseEnricher
 {
+    private array $errors = [];
+
     public function __construct(
         private readonly ClientInterface $http,
         private readonly PDO $pdo,
         private readonly string $imgDir = 'public/images',
     ) {}
+
+    /**
+     * Returns a list of errors collected during the last enrichMissing() run.
+     * Each entry: ['release_id' => int, 'message' => string]
+     */
+    public function getErrors(): array
+    {
+        return $this->errors;
+    }
 
     public function enrichOne(int $releaseId): void
     {
@@ -53,7 +64,7 @@ class ReleaseEnricher
             if ($names) $artistSummary = implode(', ', $names);
         }
 
-        $stmt = $this->pdo->prepare('UPDATE releases SET title = COALESCE(:title, title), artist = COALESCE(:artist, artist), year = COALESCE(:year, year), formats = COALESCE(:formats, formats), labels = COALESCE(:labels, labels), country = COALESCE(:country, country), genres = :genres, styles = :styles, tracklist = :tracklist, master_id = :master_id, data_quality = :data_quality, videos = :videos, extraartists = :extraartists, companies = :companies, identifiers = :identifiers, notes = :notes, updated_at = :updated_at, raw_json = :raw_json WHERE id = :id');
+        $stmt = $this->pdo->prepare('UPDATE releases SET title = COALESCE(:title, title), artist = COALESCE(:artist, artist), year = COALESCE(:year, year), formats = COALESCE(:formats, formats), labels = COALESCE(:labels, labels), country = COALESCE(:country, country), genres = :genres, styles = :styles, tracklist = :tracklist, master_id = :master_id, data_quality = :data_quality, videos = :videos, extraartists = :extraartists, companies = :companies, identifiers = :identifiers, notes = :notes, updated_at = :updated_at, enriched_at = :updated_at, raw_json = :raw_json WHERE id = :id');
         $stmt->execute([
             ':id' => $releaseId,
             ':title' => $title,
@@ -94,13 +105,21 @@ class ReleaseEnricher
 
     public function enrichMissing(int $limit = 100): int
     {
-        // Find releases missing details (no tracklist or no notes)
-        $stmt = $this->pdo->query('SELECT id FROM releases WHERE (tracklist IS NULL OR tracklist = "") OR (notes IS NULL OR notes = "") ORDER BY imported_at ASC LIMIT ' . (int)$limit);
+        // reset previous errors
+        $this->errors = [];
+        // Select releases that have not yet been enriched in this database (explicit marker)
+        $stmt = $this->pdo->query('SELECT id FROM releases WHERE enriched_at IS NULL ORDER BY imported_at ASC LIMIT ' . (int)$limit);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $n = 0;
         foreach ($rows as $r) {
-            $this->enrichOne((int)$r['id']);
-            $n++;
+            $rid = (int)$r['id'];
+            try {
+                $this->enrichOne($rid);
+                $n++;
+            } catch (\Throwable $e) {
+                $this->errors[] = ['release_id' => $rid, 'message' => $e->getMessage()];
+                // continue with next release
+            }
         }
         return $n;
     }

@@ -53,6 +53,16 @@ class MigrationRunner
                 $this->setVersion('6');
                 $version = '6';
             }
+            if ($version === '6') {
+                $this->migrateToV7();
+                $this->setVersion('7');
+                $version = '7';
+            }
+            if ($version === '7') {
+                $this->migrateToV8();
+                $this->setVersion('8');
+                $version = '8';
+            }
 
             $this->pdo->commit();
 
@@ -269,6 +279,35 @@ class MigrationRunner
         )');
         $this->pdo->exec('CREATE INDEX IF NOT EXISTS idx_push_queue_status_created ON push_queue(status, created_at)');
         $this->pdo->exec('CREATE INDEX IF NOT EXISTS idx_push_queue_instance ON push_queue(instance_id)');
+    }
+
+    private function migrateToV7(): void
+    {
+        // Authentication users and encrypted Discogs token
+        $this->pdo->exec('CREATE TABLE IF NOT EXISTS auth_users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL UNIQUE,
+            email TEXT NOT NULL UNIQUE,
+            password_hash TEXT NOT NULL,
+            discogs_username TEXT,
+            discogs_token_enc TEXT,
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at TEXT
+        )');
+        $this->pdo->exec('CREATE INDEX IF NOT EXISTS idx_auth_users_username ON auth_users(username)');
+        $this->pdo->exec('CREATE INDEX IF NOT EXISTS idx_auth_users_email ON auth_users(email)');
+    }
+
+    private function migrateToV8(): void
+    {
+        // Mark releases after enrichment to avoid reprocessing items with legitimately missing notes
+        $this->pdo->exec("ALTER TABLE releases ADD COLUMN enriched_at TEXT");
+        // Optional backfill: none — we allow the next enrich run to set this.
+    }
+
+    public function rebuildSearch(): void
+    {
+        $this->ensureFtsHealthy();
     }
 
     private function ensureFtsHealthy(): void

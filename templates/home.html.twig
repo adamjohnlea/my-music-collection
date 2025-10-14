@@ -55,41 +55,65 @@
   <div class="wrap">
     <header>
       <h1><a href="/" style="color:inherit;text-decoration:none">{{ title }}</a></h1>
-      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-        <div class="muted stats">{{ total|default(0) }} items{% if q is defined and q %} • Search: “{{ q }}”{% endif %}</div>
-        <form id="search-form" class="toolbar" method="get" action="/">
-          <input id="search-input" class="search-input" type="text" name="q" value="{{ q|default('')|e }}" placeholder="Search artist:miles year:1980..1989 barcode:…" />
-          <input type="hidden" name="page" value="{{ page }}" />
-          <input type="hidden" name="per_page" value="{{ per_page }}" />
-          <span class="sort-wrap">
-            <label for="sort" class="muted" style="font-size:.9rem">Sort</label>
-            <select id="sort" class="sort-select" name="sort" onchange="this.form.submit()">
-              <optgroup label="Collection">
-                <option value="added_desc" {{ sort=='added_desc'?'selected':'' }}>Added (newest)</option>
-                <option value="added_asc" {{ sort=='added_asc'?'selected':'' }}>Added (oldest)</option>
-                <option value="rating_desc" {{ sort=='rating_desc'?'selected':'' }}>Rating (high→low)</option>
-                <option value="rating_asc" {{ sort=='rating_asc'?'selected':'' }}>Rating (low→high)</option>
-              </optgroup>
-              <optgroup label="Release">
-                <option value="year_desc" {{ sort=='year_desc'?'selected':'' }}>Year (newest)</option>
-                <option value="year_asc" {{ sort=='year_asc'?'selected':'' }}>Year (oldest)</option>
-                <option value="artist_asc" {{ sort=='artist_asc'?'selected':'' }}>Artist (A→Z)</option>
-                <option value="artist_desc" {{ sort=='artist_desc'?'selected':'' }}>Artist (Z→A)</option>
-                <option value="title_asc" {{ sort=='title_asc'?'selected':'' }}>Title (A→Z)</option>
-                <option value="title_desc" {{ sort=='title_desc'?'selected':'' }}>Title (Z→A)</option>
-              </optgroup>
-            </select>
-          </span>
-          <a href="/about" class="muted about-link" style="margin-left:8px">About</a>
-        </form>
-      </div>
-      {% if chips is defined and chips %}
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-          {% for c in chips %}
-            <span class="muted" style="border:1px solid #2a2b2f;border-radius:999px;padding:2px 10px">{{ c.label }}</span>
-          {% endfor %}
-          <a href="/?per_page={{ per_page }}&sort={{ sort }}" class="muted" style="margin-left:4px">Clear</a>
+      {% if auth_user and not welcome and not needs_setup %}
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;width:100%">
+          <div class="muted stats">{{ total|default(0) }} items{% if q is defined and q %} • Search: “{{ q }}”{% endif %}</div>
+          <form id="search-form" class="toolbar" method="get" action="/" style="flex:1 1 auto">
+            <input id="search-input" class="search-input" type="text" name="q" value="{{ q|default('')|e }}" placeholder="Search artist:miles year:1980..1989 barcode:…" />
+            <input type="hidden" name="page" value="{{ page }}" />
+            <input type="hidden" name="per_page" value="{{ per_page }}" />
+            <span class="sort-wrap">
+              <label for="sort" class="muted" style="font-size:.9rem">Sort</label>
+              <select id="sort" class="sort-select" name="sort" onchange="this.form.submit()">
+                <optgroup label="Collection">
+                  <option value="added_desc" {{ sort=='added_desc'?'selected':'' }}>Added (newest)</option>
+                  <option value="added_asc" {{ sort=='added_asc'?'selected':'' }}>Added (oldest)</option>
+                  <option value="rating_desc" {{ sort=='rating_desc'?'selected':'' }}>Rating (high→low)</option>
+                  <option value="rating_asc" {{ sort=='rating_asc'?'selected':'' }}>Rating (low→high)</option>
+                </optgroup>
+                <optgroup label="Release">
+                  <option value="year_desc" {{ sort=='year_desc'?'selected':'' }}>Year (newest)</option>
+                  <option value="year_asc" {{ sort=='year_asc'?'selected':'' }}>Year (oldest)</option>
+                  <option value="artist_asc" {{ sort=='artist_asc'?'selected':'' }}>Artist (A→Z)</option>
+                  <option value="artist_desc" {{ sort=='artist_desc'?'selected':'' }}>Artist (Z→A)</option>
+                  <option value="title_asc" {{ sort=='title_asc'?'selected':'' }}>Title (A→Z)</option>
+                  <option value="title_desc" {{ sort=='title_desc'?'selected':'' }}>Title (Z→A)</option>
+                </optgroup>
+              </select>
+            </span>
+            <a href="/about" class="muted about-link" style="margin-left:8px">About</a>
+          </form>
+          <nav style="display:flex;gap:10px;align-items:center;flex:0 0 auto">
+            <span class="muted" title="Signed in as">{{ auth_user.username }}</span>
+            <a href="/settings" title="Account settings">Settings</a>
+            <form method="post" action="/logout" style="margin:0">
+              <input type="hidden" name="_token" value="{{ csrf_token }}">
+              <button type="submit" class="muted" style="background:transparent;border:1px solid #2a2b2f;border-radius:8px;padding:6px 10px;cursor:pointer;color:inherit">Sign out</button>
+            </form>
+          </nav>
+          {% if chips is defined and chips %}
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;width:100%">
+              {% for c in chips %}
+                <span class="muted" style="border:1px solid #2a2b2f;border-radius:999px;padding:2px 10px">{{ c.label }}</span>
+              {% endfor %}
+              <a href="/?per_page={{ per_page }}&sort={{ sort }}" class="muted" style="margin-left:4px">Clear</a>
+            </div>
+          {% endif %}
         </div>
+      {% else %}
+        <nav style="display:flex;gap:10px;align-items:center">
+          <a href="/about" class="muted">About</a>
+          {% if auth_user %}
+            <a href="/settings">Settings</a>
+            <form method="post" action="/logout" style="margin:0">
+              <input type="hidden" name="_token" value="{{ csrf_token }}">
+              <button type="submit" class="muted" style="background:transparent;border:1px solid #2a2b2f;border-radius:8px;padding:6px 10px;cursor:pointer;color:inherit">Sign out</button>
+            </form>
+          {% else %}
+            <a href="/register">Register</a>
+            <a href="/login">Sign in</a>
+          {% endif %}
+        </nav>
       {% endif %}
     </header>
   </div>
@@ -97,7 +121,23 @@
 
 {% block content %}
   <div class="wrap">
-    {% if items is not defined or items|length == 0 %}
+    {% if welcome %}
+      <div class="card"><div class="meta">
+        <h2 style="margin:0 0 8px 0">Welcome</h2>
+        <p class="muted">Browse your Discogs collection locally, fast. Create an account to get started.</p>
+        <p><a href="/register">Create an account</a> or <a href="/login">Sign in</a>. Learn more on the <a href="/about">About</a> page.</p>
+      </div></div>
+    {% elseif needs_setup %}
+      <div class="card"><div class="meta">
+        <h2 style="margin:0 0 8px 0">Connect your Discogs account</h2>
+        <p class="muted">To show your collection here, add your Discogs username and user token on the Settings page, then run the initial sync from the terminal.</p>
+        <ol style="margin:0 0 0 20px;padding:0">
+          <li>Go to <a href="/settings">Settings</a> and enter your Discogs username and user token.</li>
+          <li>From your project folder, run: <code>php bin/console sync:initial</code></li>
+          <li>Come back here to browse your collection.</li>
+        </ol>
+      </div></div>
+    {% elseif items is not defined or items|length == 0 %}
       <p class="muted">No items to display. If you already ran the sync, try refreshing. Otherwise run: <code>php bin/console sync:initial</code>.</p>
     {% else %}
       {% set return_to = '/?per_page=' ~ per_page ~ '&sort=' ~ sort ~ '&page=' ~ page ~ (q is defined and q ? '&q=' ~ (q|url_encode) : '') %}

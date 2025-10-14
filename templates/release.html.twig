@@ -140,6 +140,7 @@
               </div>
 
               <form id="notesForm" method="post" action="/release/save" style="display:none; margin-top:8px; flex-direction:column; gap:8px">
+                              <input type="hidden" name="_token" value="{{ csrf_token }}" />
                 <input type="hidden" name="release_id" value="{{ release.id }}" />
                 <input type="hidden" name="return" value="{{ back_url|default('/') }}" />
                 <label>Rating

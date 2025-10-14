@@ -49,19 +49,36 @@ class SyncInitialCommand extends Command
             $dbPath = $baseDir . '/' . ltrim($dbPath, '/');
         }
 
-        $username = $this->env('DISCOGS_USERNAME', '') ?? '';
-        $token = $this->env('DISCOGS_USER_TOKEN', '') ?? '';
         $userAgent = $this->env('USER_AGENT', 'MyDiscogsApp/0.1 (+contact: you@example.com)') ?? 'MyDiscogsApp/0.1 (+contact: you@example.com)';
-
-        if ($username === '' || $token === '') {
-            $output->writeln('<error>DISCOGS_USERNAME and DISCOGS_USER_TOKEN must be set in .env</error>');
-            return 2; // invalid
-        }
 
         // Init DB and run migrations
         $storage = new Storage($dbPath);
         (new MigrationRunner($storage->pdo()))->run();
         $pdo = $storage->pdo();
+
+        // Resolve currently logged-in user from kv_store
+        $kv = new KvStore($pdo);
+        $uidStr = $kv->get('current_user_id', '');
+        $uid = (int)($uidStr ?: '0');
+        if ($uid <= 0) {
+            $output->writeln('<error>No user is logged in. Please sign in via the web app first.</error>');
+            return 2;
+        }
+        $appKey = $this->env('APP_KEY');
+        $crypto = new \App\Infrastructure\Crypto($appKey, $baseDir);
+        $st = $pdo->prepare('SELECT discogs_username, discogs_token_enc FROM auth_users WHERE id = :id');
+        $st->execute([':id' => $uid]);
+        $row = $st->fetch();
+        $username = $row && $row['discogs_username'] ? (string)$row['discogs_username'] : '';
+        $token = '';
+        if ($row && $row['discogs_token_enc']) {
+            $dec = $crypto->decrypt((string)$row['discogs_token_enc']);
+            $token = $dec ?: '';
+        }
+        if ($username === '' || $token === '') {
+            $output->writeln('<error>Your Discogs credentials are not configured. Go to /settings and save your Discogs username and token.</error>');
+            return 2; // invalid
+        }
         $output->writeln('<info>Database ready.</info>');
 
         // Safety check: refuse to run on non-empty DB unless --force is provided

@@ -17,19 +17,20 @@ Local‑first Discogs collection viewer written in PHP 8.4. Imports your collect
 ## Prerequisites
 - PHP 8.4 (Herd recommended)
 - Composer
-- A Discogs user token and username
+- A Discogs account with a personal access token.
+  - Credentials are saved in the web app Settings per user (not in .env).
 
 ## Quick start
-1) Copy `.env.example` to `.env` and fill values:
+1) Copy `.env.example` to `.env` and fill values (no Discogs credentials here):
 
 ```
-DISCOGS_USER_TOKEN=
-DISCOGS_USERNAME=
 USER_AGENT="MyDiscogsApp/0.1 (+contact: you@example.com)"
 DB_PATH=var/app.db
 IMG_DIR=public/images
 APP_ENV=dev
 APP_DEBUG=1
+# Optional: encryption key for securing web credentials. If omitted, a random key is generated at var/app.key (0600 perms).
+# APP_KEY=base64:...
 ```
 
 2) Install dependencies
@@ -37,45 +38,63 @@ APP_DEBUG=1
 composer install
 ```
 
-3) Initial sync (creates DB and imports your collection)
+3) Run the web app and create your account
+```
+php -S 127.0.0.1:8000 -t public
+```
+Open http://127.0.0.1:8000/ → Register, sign in, then go to Settings and save your Discogs username and user token (encrypted at rest).
+
+4) Initial sync (creates DB and imports your collection)
 ```
 php bin/console sync:initial
 ```
-Important: If the database already contains data, sync:initial now refuses to run unless you pass --force. For ongoing usage, prefer:
+Important: You must be signed in (step 3). If the database already contains data, `sync:initial` refuses to run unless you pass `--force`. For ongoing usage, prefer:
 ```
 php bin/console sync:refresh
 ```
 This preserves any enriched details and updates basic fields incrementally.
 
-4) Optional: enrich releases with full details
+5) Optional: enrich releases with full details
 ```
 php bin/console sync:enrich --limit=100
 # or a specific release
 php bin/console sync:enrich --id=123456
 ```
 
-5) Optional: download missing cover images (respects 1 rps, 1000/day)
+6) Optional: download missing cover images (respects 1 rps, 1000/day)
 ```
 php bin/console images:backfill --limit=200
 ```
 
-6) Optional: incremental refresh (new/changed since last run)
+7) Optional: incremental refresh (new/changed since last run)
 ```
 php bin/console sync:refresh --pages=5
 # override the since cursor
 php bin/console sync:refresh --since=2024-01-01T00:00:00Z
 ```
 
-7) Optional: rebuild search index (maintenance)
+8) Optional: rebuild search index (maintenance)
 ```
 php bin/console search:rebuild
 ```
 
-8) Run the web app
-```
-php -S 127.0.0.1:8000 -t public
-```
-Open http://127.0.0.1:8000/
+## Accounts and settings (web)
+The web app supports user accounts with per‑user Discogs credentials.
+- Registration: visit /register to create an account with a unique username, unique email, and password + confirmation.
+- Login: visit /login to sign in. A session cookie is used.
+- Settings: after logging in, visit /settings to save your Discogs username and user token. The token is encrypted at rest using an app key.
+
+Encryption key
+- The app reads APP_KEY from .env. If absent, it auto‑generates a random key and stores it at var/app.key (600 permissions).
+- Encryption uses libsodium (secretbox) when available; otherwise OpenSSL AES‑256‑GCM.
+
+How credentials are used
+- The web UI reads your logged‑in user’s Discogs username to look up your local collection notes and ratings.
+- When you edit ratings/notes from the web UI, jobs are queued with your Discogs username. Use the CLI command below to push changes to Discogs.
+
+CLI credentials
+- Console commands use the currently signed‑in web user’s Discogs credentials (from the database; token decrypted via APP_KEY). If no one is signed in, commands refuse to run and prompt you to sign in first.
+- .env overrides for Discogs credentials are not supported.
 
 ## Search tips
 One search box with field prefixes and ranges. Examples:
@@ -92,7 +111,7 @@ One search box with field prefixes and ranges. Examples:
 
 ## Notes and ratings
 - Ratings: You can edit a release's rating in the web app. Ratings are enqueued and synced to Discogs when you run `php bin/console sync:push`. You can pull the latest values with `php bin/console sync:refresh`.
-- Personal notes: Notes are local-only in this app. They are stored in your local SQLite database and searchable here, but they are not sent to Discogs.
+- Personal notes: Notes are local‑only in this app. They are stored in your local SQLite database and searchable here, but they are not sent to Discogs.
 
 ## Commands overview
 - php bin/console sync:initial — initial import
@@ -102,7 +121,7 @@ One search box with field prefixes and ranges. Examples:
 - php bin/console search:rebuild — rebuild FTS index
 - php bin/console sync:push — push queued rating changes to Discogs
 
-For a function-by-function breakdown and safety notes for each command, see docs/console-commands.md
+For a function‑by‑function breakdown and safety notes for each command, see docs/console-commands.md
 
 ## FAQ
 - Do I need to clear the DB to see enriched data?
@@ -112,12 +131,12 @@ For a function-by-function breakdown and safety notes for each command, see docs
 - Where are images stored?
   - public/images/<release_id>/<sha1>.jpg. The UI prefers local files and falls back to Discogs URLs.
 - Where do my personal notes show up on Discogs?
-  - Personal notes are local-only in this app. They are saved in your local database and searchable here, but they do not sync to Discogs or appear on the public release page.
+  - Personal notes are local‑only in this app. They are saved in your local database and searchable here, but they do not sync to Discogs or appear on the public release page.
 
 ## Troubleshooting
-- No items on home? Ensure both CLI and web use the same DB (`var/app.db`) and run `sync:initial`.
+- Empty home page after setup? Ensure both CLI and web use the same DB path (`var/app.db`) and that you are signed in, then run `sync:initial`.
 - Images not local? Run `images:backfill` and refresh the page.
-- Notes/credits missing? Run `sync:enrich` (it targets releases missing notes/tracklist).
+- Missing notes/credits? Run `sync:enrich`; it targets releases that have not yet been enriched.
 - Search feels off? Run `search:rebuild` to repopulate the FTS index.
 
 ## DB location safety
@@ -128,5 +147,3 @@ Data provided by Discogs. Discogs® is a trademark of Zink Media, LLC. If you de
 
 ## License
 MIT
-
-

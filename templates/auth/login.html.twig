@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title|default('Sign in') }}{% endblock %}
+
+{% block styles %}
+  <style>
+    :root { --bg:#0b0b0c; --card:#16171a; --text:#e7e7ea; --muted:#a0a3aa; --accent:#67e8f9; }
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,sans-serif}
+    .wrap{max-width:720px;margin:40px auto;padding:0 20px}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    header{position:sticky;top:0;z-index:10;backdrop-filter:blur(6px);background:rgba(11,11,12,.7);display:flex;align-items:center;justify-content:space-between;gap:10px;margin:-16px -20px 24px -20px;padding:16px 20px}
+    h1{font-size:1.5rem;margin:0}
+    .card{background:var(--card);border-radius:12px;overflow:hidden}
+    .meta{padding:16px}
+    form{display:grid;gap:12px;margin-top:8px}
+    label{font-weight:600}
+    input{padding:10px 12px;border:1px solid #2a2b2f;border-radius:8px;background:#101114;color:var(--text);width:100%}
+    .error{background:#3b0a0a;border:1px solid #742a2a;color:#ffd2d2;padding:10px;border-radius:8px;margin-bottom:12px}
+    .actions{display:flex;gap:8px;align-items:center}
+    button{background:#1f2937;border:1px solid #2a2b2f;color:#fff;border-radius:8px;padding:8px 12px;cursor:pointer}
+    button:hover{background:#232f41}
+  </style>
+{% endblock %}
+
+{% block header %}
+  <div class="wrap">
+    <header>
+      <h1><a href="/" style="color:inherit;text-decoration:none">My Music Collection</a></h1>
+      <nav style="display:flex;gap:10px;align-items:center">
+        <a href="/about" class="muted">About</a>
+        <a href="/register">Register</a>
+        <a href="/login">Sign in</a>
+      </nav>
+    </header>
+  </div>
+{% endblock %}
+
+{% block content %}
+  <div class="wrap">
+    <div class="card">
+      <div class="meta">
+        <h2 style="margin:0 0 8px 0">Sign in</h2>
+        {% if error %}<div class="error">{{ error }}</div>{% endif %}
+        <form method="post" action="/login">
+                  <input type="hidden" name="_token" value="{{ csrf_token }}">
+          <div>
+            <label>Username or email</label>
+            <input type="text" name="username" value="{{ old.username|default('') }}" autocomplete="username">
+          </div>
+          <div>
+            <label>Password</label>
+            <input type="password" name="password" autocomplete="current-password">
+          </div>
+          <div class="actions">
+            <button type="submit">Sign in</button>
+            <a href="/register">Create an account</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

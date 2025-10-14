@@ -31,11 +31,29 @@ class SyncPushCommand extends Command
         (new MigrationRunner($storage->pdo()))->run();
         $pdo = $storage->pdo();
 
-        $username = $_ENV['DISCOGS_USERNAME'] ?? $_SERVER['DISCOGS_USERNAME'] ?? getenv('DISCOGS_USERNAME') ?: null;
-        $token = $_ENV['DISCOGS_USER_TOKEN'] ?? $_SERVER['DISCOGS_USER_TOKEN'] ?? getenv('DISCOGS_USER_TOKEN') ?: null;
         $ua = $_ENV['USER_AGENT'] ?? $_SERVER['USER_AGENT'] ?? getenv('USER_AGENT') ?? 'MyDiscogsApp/0.1 (+push)';
-        if (!$username || !$token) {
-            $output->writeln('<error>DISCOGS_USERNAME and DISCOGS_USER_TOKEN are required.</error>');
+
+        // Use current logged-in user (from kv_store)
+        $kv = new KvStore($pdo);
+        $uidStr = $kv->get('current_user_id', '');
+        $uid = (int)($uidStr ?: '0');
+        if ($uid <= 0) {
+            $output->writeln('<error>No user is logged in. Please sign in via the web app first.</error>');
+            return Command::INVALID;
+        }
+        $appKey = $_ENV['APP_KEY'] ?? $_SERVER['APP_KEY'] ?? getenv('APP_KEY') ?: null;
+        $crypto = new \App\Infrastructure\Crypto($appKey, $baseDir);
+        $st = $pdo->prepare('SELECT discogs_username, discogs_token_enc FROM auth_users WHERE id = :id');
+        $st->execute([':id' => $uid]);
+        $row = $st->fetch();
+        $username = $row && $row['discogs_username'] ? (string)$row['discogs_username'] : '';
+        $token = '';
+        if ($row && $row['discogs_token_enc']) {
+            $dec = $crypto->decrypt((string)$row['discogs_token_enc']);
+            $token = $dec ?: '';
+        }
+        if ($username === '' || $token === '') {
+            $output->writeln('<error>Your Discogs credentials are not configured. Go to /settings and save your Discogs username and token.</error>');
             return Command::INVALID;
         }
 

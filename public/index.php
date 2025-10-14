@@ -3,9 +3,15 @@ declare(strict_types=1);
 
 use App\Infrastructure\MigrationRunner;
 use App\Infrastructure\Storage;
+use App\Infrastructure\Crypto;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 use Dotenv\Dotenv;
+use App\Infrastructure\KvStore;
+use App\Http\DiscogsHttpClient;
+use App\Sync\CollectionImporter;
+use App\Sync\ReleaseEnricher;
+use App\Images\ImageCache;
 
 require __DIR__.'/../vendor/autoload.php';
 
@@ -142,12 +148,190 @@ $pdo = $storage->pdo();
 $loader = new FilesystemLoader(__DIR__.'/../templates');
 $twig = new Environment($loader, [
     'cache' => false,
+    'autoescape' => 'html',
 ]);
 // Register custom Twig filters
 $twig->addExtension(new \App\Presentation\Twig\DiscogsFilters());
 
+// Sessions and auth helpers
+// Harden session cookie flags before starting the session
+$secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (($_SERVER['SERVER_PORT'] ?? null) == 443);
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path' => '/',
+    'domain' => '',
+    'secure' => $secure,
+    'httponly' => true,
+    'samesite' => 'Lax',
+]);
+if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
+
+// CSRF token per session
+if (empty($_SESSION['csrf'])) {
+    $_SESSION['csrf'] = bin2hex(random_bytes(32));
+}
+$csrfValid = function(): bool {
+    return isset($_POST['_token'], $_SESSION['csrf']) && hash_equals($_SESSION['csrf'], (string)$_POST['_token']);
+};
+
+$appKey = $env('APP_KEY');
+$crypto = new Crypto($appKey, dirname(__DIR__));
+
+$currentUser = null;
+if (isset($_SESSION['uid'])) {
+    $st = $pdo->prepare('SELECT id, username, email, discogs_username, discogs_token_enc FROM auth_users WHERE id = :id');
+    $st->execute([':id' => (int)$_SESSION['uid']]);
+    $row = $st->fetch();
+    if ($row) {
+        $currentUser = [
+            'id' => (int)$row['id'],
+            'username' => (string)$row['username'],
+            'email' => (string)$row['email'],
+            'discogs_username' => $row['discogs_username'] ? (string)$row['discogs_username'] : null,
+            'discogs_token' => $row['discogs_token_enc'] ? $crypto->decrypt((string)$row['discogs_token_enc']) : null,
+        ];
+    }
+}
+
+$twig->addGlobal('auth_user', $currentUser);
+$twig->addGlobal('csrf_token', $_SESSION['csrf'] ?? '');
+
+$requireLogin = function() use ($currentUser) {
+    if (!$currentUser) {
+        header('Location: /login');
+        exit;
+    }
+};
+
 // Simple router
 $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+
+// Auth routes
+if ($uri === '/register') {
+    if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
+        if (!$csrfValid()) {
+            echo $twig->render('auth/register.html.twig', [
+                'title' => 'Create account',
+                'errors' => ['Invalid request. Please try again.'],
+                'old' => ['username' => (string)($_POST['username'] ?? ''), 'email' => (string)($_POST['email'] ?? '')],
+            ]);
+            exit;
+        }
+        $username = trim((string)($_POST['username'] ?? ''));
+        $email = trim((string)($_POST['email'] ?? ''));
+        $password = (string)($_POST['password'] ?? '');
+        $confirm = (string)($_POST['confirm'] ?? '');
+        $errors = [];
+        if ($username === '' || !preg_match('/^[A-Za-z0-9_\-\.]{3,32}$/', $username)) $errors[] = 'Invalid username';
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'Invalid email';
+        if (strlen($password) < 8) $errors[] = 'Password must be at least 8 characters';
+        if ($password !== $confirm) $errors[] = 'Passwords do not match';
+        if (!$errors) {
+            $exists = $pdo->prepare('SELECT 1 FROM auth_users WHERE username = :u OR email = :e');
+            $exists->execute([':u' => $username, ':e' => $email]);
+            if ($exists->fetchColumn()) {
+                $errors[] = 'Username or email already in use';
+            } else {
+                $hash = password_hash($password, PASSWORD_DEFAULT);
+                $ins = $pdo->prepare('INSERT INTO auth_users (username, email, password_hash) VALUES (:u, :e, :p)');
+                $ins->execute([':u' => $username, ':e' => $email, ':p' => $hash]);
+                $_SESSION['uid'] = (int)$pdo->lastInsertId();
+                header('Location: /settings');
+                exit;
+            }
+        }
+        echo $twig->render('auth/register.html.twig', [
+            'title' => 'Create account',
+            'errors' => $errors,
+            'old' => ['username' => $username, 'email' => $email],
+        ]);
+        exit;
+    }
+    echo $twig->render('auth/register.html.twig', ['title' => 'Create account']);
+    exit;
+}
+
+if ($uri === '/login') {
+    if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
+        if (!$csrfValid()) {
+            echo $twig->render('auth/login.html.twig', [
+                'title' => 'Sign in',
+                'error' => 'Invalid request. Please try again.',
+                'old' => ['username' => (string)($_POST['username'] ?? '')]
+            ]);
+            exit;
+        }
+        $usernameOrEmail = trim((string)($_POST['username'] ?? ''));
+        $password = (string)($_POST['password'] ?? '');
+        $st = $pdo->prepare('SELECT id, password_hash FROM auth_users WHERE username = :u OR email = :u');
+        $st->execute([':u' => $usernameOrEmail]);
+        $row = $st->fetch();
+        $error = null;
+        if ($row && password_verify($password, (string)$row['password_hash'])) {
+            session_regenerate_id(true);
+            $_SESSION['uid'] = (int)$row['id'];
+            // Persist currently logged-in user id for CLI commands
+            try {
+                $kv = new KvStore($pdo);
+                $kv->set('current_user_id', (string)$_SESSION['uid']);
+            } catch (\Throwable $e) { /* non-fatal */ }
+            $dest = '/';
+            if (isset($_GET['return']) && is_string($_GET['return']) && str_starts_with($_GET['return'], '/')) { $dest = $_GET['return']; }
+            header('Location: '.$dest);
+            exit;
+        } else {
+            $error = 'Invalid credentials';
+        }
+        echo $twig->render('auth/login.html.twig', ['title' => 'Sign in', 'error' => $error, 'old' => ['username' => $usernameOrEmail]]);
+        exit;
+    }
+    echo $twig->render('auth/login.html.twig', ['title' => 'Sign in']);
+    exit;
+}
+
+if ($uri === '/logout' && (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST')) {
+    if (!$csrfValid()) { header('Location: /'); exit; }
+    try {
+        $kv = new KvStore($pdo);
+        $kv->set('current_user_id', '');
+    } catch (\Throwable $e) { /* non-fatal */ }
+    session_destroy();
+    header('Location: /');
+    exit;
+}
+
+if ($uri === '/settings') {
+    $requireLogin();
+    $discogsUsername = $currentUser['discogs_username'] ?? '';
+    $discogsToken = $currentUser['discogs_token'] ?? '';
+    $saved = false; $error = null;
+    if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
+        if (!$csrfValid()) {
+            $error = 'Invalid request. Please try again.';
+        } else {
+        $discogsUsername = trim((string)($_POST['discogs_username'] ?? ''));
+        $discogsToken = trim((string)($_POST['discogs_token'] ?? ''));
+        if ($discogsUsername === '' || $discogsToken === '') {
+            $error = 'Both Discogs username and token are required';
+        } else {
+            $enc = $crypto->encrypt($discogsToken);
+            $up = $pdo->prepare('UPDATE auth_users SET discogs_username = :u, discogs_token_enc = :t, updated_at = CURRENT_TIMESTAMP WHERE id = :id');
+            $up->execute([':u' => $discogsUsername, ':t' => $enc, ':id' => (int)$currentUser['id']]);
+            $saved = true;
+        }
+    }
+    }
+    echo $twig->render('auth/settings.html.twig', [
+        'title' => 'Settings',
+        'discogs_username' => $discogsUsername,
+        'discogs_token' => $discogsToken,
+        'saved' => $saved,
+        'error' => $error,
+    ]);
+    exit;
+}
+
+
 
 if ($uri === '/about') {
     echo $twig->render('about.html.twig', [
@@ -159,9 +343,12 @@ if ($uri === '/about') {
 if ($uri === '/release/save' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     // Handle enqueueing a push job to Discogs for rating/notes
     $rid = (int)($_POST['release_id'] ?? 0);
+    if (!$csrfValid()) { header('Location: /release/' . $rid . '?saved=invalid_csrf'); exit; }
     $rating = isset($_POST['rating']) && $_POST['rating'] !== '' ? max(0, min(5, (int)$_POST['rating'])) : null;
     $notes = isset($_POST['notes']) ? trim((string)$_POST['notes']) : null;
-    $username = $_ENV['DISCOGS_USERNAME'] ?? $_SERVER['DISCOGS_USERNAME'] ?? getenv('DISCOGS_USERNAME') ?: null;
+    // Require logged-in with Discogs settings to queue updates
+    if (!$currentUser || empty($currentUser['discogs_username'])) { header('Location: /login?return=' . rawurlencode('/release/'.$rid)); exit; }
+    $username = (string)$currentUser['discogs_username'];
     $ok = false; $msg = 'queued';
     if ($rid > 0 && $username) {
         // Find latest instance for this release
@@ -293,8 +480,8 @@ if (preg_match('#^/release/(\d+)#', $uri, $m)) {
             }
         }
 
-        // Fetch my collection notes/rating for this release (current configured username)
-        $username = $_ENV['DISCOGS_USERNAME'] ?? $_SERVER['DISCOGS_USERNAME'] ?? getenv('DISCOGS_USERNAME') ?: null;
+        // Fetch my collection notes/rating for this release (current logged-in user's Discogs username)
+        $username = $currentUser['discogs_username'] ?? null;
         if ($username) {
             $ci = $pdo->prepare('SELECT notes, rating FROM collection_items WHERE release_id = :rid AND username = :u ORDER BY added DESC LIMIT 1');
             $ci->execute([':rid' => $rid, ':u' => $username]);
@@ -354,7 +541,25 @@ if (preg_match('#^/release/(\d+)#', $uri, $m)) {
     exit;
 }
 
-// Home grid with search and sorting
+// Home grid with search and sorting (per-user)
+// If no logged-in user, show a generic welcome page
+if (!$currentUser) {
+    echo $twig->render('home.html.twig', [
+        'title' => 'My Music Collection',
+        'welcome' => true,
+    ]);
+    exit;
+}
+// If user hasn't configured Discogs settings yet, prompt to set up
+if (empty($currentUser['discogs_username'])) {
+    echo $twig->render('home.html.twig', [
+        'title' => 'My Music Collection',
+        'needs_setup' => true,
+    ]);
+    exit;
+}
+$usernameFilter = (string)$currentUser['discogs_username'];
+
 $page = max(1, (int)($_GET['page'] ?? 1));
 $perPage = max(1, min(60, (int)($_GET['per_page'] ?? 24)));
 $sort = (string)($_GET['sort'] ?? 'added_desc');
@@ -394,11 +599,12 @@ if ($q !== '') {
 
     if ($useFts) {
         // Count total matches (with optional year filters)
-        $cntSql = "SELECT COUNT(f.rowid) FROM releases_fts f JOIN releases r ON r.id = f.rowid WHERE releases_fts MATCH :m";
+        $cntSql = "SELECT COUNT(DISTINCT r.id) FROM releases_fts f JOIN releases r ON r.id = f.rowid WHERE releases_fts MATCH :m AND EXISTS (SELECT 1 FROM collection_items ci WHERE ci.release_id = r.id AND ci.username = :u)";
         if ($yearFrom !== null) $cntSql .= " AND r.year >= :y1";
         if ($yearTo !== null) $cntSql .= " AND r.year <= :y2";
         $cnt = $pdo->prepare($cntSql);
         $cnt->bindValue(':m', $match);
+        $cnt->bindValue(':u', $usernameFilter);
         if ($yearFrom !== null) $cnt->bindValue(':y1', $yearFrom, \PDO::PARAM_INT);
         if ($yearTo !== null) $cnt->bindValue(':y2', $yearTo, \PDO::PARAM_INT);
         $cnt->execute();
@@ -408,19 +614,20 @@ if ($q !== '') {
         $sql = "SELECT r.id, r.title, r.artist, r.year, r.thumb_url, r.cover_url,
             (SELECT local_path FROM images i WHERE i.release_id = r.id AND i.source_url = r.cover_url ORDER BY id ASC LIMIT 1) AS primary_local_path,
             (SELECT local_path FROM images i WHERE i.release_id = r.id ORDER BY id ASC LIMIT 1) AS any_local_path,
-            MAX(ci.added) AS added_at,
-            MAX(ci.rating) AS rating
+            (SELECT MAX(ci2.added) FROM collection_items ci2 WHERE ci2.release_id = r.id AND ci2.username = :u) AS added_at,
+            (SELECT MAX(ci3.rating) FROM collection_items ci3 WHERE ci3.release_id = r.id AND ci3.username = :u) AS rating
         FROM releases_fts f
         JOIN releases r ON r.id = f.rowid
-        LEFT JOIN collection_items ci ON ci.release_id = r.id
         WHERE releases_fts MATCH :match" .
         ($yearFrom !== null ? " AND r.year >= :y1" : "") .
         ($yearTo !== null ? " AND r.year <= :y2" : "") .
-        " GROUP BY r.id
+        " AND EXISTS (SELECT 1 FROM collection_items ci WHERE ci.release_id = r.id AND ci.username = :u)
+        GROUP BY r.id
         ORDER BY r.id DESC
         LIMIT :limit OFFSET :offset";
         $stmt = $pdo->prepare($sql);
         $stmt->bindValue(':match', $match);
+        $stmt->bindValue(':u', $usernameFilter);
         if ($yearFrom !== null) $stmt->bindValue(':y1', $yearFrom, \PDO::PARAM_INT);
         if ($yearTo !== null) $stmt->bindValue(':y2', $yearTo, \PDO::PARAM_INT);
         $stmt->bindValue(':limit', $perPage, \PDO::PARAM_INT);
@@ -429,10 +636,11 @@ if ($q !== '') {
         $rows = $stmt->fetchAll();
     } else {
         // Year-only (or filters that produced no FTS terms): do non-FTS search with just year filters
-        $cntSql = "SELECT COUNT(*) FROM releases r WHERE 1=1";
+        $cntSql = "SELECT COUNT(DISTINCT r.id) FROM releases r WHERE 1=1 AND EXISTS (SELECT 1 FROM collection_items ci WHERE ci.release_id = r.id AND ci.username = :u)";
         if ($yearFrom !== null) $cntSql .= " AND r.year >= :y1";
         if ($yearTo !== null) $cntSql .= " AND r.year <= :y2";
         $cnt = $pdo->prepare($cntSql);
+        $cnt->bindValue(':u', $usernameFilter);
         if ($yearFrom !== null) $cnt->bindValue(':y1', $yearFrom, \PDO::PARAM_INT);
         if ($yearTo !== null) $cnt->bindValue(':y2', $yearTo, \PDO::PARAM_INT);
         $cnt->execute();
@@ -442,17 +650,18 @@ if ($q !== '') {
         $sql = "SELECT r.id, r.title, r.artist, r.year, r.thumb_url, r.cover_url,
             (SELECT local_path FROM images i WHERE i.release_id = r.id AND i.source_url = r.cover_url ORDER BY id ASC LIMIT 1) AS primary_local_path,
             (SELECT local_path FROM images i WHERE i.release_id = r.id ORDER BY id ASC LIMIT 1) AS any_local_path,
-            MAX(ci.added) AS added_at,
-            MAX(ci.rating) AS rating
+            (SELECT MAX(ci2.added) FROM collection_items ci2 WHERE ci2.release_id = r.id AND ci2.username = :u) AS added_at,
+            (SELECT MAX(ci3.rating) FROM collection_items ci3 WHERE ci3.release_id = r.id AND ci3.username = :u) AS rating
         FROM releases r
-        LEFT JOIN collection_items ci ON ci.release_id = r.id
         WHERE 1=1" .
         ($yearFrom !== null ? " AND r.year >= :y1" : "") .
         ($yearTo !== null ? " AND r.year <= :y2" : "") .
-        " GROUP BY r.id
+        " AND EXISTS (SELECT 1 FROM collection_items ci WHERE ci.release_id = r.id AND ci.username = :u)
+        GROUP BY r.id
         ORDER BY r.id DESC
         LIMIT :limit OFFSET :offset";
         $stmt = $pdo->prepare($sql);
+        $stmt->bindValue(':u', $usernameFilter);
         if ($yearFrom !== null) $stmt->bindValue(':y1', $yearFrom, \PDO::PARAM_INT);
         if ($yearTo !== null) $stmt->bindValue(':y2', $yearTo, \PDO::PARAM_INT);
         $stmt->bindValue(':limit', $perPage, \PDO::PARAM_INT);
@@ -461,21 +670,26 @@ if ($q !== '') {
         $rows = $stmt->fetchAll();
     }
 } else {
-    $total = (int)$pdo->query('SELECT COUNT(*) FROM releases')->fetchColumn();
+    // Default listing (no query): per-user collection only
+    $cnt = $pdo->prepare('SELECT COUNT(DISTINCT r.id) FROM releases r WHERE EXISTS (SELECT 1 FROM collection_items ci WHERE ci.release_id = r.id AND ci.username = :u)');
+    $cnt->bindValue(':u', $usernameFilter);
+    $cnt->execute();
+    $total = (int)$cnt->fetchColumn();
     $totalPages = $total > 0 ? (int)ceil($total / $perPage) : 1;
 
     $sql = "SELECT r.id, r.title, r.artist, r.year, r.thumb_url, r.cover_url,
         (SELECT local_path FROM images i WHERE i.release_id = r.id AND i.source_url = r.cover_url ORDER BY id ASC LIMIT 1) AS primary_local_path,
         (SELECT local_path FROM images i WHERE i.release_id = r.id ORDER BY id ASC LIMIT 1) AS any_local_path,
-        MAX(ci.added) AS added_at,
-        MAX(ci.rating) AS rating
+        (SELECT MAX(ci2.added) FROM collection_items ci2 WHERE ci2.release_id = r.id AND ci2.username = :u) AS added_at,
+        (SELECT MAX(ci3.rating) FROM collection_items ci3 WHERE ci3.release_id = r.id AND ci3.username = :u) AS rating
     FROM releases r
-    LEFT JOIN collection_items ci ON ci.release_id = r.id
+    WHERE EXISTS (SELECT 1 FROM collection_items ci WHERE ci.release_id = r.id AND ci.username = :u)
     GROUP BY r.id
     ORDER BY $orderBy
     LIMIT :limit OFFSET :offset";
 
     $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':u', $usernameFilter);
     $stmt->bindValue(':limit', $perPage, \PDO::PARAM_INT);
     $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
     $stmt->execute();
