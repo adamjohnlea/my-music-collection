@@ -1,0 +1,93 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block styles %}
+  <style>
+    :root { --bg:#0b0b0c; --card:#16171a; --text:#e7e7ea; --muted:#a0a3aa; --accent:#67e8f9; }
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif}
+    .wrap{max-width:1200px;margin:40px auto;padding:0 20px}
+    header{position:sticky;top:0;z-index:10;backdrop-filter:blur(6px);background:rgba(11,11,12,.7);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin:-16px -20px 24px -20px;padding:16px 20px}
+    h1{font-size:1.5rem;margin:0}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px}
+    .card{background:var(--card);border-radius:12px;overflow:hidden}
+    .cover{aspect-ratio:1/1;width:100%;object-fit:cover;background:#222}
+    .meta{padding:10px}
+    .title{font-weight:600}
+    .artist{color:var(--muted);font-size:.9rem}
+    .muted{color:var(--muted)}
+    nav{display:flex;justify-content:center;gap:12px;margin-top:20px}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .toolbar{display:flex;gap:8px;align-items:center;margin:0;flex-wrap:wrap}
+    .search-input{background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:8px 12px;width:360px;max-width:100%}
+    .sort-wrap{display:flex;gap:8px;align-items:center}
+    .sort-select{background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:8px 8px}
+    .pagination{display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap}
+    .page-btn{display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:0 12px;border-radius:12px;border:1px solid #2a2b2f;background:var(--card);color:var(--text);text-decoration:none;font-weight:600}
+    .page-btn:hover{background:#1d1f24;text-decoration:none}
+    .page-btn.is-current{background:linear-gradient(135deg,#222631,#1a1d24);border-color:#3a3d44;box-shadow:0 0 0 1px rgba(103,232,249,.2) inset;color:#fff}
+    .page-btn.is-disabled{opacity:.5;pointer-events:none}
+    .page-ellipsis{color:var(--muted);padding:0 6px}
+    @media (max-width: 640px){
+      .wrap{margin:20px auto}
+      header{gap:12px}
+      .muted.stats{width:100%;order:1}
+      .toolbar{width:100%;order:2}
+      .search-input{width:100%}
+      .sort-wrap{width:100%;justify-content:flex-start;margin-top:4px}
+      .about-link{order:3;margin-left:0}
+      .pagination{position:sticky;bottom:calc(8px + env(safe-area-inset-bottom));background:rgba(11,11,12,.8);backdrop-filter:blur(8px);padding:8px 12px;border-radius:14px;border:1px solid #2a2b2f}
+      .page-num,.page-ellipsis{display:none}
+      .page-btn{min-width:64px;height:44px;font-size:1rem}
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="wrap">
+    <header>
+      <h1><a href="./" style="color:inherit;text-decoration:none">{{ title }}</a></h1>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;width:100%">
+        <div id="stats" class="muted stats">{{ total|default(0) }} items</div>
+        <form id="search-form" class="toolbar" method="get" action="./" style="flex:1 1 auto">
+          <input id="search-input" class="search-input" type="text" name="q" value="{{ q|default('')|e }}" placeholder="Search artist:miles year:1980..1989 barcode:…" />
+          <input type="hidden" name="page" value="1" />
+          <input type="hidden" name="per_page" value="24" />
+          <span class="sort-wrap">
+            <label for="sort" class="muted" style="font-size:.9rem">Sort</label>
+            <select id="sort" class="sort-select" name="sort">
+              <optgroup label="Collection">
+                <option value="added_desc">Added (newest)</option>
+                <option value="added_asc">Added (oldest)</option>
+                <option value="rating_desc">Rating (high→low)</option>
+                <option value="rating_asc">Rating (low→high)</option>
+              </optgroup>
+              <optgroup label="Release">
+                <option value="year_desc">Year (newest)</option>
+                <option value="year_asc">Year (oldest)</option>
+                <option value="artist_asc">Artist (A→Z)</option>
+                <option value="artist_desc">Artist (Z→A)</option>
+                <option value="title_asc">Title (A→Z)</option>
+                <option value="title_desc">Title (Z→A)</option>
+              </optgroup>
+            </select>
+          </span>
+          <a href="{{ base_url }}/about.html" class="muted about-link" style="margin-left:8px;display:none">About</a>
+        </form>
+      </div>
+    </header>
+
+    <div id="grid" class="grid" aria-live="polite"></div>
+
+    <nav id="pager" class="pagination" aria-label="Pagination"></nav>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  {# Inline JSON fallback for file:// viewing when fetch() is blocked. Only rendered when releases_json is provided. #}
+  {% if releases_json is defined and releases_json %}
+    <script id="releases-data" type="application/json">{{ releases_json|raw }}</script>
+  {% endif %}
+  <script src="assets/app.js" defer></script>
+{% endblock %}

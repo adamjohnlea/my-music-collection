@@ -120,6 +120,7 @@ One search box with field prefixes and ranges. Examples:
 - php bin/console images:backfill [--limit=N] — download covers to local cache
 - php bin/console search:rebuild — rebuild FTS index
 - php bin/console sync:push — push queued rating changes to Discogs
+- php bin/console export:static [--out=dist] [--base-url=/] [--copy-images] [--chunk-size=N] — generate a static site of your collection
 
 For a function‑by‑function breakdown and safety notes for each command, see docs/console-commands.md
 

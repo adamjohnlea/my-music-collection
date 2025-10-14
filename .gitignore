@@ -40,6 +40,8 @@
 *.swp
 *.swo
 
+# Static export output (build artifact)
+/dist/
 
 # Local working status file (intentionally untracked)
 /CURRENTSTATUS.md
