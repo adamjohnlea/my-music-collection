@@ -89,7 +89,8 @@ class SyncInitialCommand extends Command
         $output->writeln('<comment>HTTP client configured for Discogs API.</comment>');
 
         // Run importer
-        $imgDir = $config->getImgDir($baseDir);
+        // Store relative image paths in DB (e.g., public/images/...)
+        $imgDir = $config->env('IMG_DIR', 'public/images') ?? 'public/images';
         $importer = new CollectionImporter($http, $pdo, $kv, $imgDir);
         $output->writeln(sprintf('<info>Starting import for user %s …</info>', $username));
         $totalImported = 0;

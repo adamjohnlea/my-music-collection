@@ -45,10 +45,51 @@ class ImagesBackfillCommand extends Command
         $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
         $base = dirname(__DIR__, 2);
+
+        // Normalize DB paths: make local_path relative to project root (strip absolute base prefix)
+        $basePrefix = rtrim($base, '/\\') . '/';
+        try {
+            $sel = $pdo->prepare('SELECT id, local_path FROM images WHERE local_path LIKE :pfx');
+            $sel->execute([':pfx' => $basePrefix . '%']);
+            $toFix = $sel->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+            foreach ($toFix as $fix) {
+                $lp = (string)$fix['local_path'];
+                if (str_starts_with($lp, $basePrefix)) {
+                    $new = ltrim(substr($lp, strlen($basePrefix)), '/\\');
+                    $up = $pdo->prepare('UPDATE images SET local_path = :p WHERE id = :id');
+                    $up->execute([':p' => $new, ':id' => $fix['id']]);
+                }
+            }
+        } catch (\Throwable $e) {
+            // best-effort; continue
+        }
+
+        // Move any mistakenly nested images (e.g., <base>/<base>/public/images -> <base>/public/images)
+        $nested = $base . '/' . ltrim($base, '/\\') . '/public/images';
+        $target = $base . '/public/images';
+        if (is_dir($nested) && $nested !== $target) {
+            $output->writeln('<comment>Repairing misplaced images…</comment>');
+            $it = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($nested, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
+            foreach ($it as $path => $info) {
+                if ($info->isFile()) {
+                    $rel = ltrim(substr($path, strlen($nested)), '/\\');
+                    $dst = $target . '/' . $rel;
+                    $dir = dirname($dst);
+                    if (!is_dir($dir)) @mkdir($dir, 0777, true);
+                    @rename($path, $dst);
+                }
+            }
+            // attempt to remove empty dirs
+            $it2 = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($nested, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST);
+            foreach ($it2 as $p => $info2) { if ($info2->isDir()) @rmdir($p); }
+            @rmdir($nested);
+        }
+
         $done = 0; $skipped = 0; $failed = 0; $quotaStop = false;
         foreach ($rows as $row) {
             if ($done >= $limit) break;
-            $local = $base . '/' . ltrim($row['local_path'], '/');
+            $lp = (string)$row['local_path'];
+            $local = $config->isAbsolutePath($lp) ? $lp : ($base . '/' . ltrim($lp, '/'));
             if (is_file($local)) { $skipped++; continue; }
 
             $ok = $cache->fetch($row['source_url'], $local);

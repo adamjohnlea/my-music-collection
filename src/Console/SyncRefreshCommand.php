@@ -31,7 +31,8 @@ class SyncRefreshCommand extends Command
         $baseDir = dirname(__DIR__, 2);
         $dbPath = $config->getDbPath($baseDir);
         $userAgent = $config->getUserAgent('MyDiscogsApp/0.1 (+refresh)');
-        $imgDir = $config->getImgDir($baseDir);
+        // Use relative image dir for DB entries
+        $imgDir = $config->env('IMG_DIR', 'public/images') ?? 'public/images';
 
         $storage = new Storage($dbPath);
         (new MigrationRunner($storage->pdo()))->run();

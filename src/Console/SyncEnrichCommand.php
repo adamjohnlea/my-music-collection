@@ -60,7 +60,8 @@ class SyncEnrichCommand extends Command
 
         // Reuse KvStore for rate limiters
         $http = (new DiscogsHttpClient($userAgent, $token, $kv))->client();
-        $imgDir = $this->env('IMG_DIR', 'public/images') ?? 'public/images';
+        // Store relative image paths in DB (e.g., public/images/...)
+        $imgDir = $config->env('IMG_DIR', 'public/images') ?? 'public/images';
         $enricher = new ReleaseEnricher($http, $pdo, $imgDir);
 
         $idOpt = $input->getOption('id');
