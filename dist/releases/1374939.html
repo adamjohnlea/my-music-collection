@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bad Brains — Bad Brains</title>
+    <style>
+    :root { --bg:#0b0b0c; --card:#16171a; --text:#e7e7ea; --muted:#a0a3aa; --accent:#67e8f9; --overlay: rgba(0,0,0,.9); }
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif}
+    .wrap{max-width:1000px;margin:40px auto;padding:0 20px}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .layout{display:grid;grid-template-columns:280px 1fr;gap:24px}
+    .card{background:var(--card);border-radius:12px;overflow:hidden}
+    .cover{width:100%;aspect-ratio:1/1;object-fit:cover;background:#222;cursor:zoom-in}
+    .meta{padding:16px}
+    .muted{color:var(--muted)}
+    h1{margin:0 0 8px 0;font-size:1.6rem}
+
+    /* Lightbox */
+    .lightbox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--overlay);z-index:1000}
+    .lightbox.open{display:flex}
+    .lb-inner{position:relative;max-width:95vw;max-height:95vh;display:flex;align-items:center;justify-content:center}
+    .lb-img{max-width:95vw;max-height:95vh;object-fit:contain;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+    .lb-close{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:999px;width:40px;height:40px;cursor:pointer;font-size:20px}
+    .lb-nav{position:absolute;top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center}
+    .lb-prev,.lb-next{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:999px;width:44px;height:44px;cursor:pointer;font-size:20px}
+    .lb-prev{left:-60px}
+    .lb-next{right:-60px}
+    .lb-counter{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);color:#fff;background:rgba(0,0,0,.5);padding:4px 10px;border-radius:999px;font-size:.9rem}
+
+    @media (max-width: 800px){
+      .layout{grid-template-columns:1fr}
+      .lb-prev{left:10px}
+      .lb-next{right:10px}
+    }
+  </style>
+</head>
+<body>
+  
+    <div class="wrap">
+    <p><a href="../index.html">← Back</a></p>
+          <div class="layout">
+        <div>
+          <div class="card">
+                          <img id="main-cover" class="cover" src="../images/1374939/d6ca57691ce373b1ec5a94a4da20e27c00fceea5.jpg" alt="Bad Brains cover" data-idx="0" />
+                      </div>
+                      <div class="thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+                              <button class="thumb" data-url="../images/1374939/d6ca57691ce373b1ec5a94a4da20e27c00fceea5.jpg" data-idx="0" title="Image 1" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/1374939/d6ca57691ce373b1ec5a94a4da20e27c00fceea5.jpg" alt="thumb 1" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:1" />
+                </button>
+                              <button class="thumb" data-url="../images/1374939/60f96d6a14ae082eab929dabe8f1e88a4d09834d.jpg" data-idx="1" title="Image 2" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/1374939/60f96d6a14ae082eab929dabe8f1e88a4d09834d.jpg" alt="thumb 2" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/1374939/435e3cea2cbcda2dcd1cf4586722056a41fbdc5e.jpg" data-idx="2" title="Image 3" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/1374939/435e3cea2cbcda2dcd1cf4586722056a41fbdc5e.jpg" alt="thumb 3" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/1374939/4238ce36e8cbb420dc13f1100190c2359dede153.jpg" data-idx="3" title="Image 4" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/1374939/4238ce36e8cbb420dc13f1100190c2359dede153.jpg" alt="thumb 4" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                          </div>
+                  </div>
+        <div>
+          <h1>Bad Brains</h1>
+          <p class="muted">Bad Brains</p>
+          <p class="muted">US</p>
+                      <p style="margin:8px 0;">
+              <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Rock</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Reggae</span>              <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Reggae</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Hardcore</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Punk</span>            </p>
+          
+                      <p class="muted">Formats:
+                              Vinyl                          </p>
+          
+                      <p class="muted">Labels:
+              ROIR (RUSLP 8223)            </p>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Tracklist</strong>
+                <ol>
+                                      <li>A1 — Sailin&#039; On <span class="muted">(1:55)</span></li>
+                                      <li>A2 — Don&#039;t Need It <span class="muted">(1:07)</span></li>
+                                      <li>A3 — Attitude <span class="muted">(1:20)</span></li>
+                                      <li>A4 — The Regulator <span class="muted">(1:08)</span></li>
+                                      <li>A5 — Banned In D.C. <span class="muted">(2:13)</span></li>
+                                      <li>A6 — Jah Calling <span class="muted">(2:32)</span></li>
+                                      <li>A7 — Supertouch/Shitfit <span class="muted">(2:31)</span></li>
+                                      <li>A8 — Leaving Babylon <span class="muted">(4:11)</span></li>
+                                      <li>B1 — Fearless Vampire Killers <span class="muted">(1:08)</span></li>
+                                      <li>B2 — I <span class="muted">(2:05)</span></li>
+                                      <li>B3 — Big Takeover <span class="muted">(2:57)</span></li>
+                                      <li>B4 — Pay To Cum <span class="muted">(1:26)</span></li>
+                                      <li>B5 — Right Brigade <span class="muted">(2:28)</span></li>
+                                      <li>B6 — I Luv I Jah <span class="muted">(6:23)</span></li>
+                                      <li>B7 — Intro <span class="muted">(0:45)</span></li>
+                                  </ol>
+              </div>
+            </div>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Videos</strong>
+                <ul>
+                                      <li><a href="https://www.youtube.com/watch?v=gnWKhq8l_5c" target="_blank" rel="noopener">Bad Brains - Banned in D.C.</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=ggBFC-8FmlA" target="_blank" rel="noopener">Bad Brains   Right Brigade with Lyrics on screen</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=bIhX-FYhKKg" target="_blank" rel="noopener">Bad Brains - Right Brigade</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=Ga5ZbMMZ6Hk" target="_blank" rel="noopener">Bad Brains - Bad Brains (1982) Full Album</a></li>
+                                  </ul>
+              </div>
+            </div>
+          
+          
+          <div class="card" style="margin-top:16px;">
+            <div class="meta">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                <strong>My Notes</strong>
+                <button id="editToggle" type="button" title="Edit" style="background:transparent;color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:4px 8px;cursor:pointer;font-size:.9rem">Edit</button>
+              </div>
+
+              
+              <div id="notesView" style="margin-top:8px">
+                                                  <div class="muted">(none)</div>
+                              </div>
+
+              <form id="notesForm" method="post" action="/release/save" style="display:none; margin-top:8px; flex-direction:column; gap:8px">
+                              <input type="hidden" name="_token" value="" />
+                <input type="hidden" name="release_id" value="1374939" />
+                <input type="hidden" name="return" value="../index.html" />
+                <label>Rating
+                  <select name="rating" style="background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:6px 8px">
+                    <option value="">—</option>
+                                          <option value="0" >0/5</option>
+                                          <option value="1" >1/5</option>
+                                          <option value="2" >2/5</option>
+                                          <option value="3" >3/5</option>
+                                          <option value="4" >4/5</option>
+                                          <option value="5" >5/5</option>
+                                      </select>
+                </label>
+                <label>Notes
+                  <textarea name="notes" rows="4" style="width:100%;background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:8px"></textarea>
+                </label>
+                <div>
+                  <button type="submit" style="background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:8px 12px;cursor:pointer">Save to Discogs</button>
+                  <span class="muted" style="margin-left:8px">This queues a background job. Run <code>php bin/console sync:push</code> to process.</span>
+                </div>
+                <p class="muted" style="margin:6px 0 0 0; font-size:.9rem">Note: your rating and notes are stored on your personal Discogs collection entry for this release. They do not appear on the public release page.</p>
+              </form>
+
+              <script>
+                (function(){
+                  const btn = document.getElementById('editToggle');
+                  const form = document.getElementById('notesForm');
+                  const view = document.getElementById('notesView');
+                  if (!btn || !form || !view) return;
+                  function setOpen(open){
+                    form.style.display = open ? 'flex' : 'none';
+                    view.style.display = open ? 'none' : 'block';
+                    btn.textContent = open ? 'Cancel' : 'Edit';
+                  }
+                  btn.addEventListener('click', function(){
+                    const open = form.style.display === 'none';
+                    setOpen(open);
+                  });
+                  // If page loaded with ?edit=1, open form
+                  const q = new URLSearchParams(window.location.search);
+                  if (q.get('edit') === '1') setOpen(true);
+                })();
+              </script>
+            </div>
+          </div>
+
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Credits</strong>
+                <ul>
+                                      <li>
+                      Darryl Jenifer
+                      <span class="muted">— Bass, Backing Vocals</span>                                          </li>
+                                      <li>
+                      Neil Cooper
+                      <span class="muted">— Concept By</span>                                          </li>
+                                      <li>
+                      David Hahn
+                      <span class="muted">— Coordinator [Production For Bad Brains]</span>                                          </li>
+                                      <li>
+                      John Hanti
+                      <span class="muted">— Coordinator [Production For Roir]</span>                                          </li>
+                                      <li>
+                      Donnell Gibson
+                      <span class="muted">— Design [Logo]</span>                                          </li>
+                                      <li>
+                      Jay Jones
+                      <span class="muted">— Design [Logo]</span>                                          </li>
+                                      <li>
+                      Earl Hudson
+                      <span class="muted">— Drums</span>                                          </li>
+                                      <li>
+                      Stanley Moskowitz
+                      <span class="muted">— Engineer [Mastering]</span>                                          </li>
+                                      <li>
+                      Wayne Vlcan
+                      <span class="muted">— Engineer [Mixing]</span>                                          </li>
+                                      <li>
+                      Dr. Know
+                      <span class="muted">— Guitar, Backing Vocals</span>                                          </li>
+                                      <li>
+                      Sneak Attack
+                      <span class="muted">— Layout</span>                                          </li>
+                                      <li>
+                      Ira Kaplan
+                      <span class="muted">— Liner Notes</span>                                          </li>
+                                      <li>
+                      Bad Brains
+                      <span class="muted">— Mixed By</span>                                          </li>
+                                      <li>
+                      Jay Dublee
+                      <span class="muted">— Mixed By</span>                                          </li>
+                                      <li>
+                      Laura Levine
+                      <span class="muted">— Photography By</span>                                          </li>
+                                      <li>
+                      Jay Dublee
+                      <span class="muted">— Recorded By</span>                                          </li>
+                                      <li>
+                      H.R.
+                      <span class="muted">— Vocals [Throat]</span>                                          </li>
+                                  </ul>
+              </div>
+            </div>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Companies</strong>
+                <ul>
+                                      <li>
+                      Reachout International Records, Inc.
+                      <span class="muted"> — Copyright (c)</span>                                          </li>
+                                      <li>
+                      Reachout International Records, Inc.
+                      <span class="muted"> — Phonographic Copyright (p)</span>                                          </li>
+                                      <li>
+                      Bad Brains
+                      <span class="muted"> — Copyright (c)</span>                                          </li>
+                                      <li>
+                      Bad Brains
+                      <span class="muted"> — Phonographic Copyright (p)</span>                                          </li>
+                                      <li>
+                      171-A Studios
+                      <span class="muted"> — Recorded At</span>                                          </li>
+                                      <li>
+                      United Record Pressing
+                      <span class="muted"> — Pressed By</span>                                          </li>
+                                  </ul>
+              </div>
+            </div>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Barcodes</strong>
+                <ul>
+                                      <li>0 53436 82231 9</li>
+                                  </ul>
+              </div>
+            </div>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Identifiers</strong>
+                <ul>
+                                      <li>Matrix / Runout: RUSLP-8223-A PMA L-20163M-A <span class="muted">(Side A)</span></li>
+                                      <li>Matrix / Runout: RUSLP-8223-B I LUV I JAH L-20163M-B <span class="muted">(Side B)</span></li>
+                                      <li>Matrix / Runout: PMA L-20163M-A <span class="muted">(Side A)</span></li>
+                                      <li>Matrix / Runout: RUSLP-8223-B I LUV I JAH L-20163M-B <span class="muted">(Side B)</span></li>
+                                  </ul>
+              </div>
+            </div>
+                  </div>
+      </div>
+
+            <!-- Lightbox overlay -->
+      <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog">
+        <div class="lb-inner">
+          <button class="lb-close" aria-label="Close">✕</button>
+          <button class="lb-prev" aria-label="Previous">◀</button>
+          <img class="lb-img" src="" alt="Full-size image" />
+          <button class="lb-next" aria-label="Next">▶</button>
+          <div class="lb-counter">1 / 4</div>
+        </div>
+      </div>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', function(){
+          const images = [
+            '..\/images\/1374939\/d6ca57691ce373b1ec5a94a4da20e27c00fceea5.jpg', '..\/images\/1374939\/60f96d6a14ae082eab929dabe8f1e88a4d09834d.jpg', '..\/images\/1374939\/435e3cea2cbcda2dcd1cf4586722056a41fbdc5e.jpg', '..\/images\/1374939\/4238ce36e8cbb420dc13f1100190c2359dede153.jpg'          ];
+          const main = document.getElementById('main-cover');
+          const thumbs = document.querySelectorAll('.thumb');
+          const lb = document.getElementById('lightbox');
+          const lbImg = lb ? lb.querySelector('.lb-img') : null;
+          const lbClose = lb ? lb.querySelector('.lb-close') : null;
+          const lbPrev = lb ? lb.querySelector('.lb-prev') : null;
+          const lbNext = lb ? lb.querySelector('.lb-next') : null;
+          const lbCounter = lb ? lb.querySelector('.lb-counter') : null;
+          let idx = parseInt(main?.getAttribute('data-idx') || '0', 10) || 0;
+
+          function updateMain(to){
+            if (!main) return;
+            const i = Math.max(0, Math.min(images.length - 1, to));
+            if (images[i] && main.getAttribute('src') !== images[i]) {
+              main.setAttribute('src', images[i]);
+            }
+            main.setAttribute('data-idx', String(i));
+            idx = i;
+          }
+
+          function openLightbox(startIdx){
+            if (!lb || !lbImg) return;
+            idx = Math.max(0, Math.min(images.length - 1, startIdx));
+            lbImg.src = images[idx];
+            if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length;
+            lb.classList.add('open');
+            lb.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+          }
+          function closeLightbox(){
+            if (!lb) return;
+            lb.classList.remove('open');
+            lb.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+          }
+          function next(){ idx = (idx + 1) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
+          function prev(){ idx = (idx - 1 + images.length) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
+
+          // Thumbnail click: swap main and set index; Shift+Click opens lightbox
+          thumbs.forEach(function(btn){
+            btn.addEventListener('click', function(e){
+              const i = parseInt(this.getAttribute('data-idx') || '0', 10) || 0;
+              if (e.shiftKey) { openLightbox(i); return; }
+              updateMain(i);
+            });
+          });
+
+          // Main cover click: open lightbox on current index
+          if (main) {
+            main.addEventListener('click', function(){
+              const i = parseInt(main.getAttribute('data-idx') || '0', 10) || 0;
+              openLightbox(i);
+            });
+          }
+
+          // Lightbox interactions
+          lbClose?.addEventListener('click', closeLightbox);
+          lbPrev?.addEventListener('click', prev);
+          lbNext?.addEventListener('click', next);
+          lbImg?.addEventListener('click', next); // click image to advance
+          lb?.addEventListener('click', function(e){ if (e.target === lb) closeLightbox(); });
+
+          // Keyboard support
+          document.addEventListener('keydown', function(e){
+            if (!lb || !lb.classList.contains('open')) return;
+            if (e.key === 'Escape') { e.preventDefault(); closeLightbox(); }
+            else if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+          });
+
+          // Ensure initial main index reflects the list
+          if (images.length > 0 && main) {
+            let initial = images.indexOf(main.getAttribute('src'));
+            if (initial < 0) initial = 0;
+            main.setAttribute('data-idx', String(initial));
+          }
+        });
+      </script>
+            </div>
+
+  
+  <footer class="site-footer muted" style="text-align:center;margin:24px 0 8px 0;font-size:.9rem;">
+  Powered by Discogs API & Coffee Since 2025 | Lovingly Crafted in Boise, Idaho
+</footer>
+</body>
+</html>

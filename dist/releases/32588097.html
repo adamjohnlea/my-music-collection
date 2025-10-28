@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Devo — Recombo DNA</title>
+    <style>
+    :root { --bg:#0b0b0c; --card:#16171a; --text:#e7e7ea; --muted:#a0a3aa; --accent:#67e8f9; --overlay: rgba(0,0,0,.9); }
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif}
+    .wrap{max-width:1000px;margin:40px auto;padding:0 20px}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .layout{display:grid;grid-template-columns:280px 1fr;gap:24px}
+    .card{background:var(--card);border-radius:12px;overflow:hidden}
+    .cover{width:100%;aspect-ratio:1/1;object-fit:cover;background:#222;cursor:zoom-in}
+    .meta{padding:16px}
+    .muted{color:var(--muted)}
+    h1{margin:0 0 8px 0;font-size:1.6rem}
+
+    /* Lightbox */
+    .lightbox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--overlay);z-index:1000}
+    .lightbox.open{display:flex}
+    .lb-inner{position:relative;max-width:95vw;max-height:95vh;display:flex;align-items:center;justify-content:center}
+    .lb-img{max-width:95vw;max-height:95vh;object-fit:contain;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+    .lb-close{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:999px;width:40px;height:40px;cursor:pointer;font-size:20px}
+    .lb-nav{position:absolute;top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center}
+    .lb-prev,.lb-next{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:999px;width:44px;height:44px;cursor:pointer;font-size:20px}
+    .lb-prev{left:-60px}
+    .lb-next{right:-60px}
+    .lb-counter{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);color:#fff;background:rgba(0,0,0,.5);padding:4px 10px;border-radius:999px;font-size:.9rem}
+
+    @media (max-width: 800px){
+      .layout{grid-template-columns:1fr}
+      .lb-prev{left:10px}
+      .lb-next{right:10px}
+    }
+  </style>
+</head>
+<body>
+  
+    <div class="wrap">
+    <p><a href="../index.html">← Back</a></p>
+          <div class="layout">
+        <div>
+          <div class="card">
+                          <img id="main-cover" class="cover" src="../images/32588097/97642e14893b37da1e1cc32daf93b497b8ed67fa.jpg" alt="Recombo DNA cover" data-idx="0" />
+                      </div>
+                      <div class="thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+                              <button class="thumb" data-url="../images/32588097/97642e14893b37da1e1cc32daf93b497b8ed67fa.jpg" data-idx="0" title="Image 1" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/32588097/97642e14893b37da1e1cc32daf93b497b8ed67fa.jpg" alt="thumb 1" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:1" />
+                </button>
+                              <button class="thumb" data-url="../images/32588097/d31a435e22600df9e0c9dea1408ca5e6c56c7464.jpg" data-idx="1" title="Image 2" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/32588097/d31a435e22600df9e0c9dea1408ca5e6c56c7464.jpg" alt="thumb 2" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/32588097/ad61fc925fe9a5e97531d92a9739122e6f3c5695.jpg" data-idx="2" title="Image 3" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/32588097/ad61fc925fe9a5e97531d92a9739122e6f3c5695.jpg" alt="thumb 3" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/32588097/2d085bb5e706719098612cd51069153c08cd5aa3.jpg" data-idx="3" title="Image 4" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/32588097/2d085bb5e706719098612cd51069153c08cd5aa3.jpg" alt="thumb 4" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/32588097/66a556713d0ff2a7211db1b1c4b6202f91e39ac4.jpg" data-idx="4" title="Image 5" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/32588097/66a556713d0ff2a7211db1b1c4b6202f91e39ac4.jpg" alt="thumb 5" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/32588097/ff6b53b46294f1b9ced16419ccfee070af0b5abd.jpg" data-idx="5" title="Image 6" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/32588097/ff6b53b46294f1b9ced16419ccfee070af0b5abd.jpg" alt="thumb 6" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/32588097/bed2516b8dd30a556df80c79c9a2f0490c858e56.jpg" data-idx="6" title="Image 7" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/32588097/bed2516b8dd30a556df80c79c9a2f0490c858e56.jpg" alt="thumb 7" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/32588097/16361106f7daac9fa5fbcd947b189d4d3aa07e2a.jpg" data-idx="7" title="Image 8" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/32588097/16361106f7daac9fa5fbcd947b189d4d3aa07e2a.jpg" alt="thumb 8" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/32588097/e72f09163d89870bef69567f657057c6143a2349.jpg" data-idx="8" title="Image 9" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/32588097/e72f09163d89870bef69567f657057c6143a2349.jpg" alt="thumb 9" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/32588097/effe257df4da1b0c7dd0c6c27f373fe25eb61270.jpg" data-idx="9" title="Image 10" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/32588097/effe257df4da1b0c7dd0c6c27f373fe25eb61270.jpg" alt="thumb 10" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/32588097/6336ae4fc9bbdc5bb7ad0e8bd6891e3f38ccadec.jpg" data-idx="10" title="Image 11" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/32588097/6336ae4fc9bbdc5bb7ad0e8bd6891e3f38ccadec.jpg" alt="thumb 11" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/32588097/ddb87d86078471be0fb47c815d3021f21d6a0d18.jpg" data-idx="11" title="Image 12" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/32588097/ddb87d86078471be0fb47c815d3021f21d6a0d18.jpg" alt="thumb 12" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/32588097/1b5ad7c6a22bffa35fb14930100ec8e9b7d4ccf5.jpg" data-idx="12" title="Image 13" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/32588097/1b5ad7c6a22bffa35fb14930100ec8e9b7d4ccf5.jpg" alt="thumb 13" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/32588097/c0777321478af8b7a87ee8b8860af7f07444e0f6.jpg" data-idx="13" title="Image 14" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/32588097/c0777321478af8b7a87ee8b8860af7f07444e0f6.jpg" alt="thumb 14" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/32588097/92ae7ca5c80892229c3b93fae665d049823364dc.jpg" data-idx="14" title="Image 15" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/32588097/92ae7ca5c80892229c3b93fae665d049823364dc.jpg" alt="thumb 15" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/32588097/512976f89a9c9e3ad250a4e9c02075ca8cf5e703.jpg" data-idx="15" title="Image 16" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/32588097/512976f89a9c9e3ad250a4e9c02075ca8cf5e703.jpg" alt="thumb 16" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/32588097/b6180493b8a0fbe4816c411d5ed78bd0b46cfe9e.jpg" data-idx="16" title="Image 17" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/32588097/b6180493b8a0fbe4816c411d5ed78bd0b46cfe9e.jpg" alt="thumb 17" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/32588097/75eb96a6a5a105d705b19333d17a4d5f4ab529c6.jpg" data-idx="17" title="Image 18" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/32588097/75eb96a6a5a105d705b19333d17a4d5f4ab529c6.jpg" alt="thumb 18" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/32588097/d29adaecaabbf891ff692a352ec511b630623a52.jpg" data-idx="18" title="Image 19" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/32588097/d29adaecaabbf891ff692a352ec511b630623a52.jpg" alt="thumb 19" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/32588097/ece4e0721ec6affadd9fb49f2d0174a31ab76607.jpg" data-idx="19" title="Image 20" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/32588097/ece4e0721ec6affadd9fb49f2d0174a31ab76607.jpg" alt="thumb 20" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/32588097/abe49c66950bd268623490a859b0421feeff3123.jpg" data-idx="20" title="Image 21" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/32588097/abe49c66950bd268623490a859b0421feeff3123.jpg" alt="thumb 21" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/32588097/76b98be2adb53b19274cdc6e88909feb2e538804.jpg" data-idx="21" title="Image 22" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/32588097/76b98be2adb53b19274cdc6e88909feb2e538804.jpg" alt="thumb 22" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/32588097/c226523f0dc3de5cde6d60f4a380fa1231e9e29c.jpg" data-idx="22" title="Image 23" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/32588097/c226523f0dc3de5cde6d60f4a380fa1231e9e29c.jpg" alt="thumb 23" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                          </div>
+                  </div>
+        <div>
+          <h1>Recombo DNA</h1>
+          <p class="muted">Devo • 2024</p>
+          <p class="muted">UK</p>
+                      <p style="margin:8px 0;">
+              <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Rock</span>              <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">New Wave</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Post-Punk</span>            </p>
+          
+                      <p class="muted">Formats:
+                              Vinyl (Big Mess Colored Vinyl),                               CD,                               All Media (Big Mess)                          </p>
+          
+                      <p class="muted">Labels:
+              Futurismo (FTRSMO53A)            </p>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Tracklist</strong>
+                <ol>
+                                      <li> — Sequence: (a)</li>
+                                      <li>A1 — A Neccessary Response With Jerry Casale <span class="muted">(0:15)</span></li>
+                                      <li>A2 — Recombo DNA (Demo) <span class="muted">(2:06)</span></li>
+                                      <li>A3 — The Words Get Stuck In My Throat (Live) <span class="muted">(5:27)</span></li>
+                                      <li>A4 — Sloppy (I Saw My Baby Gettin&#039;) (Demo) <span class="muted">(2:17)</span></li>
+                                      <li>A5 — Be Stiff (Alternate Mix) <span class="muted">(2:43)</span></li>
+                                      <li>A6 — Pink Pussycat (Demo) <span class="muted">(4:08)</span></li>
+                                      <li>A7 — Goo Goo Itch (Alternate Version) <span class="muted">(2:25)</span></li>
+                                      <li>A8 — Strange Pursuit (Demo) <span class="muted">(2:31)</span></li>
+                                      <li> — Sequence: (b)</li>
+                                      <li>B1 — The Day My Baby Gave Me A Surprise (Demo) <span class="muted">(3:32)</span></li>
+                                      <li>B2 — Bushwacked (Prosthetic Version) <span class="muted">(4:40)</span></li>
+                                      <li>B3 — Girl U Want (Demo Alternate Version) <span class="muted">(2:59)</span></li>
+                                      <li>B4 — Turn Around (Demo Alternate Version) <span class="muted">(2:12)</span></li>
+                                      <li>B5 — Snowball (Demo Alternate Version) <span class="muted">(2:49)</span></li>
+                                      <li>B6 — Luv &amp; Such <span class="muted">(2:53)</span></li>
+                                      <li>B7 — Conscious Mutation with Mark Motherbaugh <span class="muted">(0:38)</span></li>
+                                      <li> — Sequence: (c)</li>
+                                      <li>C1 — Gates Of Steel (Demo Alternate Version) <span class="muted">(3:28)</span></li>
+                                      <li>C2 — Planet Earth (Demo Alternate Version) <span class="muted">(3:16)</span></li>
+                                      <li>C3 — Whip It (Demo Alternate Version) <span class="muted">(2:38)</span></li>
+                                      <li>C4 — Cold War (Demo Alternate Version) <span class="muted">(2:33)</span></li>
+                                      <li>C5 — Time Bomb <span class="muted">(3:13)</span></li>
+                                      <li>C6 — That&#039;s Pep (Demo Alternate Version) <span class="muted">(2:31)</span></li>
+                                      <li>C7 — Mental Warfare With Jerry Casale And Mark Mothersbaugh <span class="muted">(0:35)</span></li>
+                                      <li> — Sequence: (d)</li>
+                                      <li>D1 — Ton &#039;O Luv (Instrumental Demo) <span class="muted">(2:54)</span></li>
+                                      <li>D2 — Make Me Dance (Labeled &#039;Make Me Move&#039;) <span class="muted">(2:16)</span></li>
+                                      <li>D3 — Gotta Serve Somebody (Live) By Dove <span class="muted">(6:30)</span></li>
+                                      <li>D4 — I Saw Jesus <span class="muted">(1:30)</span></li>
+                                      <li>D5 — Psychology Of Desire (Demo) <span class="muted">(4:23)</span></li>
+                                      <li>D6 — Pity You (Demo) <span class="muted">(2:54)</span></li>
+                                      <li> — Sequence: (e)</li>
+                                      <li>E1 — Beautiful World (Demo) <span class="muted">(3:41)</span></li>
+                                      <li>E2 — Race Of Doom (Demo) <span class="muted">(3:43)</span></li>
+                                      <li>E3 — I Desire (Demo) <span class="muted">(3:18)</span></li>
+                                      <li>E4 — Big Mess (Demo) <span class="muted">(2:48)</span></li>
+                                      <li>E5 — The 4th Dimension (Alternate Version Rough Mix) <span class="muted">(4:19)</span></li>
+                                      <li>E6 — Here To Go (Alternate Version Rough Mix) <span class="muted">(3:18)</span></li>
+                                      <li> — Sequence: (f)</li>
+                                      <li>F1 — Some Things Don&#039;t Change (Rough Mix) <span class="muted">(2:55)</span></li>
+                                      <li>F2 — Big Adventure (Rough Mix) <span class="muted">(2:45)</span></li>
+                                      <li>F3 — No Noise (Rough Mix) <span class="muted">(2:50)</span></li>
+                                      <li>F4 — Love Is Stronger Than Dirt <span class="muted">(2:11)</span></li>
+                                      <li>F5 — Faster And Faster <span class="muted">(2:49)</span></li>
+                                      <li>F6 — Modern Life <span class="muted">(3:04)</span></li>
+                                      <li>F7 — We Are Unique With Jerry Casale And Mark Mothersbaugh <span class="muted">(0:31)</span></li>
+                                      <li> — Sequence: (g)</li>
+                                      <li>G1 — The Only One (Demo) Vocal By Toni Basil <span class="muted">(4:06)</span></li>
+                                      <li>G2 — Baby Doll (Demo) <span class="muted">(3:36)</span></li>
+                                      <li>G3 — Some Things Never Change (Demo) <span class="muted">(5:27)</span></li>
+                                      <li>G4 — Plain Truth (Demo) <span class="muted">(3:59)</span></li>
+                                      <li>G5 — Happy Guy (Demo) <span class="muted">(3:32)</span></li>
+                                      <li> — Sequence: (h)</li>
+                                      <li>H1 — Before Babydoll There Was Satan With Mark Motherbaugh <span class="muted">(0:47)</span></li>
+                                      <li>H2 — Satan Rm (Pre-Baby Doll) <span class="muted">(3:47)</span></li>
+                                      <li>H3 — Red Alert (Unreleased) <span class="muted">(2:56)</span></li>
+                                      <li>H4 — Sad Song (Unreleased) <span class="muted">(3:35)</span></li>
+                                      <li>H5 — Mind Games (Demo) <span class="muted">(2:25)</span></li>
+                                      <li>H6 — Later Is Now (Instrumental Demo) <span class="muted">(3:53)</span></li>
+                                      <li>H7 — It&#039;s Not Nuclear Bombs You Must Fear With Booji Boy <span class="muted">(0:16)</span></li>
+                                      <li> — Sequence: (i)</li>
+                                      <li>CD-1 — The Somewhere Suite (Studio Version Demo) <span class="muted">(18:22)</span></li>
+                                  </ol>
+              </div>
+            </div>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Videos</strong>
+                <ul>
+                                      <li><a href="https://www.youtube.com/watch?v=uHExhwQWwJs" target="_blank" rel="noopener">DEVO - Recombo DNA (demo)</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=brSmxBIzEkM" target="_blank" rel="noopener">Devo - Recombo DNA (1977 Demo) (Speed/Pitch Corrected)</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=vCMiUO0tvKg" target="_blank" rel="noopener">DEVO - Time Bomb</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=NgMnb2TgrM4" target="_blank" rel="noopener">DEVO - Be Stiff (alternate mix)</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=pbz8094OnwQ" target="_blank" rel="noopener">Devo: Recombo DNA Disc 2</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=l4tNqBNWywA" target="_blank" rel="noopener">Mystery Bonus Track Teaser no1 - DEVO Recombo DNA 2017 Release</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=Fkw07flI7Jo" target="_blank" rel="noopener">DEVO - Somewhere with DEVO (Recombo DNA studio version / demo)</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=A5Uh4MkLGE4" target="_blank" rel="noopener">DEVO - Strange Pursuit (Demo)</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=WIos_bkAzrk" target="_blank" rel="noopener">Devo - Red Shark</a></li>
+                                  </ul>
+              </div>
+            </div>
+          
+          
+          <div class="card" style="margin-top:16px;">
+            <div class="meta">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                <strong>My Notes</strong>
+                <button id="editToggle" type="button" title="Edit" style="background:transparent;color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:4px 8px;cursor:pointer;font-size:.9rem">Edit</button>
+              </div>
+
+              
+              <div id="notesView" style="margin-top:8px">
+                                                  <div class="muted">(none)</div>
+                              </div>
+
+              <form id="notesForm" method="post" action="/release/save" style="display:none; margin-top:8px; flex-direction:column; gap:8px">
+                              <input type="hidden" name="_token" value="" />
+                <input type="hidden" name="release_id" value="32588097" />
+                <input type="hidden" name="return" value="../index.html" />
+                <label>Rating
+                  <select name="rating" style="background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:6px 8px">
+                    <option value="">—</option>
+                                          <option value="0" >0/5</option>
+                                          <option value="1" >1/5</option>
+                                          <option value="2" >2/5</option>
+                                          <option value="3" >3/5</option>
+                                          <option value="4" >4/5</option>
+                                          <option value="5" >5/5</option>
+                                      </select>
+                </label>
+                <label>Notes
+                  <textarea name="notes" rows="4" style="width:100%;background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:8px"></textarea>
+                </label>
+                <div>
+                  <button type="submit" style="background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:8px 12px;cursor:pointer">Save to Discogs</button>
+                  <span class="muted" style="margin-left:8px">This queues a background job. Run <code>php bin/console sync:push</code> to process.</span>
+                </div>
+                <p class="muted" style="margin:6px 0 0 0; font-size:.9rem">Note: your rating and notes are stored on your personal Discogs collection entry for this release. They do not appear on the public release page.</p>
+              </form>
+
+              <script>
+                (function(){
+                  const btn = document.getElementById('editToggle');
+                  const form = document.getElementById('notesForm');
+                  const view = document.getElementById('notesView');
+                  if (!btn || !form || !view) return;
+                  function setOpen(open){
+                    form.style.display = open ? 'flex' : 'none';
+                    view.style.display = open ? 'none' : 'block';
+                    btn.textContent = open ? 'Cancel' : 'Edit';
+                  }
+                  btn.addEventListener('click', function(){
+                    const open = form.style.display === 'none';
+                    setOpen(open);
+                  });
+                  // If page loaded with ?edit=1, open form
+                  const q = new URLSearchParams(window.location.search);
+                  if (q.get('edit') === '1') setOpen(true);
+                })();
+              </script>
+            </div>
+          </div>
+
+          
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Barcodes</strong>
+                <ul>
+                                      <li>5053760123309</li>
+                                  </ul>
+              </div>
+            </div>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Identifiers</strong>
+                <ul>
+                                      <li>Matrix / Runout: MPO [Logo] ® 24345491 <span class="muted">(Side A - Stamped)</span></li>
+                                      <li>Matrix / Runout: MPO FUTNO 27 A <span class="muted">(Side A - Etched)</span></li>
+                                      <li>Matrix / Runout: MPO [Logo] ® 24345492 <span class="muted">(Side B - Stamped)</span></li>
+                                      <li>Matrix / Runout: MPO GREG @ FT FUTNO 27 B <span class="muted">(Side B - Etched)</span></li>
+                                      <li>Matrix / Runout: MPO [Logo] ® 24351984 <span class="muted">(Side C - Stamped)</span></li>
+                                      <li>Matrix / Runout: MPO FUTNO 27 C <span class="muted">(Side C - Etched)</span></li>
+                                      <li>Matrix / Runout: MPO [Logo] ® 24351115 <span class="muted">(Side D - Stamped)</span></li>
+                                      <li>Matrix / Runout: GREG @ FT MPO FUTNO 27 D <span class="muted">(Side D - Etched)</span></li>
+                                      <li>Matrix / Runout: MPO [Logo] ® 24345509 <span class="muted">(Side E - Stamped)</span></li>
+                                      <li>Matrix / Runout: MPO FUTNO 27 E <span class="muted">(Side E - Etched)</span></li>
+                                      <li>Matrix / Runout: MPO [Logo] ® 24345510 <span class="muted">(Side F - Stamped)</span></li>
+                                      <li>Matrix / Runout: GREG @ FT MPO FUTNO 27 F <span class="muted">(Side F - Etched)</span></li>
+                                      <li>Matrix / Runout: MPO [Logo] ® 24345507 <span class="muted">(Side G - Stamped)</span></li>
+                                      <li>Matrix / Runout: MPO FUTN O27T G <span class="muted">(Side G - Etched)</span></li>
+                                      <li>Matrix / Runout: MPO [Logo] ® 24345508 <span class="muted">(Side H - Stamped)</span></li>
+                                      <li>Matrix / Runout: MPO FUTNO 27 H GREG @ FT <span class="muted">(Side H - Etched)</span></li>
+                                  </ul>
+              </div>
+            </div>
+                  </div>
+      </div>
+
+            <!-- Lightbox overlay -->
+      <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog">
+        <div class="lb-inner">
+          <button class="lb-close" aria-label="Close">✕</button>
+          <button class="lb-prev" aria-label="Previous">◀</button>
+          <img class="lb-img" src="" alt="Full-size image" />
+          <button class="lb-next" aria-label="Next">▶</button>
+          <div class="lb-counter">1 / 23</div>
+        </div>
+      </div>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', function(){
+          const images = [
+            '..\/images\/32588097\/97642e14893b37da1e1cc32daf93b497b8ed67fa.jpg', '..\/images\/32588097\/d31a435e22600df9e0c9dea1408ca5e6c56c7464.jpg', '..\/images\/32588097\/ad61fc925fe9a5e97531d92a9739122e6f3c5695.jpg', '..\/images\/32588097\/2d085bb5e706719098612cd51069153c08cd5aa3.jpg', '..\/images\/32588097\/66a556713d0ff2a7211db1b1c4b6202f91e39ac4.jpg', '..\/images\/32588097\/ff6b53b46294f1b9ced16419ccfee070af0b5abd.jpg', '..\/images\/32588097\/bed2516b8dd30a556df80c79c9a2f0490c858e56.jpg', '..\/images\/32588097\/16361106f7daac9fa5fbcd947b189d4d3aa07e2a.jpg', '..\/images\/32588097\/e72f09163d89870bef69567f657057c6143a2349.jpg', '..\/images\/32588097\/effe257df4da1b0c7dd0c6c27f373fe25eb61270.jpg', '..\/images\/32588097\/6336ae4fc9bbdc5bb7ad0e8bd6891e3f38ccadec.jpg', '..\/images\/32588097\/ddb87d86078471be0fb47c815d3021f21d6a0d18.jpg', '..\/images\/32588097\/1b5ad7c6a22bffa35fb14930100ec8e9b7d4ccf5.jpg', '..\/images\/32588097\/c0777321478af8b7a87ee8b8860af7f07444e0f6.jpg', '..\/images\/32588097\/92ae7ca5c80892229c3b93fae665d049823364dc.jpg', '..\/images\/32588097\/512976f89a9c9e3ad250a4e9c02075ca8cf5e703.jpg', '..\/images\/32588097\/b6180493b8a0fbe4816c411d5ed78bd0b46cfe9e.jpg', '..\/images\/32588097\/75eb96a6a5a105d705b19333d17a4d5f4ab529c6.jpg', '..\/images\/32588097\/d29adaecaabbf891ff692a352ec511b630623a52.jpg', '..\/images\/32588097\/ece4e0721ec6affadd9fb49f2d0174a31ab76607.jpg', '..\/images\/32588097\/abe49c66950bd268623490a859b0421feeff3123.jpg', '..\/images\/32588097\/76b98be2adb53b19274cdc6e88909feb2e538804.jpg', '..\/images\/32588097\/c226523f0dc3de5cde6d60f4a380fa1231e9e29c.jpg'          ];
+          const main = document.getElementById('main-cover');
+          const thumbs = document.querySelectorAll('.thumb');
+          const lb = document.getElementById('lightbox');
+          const lbImg = lb ? lb.querySelector('.lb-img') : null;
+          const lbClose = lb ? lb.querySelector('.lb-close') : null;
+          const lbPrev = lb ? lb.querySelector('.lb-prev') : null;
+          const lbNext = lb ? lb.querySelector('.lb-next') : null;
+          const lbCounter = lb ? lb.querySelector('.lb-counter') : null;
+          let idx = parseInt(main?.getAttribute('data-idx') || '0', 10) || 0;
+
+          function updateMain(to){
+            if (!main) return;
+            const i = Math.max(0, Math.min(images.length - 1, to));
+            if (images[i] && main.getAttribute('src') !== images[i]) {
+              main.setAttribute('src', images[i]);
+            }
+            main.setAttribute('data-idx', String(i));
+            idx = i;
+          }
+
+          function openLightbox(startIdx){
+            if (!lb || !lbImg) return;
+            idx = Math.max(0, Math.min(images.length - 1, startIdx));
+            lbImg.src = images[idx];
+            if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length;
+            lb.classList.add('open');
+            lb.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+          }
+          function closeLightbox(){
+            if (!lb) return;
+            lb.classList.remove('open');
+            lb.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+          }
+          function next(){ idx = (idx + 1) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
+          function prev(){ idx = (idx - 1 + images.length) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
+
+          // Thumbnail click: swap main and set index; Shift+Click opens lightbox
+          thumbs.forEach(function(btn){
+            btn.addEventListener('click', function(e){
+              const i = parseInt(this.getAttribute('data-idx') || '0', 10) || 0;
+              if (e.shiftKey) { openLightbox(i); return; }
+              updateMain(i);
+            });
+          });
+
+          // Main cover click: open lightbox on current index
+          if (main) {
+            main.addEventListener('click', function(){
+              const i = parseInt(main.getAttribute('data-idx') || '0', 10) || 0;
+              openLightbox(i);
+            });
+          }
+
+          // Lightbox interactions
+          lbClose?.addEventListener('click', closeLightbox);
+          lbPrev?.addEventListener('click', prev);
+          lbNext?.addEventListener('click', next);
+          lbImg?.addEventListener('click', next); // click image to advance
+          lb?.addEventListener('click', function(e){ if (e.target === lb) closeLightbox(); });
+
+          // Keyboard support
+          document.addEventListener('keydown', function(e){
+            if (!lb || !lb.classList.contains('open')) return;
+            if (e.key === 'Escape') { e.preventDefault(); closeLightbox(); }
+            else if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+          });
+
+          // Ensure initial main index reflects the list
+          if (images.length > 0 && main) {
+            let initial = images.indexOf(main.getAttribute('src'));
+            if (initial < 0) initial = 0;
+            main.setAttribute('data-idx', String(initial));
+          }
+        });
+      </script>
+            </div>
+
+  
+  <footer class="site-footer muted" style="text-align:center;margin:24px 0 8px 0;font-size:.9rem;">
+  Powered by Discogs API & Coffee Since 2025 | Lovingly Crafted in Boise, Idaho
+</footer>
+</body>
+</html>

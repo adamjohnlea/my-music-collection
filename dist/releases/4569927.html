@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Devo — Hardcore Volume 1</title>
+    <style>
+    :root { --bg:#0b0b0c; --card:#16171a; --text:#e7e7ea; --muted:#a0a3aa; --accent:#67e8f9; --overlay: rgba(0,0,0,.9); }
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif}
+    .wrap{max-width:1000px;margin:40px auto;padding:0 20px}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .layout{display:grid;grid-template-columns:280px 1fr;gap:24px}
+    .card{background:var(--card);border-radius:12px;overflow:hidden}
+    .cover{width:100%;aspect-ratio:1/1;object-fit:cover;background:#222;cursor:zoom-in}
+    .meta{padding:16px}
+    .muted{color:var(--muted)}
+    h1{margin:0 0 8px 0;font-size:1.6rem}
+
+    /* Lightbox */
+    .lightbox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--overlay);z-index:1000}
+    .lightbox.open{display:flex}
+    .lb-inner{position:relative;max-width:95vw;max-height:95vh;display:flex;align-items:center;justify-content:center}
+    .lb-img{max-width:95vw;max-height:95vh;object-fit:contain;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+    .lb-close{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:999px;width:40px;height:40px;cursor:pointer;font-size:20px}
+    .lb-nav{position:absolute;top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center}
+    .lb-prev,.lb-next{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:999px;width:44px;height:44px;cursor:pointer;font-size:20px}
+    .lb-prev{left:-60px}
+    .lb-next{right:-60px}
+    .lb-counter{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);color:#fff;background:rgba(0,0,0,.5);padding:4px 10px;border-radius:999px;font-size:.9rem}
+
+    @media (max-width: 800px){
+      .layout{grid-template-columns:1fr}
+      .lb-prev{left:10px}
+      .lb-next{right:10px}
+    }
+  </style>
+</head>
+<body>
+  
+    <div class="wrap">
+    <p><a href="../index.html">← Back</a></p>
+          <div class="layout">
+        <div>
+          <div class="card">
+                          <img id="main-cover" class="cover" src="../images/4569927/df86fd3d34d788586095373ad39dabb3e1757efa.jpg" alt="Hardcore Volume 1 cover" data-idx="0" />
+                      </div>
+                      <div class="thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+                              <button class="thumb" data-url="../images/4569927/df86fd3d34d788586095373ad39dabb3e1757efa.jpg" data-idx="0" title="Image 1" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/4569927/df86fd3d34d788586095373ad39dabb3e1757efa.jpg" alt="thumb 1" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:1" />
+                </button>
+                              <button class="thumb" data-url="../images/4569927/69fcdb1bd9467bb766731f3f3c5e3cd9fd7135b6.jpg" data-idx="1" title="Image 2" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/4569927/69fcdb1bd9467bb766731f3f3c5e3cd9fd7135b6.jpg" alt="thumb 2" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/4569927/2484709ba7685f248f63a9c7dba19deabd1bde28.jpg" data-idx="2" title="Image 3" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/4569927/2484709ba7685f248f63a9c7dba19deabd1bde28.jpg" alt="thumb 3" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/4569927/9480ca47d16037e048a9880b1574f191e9812739.jpg" data-idx="3" title="Image 4" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/4569927/9480ca47d16037e048a9880b1574f191e9812739.jpg" alt="thumb 4" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/4569927/c2c814139054f07796a66f15ae88052add513aac.jpg" data-idx="4" title="Image 5" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/4569927/c2c814139054f07796a66f15ae88052add513aac.jpg" alt="thumb 5" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/4569927/80677d1e780d18c85259f5741dc6f6d7a2b6852d.jpg" data-idx="5" title="Image 6" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/4569927/80677d1e780d18c85259f5741dc6f6d7a2b6852d.jpg" alt="thumb 6" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                          </div>
+                  </div>
+        <div>
+          <h1>Hardcore Volume 1</h1>
+          <p class="muted">Devo • 2013</p>
+          <p class="muted">US</p>
+                      <p style="margin:8px 0;">
+              <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Electronic</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Rock</span>              <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">New Wave</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Experimental</span>            </p>
+          
+                      <p class="muted">Formats:
+                              Vinyl                          </p>
+          
+                      <p class="muted">Labels:
+              Superior Viaduct (SV024)            </p>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Tracklist</strong>
+                <ol>
+                                      <li>A1 — Mechanical Man <span class="muted">(4:20)</span></li>
+                                      <li>A2 — Auto Modown <span class="muted">(2:01)</span></li>
+                                      <li>A3 — Space Girl Blues <span class="muted">(1:50)</span></li>
+                                      <li>A4 — Social Fools <span class="muted">(3:37)</span></li>
+                                      <li>A5 — Soo Bawls <span class="muted">(2:40)</span></li>
+                                      <li>A6 — (I Can&#039;t Get No) Satisfaction <span class="muted">(2:58)</span></li>
+                                      <li>A7 — Jocko Homo <span class="muted">(2:53)</span></li>
+                                      <li>B1 — Golden Energy <span class="muted">(2:27)</span></li>
+                                      <li>B2 — Buttered Beauties <span class="muted">(3:37)</span></li>
+                                      <li>B3 — Midget <span class="muted">(2:37)</span></li>
+                                      <li>B4 — I&#039;m A Potato <span class="muted">(2:35)</span></li>
+                                      <li>B5 — Uglatto <span class="muted">(1:58)</span></li>
+                                      <li>B6 — Stop Look And Listen <span class="muted">(2:31)</span></li>
+                                      <li>B7 — Ono <span class="muted">(2:44)</span></li>
+                                      <li>B8 — Mongoloid <span class="muted">(3:32)</span></li>
+                                  </ol>
+              </div>
+            </div>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Videos</strong>
+                <ul>
+                                      <li><a href="https://www.youtube.com/watch?v=SJcshY5ywro" target="_blank" rel="noopener">Mechanical Man - Devo</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=YJmvWHcOB50" target="_blank" rel="noopener">Auto Modown</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=Fhf_3NAqJF4" target="_blank" rel="noopener">Space Girl Blues</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=Fo7bgRMrnZQ" target="_blank" rel="noopener">Social  Fools - Devo</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=BItxv2ey-ek" target="_blank" rel="noopener">Soo Bawls</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=XTIFncMcs1k" target="_blank" rel="noopener">Satisfaction</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=mxBPijR41ac" target="_blank" rel="noopener">Jocko Homo</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=BPGPs2bGRJI" target="_blank" rel="noopener">Golden Energy</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=QXgBpMEP7i4" target="_blank" rel="noopener">Devo - Buttered Beauties [Hardcore Devo: Volume One]</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=wVoP-Y2Z4ZE" target="_blank" rel="noopener">Devo - Midget</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=7092LEI9wQQ" target="_blank" rel="noopener">I&#039;m A Potato</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=8bdjBNQRSgg" target="_blank" rel="noopener">Devo - Uglatto</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=g5CjICLA4mA" target="_blank" rel="noopener">Stop Look And Listen</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=_zfz2P6gAz4" target="_blank" rel="noopener">Ono</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=cBSoeWvkIMk" target="_blank" rel="noopener">Mongoloid</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=QXgBpMEP7i4" target="_blank" rel="noopener">Devo - Buttered Beauties [Hardcore Devo: Volume One]</a></li>
+                                  </ul>
+              </div>
+            </div>
+          
+          
+          <div class="card" style="margin-top:16px;">
+            <div class="meta">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                <strong>My Notes</strong>
+                <button id="editToggle" type="button" title="Edit" style="background:transparent;color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:4px 8px;cursor:pointer;font-size:.9rem">Edit</button>
+              </div>
+
+              
+              <div id="notesView" style="margin-top:8px">
+                                                  <div class="muted">(none)</div>
+                              </div>
+
+              <form id="notesForm" method="post" action="/release/save" style="display:none; margin-top:8px; flex-direction:column; gap:8px">
+                              <input type="hidden" name="_token" value="" />
+                <input type="hidden" name="release_id" value="4569927" />
+                <input type="hidden" name="return" value="../index.html" />
+                <label>Rating
+                  <select name="rating" style="background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:6px 8px">
+                    <option value="">—</option>
+                                          <option value="0" >0/5</option>
+                                          <option value="1" >1/5</option>
+                                          <option value="2" >2/5</option>
+                                          <option value="3" >3/5</option>
+                                          <option value="4" >4/5</option>
+                                          <option value="5" >5/5</option>
+                                      </select>
+                </label>
+                <label>Notes
+                  <textarea name="notes" rows="4" style="width:100%;background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:8px"></textarea>
+                </label>
+                <div>
+                  <button type="submit" style="background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:8px 12px;cursor:pointer">Save to Discogs</button>
+                  <span class="muted" style="margin-left:8px">This queues a background job. Run <code>php bin/console sync:push</code> to process.</span>
+                </div>
+                <p class="muted" style="margin:6px 0 0 0; font-size:.9rem">Note: your rating and notes are stored on your personal Discogs collection entry for this release. They do not appear on the public release page.</p>
+              </form>
+
+              <script>
+                (function(){
+                  const btn = document.getElementById('editToggle');
+                  const form = document.getElementById('notesForm');
+                  const view = document.getElementById('notesView');
+                  if (!btn || !form || !view) return;
+                  function setOpen(open){
+                    form.style.display = open ? 'flex' : 'none';
+                    view.style.display = open ? 'none' : 'block';
+                    btn.textContent = open ? 'Cancel' : 'Edit';
+                  }
+                  btn.addEventListener('click', function(){
+                    const open = form.style.display === 'none';
+                    setOpen(open);
+                  });
+                  // If page loaded with ?edit=1, open form
+                  const q = new URLSearchParams(window.location.search);
+                  if (q.get('edit') === '1') setOpen(true);
+                })();
+              </script>
+            </div>
+          </div>
+
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Credits</strong>
+                <ul>
+                                      <li>
+                      Bob Mothersbaugh
+                      <span class="muted">— Backing Vocals</span>                      <span class="muted"> (tracks: A4 to A7, B2, B3)</span>                    </li>
+                                      <li>
+                      Gerald V. Casale
+                      <span class="muted">— Backing Vocals</span>                      <span class="muted"> (tracks: A5 to A7)</span>                    </li>
+                                      <li>
+                      Mark Mothersbaugh
+                      <span class="muted">— Backing Vocals</span>                      <span class="muted"> (tracks: B2, B7)</span>                    </li>
+                                      <li>
+                      Gerald V. Casale
+                      <span class="muted">— Bass</span>                                          </li>
+                                      <li>
+                      Nathaniel Russell
+                      <span class="muted">— Design [Reissue]</span>                                          </li>
+                                      <li>
+                      Alan Myers
+                      <span class="muted">— Drums</span>                      <span class="muted"> (tracks: A5, A6, B5, B6, B8)</span>                    </li>
+                                      <li>
+                      Jim Mothersbaugh
+                      <span class="muted">— Drums</span>                      <span class="muted"> (tracks: A1 to A4, A7 to B4, B7)</span>                    </li>
+                                      <li>
+                      Bob Mothersbaugh
+                      <span class="muted">— Guitar</span>                                          </li>
+                                      <li>
+                      Robert Casale
+                      <span class="muted">— Guitar [Additional]</span>                      <span class="muted"> (tracks: A5, A6, B4, B6 to B8)</span>                    </li>
+                                      <li>
+                      George Horn
+                      <span class="muted">— Mastered By</span>                                          </li>
+                                      <li>
+                      Barbara Watson
+                      <span class="muted">— Photography By [Back Cover / Insert]</span>                                          </li>
+                                      <li>
+                      Moshe Brakha
+                      <span class="muted">— Photography By [Front Cover]</span>                                          </li>
+                                      <li>
+                      Devo
+                      <span class="muted">— Recorded By, Mixed By, Liner Notes</span>                                          </li>
+                                      <li>
+                      Michael Pilmer
+                      <span class="muted">— Research [Archival]</span>                                          </li>
+                                      <li>
+                      Mark Mothersbaugh
+                      <span class="muted">— Synth [Synths]</span>                                          </li>
+                                      <li>
+                      Bob Mothersbaugh
+                      <span class="muted">— Vocals</span>                      <span class="muted"> (tracks: B8)</span>                    </li>
+                                      <li>
+                      Gerald V. Casale
+                      <span class="muted">— Vocals</span>                      <span class="muted"> (tracks: A2 to A4, B2 to B5, B7, B8)</span>                    </li>
+                                      <li>
+                      Mark Mothersbaugh
+                      <span class="muted">— Vocals</span>                      <span class="muted"> (tracks: A1, A5 to A7, B1, B6)</span>                    </li>
+                                      <li>
+                      Bob Mothersbaugh
+                      <span class="muted">— Written-By</span>                      <span class="muted"> (tracks: B3)</span>                    </li>
+                                      <li>
+                      Gerald V. Casale
+                      <span class="muted">— Written-By</span>                      <span class="muted"> (tracks: A2 to A4, B2 to B5, B7, B8)</span>                    </li>
+                                      <li>
+                      Jagger-Richards
+                      <span class="muted">— Written-By</span>                      <span class="muted"> (tracks: A6)</span>                    </li>
+                                      <li>
+                      Jagger-Richards
+                      <span class="muted">— Written-By</span>                      <span class="muted"> (tracks: A6)</span>                    </li>
+                                      <li>
+                      Mark Mothersbaugh
+                      <span class="muted">— Written-By</span>                      <span class="muted"> (tracks: A1, A5, A7, B1, B2, B6, B7)</span>                    </li>
+                                      <li>
+                      Robert Casale
+                      <span class="muted">— Written-By</span>                      <span class="muted"> (tracks: B4)</span>                    </li>
+                                  </ul>
+              </div>
+            </div>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Companies</strong>
+                <ul>
+                                      <li>
+                      Superior Viaduct
+                      <span class="muted"> — Licensed To</span>                                          </li>
+                                      <li>
+                      DEVO Inc.
+                      <span class="muted"> — Copyright (c)</span>                                          </li>
+                                      <li>
+                      DEVO Inc.
+                      <span class="muted"> — Phonographic Copyright (p)</span>                                          </li>
+                                      <li>
+                      Recombinant Music
+                      <span class="muted"> — Published By</span>                                          </li>
+                                      <li>
+                      ABKCO Music
+                      <span class="muted"> — Published By</span>                                          </li>
+                                      <li>
+                      Rainbo Records
+                      <span class="muted"> — Pressed By</span>                                          </li>
+                                      <li>
+                      Rainbo Records
+                      <span class="muted"> — Pressed By</span>                                          </li>
+                                      <li>
+                      Fantasy Studios
+                      <span class="muted"> — Mastered At</span>                                          </li>
+                                  </ul>
+              </div>
+            </div>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Barcodes</strong>
+                <ul>
+                                      <li>857176003249</li>
+                                  </ul>
+              </div>
+            </div>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Identifiers</strong>
+                <ul>
+                                      <li>Matrix / Runout: SV-024 A1 S-85650 <span class="muted">(Side A runout, etched)</span></li>
+                                      <li>Matrix / Runout: SV-024 B2 S-85651 RE-1 <span class="muted">(Side B runout, etched)</span></li>
+                                      <li>Rights Society: BMI</li>
+                                  </ul>
+              </div>
+            </div>
+                  </div>
+      </div>
+
+            <!-- Lightbox overlay -->
+      <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog">
+        <div class="lb-inner">
+          <button class="lb-close" aria-label="Close">✕</button>
+          <button class="lb-prev" aria-label="Previous">◀</button>
+          <img class="lb-img" src="" alt="Full-size image" />
+          <button class="lb-next" aria-label="Next">▶</button>
+          <div class="lb-counter">1 / 6</div>
+        </div>
+      </div>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', function(){
+          const images = [
+            '..\/images\/4569927\/df86fd3d34d788586095373ad39dabb3e1757efa.jpg', '..\/images\/4569927\/69fcdb1bd9467bb766731f3f3c5e3cd9fd7135b6.jpg', '..\/images\/4569927\/2484709ba7685f248f63a9c7dba19deabd1bde28.jpg', '..\/images\/4569927\/9480ca47d16037e048a9880b1574f191e9812739.jpg', '..\/images\/4569927\/c2c814139054f07796a66f15ae88052add513aac.jpg', '..\/images\/4569927\/80677d1e780d18c85259f5741dc6f6d7a2b6852d.jpg'          ];
+          const main = document.getElementById('main-cover');
+          const thumbs = document.querySelectorAll('.thumb');
+          const lb = document.getElementById('lightbox');
+          const lbImg = lb ? lb.querySelector('.lb-img') : null;
+          const lbClose = lb ? lb.querySelector('.lb-close') : null;
+          const lbPrev = lb ? lb.querySelector('.lb-prev') : null;
+          const lbNext = lb ? lb.querySelector('.lb-next') : null;
+          const lbCounter = lb ? lb.querySelector('.lb-counter') : null;
+          let idx = parseInt(main?.getAttribute('data-idx') || '0', 10) || 0;
+
+          function updateMain(to){
+            if (!main) return;
+            const i = Math.max(0, Math.min(images.length - 1, to));
+            if (images[i] && main.getAttribute('src') !== images[i]) {
+              main.setAttribute('src', images[i]);
+            }
+            main.setAttribute('data-idx', String(i));
+            idx = i;
+          }
+
+          function openLightbox(startIdx){
+            if (!lb || !lbImg) return;
+            idx = Math.max(0, Math.min(images.length - 1, startIdx));
+            lbImg.src = images[idx];
+            if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length;
+            lb.classList.add('open');
+            lb.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+          }
+          function closeLightbox(){
+            if (!lb) return;
+            lb.classList.remove('open');
+            lb.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+          }
+          function next(){ idx = (idx + 1) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
+          function prev(){ idx = (idx - 1 + images.length) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
+
+          // Thumbnail click: swap main and set index; Shift+Click opens lightbox
+          thumbs.forEach(function(btn){
+            btn.addEventListener('click', function(e){
+              const i = parseInt(this.getAttribute('data-idx') || '0', 10) || 0;
+              if (e.shiftKey) { openLightbox(i); return; }
+              updateMain(i);
+            });
+          });
+
+          // Main cover click: open lightbox on current index
+          if (main) {
+            main.addEventListener('click', function(){
+              const i = parseInt(main.getAttribute('data-idx') || '0', 10) || 0;
+              openLightbox(i);
+            });
+          }
+
+          // Lightbox interactions
+          lbClose?.addEventListener('click', closeLightbox);
+          lbPrev?.addEventListener('click', prev);
+          lbNext?.addEventListener('click', next);
+          lbImg?.addEventListener('click', next); // click image to advance
+          lb?.addEventListener('click', function(e){ if (e.target === lb) closeLightbox(); });
+
+          // Keyboard support
+          document.addEventListener('keydown', function(e){
+            if (!lb || !lb.classList.contains('open')) return;
+            if (e.key === 'Escape') { e.preventDefault(); closeLightbox(); }
+            else if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+          });
+
+          // Ensure initial main index reflects the list
+          if (images.length > 0 && main) {
+            let initial = images.indexOf(main.getAttribute('src'));
+            if (initial < 0) initial = 0;
+            main.setAttribute('data-idx', String(initial));
+          }
+        });
+      </script>
+            </div>
+
+  
+  <footer class="site-footer muted" style="text-align:center;margin:24px 0 8px 0;font-size:.9rem;">
+  Powered by Discogs API & Coffee Since 2025 | Lovingly Crafted in Boise, Idaho
+</footer>
+</body>
+</html>

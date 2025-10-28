@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Scritti Politti — Cupid &amp; Psyche 85</title>
+    <style>
+    :root { --bg:#0b0b0c; --card:#16171a; --text:#e7e7ea; --muted:#a0a3aa; --accent:#67e8f9; --overlay: rgba(0,0,0,.9); }
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif}
+    .wrap{max-width:1000px;margin:40px auto;padding:0 20px}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .layout{display:grid;grid-template-columns:280px 1fr;gap:24px}
+    .card{background:var(--card);border-radius:12px;overflow:hidden}
+    .cover{width:100%;aspect-ratio:1/1;object-fit:cover;background:#222;cursor:zoom-in}
+    .meta{padding:16px}
+    .muted{color:var(--muted)}
+    h1{margin:0 0 8px 0;font-size:1.6rem}
+
+    /* Lightbox */
+    .lightbox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--overlay);z-index:1000}
+    .lightbox.open{display:flex}
+    .lb-inner{position:relative;max-width:95vw;max-height:95vh;display:flex;align-items:center;justify-content:center}
+    .lb-img{max-width:95vw;max-height:95vh;object-fit:contain;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+    .lb-close{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:999px;width:40px;height:40px;cursor:pointer;font-size:20px}
+    .lb-nav{position:absolute;top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center}
+    .lb-prev,.lb-next{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:999px;width:44px;height:44px;cursor:pointer;font-size:20px}
+    .lb-prev{left:-60px}
+    .lb-next{right:-60px}
+    .lb-counter{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);color:#fff;background:rgba(0,0,0,.5);padding:4px 10px;border-radius:999px;font-size:.9rem}
+
+    @media (max-width: 800px){
+      .layout{grid-template-columns:1fr}
+      .lb-prev{left:10px}
+      .lb-next{right:10px}
+    }
+  </style>
+</head>
+<body>
+  
+    <div class="wrap">
+    <p><a href="../index.html">← Back</a></p>
+          <div class="layout">
+        <div>
+          <div class="card">
+                          <img id="main-cover" class="cover" src="../images/55919/fa8db4e1520492eae8c6f1cdecf5fa98c55eba91.jpg" alt="Cupid &amp; Psyche 85 cover" data-idx="0" />
+                      </div>
+                      <div class="thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+                              <button class="thumb" data-url="../images/55919/fa8db4e1520492eae8c6f1cdecf5fa98c55eba91.jpg" data-idx="0" title="Image 1" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/55919/fa8db4e1520492eae8c6f1cdecf5fa98c55eba91.jpg" alt="thumb 1" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:1" />
+                </button>
+                              <button class="thumb" data-url="../images/55919/0f65405cadbf390596219044864f4ddabc16ae28.jpg" data-idx="1" title="Image 2" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/55919/0f65405cadbf390596219044864f4ddabc16ae28.jpg" alt="thumb 2" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/55919/c25c24cbcb6f57bb8d8634697cb26077f2d70a44.jpg" data-idx="2" title="Image 3" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/55919/c25c24cbcb6f57bb8d8634697cb26077f2d70a44.jpg" alt="thumb 3" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/55919/6293a2fc1267e013e35d09a9eafd40625d069aa8.jpg" data-idx="3" title="Image 4" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/55919/6293a2fc1267e013e35d09a9eafd40625d069aa8.jpg" alt="thumb 4" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/55919/8ea55fbe3b153c8b2826b1e68eb267bd92648342.jpg" data-idx="4" title="Image 5" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/55919/8ea55fbe3b153c8b2826b1e68eb267bd92648342.jpg" alt="thumb 5" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/55919/6719e63737c101ed51a6c89b076611f3dbbde979.jpg" data-idx="5" title="Image 6" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/55919/6719e63737c101ed51a6c89b076611f3dbbde979.jpg" alt="thumb 6" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                          </div>
+                  </div>
+        <div>
+          <h1>Cupid &amp; Psyche 85</h1>
+          <p class="muted">Scritti Politti • 1985</p>
+          <p class="muted">US</p>
+                      <p style="margin:8px 0;">
+              <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Electronic</span>              <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Synth-pop</span>            </p>
+          
+                      <p class="muted">Formats:
+                              Vinyl                          </p>
+          
+                      <p class="muted">Labels:
+              Warner Bros. Records (9 25302-1), Warner Bros. Records (1-25302)            </p>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Tracklist</strong>
+                <ol>
+                                      <li>A1 — The Word Girl <span class="muted">(4:24)</span></li>
+                                      <li>A2 — Small Talk <span class="muted">(3:37)</span></li>
+                                      <li>A3 — Absolute <span class="muted">(4:23)</span></li>
+                                      <li>A4 — A Little Knowledge <span class="muted">(4:59)</span></li>
+                                      <li>A5 — Don&#039;t Work That Hard <span class="muted">(3:57)</span></li>
+                                      <li>B1 — Perfect Way <span class="muted">(4:31)</span></li>
+                                      <li>B2 — Lover To Fall <span class="muted">(4:12)</span></li>
+                                      <li>B3 — Wood Beez <span class="muted">(4:45)</span></li>
+                                      <li>B4 — Hypnotize <span class="muted">(3:35)</span></li>
+                                  </ol>
+              </div>
+            </div>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Videos</strong>
+                <ul>
+                                      <li><a href="https://www.youtube.com/watch?v=VIT9q73I87U" target="_blank" rel="noopener">Scritti Politti - Absolute</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=VdTjOqb_GCE" target="_blank" rel="noopener">Scritti Politti - Wood Beez (Pray Like Aretha Franklin)</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=cLxIB_lrwk0" target="_blank" rel="noopener">Scritti Politti - Perfect Way</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=XnBrEn3rkyI" target="_blank" rel="noopener">Scritti Politti - Hypnotize (Official Video)</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=bIyhpKhjl_g" target="_blank" rel="noopener">Scritti Politti - Absolute</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=_cWTgxeYqHQ" target="_blank" rel="noopener">Scritti Politti - Cupid &amp; Psyche - 08 - Wood Beez (1985) (HQ)</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=cLdY5Pslcfg" target="_blank" rel="noopener">Small Talk</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=ty2AkjVaZo8" target="_blank" rel="noopener">Scritti Politti - Cupid &amp; Psyche - 03 - Absolute (1985) (HQ)</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=P6YfEfAlS3M" target="_blank" rel="noopener">Scritti Politti - Cupid &amp; Psyche - 04 - A Little Knowledge (1985) (HQ)</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=G1l8MCbGPUI" target="_blank" rel="noopener">Scritti Politti - Cupid &amp; Psyche - 07 - Lover To Fall (1985) (HQ).mp4</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=f2lh79WGvTg" target="_blank" rel="noopener">The Word Girl</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=oZzr5IxA8eA" target="_blank" rel="noopener">Scritti Politti - Cupid &amp; Psyche - 09 - Hypnotize (1985) (HQ).mp4</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=-lvX6-7g8Bs" target="_blank" rel="noopener">Scritti Politti - Cupid &amp; Psyche - 05 - Don&#039;t Work That Hard (1985) (HQ)</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=REpOt-25skU" target="_blank" rel="noopener">Scritti Politti Mega mix (Cupid and Psyche 85)</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=yAoTJGtgfgw" target="_blank" rel="noopener">Scritti Politti - Absolute</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=AbQjcVpfqOA" target="_blank" rel="noopener">Don&#039;t Work That Hard</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=P6YfEfAlS3M" target="_blank" rel="noopener">Scritti Politti - Cupid &amp; Psyche - 04 - A Little Knowledge (1985) (HQ)</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=UHg_90CUk0k" target="_blank" rel="noopener">Hypnotize (2022 Remaster)</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=ty2AkjVaZo8" target="_blank" rel="noopener">Scritti Politti - Cupid &amp; Psyche - 03 - Absolute (1985) (HQ)</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=JZ41Se5Lk2s" target="_blank" rel="noopener">The Word Girl (2022 Remaster)</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=cLdY5Pslcfg" target="_blank" rel="noopener">Small Talk</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=oZzr5IxA8eA" target="_blank" rel="noopener">Scritti Politti - Cupid &amp; Psyche - 09 - Hypnotize (1985) (HQ).mp4</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=t19kz-qII58" target="_blank" rel="noopener">Absolute (Version - 2022 Remaster)</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=-H8i-CCOI54" target="_blank" rel="noopener">黒っぽさとイギリスポップスの融合。80年代に玄人受けしたScritti Politti「Cupid &amp; Psyche 85」</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=s-P94UFne-w" target="_blank" rel="noopener">Perfect Way</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=8wDm-xV3AbM" target="_blank" rel="noopener">A Little Knowledge</a></li>
+                                  </ul>
+              </div>
+            </div>
+          
+          
+          <div class="card" style="margin-top:16px;">
+            <div class="meta">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                <strong>My Notes</strong>
+                <button id="editToggle" type="button" title="Edit" style="background:transparent;color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:4px 8px;cursor:pointer;font-size:.9rem">Edit</button>
+              </div>
+
+              
+              <div id="notesView" style="margin-top:8px">
+                                                  <div class="muted">(none)</div>
+                              </div>
+
+              <form id="notesForm" method="post" action="/release/save" style="display:none; margin-top:8px; flex-direction:column; gap:8px">
+                              <input type="hidden" name="_token" value="" />
+                <input type="hidden" name="release_id" value="55919" />
+                <input type="hidden" name="return" value="../index.html" />
+                <label>Rating
+                  <select name="rating" style="background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:6px 8px">
+                    <option value="">—</option>
+                                          <option value="0" >0/5</option>
+                                          <option value="1" >1/5</option>
+                                          <option value="2" >2/5</option>
+                                          <option value="3" >3/5</option>
+                                          <option value="4" >4/5</option>
+                                          <option value="5" >5/5</option>
+                                      </select>
+                </label>
+                <label>Notes
+                  <textarea name="notes" rows="4" style="width:100%;background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:8px"></textarea>
+                </label>
+                <div>
+                  <button type="submit" style="background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:8px 12px;cursor:pointer">Save to Discogs</button>
+                  <span class="muted" style="margin-left:8px">This queues a background job. Run <code>php bin/console sync:push</code> to process.</span>
+                </div>
+                <p class="muted" style="margin:6px 0 0 0; font-size:.9rem">Note: your rating and notes are stored on your personal Discogs collection entry for this release. They do not appear on the public release page.</p>
+              </form>
+
+              <script>
+                (function(){
+                  const btn = document.getElementById('editToggle');
+                  const form = document.getElementById('notesForm');
+                  const view = document.getElementById('notesView');
+                  if (!btn || !form || !view) return;
+                  function setOpen(open){
+                    form.style.display = open ? 'flex' : 'none';
+                    view.style.display = open ? 'none' : 'block';
+                    btn.textContent = open ? 'Cancel' : 'Edit';
+                  }
+                  btn.addEventListener('click', function(){
+                    const open = form.style.display === 'none';
+                    setOpen(open);
+                  });
+                  // If page loaded with ?edit=1, open form
+                  const q = new URLSearchParams(window.location.search);
+                  if (q.get('edit') === '1') setOpen(true);
+                })();
+              </script>
+            </div>
+          </div>
+
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Credits</strong>
+                <ul>
+                                      <li>
+                      Art-O-Matic
+                      <span class="muted">— Artwork [Screen Process Printing]</span>                                          </li>
+                                      <li>
+                      Keith Breeden
+                      <span class="muted">— Design [Packaging]</span>                                          </li>
+                                      <li>
+                      Howie Weinberg
+                      <span class="muted">— Lacquer Cut By</span>                                          </li>
+                                      <li>
+                      Bob Last
+                      <span class="muted">— Management</span>                                          </li>
+                                      <li>
+                      Partisan Management Ltd.
+                      <span class="muted">— Management</span>                                          </li>
+                                      <li>
+                      Tony Cousins
+                      <span class="muted">— Mastered By</span>                                          </li>
+                                      <li>
+                      Howard Gray
+                      <span class="muted">— Mixed By</span>                      <span class="muted"> (tracks: A1, A2, A4 to B2)</span>                    </li>
+                                      <li>
+                      Rob Brimson
+                      <span class="muted">— Photography By [Back Cover]</span>                                          </li>
+                                      <li>
+                      Andy Earl
+                      <span class="muted">— Photography By [Inner Sleeve]</span>                                          </li>
+                                      <li>
+                      David Gamson
+                      <span class="muted">— Producer</span>                      <span class="muted"> (tracks: A1, A2, A4, B1, B2, B4)</span>                    </li>
+                                      <li>
+                      Fred Maher
+                      <span class="muted">— Producer</span>                      <span class="muted"> (tracks: A1, A2, A4, B1, B2, B4)</span>                    </li>
+                                      <li>
+                      Green Gartside
+                      <span class="muted">— Producer</span>                      <span class="muted"> (tracks: A1, A2, A4, B1, B2, B4)</span>                    </li>
+                                      <li>
+                      The Printed Word
+                      <span class="muted">— Typography [Typesetting]</span>                                          </li>
+                                      <li>
+                      Green Gartside
+                      <span class="muted">— Written-By</span>                                          </li>
+                                  </ul>
+              </div>
+            </div>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Companies</strong>
+                <ul>
+                                      <li>
+                      Jouissance Ltd.
+                      <span class="muted"> — Phonographic Copyright (p)</span>                                          </li>
+                                      <li>
+                      Virgin Records Ltd.
+                      <span class="muted"> — Copyright (c)</span>                                          </li>
+                                      <li>
+                      Allied Record Company
+                      <span class="muted"> — Pressed By</span>                                          </li>
+                                      <li>
+                      Allied Record Company
+                      <span class="muted"> — Pressed By</span>                                          </li>
+                                      <li>
+                      Art-O-Matic
+                      <span class="muted"> — Printed By</span>                                          </li>
+                                      <li>
+                      Jouissance Music
+                      <span class="muted"> — Published By</span>                                          </li>
+                                      <li>
+                      Wb Music Corp.
+                      <span class="muted"> — Published By</span>                                          </li>
+                                      <li>
+                      Minot Sound
+                      <span class="muted"> — Recorded At</span>                                          </li>
+                                      <li>
+                      Power Station
+                      <span class="muted"> — Recorded At</span>                                          </li>
+                                      <li>
+                      Atlantic Studios
+                      <span class="muted"> — Recorded At</span>                                          </li>
+                                      <li>
+                      Eden Studios
+                      <span class="muted"> — Recorded At</span>                                          </li>
+                                      <li>
+                      Wessex Sound Studios
+                      <span class="muted"> — Recorded At</span>                                          </li>
+                                      <li>
+                      Sarm East Studios
+                      <span class="muted"> — Recorded At</span>                                          </li>
+                                      <li>
+                      Sarm West Studios
+                      <span class="muted"> — Recorded At</span>                                          </li>
+                                      <li>
+                      The Town House
+                      <span class="muted"> — Edited At</span>                                          </li>
+                                      <li>
+                      Sheffield Lab Matrix
+                      <span class="muted"> — Mastered At</span>                                          </li>
+                                      <li>
+                      Masterdisk
+                      <span class="muted"> — Lacquer Cut At</span>                                          </li>
+                                      <li>
+                      DKB
+                      <span class="muted"> — Designed At</span>                                          </li>
+                                  </ul>
+              </div>
+            </div>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Barcodes</strong>
+                <ul>
+                                      <li>0 7599-25302-1 <span class="muted">(Text)</span></li>
+                                      <li>075992530217 <span class="muted">(Scanned)</span></li>
+                                  </ul>
+              </div>
+            </div>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Identifiers</strong>
+                <ul>
+                                      <li>Matrix / Runout: 1-25302-A-SH1 HW B-21333-SH1 SLM∆9771 1-1 <span class="muted">(Side A Runout Etched Variant 1)</span></li>
+                                      <li>Matrix / Runout: 1-25302-B-SH1 HW B-21334-SH1 SLM∆9771-X 1-1 <span class="muted">(Side B Runout Etched Variant 1)</span></li>
+                                      <li>Matrix / Runout: 1-25302-A-SH4 HW B-21333-SH4 SLM∆9771 1-1 <span class="muted">(Side A Runout Etched Variant 2)</span></li>
+                                      <li>Matrix / Runout: 1-25302-B-SH1 HW B-21334-SH1 SLM∆9771-X 1-1 <span class="muted">(Side B Runout Etched Variant 2)</span></li>
+                                      <li>Matrix / Runout: [Allied &#039;ɑ&#039; logo] MASTERDISK <span class="muted">(Side A &amp; B Runout Stamped)</span></li>
+                                      <li>Rights Society: ASCAP</li>
+                                  </ul>
+              </div>
+            </div>
+                  </div>
+      </div>
+
+            <!-- Lightbox overlay -->
+      <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog">
+        <div class="lb-inner">
+          <button class="lb-close" aria-label="Close">✕</button>
+          <button class="lb-prev" aria-label="Previous">◀</button>
+          <img class="lb-img" src="" alt="Full-size image" />
+          <button class="lb-next" aria-label="Next">▶</button>
+          <div class="lb-counter">1 / 6</div>
+        </div>
+      </div>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', function(){
+          const images = [
+            '..\/images\/55919\/fa8db4e1520492eae8c6f1cdecf5fa98c55eba91.jpg', '..\/images\/55919\/0f65405cadbf390596219044864f4ddabc16ae28.jpg', '..\/images\/55919\/c25c24cbcb6f57bb8d8634697cb26077f2d70a44.jpg', '..\/images\/55919\/6293a2fc1267e013e35d09a9eafd40625d069aa8.jpg', '..\/images\/55919\/8ea55fbe3b153c8b2826b1e68eb267bd92648342.jpg', '..\/images\/55919\/6719e63737c101ed51a6c89b076611f3dbbde979.jpg'          ];
+          const main = document.getElementById('main-cover');
+          const thumbs = document.querySelectorAll('.thumb');
+          const lb = document.getElementById('lightbox');
+          const lbImg = lb ? lb.querySelector('.lb-img') : null;
+          const lbClose = lb ? lb.querySelector('.lb-close') : null;
+          const lbPrev = lb ? lb.querySelector('.lb-prev') : null;
+          const lbNext = lb ? lb.querySelector('.lb-next') : null;
+          const lbCounter = lb ? lb.querySelector('.lb-counter') : null;
+          let idx = parseInt(main?.getAttribute('data-idx') || '0', 10) || 0;
+
+          function updateMain(to){
+            if (!main) return;
+            const i = Math.max(0, Math.min(images.length - 1, to));
+            if (images[i] && main.getAttribute('src') !== images[i]) {
+              main.setAttribute('src', images[i]);
+            }
+            main.setAttribute('data-idx', String(i));
+            idx = i;
+          }
+
+          function openLightbox(startIdx){
+            if (!lb || !lbImg) return;
+            idx = Math.max(0, Math.min(images.length - 1, startIdx));
+            lbImg.src = images[idx];
+            if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length;
+            lb.classList.add('open');
+            lb.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+          }
+          function closeLightbox(){
+            if (!lb) return;
+            lb.classList.remove('open');
+            lb.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+          }
+          function next(){ idx = (idx + 1) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
+          function prev(){ idx = (idx - 1 + images.length) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
+
+          // Thumbnail click: swap main and set index; Shift+Click opens lightbox
+          thumbs.forEach(function(btn){
+            btn.addEventListener('click', function(e){
+              const i = parseInt(this.getAttribute('data-idx') || '0', 10) || 0;
+              if (e.shiftKey) { openLightbox(i); return; }
+              updateMain(i);
+            });
+          });
+
+          // Main cover click: open lightbox on current index
+          if (main) {
+            main.addEventListener('click', function(){
+              const i = parseInt(main.getAttribute('data-idx') || '0', 10) || 0;
+              openLightbox(i);
+            });
+          }
+
+          // Lightbox interactions
+          lbClose?.addEventListener('click', closeLightbox);
+          lbPrev?.addEventListener('click', prev);
+          lbNext?.addEventListener('click', next);
+          lbImg?.addEventListener('click', next); // click image to advance
+          lb?.addEventListener('click', function(e){ if (e.target === lb) closeLightbox(); });
+
+          // Keyboard support
+          document.addEventListener('keydown', function(e){
+            if (!lb || !lb.classList.contains('open')) return;
+            if (e.key === 'Escape') { e.preventDefault(); closeLightbox(); }
+            else if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+          });
+
+          // Ensure initial main index reflects the list
+          if (images.length > 0 && main) {
+            let initial = images.indexOf(main.getAttribute('src'));
+            if (initial < 0) initial = 0;
+            main.setAttribute('data-idx', String(initial));
+          }
+        });
+      </script>
+            </div>
+
+  
+  <footer class="site-footer muted" style="text-align:center;margin:24px 0 8px 0;font-size:.9rem;">
+  Powered by Discogs API & Coffee Since 2025 | Lovingly Crafted in Boise, Idaho
+</footer>
+</body>
+</html>

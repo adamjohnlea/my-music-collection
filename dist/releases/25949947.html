@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Go-Go&#039;s — Beauty And The Beat</title>
+    <style>
+    :root { --bg:#0b0b0c; --card:#16171a; --text:#e7e7ea; --muted:#a0a3aa; --accent:#67e8f9; --overlay: rgba(0,0,0,.9); }
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif}
+    .wrap{max-width:1000px;margin:40px auto;padding:0 20px}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .layout{display:grid;grid-template-columns:280px 1fr;gap:24px}
+    .card{background:var(--card);border-radius:12px;overflow:hidden}
+    .cover{width:100%;aspect-ratio:1/1;object-fit:cover;background:#222;cursor:zoom-in}
+    .meta{padding:16px}
+    .muted{color:var(--muted)}
+    h1{margin:0 0 8px 0;font-size:1.6rem}
+
+    /* Lightbox */
+    .lightbox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--overlay);z-index:1000}
+    .lightbox.open{display:flex}
+    .lb-inner{position:relative;max-width:95vw;max-height:95vh;display:flex;align-items:center;justify-content:center}
+    .lb-img{max-width:95vw;max-height:95vh;object-fit:contain;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+    .lb-close{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:999px;width:40px;height:40px;cursor:pointer;font-size:20px}
+    .lb-nav{position:absolute;top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center}
+    .lb-prev,.lb-next{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:999px;width:44px;height:44px;cursor:pointer;font-size:20px}
+    .lb-prev{left:-60px}
+    .lb-next{right:-60px}
+    .lb-counter{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);color:#fff;background:rgba(0,0,0,.5);padding:4px 10px;border-radius:999px;font-size:.9rem}
+
+    @media (max-width: 800px){
+      .layout{grid-template-columns:1fr}
+      .lb-prev{left:10px}
+      .lb-next{right:10px}
+    }
+  </style>
+</head>
+<body>
+  
+    <div class="wrap">
+    <p><a href="../index.html">← Back</a></p>
+          <div class="layout">
+        <div>
+          <div class="card">
+                          <img id="main-cover" class="cover" src="../images/25949947/016eccdf1ae7b35c01644b4e5610d6e66d1b14f8.jpg" alt="Beauty And The Beat cover" data-idx="0" />
+                      </div>
+                      <div class="thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+                              <button class="thumb" data-url="../images/25949947/016eccdf1ae7b35c01644b4e5610d6e66d1b14f8.jpg" data-idx="0" title="Image 1" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/25949947/016eccdf1ae7b35c01644b4e5610d6e66d1b14f8.jpg" alt="thumb 1" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:1" />
+                </button>
+                              <button class="thumb" data-url="../images/25949947/6d38f4a34a05f5299c82fba43e12565c1c29077a.jpg" data-idx="1" title="Image 2" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/25949947/6d38f4a34a05f5299c82fba43e12565c1c29077a.jpg" alt="thumb 2" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/25949947/bb515d053123cd84bec56e2ac29867b7f36e0bd0.jpg" data-idx="2" title="Image 3" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/25949947/bb515d053123cd84bec56e2ac29867b7f36e0bd0.jpg" alt="thumb 3" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/25949947/369d32ca38b1b81a1173ab84ee1057d8d0b92788.jpg" data-idx="3" title="Image 4" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/25949947/369d32ca38b1b81a1173ab84ee1057d8d0b92788.jpg" alt="thumb 4" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/25949947/09bbd814800c3db4c6d70524196c9e0587bd87b4.jpg" data-idx="4" title="Image 5" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/25949947/09bbd814800c3db4c6d70524196c9e0587bd87b4.jpg" alt="thumb 5" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/25949947/c65e7550c0912c7337eeaa92fb577864f798d382.jpg" data-idx="5" title="Image 6" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/25949947/c65e7550c0912c7337eeaa92fb577864f798d382.jpg" alt="thumb 6" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/25949947/75be310e790906a04bbba093243d489460df09b8.jpg" data-idx="6" title="Image 7" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/25949947/75be310e790906a04bbba093243d489460df09b8.jpg" alt="thumb 7" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                          </div>
+                  </div>
+        <div>
+          <h1>Beauty And The Beat</h1>
+          <p class="muted">Go-Go&#039;s • 1981</p>
+          <p class="muted">US</p>
+                      <p style="margin:8px 0;">
+              <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Rock</span>              <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Pop Rock</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">New Wave</span>            </p>
+          
+                      <p class="muted">Formats:
+                              Vinyl (Terre Haute Pressing)                          </p>
+          
+                      <p class="muted">Labels:
+              I.R.S. Records (SP 70021)            </p>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Tracklist</strong>
+                <ol>
+                                      <li>A1 — Our Lips Are Sealed <span class="muted">(2:45)</span></li>
+                                      <li>A2 — How Much More <span class="muted">(3:03)</span></li>
+                                      <li>A3 — Tonite <span class="muted">(3:33)</span></li>
+                                      <li>A4 — Lust To Love <span class="muted">(4:00)</span></li>
+                                      <li>A5 — This Town <span class="muted">(3:15)</span></li>
+                                      <li>B1 — We Got The Beat <span class="muted">(2:36)</span></li>
+                                      <li>B2 — Fading Fast <span class="muted">(3:32)</span></li>
+                                      <li>B3 — Automatic <span class="muted">(2:34)</span></li>
+                                      <li>B4 — You Can&#039;t Walk In Your Sleep (If You Can&#039;t Sleep) <span class="muted">(3:00)</span></li>
+                                      <li>B5 — Skidmarks On My Heart <span class="muted">(3:13)</span></li>
+                                      <li>B6 — Can&#039;t Stop The World <span class="muted">(3:22)</span></li>
+                                  </ol>
+              </div>
+            </div>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Videos</strong>
+                <ul>
+                                      <li><a href="https://www.youtube.com/watch?v=r3kQlzOi27M" target="_blank" rel="noopener">The Go-Go&#039;s - Our Lips Are Sealed (Official Video)</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=f55KlPe81Yw" target="_blank" rel="noopener">The Go-Go&#039;s - We Got The Beat (Official Video)</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=vag0dUNNuHY" target="_blank" rel="noopener">Tonite</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=Kh3z-R8cYbY" target="_blank" rel="noopener">Lust To Love</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=L4ff7Hze_mk" target="_blank" rel="noopener">This Town</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=_Wvue2OT-FA" target="_blank" rel="noopener">We Got The Beat</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=Z_VT9l3Pl_0" target="_blank" rel="noopener">You Can&#039;t Walk In Your Sleep (If You Can&#039;t Sleep)</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=nS572_s4MCA" target="_blank" rel="noopener">Can&#039;t Stop The World</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=ve20q1L6nXM" target="_blank" rel="noopener">The Go Gos-Beauty &amp; The Beat(1981)(Vinyl Rip)</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=5OULlWNCqDQ" target="_blank" rel="noopener">Go-Go&#039;s - Our Lips Are Sealed (Extended 12&quot; Version) (Music Video)</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=tyjwFsWkNmc" target="_blank" rel="noopener">Go-Go&#039;s - We Got The Beat (1980 original stiff records single version) (audio)</a></li>
+                                  </ul>
+              </div>
+            </div>
+          
+          
+          <div class="card" style="margin-top:16px;">
+            <div class="meta">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                <strong>My Notes</strong>
+                <button id="editToggle" type="button" title="Edit" style="background:transparent;color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:4px 8px;cursor:pointer;font-size:.9rem">Edit</button>
+              </div>
+
+              
+              <div id="notesView" style="margin-top:8px">
+                                                  <div class="muted">(none)</div>
+                              </div>
+
+              <form id="notesForm" method="post" action="/release/save" style="display:none; margin-top:8px; flex-direction:column; gap:8px">
+                              <input type="hidden" name="_token" value="" />
+                <input type="hidden" name="release_id" value="25949947" />
+                <input type="hidden" name="return" value="../index.html" />
+                <label>Rating
+                  <select name="rating" style="background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:6px 8px">
+                    <option value="">—</option>
+                                          <option value="0" >0/5</option>
+                                          <option value="1" >1/5</option>
+                                          <option value="2" >2/5</option>
+                                          <option value="3" >3/5</option>
+                                          <option value="4" >4/5</option>
+                                          <option value="5" >5/5</option>
+                                      </select>
+                </label>
+                <label>Notes
+                  <textarea name="notes" rows="4" style="width:100%;background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:8px"></textarea>
+                </label>
+                <div>
+                  <button type="submit" style="background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:8px 12px;cursor:pointer">Save to Discogs</button>
+                  <span class="muted" style="margin-left:8px">This queues a background job. Run <code>php bin/console sync:push</code> to process.</span>
+                </div>
+                <p class="muted" style="margin:6px 0 0 0; font-size:.9rem">Note: your rating and notes are stored on your personal Discogs collection entry for this release. They do not appear on the public release page.</p>
+              </form>
+
+              <script>
+                (function(){
+                  const btn = document.getElementById('editToggle');
+                  const form = document.getElementById('notesForm');
+                  const view = document.getElementById('notesView');
+                  if (!btn || !form || !view) return;
+                  function setOpen(open){
+                    form.style.display = open ? 'flex' : 'none';
+                    view.style.display = open ? 'none' : 'block';
+                    btn.textContent = open ? 'Cancel' : 'Edit';
+                  }
+                  btn.addEventListener('click', function(){
+                    const open = form.style.display === 'none';
+                    setOpen(open);
+                  });
+                  // If page loaded with ?edit=1, open form
+                  const q = new URLSearchParams(window.location.search);
+                  if (q.get('edit') === '1') setOpen(true);
+                })();
+              </script>
+            </div>
+          </div>
+
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Credits</strong>
+                <ul>
+                                      <li>
+                      Ginger Canzoneri
+                      <span class="muted">— Art Direction</span>                                          </li>
+                                      <li>
+                      Mike Doud
+                      <span class="muted">— Art Direction</span>                                          </li>
+                                      <li>
+                      Kathy Valentine
+                      <span class="muted">— Bass, Guitar</span>                                          </li>
+                                      <li>
+                      Mike Fink
+                      <span class="muted">— Design</span>                                          </li>
+                                      <li>
+                      Gina Schock
+                      <span class="muted">— Drums, Percussion</span>                                          </li>
+                                      <li>
+                      Charlotte Caffey
+                      <span class="muted">— Guitar, Vocals, Keyboards</span>                                          </li>
+                                      <li>
+                      Cindy Marsh
+                      <span class="muted">— Illustration [Photo-Illustration]</span>                                          </li>
+                                      <li>
+                      Belinda Carlisle
+                      <span class="muted">— Lead Vocals</span>                                          </li>
+                                      <li>
+                      Ginger Canzoneri
+                      <span class="muted">— Management</span>                                          </li>
+                                      <li>
+                      Gray Russell
+                      <span class="muted">— Mixed By [Assistant, Record Plant]</span>                                          </li>
+                                      <li>
+                      George DuBose
+                      <span class="muted">— Photography By</span>                                          </li>
+                                      <li>
+                      Richard Gottehrer
+                      <span class="muted">— Producer</span>                                          </li>
+                                      <li>
+                      Rob Freeman
+                      <span class="muted">— Producer</span>                                          </li>
+                                      <li>
+                      John Terelle
+                      <span class="muted">— Recorded By [Assistant, Pennylane]</span>                                          </li>
+                                      <li>
+                      Ted Blechta
+                      <span class="muted">— Recorded By [Assistant, Pennylane]</span>                                          </li>
+                                      <li>
+                      James A. Ball
+                      <span class="muted">— Recorded By [Assistant, Record Plant]</span>                                          </li>
+                                      <li>
+                      Darroll Gustamachio
+                      <span class="muted">— Recorded By [Assistant, Sound Mixers]</span>                                          </li>
+                                      <li>
+                      Eric Korte
+                      <span class="muted">— Recorded By [Assistant, Sound Mixers]</span>                                          </li>
+                                      <li>
+                      Rob Freeman
+                      <span class="muted">— Recorded By, Mixed By</span>                                          </li>
+                                      <li>
+                      Jane Wiedlin
+                      <span class="muted">— Rhythm Guitar, Vocals</span>                                          </li>
+                                      <li>
+                      Go-Go&#039;s
+                      <span class="muted">— Written-By [All Selections]</span>                                          </li>
+                                  </ul>
+              </div>
+            </div>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Companies</strong>
+                <ul>
+                                      <li>
+                      Columbia House
+                      <span class="muted"> — Manufactured By</span>                                          </li>
+                                      <li>
+                      A&amp;M Records, Inc.
+                      <span class="muted"> — Manufactured By</span>                                          </li>
+                                      <li>
+                      A&amp;M Records, Inc.
+                      <span class="muted"> — Distributed By</span>                                          </li>
+                                      <li>
+                      I.R.S., Inc.
+                      <span class="muted"> — Phonographic Copyright (p)</span>                                          </li>
+                                      <li>
+                      I.R.S., Inc.
+                      <span class="muted"> — Copyright (c)</span>                                          </li>
+                                      <li>
+                      Baby Oh Yeah Music
+                      <span class="muted"> — Published By</span>                                          </li>
+                                      <li>
+                      Daddy-Oh Music
+                      <span class="muted"> — Published By</span>                                          </li>
+                                      <li>
+                      Plangent Visions Music Ltd.
+                      <span class="muted"> — Published By</span>                                          </li>
+                                      <li>
+                      Punishment Tunes
+                      <span class="muted"> — Published By</span>                                          </li>
+                                      <li>
+                      Some Other Music
+                      <span class="muted"> — Published By</span>                                          </li>
+                                      <li>
+                      Pennylane Studios, New York City
+                      <span class="muted"> — Recorded At</span>                                          </li>
+                                      <li>
+                      Record Plant, N.Y.C.
+                      <span class="muted"> — Recorded At</span>                                          </li>
+                                      <li>
+                      Soundmixers, New York City
+                      <span class="muted"> — Recorded At</span>                                          </li>
+                                      <li>
+                      Record Plant, N.Y.C.
+                      <span class="muted"> — Mixed At</span>                                          </li>
+                                      <li>
+                      Sterling Sound
+                      <span class="muted"> — Lacquer Cut At</span>                                          </li>
+                                      <li>
+                      Columbia Records Pressing Plant, Terre Haute
+                      <span class="muted"> — Pressed By</span>                                          </li>
+                                      <li>
+                      Columbia Records Pressing Plant, Santa Maria
+                      <span class="muted"> — Mastered At</span>                                          </li>
+                                  </ul>
+              </div>
+            </div>
+          
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Identifiers</strong>
+                <ul>
+                                      <li>Rights Society: ASCAP <span class="muted">(B6)</span></li>
+                                      <li>Pressing Plant ID: T <span class="muted">(Etched in Side A runout)</span></li>
+                                      <li>Matrix / Runout: 0-70021-A <span class="muted">(Label A)</span></li>
+                                      <li>Matrix / Runout: 0-70021-B <span class="muted">(Label B)</span></li>
+                                      <li>Matrix / Runout: S 2 SP 070021-A-CS2 L STERLING <span class="muted">(Runout A (Variation 1))</span></li>
+                                      <li>Matrix / Runout: T1 A&amp;M·SP·070021-B-T6 A7 STERLING <span class="muted">(Runout B (Variation 1))</span></li>
+                                      <li>Matrix / Runout: S 2 (upside down) SP0 70021-A-CS2 SX B STERLING  <span class="muted">(Runout A (Variation 2))</span></li>
+                                      <li>Matrix / Runout: T1 A&amp;M SP 070021-B-T6 N3 STERLING <span class="muted">(Runout B (Variation 2))</span></li>
+                                  </ul>
+              </div>
+            </div>
+                  </div>
+      </div>
+
+            <!-- Lightbox overlay -->
+      <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog">
+        <div class="lb-inner">
+          <button class="lb-close" aria-label="Close">✕</button>
+          <button class="lb-prev" aria-label="Previous">◀</button>
+          <img class="lb-img" src="" alt="Full-size image" />
+          <button class="lb-next" aria-label="Next">▶</button>
+          <div class="lb-counter">1 / 7</div>
+        </div>
+      </div>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', function(){
+          const images = [
+            '..\/images\/25949947\/016eccdf1ae7b35c01644b4e5610d6e66d1b14f8.jpg', '..\/images\/25949947\/6d38f4a34a05f5299c82fba43e12565c1c29077a.jpg', '..\/images\/25949947\/bb515d053123cd84bec56e2ac29867b7f36e0bd0.jpg', '..\/images\/25949947\/369d32ca38b1b81a1173ab84ee1057d8d0b92788.jpg', '..\/images\/25949947\/09bbd814800c3db4c6d70524196c9e0587bd87b4.jpg', '..\/images\/25949947\/c65e7550c0912c7337eeaa92fb577864f798d382.jpg', '..\/images\/25949947\/75be310e790906a04bbba093243d489460df09b8.jpg'          ];
+          const main = document.getElementById('main-cover');
+          const thumbs = document.querySelectorAll('.thumb');
+          const lb = document.getElementById('lightbox');
+          const lbImg = lb ? lb.querySelector('.lb-img') : null;
+          const lbClose = lb ? lb.querySelector('.lb-close') : null;
+          const lbPrev = lb ? lb.querySelector('.lb-prev') : null;
+          const lbNext = lb ? lb.querySelector('.lb-next') : null;
+          const lbCounter = lb ? lb.querySelector('.lb-counter') : null;
+          let idx = parseInt(main?.getAttribute('data-idx') || '0', 10) || 0;
+
+          function updateMain(to){
+            if (!main) return;
+            const i = Math.max(0, Math.min(images.length - 1, to));
+            if (images[i] && main.getAttribute('src') !== images[i]) {
+              main.setAttribute('src', images[i]);
+            }
+            main.setAttribute('data-idx', String(i));
+            idx = i;
+          }
+
+          function openLightbox(startIdx){
+            if (!lb || !lbImg) return;
+            idx = Math.max(0, Math.min(images.length - 1, startIdx));
+            lbImg.src = images[idx];
+            if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length;
+            lb.classList.add('open');
+            lb.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+          }
+          function closeLightbox(){
+            if (!lb) return;
+            lb.classList.remove('open');
+            lb.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+          }
+          function next(){ idx = (idx + 1) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
+          function prev(){ idx = (idx - 1 + images.length) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
+
+          // Thumbnail click: swap main and set index; Shift+Click opens lightbox
+          thumbs.forEach(function(btn){
+            btn.addEventListener('click', function(e){
+              const i = parseInt(this.getAttribute('data-idx') || '0', 10) || 0;
+              if (e.shiftKey) { openLightbox(i); return; }
+              updateMain(i);
+            });
+          });
+
+          // Main cover click: open lightbox on current index
+          if (main) {
+            main.addEventListener('click', function(){
+              const i = parseInt(main.getAttribute('data-idx') || '0', 10) || 0;
+              openLightbox(i);
+            });
+          }
+
+          // Lightbox interactions
+          lbClose?.addEventListener('click', closeLightbox);
+          lbPrev?.addEventListener('click', prev);
+          lbNext?.addEventListener('click', next);
+          lbImg?.addEventListener('click', next); // click image to advance
+          lb?.addEventListener('click', function(e){ if (e.target === lb) closeLightbox(); });
+
+          // Keyboard support
+          document.addEventListener('keydown', function(e){
+            if (!lb || !lb.classList.contains('open')) return;
+            if (e.key === 'Escape') { e.preventDefault(); closeLightbox(); }
+            else if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+          });
+
+          // Ensure initial main index reflects the list
+          if (images.length > 0 && main) {
+            let initial = images.indexOf(main.getAttribute('src'));
+            if (initial < 0) initial = 0;
+            main.setAttribute('data-idx', String(initial));
+          }
+        });
+      </script>
+            </div>
+
+  
+  <footer class="site-footer muted" style="text-align:center;margin:24px 0 8px 0;font-size:.9rem;">
+  Powered by Discogs API & Coffee Since 2025 | Lovingly Crafted in Boise, Idaho
+</footer>
+</body>
+</html>

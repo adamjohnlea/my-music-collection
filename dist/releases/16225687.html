@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Elvis Costello — Hey Clockface</title>
+    <style>
+    :root { --bg:#0b0b0c; --card:#16171a; --text:#e7e7ea; --muted:#a0a3aa; --accent:#67e8f9; --overlay: rgba(0,0,0,.9); }
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif}
+    .wrap{max-width:1000px;margin:40px auto;padding:0 20px}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .layout{display:grid;grid-template-columns:280px 1fr;gap:24px}
+    .card{background:var(--card);border-radius:12px;overflow:hidden}
+    .cover{width:100%;aspect-ratio:1/1;object-fit:cover;background:#222;cursor:zoom-in}
+    .meta{padding:16px}
+    .muted{color:var(--muted)}
+    h1{margin:0 0 8px 0;font-size:1.6rem}
+
+    /* Lightbox */
+    .lightbox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--overlay);z-index:1000}
+    .lightbox.open{display:flex}
+    .lb-inner{position:relative;max-width:95vw;max-height:95vh;display:flex;align-items:center;justify-content:center}
+    .lb-img{max-width:95vw;max-height:95vh;object-fit:contain;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+    .lb-close{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:999px;width:40px;height:40px;cursor:pointer;font-size:20px}
+    .lb-nav{position:absolute;top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center}
+    .lb-prev,.lb-next{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:999px;width:44px;height:44px;cursor:pointer;font-size:20px}
+    .lb-prev{left:-60px}
+    .lb-next{right:-60px}
+    .lb-counter{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);color:#fff;background:rgba(0,0,0,.5);padding:4px 10px;border-radius:999px;font-size:.9rem}
+
+    @media (max-width: 800px){
+      .layout{grid-template-columns:1fr}
+      .lb-prev{left:10px}
+      .lb-next{right:10px}
+    }
+  </style>
+</head>
+<body>
+  
+    <div class="wrap">
+    <p><a href="../index.html">← Back</a></p>
+          <div class="layout">
+        <div>
+          <div class="card">
+                          <img id="main-cover" class="cover" src="../images/16225687/09561537f6534eca9ea7d46850759e0c8ec5e7f6.jpg" alt="Hey Clockface cover" data-idx="0" />
+                      </div>
+                      <div class="thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+                              <button class="thumb" data-url="../images/16225687/09561537f6534eca9ea7d46850759e0c8ec5e7f6.jpg" data-idx="0" title="Image 1" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/16225687/09561537f6534eca9ea7d46850759e0c8ec5e7f6.jpg" alt="thumb 1" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:1" />
+                </button>
+                              <button class="thumb" data-url="../images/16225687/c20a989c96998bfb625e2efe943ba2f2dc49184c.jpg" data-idx="1" title="Image 2" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/16225687/c20a989c96998bfb625e2efe943ba2f2dc49184c.jpg" alt="thumb 2" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/16225687/7812095b3479482ef94e1d5183680c90cca40e35.jpg" data-idx="2" title="Image 3" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/16225687/7812095b3479482ef94e1d5183680c90cca40e35.jpg" alt="thumb 3" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/16225687/2fc6d497feaac1c7e60d5b88d58ccf5d5373d1bd.jpg" data-idx="3" title="Image 4" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/16225687/2fc6d497feaac1c7e60d5b88d58ccf5d5373d1bd.jpg" alt="thumb 4" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/16225687/b3b038918339d9d944343d70006859a34ebcfbb9.jpg" data-idx="4" title="Image 5" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/16225687/b3b038918339d9d944343d70006859a34ebcfbb9.jpg" alt="thumb 5" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/16225687/10d2ca7447fd8c10ce869c636d4cd57f531667b3.jpg" data-idx="5" title="Image 6" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/16225687/10d2ca7447fd8c10ce869c636d4cd57f531667b3.jpg" alt="thumb 6" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/16225687/523be89ade0fd39578aa82d2e0261166691ea20b.jpg" data-idx="6" title="Image 7" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/16225687/523be89ade0fd39578aa82d2e0261166691ea20b.jpg" alt="thumb 7" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/16225687/0a8a2c1e95246b25c890d27608a5a9fa99f20f11.jpg" data-idx="7" title="Image 8" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/16225687/0a8a2c1e95246b25c890d27608a5a9fa99f20f11.jpg" alt="thumb 8" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/16225687/bd1eb153773b7baf1ff48d6facbab4e0b1fb7526.jpg" data-idx="8" title="Image 9" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/16225687/bd1eb153773b7baf1ff48d6facbab4e0b1fb7526.jpg" alt="thumb 9" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/16225687/d25948830517bf99051a5123374290621f45e3c7.jpg" data-idx="9" title="Image 10" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/16225687/d25948830517bf99051a5123374290621f45e3c7.jpg" alt="thumb 10" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/16225687/7824019337d017933a9a0401b62ee79d3c308633.jpg" data-idx="10" title="Image 11" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/16225687/7824019337d017933a9a0401b62ee79d3c308633.jpg" alt="thumb 11" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/16225687/ae6ec40c885e88035dba047fd56a280385f892cc.jpg" data-idx="11" title="Image 12" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/16225687/ae6ec40c885e88035dba047fd56a280385f892cc.jpg" alt="thumb 12" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/16225687/a7e223b7cf0df1f02d465a2b87216f0fea44c0e1.jpg" data-idx="12" title="Image 13" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/16225687/a7e223b7cf0df1f02d465a2b87216f0fea44c0e1.jpg" alt="thumb 13" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/16225687/a1766adc8f4d69b531f9acd3de362a70499f6b06.jpg" data-idx="13" title="Image 14" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/16225687/a1766adc8f4d69b531f9acd3de362a70499f6b06.jpg" alt="thumb 14" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                          </div>
+                  </div>
+        <div>
+          <h1>Hey Clockface</h1>
+          <p class="muted">Elvis Costello • 2020</p>
+          <p class="muted">US</p>
+                      <p style="margin:8px 0;">
+              <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Rock</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Pop</span>                          </p>
+          
+                      <p class="muted">Formats:
+                              Vinyl (Red Transparent )                          </p>
+          
+                      <p class="muted">Labels:
+              Concord Records (CRE01394), Concord Records (CRE01446)            </p>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Tracklist</strong>
+                <ol>
+                                      <li>A1 — Revolution #49 <span class="muted">(2:41)</span></li>
+                                      <li>A2 — No Flag <span class="muted">(3:56)</span></li>
+                                      <li>A3 — They&#039;re Not Laughing At Me Now <span class="muted">(4:26)</span></li>
+                                      <li>A4 — Newspaper Pane <span class="muted">(4:10)</span></li>
+                                      <li>B1 — I Do (Zula&#039;s Song) <span class="muted">(3:49)</span></li>
+                                      <li>B2 — We Are All Cowards Now <span class="muted">(3:36)</span></li>
+                                      <li>B3 — Hey Clockface/How Can You Face Me? <span class="muted">(2:56)</span></li>
+                                      <li>B4 — The Whirlwind <span class="muted">(3:17)</span></li>
+                                      <li>C1 — Hetty O&#039;hara Confidential <span class="muted">(4:14)</span></li>
+                                      <li>C2 — The Last Confession Of Vivian Whip <span class="muted">(2:59)</span></li>
+                                      <li>C3 — What Is It That I Need That I Don&#039;t Already Have? <span class="muted">(3:46)</span></li>
+                                      <li>D1 — Radio Is Everything <span class="muted">(4:25)</span></li>
+                                      <li>D2 — I Can&#039;t Say Her Name <span class="muted">(2:57)</span></li>
+                                      <li>D3 — Byline <span class="muted">(2:40)</span></li>
+                                  </ol>
+              </div>
+            </div>
+          
+          
+          
+          <div class="card" style="margin-top:16px;">
+            <div class="meta">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                <strong>My Notes</strong>
+                <button id="editToggle" type="button" title="Edit" style="background:transparent;color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:4px 8px;cursor:pointer;font-size:.9rem">Edit</button>
+              </div>
+
+              
+              <div id="notesView" style="margin-top:8px">
+                                                  <div class="muted">(none)</div>
+                              </div>
+
+              <form id="notesForm" method="post" action="/release/save" style="display:none; margin-top:8px; flex-direction:column; gap:8px">
+                              <input type="hidden" name="_token" value="" />
+                <input type="hidden" name="release_id" value="16225687" />
+                <input type="hidden" name="return" value="../index.html" />
+                <label>Rating
+                  <select name="rating" style="background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:6px 8px">
+                    <option value="">—</option>
+                                          <option value="0" >0/5</option>
+                                          <option value="1" >1/5</option>
+                                          <option value="2" >2/5</option>
+                                          <option value="3" >3/5</option>
+                                          <option value="4" >4/5</option>
+                                          <option value="5" >5/5</option>
+                                      </select>
+                </label>
+                <label>Notes
+                  <textarea name="notes" rows="4" style="width:100%;background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:8px"></textarea>
+                </label>
+                <div>
+                  <button type="submit" style="background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:8px 12px;cursor:pointer">Save to Discogs</button>
+                  <span class="muted" style="margin-left:8px">This queues a background job. Run <code>php bin/console sync:push</code> to process.</span>
+                </div>
+                <p class="muted" style="margin:6px 0 0 0; font-size:.9rem">Note: your rating and notes are stored on your personal Discogs collection entry for this release. They do not appear on the public release page.</p>
+              </form>
+
+              <script>
+                (function(){
+                  const btn = document.getElementById('editToggle');
+                  const form = document.getElementById('notesForm');
+                  const view = document.getElementById('notesView');
+                  if (!btn || !form || !view) return;
+                  function setOpen(open){
+                    form.style.display = open ? 'flex' : 'none';
+                    view.style.display = open ? 'none' : 'block';
+                    btn.textContent = open ? 'Cancel' : 'Edit';
+                  }
+                  btn.addEventListener('click', function(){
+                    const open = form.style.display === 'none';
+                    setOpen(open);
+                  });
+                  // If page loaded with ?edit=1, open form
+                  const q = new URLSearchParams(window.location.search);
+                  if (q.get('edit') === '1') setOpen(true);
+                })();
+              </script>
+            </div>
+          </div>
+
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Credits</strong>
+                <ul>
+                                      <li>
+                      Elvis Costello
+                      <span class="muted">— Arranged By [Trumpet &amp; Alto Saxophone]</span>                      <span class="muted"> (tracks: B1)</span>                    </li>
+                                      <li>
+                      Eamonn Singer
+                      <span class="muted">— Artwork [Daubs]</span>                                          </li>
+                                      <li>
+                      Sonic Jackson
+                      <span class="muted">— Consultant [FX]</span>                                          </li>
+                                      <li>
+                      Ron Taylor
+                      <span class="muted">— Engineer [Additionnal Engineering]</span>                                          </li>
+                                      <li>
+                      Bastien Lozier
+                      <span class="muted">— Engineer [Assistant]</span>                      <span class="muted"> (tracks: A1, A3, B1, B3, B4, C2, C3, D2, D3)</span>                    </li>
+                                      <li>
+                      Spencer Bleasdale
+                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
+                                      <li>
+                      Tim Mikkola
+                      <span class="muted">— Engineer [Assistant]</span>                      <span class="muted"> (tracks: A2, B2, C1)</span>                    </li>
+                                      <li>
+                      Daniel Galindo
+                      <span class="muted">— Engineer [Mix Assistant]</span>                                          </li>
+                                      <li>
+                      Chris Bellman
+                      <span class="muted">— Lacquer Cut By</span>                                          </li>
+                                      <li>
+                      Coco Shinomiya
+                      <span class="muted">— Layout</span>                                          </li>
+                                      <li>
+                      Eamonn Singer
+                      <span class="muted">— Layout</span>                                          </li>
+                                      <li>
+                      Macklam Feldman Management
+                      <span class="muted">— Management</span>                                          </li>
+                                      <li>
+                      Brian Lucey
+                      <span class="muted">— Mastered By</span>                                          </li>
+                                      <li>
+                      Sebastian Krys
+                      <span class="muted">— Mixed By</span>                                          </li>
+                                      <li>
+                      Ajuq
+                      <span class="muted">— Other [Instrumental Part Improvised]</span>                                          </li>
+                                      <li>
+                      Mickaël Gasche
+                      <span class="muted">— Other [Instrumental Part Improvised]</span>                                          </li>
+                                      <li>
+                      Pierre-François Dufour
+                      <span class="muted">— Other [Instrumental Part Improvised]</span>                                          </li>
+                                      <li>
+                      Renaud Pion
+                      <span class="muted">— Other [Instrumental Part Improvised]</span>                                          </li>
+                                      <li>
+                      Steve Nieve
+                      <span class="muted">— Other [Instrumental Part Improvised]</span>                                          </li>
+                                      <li>
+                      Diana Krall
+                      <span class="muted">— Photography By</span>                                          </li>
+                                      <li>
+                      Elvis Costello
+                      <span class="muted">— Producer</span>                                          </li>
+                                      <li>
+                      Sebastian Krys
+                      <span class="muted">— Producer</span>                                          </li>
+                                      <li>
+                      Eetu Seppälä
+                      <span class="muted">— Recorded By</span>                      <span class="muted"> (tracks: A2, B2, C1)</span>                    </li>
+                                      <li>
+                      François Delabrière
+                      <span class="muted">— Recorded By</span>                      <span class="muted"> (tracks: A1, A3, B1, B3, B4, C2, C3, D2, D3)</span>                    </li>
+                                      <li>
+                      Michael Leonhart
+                      <span class="muted">— Recorded By</span>                      <span class="muted"> (tracks: A4, D1)</span>                    </li>
+                                      <li>
+                      Steve Nieve
+                      <span class="muted">— Recorded By [Ajuq&#039;s Vocals]</span>                                          </li>
+                                      <li>
+                      Paul Silveira
+                      <span class="muted">— Recorded By [Editorial &amp; Instrumental Additions]</span>                                          </li>
+                                      <li>
+                      Steve Nieve
+                      <span class="muted">— Transcription By</span>                                          </li>
+                                  </ul>
+              </div>
+            </div>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Companies</strong>
+                <ul>
+                                      <li>
+                      Elvis Costello
+                      <span class="muted"> — Phonographic Copyright (p)</span>                                          </li>
+                                      <li>
+                      Elvis Costello
+                      <span class="muted"> — Copyright (c)</span>                                          </li>
+                                  </ul>
+              </div>
+            </div>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Barcodes</strong>
+                <ul>
+                                      <li>888072210530 <span class="muted">(Sticker over upc on shrinkwrap)</span></li>
+                                      <li>888072202863 <span class="muted">(On jacket)</span></li>
+                                  </ul>
+              </div>
+            </div>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Identifiers</strong>
+                <ul>
+                                      <li>Matrix / Runout: CRE-01394-A CB <span class="muted">(Side A)</span></li>
+                                      <li>Matrix / Runout: CRE-01394-B CB <span class="muted">(Side B)</span></li>
+                                      <li>Matrix / Runout: CRE-01394-C CB <span class="muted">(Side C)</span></li>
+                                      <li>Matrix / Runout: CRE-01394-D CB <span class="muted">(Side D)</span></li>
+                                  </ul>
+              </div>
+            </div>
+                  </div>
+      </div>
+
+            <!-- Lightbox overlay -->
+      <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog">
+        <div class="lb-inner">
+          <button class="lb-close" aria-label="Close">✕</button>
+          <button class="lb-prev" aria-label="Previous">◀</button>
+          <img class="lb-img" src="" alt="Full-size image" />
+          <button class="lb-next" aria-label="Next">▶</button>
+          <div class="lb-counter">1 / 14</div>
+        </div>
+      </div>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', function(){
+          const images = [
+            '..\/images\/16225687\/09561537f6534eca9ea7d46850759e0c8ec5e7f6.jpg', '..\/images\/16225687\/c20a989c96998bfb625e2efe943ba2f2dc49184c.jpg', '..\/images\/16225687\/7812095b3479482ef94e1d5183680c90cca40e35.jpg', '..\/images\/16225687\/2fc6d497feaac1c7e60d5b88d58ccf5d5373d1bd.jpg', '..\/images\/16225687\/b3b038918339d9d944343d70006859a34ebcfbb9.jpg', '..\/images\/16225687\/10d2ca7447fd8c10ce869c636d4cd57f531667b3.jpg', '..\/images\/16225687\/523be89ade0fd39578aa82d2e0261166691ea20b.jpg', '..\/images\/16225687\/0a8a2c1e95246b25c890d27608a5a9fa99f20f11.jpg', '..\/images\/16225687\/bd1eb153773b7baf1ff48d6facbab4e0b1fb7526.jpg', '..\/images\/16225687\/d25948830517bf99051a5123374290621f45e3c7.jpg', '..\/images\/16225687\/7824019337d017933a9a0401b62ee79d3c308633.jpg', '..\/images\/16225687\/ae6ec40c885e88035dba047fd56a280385f892cc.jpg', '..\/images\/16225687\/a7e223b7cf0df1f02d465a2b87216f0fea44c0e1.jpg', '..\/images\/16225687\/a1766adc8f4d69b531f9acd3de362a70499f6b06.jpg'          ];
+          const main = document.getElementById('main-cover');
+          const thumbs = document.querySelectorAll('.thumb');
+          const lb = document.getElementById('lightbox');
+          const lbImg = lb ? lb.querySelector('.lb-img') : null;
+          const lbClose = lb ? lb.querySelector('.lb-close') : null;
+          const lbPrev = lb ? lb.querySelector('.lb-prev') : null;
+          const lbNext = lb ? lb.querySelector('.lb-next') : null;
+          const lbCounter = lb ? lb.querySelector('.lb-counter') : null;
+          let idx = parseInt(main?.getAttribute('data-idx') || '0', 10) || 0;
+
+          function updateMain(to){
+            if (!main) return;
+            const i = Math.max(0, Math.min(images.length - 1, to));
+            if (images[i] && main.getAttribute('src') !== images[i]) {
+              main.setAttribute('src', images[i]);
+            }
+            main.setAttribute('data-idx', String(i));
+            idx = i;
+          }
+
+          function openLightbox(startIdx){
+            if (!lb || !lbImg) return;
+            idx = Math.max(0, Math.min(images.length - 1, startIdx));
+            lbImg.src = images[idx];
+            if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length;
+            lb.classList.add('open');
+            lb.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+          }
+          function closeLightbox(){
+            if (!lb) return;
+            lb.classList.remove('open');
+            lb.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+          }
+          function next(){ idx = (idx + 1) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
+          function prev(){ idx = (idx - 1 + images.length) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
+
+          // Thumbnail click: swap main and set index; Shift+Click opens lightbox
+          thumbs.forEach(function(btn){
+            btn.addEventListener('click', function(e){
+              const i = parseInt(this.getAttribute('data-idx') || '0', 10) || 0;
+              if (e.shiftKey) { openLightbox(i); return; }
+              updateMain(i);
+            });
+          });
+
+          // Main cover click: open lightbox on current index
+          if (main) {
+            main.addEventListener('click', function(){
+              const i = parseInt(main.getAttribute('data-idx') || '0', 10) || 0;
+              openLightbox(i);
+            });
+          }
+
+          // Lightbox interactions
+          lbClose?.addEventListener('click', closeLightbox);
+          lbPrev?.addEventListener('click', prev);
+          lbNext?.addEventListener('click', next);
+          lbImg?.addEventListener('click', next); // click image to advance
+          lb?.addEventListener('click', function(e){ if (e.target === lb) closeLightbox(); });
+
+          // Keyboard support
+          document.addEventListener('keydown', function(e){
+            if (!lb || !lb.classList.contains('open')) return;
+            if (e.key === 'Escape') { e.preventDefault(); closeLightbox(); }
+            else if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+          });
+
+          // Ensure initial main index reflects the list
+          if (images.length > 0 && main) {
+            let initial = images.indexOf(main.getAttribute('src'));
+            if (initial < 0) initial = 0;
+            main.setAttribute('data-idx', String(initial));
+          }
+        });
+      </script>
+            </div>
+
+  
+  <footer class="site-footer muted" style="text-align:center;margin:24px 0 8px 0;font-size:.9rem;">
+  Powered by Discogs API & Coffee Since 2025 | Lovingly Crafted in Boise, Idaho
+</footer>
+</body>
+</html>

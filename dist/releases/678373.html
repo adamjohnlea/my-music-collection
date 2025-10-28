@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Laurie Anderson — Strange Angels</title>
+    <style>
+    :root { --bg:#0b0b0c; --card:#16171a; --text:#e7e7ea; --muted:#a0a3aa; --accent:#67e8f9; --overlay: rgba(0,0,0,.9); }
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif}
+    .wrap{max-width:1000px;margin:40px auto;padding:0 20px}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .layout{display:grid;grid-template-columns:280px 1fr;gap:24px}
+    .card{background:var(--card);border-radius:12px;overflow:hidden}
+    .cover{width:100%;aspect-ratio:1/1;object-fit:cover;background:#222;cursor:zoom-in}
+    .meta{padding:16px}
+    .muted{color:var(--muted)}
+    h1{margin:0 0 8px 0;font-size:1.6rem}
+
+    /* Lightbox */
+    .lightbox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--overlay);z-index:1000}
+    .lightbox.open{display:flex}
+    .lb-inner{position:relative;max-width:95vw;max-height:95vh;display:flex;align-items:center;justify-content:center}
+    .lb-img{max-width:95vw;max-height:95vh;object-fit:contain;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+    .lb-close{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:999px;width:40px;height:40px;cursor:pointer;font-size:20px}
+    .lb-nav{position:absolute;top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center}
+    .lb-prev,.lb-next{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:999px;width:44px;height:44px;cursor:pointer;font-size:20px}
+    .lb-prev{left:-60px}
+    .lb-next{right:-60px}
+    .lb-counter{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);color:#fff;background:rgba(0,0,0,.5);padding:4px 10px;border-radius:999px;font-size:.9rem}
+
+    @media (max-width: 800px){
+      .layout{grid-template-columns:1fr}
+      .lb-prev{left:10px}
+      .lb-next{right:10px}
+    }
+  </style>
+</head>
+<body>
+  
+    <div class="wrap">
+    <p><a href="../index.html">← Back</a></p>
+          <div class="layout">
+        <div>
+          <div class="card">
+                          <img id="main-cover" class="cover" src="../images/678373/cf4fc7379f0d6d54c588677c137b7f196e408bb7.jpg" alt="Strange Angels cover" data-idx="0" />
+                      </div>
+                      <div class="thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+                              <button class="thumb" data-url="../images/678373/cf4fc7379f0d6d54c588677c137b7f196e408bb7.jpg" data-idx="0" title="Image 1" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/678373/cf4fc7379f0d6d54c588677c137b7f196e408bb7.jpg" alt="thumb 1" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:1" />
+                </button>
+                              <button class="thumb" data-url="../images/678373/ff4b53d13905acf536a7ebf36a36819642719411.jpg" data-idx="1" title="Image 2" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/678373/ff4b53d13905acf536a7ebf36a36819642719411.jpg" alt="thumb 2" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/678373/72615b4bfa1060c588aaec65a13de96e2d5abb20.jpg" data-idx="2" title="Image 3" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/678373/72615b4bfa1060c588aaec65a13de96e2d5abb20.jpg" alt="thumb 3" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/678373/4f268d3fd61e686ca53884ccaebb22d5d52c7fb3.jpg" data-idx="3" title="Image 4" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/678373/4f268d3fd61e686ca53884ccaebb22d5d52c7fb3.jpg" alt="thumb 4" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/678373/1b1995b0e8158b7d7a3c2e580dd6b4bc4ee780d6.jpg" data-idx="4" title="Image 5" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/678373/1b1995b0e8158b7d7a3c2e580dd6b4bc4ee780d6.jpg" alt="thumb 5" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/678373/f6f957901198f87081718f47c7f2a1849a00993a.jpg" data-idx="5" title="Image 6" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/678373/f6f957901198f87081718f47c7f2a1849a00993a.jpg" alt="thumb 6" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                          </div>
+                  </div>
+        <div>
+          <h1>Strange Angels</h1>
+          <p class="muted">Laurie Anderson • 1989</p>
+          <p class="muted">US</p>
+                      <p style="margin:8px 0;">
+              <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Electronic</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Rock</span>              <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Synth-pop</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Avantgarde</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Experimental</span>            </p>
+          
+                      <p class="muted">Formats:
+                              Vinyl                          </p>
+          
+                      <p class="muted">Labels:
+              Warner Bros. Records (9 25900-1), Warner Bros. Records (1-25900)            </p>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Tracklist</strong>
+                <ol>
+                                      <li>A1 — Strange Angels <span class="muted">(3:51)</span></li>
+                                      <li>A2 — Monkey&#039;s Paw <span class="muted">(4:33)</span></li>
+                                      <li>A3 — Coolsville <span class="muted">(4:34)</span></li>
+                                      <li>A4 — Ramon <span class="muted">(5:03)</span></li>
+                                      <li>A5 — Babydoll <span class="muted">(3:38)</span></li>
+                                      <li>B1 — Beautiful Red Dress <span class="muted">(4:43)</span></li>
+                                      <li>B2 — The Day The Devil <span class="muted">(4:00)</span></li>
+                                      <li>B3 — The Dream Before <span class="muted">(3:03)</span></li>
+                                      <li>B4 — My Eyes <span class="muted">(5:29)</span></li>
+                                      <li>B5 — Hiawatha <span class="muted">(6:53)</span></li>
+                                  </ol>
+              </div>
+            </div>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Videos</strong>
+                <ul>
+                                      <li><a href="https://www.youtube.com/watch?v=bkiKHIg_K8s" target="_blank" rel="noopener">Strange Angels</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=gTjzm-zrghc" target="_blank" rel="noopener">Babydoll</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=4S8rtxPmHTA" target="_blank" rel="noopener">Monkey&#039;s Paw</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=v2n3reJHnp8" target="_blank" rel="noopener">Coolsville</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=ZOuzxV1TC1E" target="_blank" rel="noopener">Ramon</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=jWkMMUEkIKE" target="_blank" rel="noopener">Beautiful Red Dress</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=tDwujHwD8m8" target="_blank" rel="noopener">The Day the Devil</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=RGL2Ne0V9mI" target="_blank" rel="noopener">The Dream Before</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=hJhix3LNHMQ" target="_blank" rel="noopener">My Eyes</a></li>
+                                      <li><a href="https://www.youtube.com/watch?v=uo_6ikuW4MQ" target="_blank" rel="noopener">Hiawatha</a></li>
+                                  </ul>
+              </div>
+            </div>
+          
+          
+          <div class="card" style="margin-top:16px;">
+            <div class="meta">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                <strong>My Notes</strong>
+                <button id="editToggle" type="button" title="Edit" style="background:transparent;color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:4px 8px;cursor:pointer;font-size:.9rem">Edit</button>
+              </div>
+
+              
+              <div id="notesView" style="margin-top:8px">
+                                                  <div class="muted">(none)</div>
+                              </div>
+
+              <form id="notesForm" method="post" action="/release/save" style="display:none; margin-top:8px; flex-direction:column; gap:8px">
+                              <input type="hidden" name="_token" value="" />
+                <input type="hidden" name="release_id" value="678373" />
+                <input type="hidden" name="return" value="../index.html" />
+                <label>Rating
+                  <select name="rating" style="background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:6px 8px">
+                    <option value="">—</option>
+                                          <option value="0" >0/5</option>
+                                          <option value="1" >1/5</option>
+                                          <option value="2" >2/5</option>
+                                          <option value="3" >3/5</option>
+                                          <option value="4" >4/5</option>
+                                          <option value="5" >5/5</option>
+                                      </select>
+                </label>
+                <label>Notes
+                  <textarea name="notes" rows="4" style="width:100%;background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:8px"></textarea>
+                </label>
+                <div>
+                  <button type="submit" style="background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:8px 12px;cursor:pointer">Save to Discogs</button>
+                  <span class="muted" style="margin-left:8px">This queues a background job. Run <code>php bin/console sync:push</code> to process.</span>
+                </div>
+                <p class="muted" style="margin:6px 0 0 0; font-size:.9rem">Note: your rating and notes are stored on your personal Discogs collection entry for this release. They do not appear on the public release page.</p>
+              </form>
+
+              <script>
+                (function(){
+                  const btn = document.getElementById('editToggle');
+                  const form = document.getElementById('notesForm');
+                  const view = document.getElementById('notesView');
+                  if (!btn || !form || !view) return;
+                  function setOpen(open){
+                    form.style.display = open ? 'flex' : 'none';
+                    view.style.display = open ? 'none' : 'block';
+                    btn.textContent = open ? 'Cancel' : 'Edit';
+                  }
+                  btn.addEventListener('click', function(){
+                    const open = form.style.display === 'none';
+                    setOpen(open);
+                  });
+                  // If page loaded with ?edit=1, open form
+                  const q = new URLSearchParams(window.location.search);
+                  if (q.get('edit') === '1') setOpen(true);
+                })();
+              </script>
+            </div>
+          </div>
+
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Credits</strong>
+                <ul>
+                                      <li>
+                      M&amp;co.
+                      <span class="muted">— Design</span>                                          </li>
+                                      <li>
+                      Scott Hull
+                      <span class="muted">— Edited By</span>                                          </li>
+                                      <li>
+                      Abdu Malahi
+                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
+                                      <li>
+                      Adam Yellin
+                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
+                                      <li>
+                      Alan Fierstein
+                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
+                                      <li>
+                      Anthony Stuart
+                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
+                                      <li>
+                      Chris Laidlaw
+                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
+                                      <li>
+                      Christopher Savino
+                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
+                                      <li>
+                      David Schiffman
+                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
+                                      <li>
+                      Dimitri Jakimowicz
+                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
+                                      <li>
+                      Ed Korengo
+                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
+                                      <li>
+                      George Cowan
+                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
+                                      <li>
+                      Jim Goatley
+                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
+                                      <li>
+                      Jim Petrie
+                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
+                                      <li>
+                      John Herman
+                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
+                                      <li>
+                      John Tumminia
+                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
+                                      <li>
+                      Katherine Miller
+                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
+                                      <li>
+                      Kieran Connelly
+                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
+                                      <li>
+                      Oz Fritz
+                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
+                                      <li>
+                      Patrick Dillett
+                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
+                                      <li>
+                      Paul Angelli
+                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
+                                      <li>
+                      Robert Derby
+                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
+                                      <li>
+                      Scott Gootman
+                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
+                                      <li>
+                      Thomas Schaumann
+                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
+                                      <li>
+                      UE Nastasi
+                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
+                                      <li>
+                      Valerie Ghent
+                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
+                                      <li>
+                      Eric Liljestrand
+                      <span class="muted">— Engineer, Programmed By [Macintosh Programming]</span>                                          </li>
+                                      <li>
+                      Linda Goldstein
+                      <span class="muted">— Management</span>                                          </li>
+                                      <li>
+                      Original Artists
+                      <span class="muted">— Management</span>                                          </li>
+                                      <li>
+                      Bob Ludwig
+                      <span class="muted">— Mastered By</span>                                          </li>
+                                      <li>
+                      Bob Clearmountain
+                      <span class="muted">— Mixed By</span>                      <span class="muted"> (tracks: A2, B2)</span>                    </li>
+                                      <li>
+                      Jay Healy
+                      <span class="muted">— Mixed By</span>                      <span class="muted"> (tracks: B1)</span>                    </li>
+                                      <li>
+                      Josh Abbey
+                      <span class="muted">— Mixed By</span>                      <span class="muted"> (tracks: B3)</span>                    </li>
+                                      <li>
+                      Neil Dorfsman
+                      <span class="muted">— Mixed By</span>                      <span class="muted"> (tracks: A1, A3 to A5, B4, B5)</span>                    </li>
+                                      <li>
+                      Robert Mapplethorpe
+                      <span class="muted">— Photography By</span>                                          </li>
+                                      <li>
+                      Arto Lindsay
+                      <span class="muted">— Producer</span>                      <span class="muted"> (tracks: B1)</span>                    </li>
+                                      <li>
+                      Ian Ritchie
+                      <span class="muted">— Producer</span>                      <span class="muted"> (tracks: A2, B3, B4)</span>                    </li>
+                                      <li>
+                      Laurie Anderson
+                      <span class="muted">— Producer</span>                                          </li>
+                                      <li>
+                      Leon Pendarvis
+                      <span class="muted">— Producer</span>                      <span class="muted"> (tracks: A5)</span>                    </li>
+                                      <li>
+                      Mike Thorne
+                      <span class="muted">— Producer</span>                      <span class="muted"> (tracks: A1, A2, A4, B2)</span>                    </li>
+                                      <li>
+                      Peter Scherer
+                      <span class="muted">— Producer</span>                      <span class="muted"> (tracks: B1)</span>                    </li>
+                                      <li>
+                      Roma Baran
+                      <span class="muted">— Producer</span>                                          </li>
+                                      <li>
+                      Dominick Maita
+                      <span class="muted">— Recorded By [Additional Recording]</span>                                          </li>
+                                      <li>
+                      Francis Manzella
+                      <span class="muted">— Recorded By [Additional Recording]</span>                                          </li>
+                                      <li>
+                      James Farber
+                      <span class="muted">— Recorded By [Additional Recording]</span>                                          </li>
+                                      <li>
+                      Jeff Lippay
+                      <span class="muted">— Recorded By [Additional Recording]</span>                                          </li>
+                                      <li>
+                      Josh Abbey
+                      <span class="muted">— Recorded By [Additional Recording]</span>                                          </li>
+                                      <li>
+                      Malcolm Pollack
+                      <span class="muted">— Recorded By [Additional Recording]</span>                                          </li>
+                                      <li>
+                      Mike Krowiak
+                      <span class="muted">— Recorded By [Additional Recording]</span>                                          </li>
+                                      <li>
+                      Roger Moutenot
+                      <span class="muted">— Recorded By [Additional Recording]</span>                                          </li>
+                                      <li>
+                      Scott Ansell
+                      <span class="muted">— Recorded By [Additional Recording]</span>                                          </li>
+                                      <li>
+                      Tom Size
+                      <span class="muted">— Recorded By [Additional Recording]</span>                                          </li>
+                                      <li>
+                      Ian Lintault
+                      <span class="muted">— Technician [Sludge Jamming]</span>                                          </li>
+                                      <li>
+                      Laurie Anderson
+                      <span class="muted">— Vocals</span>                                          </li>
+                                      <li>
+                      Laurie Anderson
+                      <span class="muted">— Words By, Music By</span>                                          </li>
+                                  </ul>
+              </div>
+            </div>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Companies</strong>
+                <ul>
+                                      <li>
+                      Specialty Records Corporation
+                      <span class="muted"> — Pressed By</span>                                          </li>
+                                      <li>
+                      Warner Bros. Records Inc.
+                      <span class="muted"> — Phonographic Copyright (p)</span>                                          </li>
+                                      <li>
+                      Warner Bros. Records Inc.
+                      <span class="muted"> — Copyright (c)</span>                                          </li>
+                                      <li>
+                      Difficult Music
+                      <span class="muted"> — Published By</span>                                          </li>
+                                      <li>
+                      Lolo Music
+                      <span class="muted"> — Published By</span>                                          </li>
+                                      <li>
+                      Blackwood Music
+                      <span class="muted"> — Published By</span>                                          </li>
+                                      <li>
+                      The Lobby
+                      <span class="muted"> — Recorded At</span>                                          </li>
+                                      <li>
+                      Skyline Studios
+                      <span class="muted"> — Recorded At</span>                                          </li>
+                                      <li>
+                      Right Track Recording
+                      <span class="muted"> — Recorded At</span>                                          </li>
+                                      <li>
+                      Platinum Island Studios
+                      <span class="muted"> — Recorded At</span>                                          </li>
+                                      <li>
+                      Electric Lady Studios
+                      <span class="muted"> — Recorded At</span>                                          </li>
+                                      <li>
+                      Kampo Cultural Center
+                      <span class="muted"> — Recorded At</span>                                          </li>
+                                      <li>
+                      Soundtrack Studios
+                      <span class="muted"> — Recorded At</span>                                          </li>
+                                      <li>
+                      Sigma Sound Studios, New York
+                      <span class="muted"> — Recorded At</span>                                          </li>
+                                      <li>
+                      Sorcerer Sound
+                      <span class="muted"> — Recorded At</span>                                          </li>
+                                      <li>
+                      RPM Studios
+                      <span class="muted"> — Recorded At</span>                                          </li>
+                                      <li>
+                      Pinwheel
+                      <span class="muted"> — Recorded At</span>                                          </li>
+                                      <li>
+                      The Stereo Society
+                      <span class="muted"> — Recorded At</span>                                          </li>
+                                      <li>
+                      Bearsville Studios
+                      <span class="muted"> — Recorded At</span>                                          </li>
+                                      <li>
+                      Fantasy Studios
+                      <span class="muted"> — Recorded At</span>                                          </li>
+                                      <li>
+                      Quad Recording Studios
+                      <span class="muted"> — Recorded At</span>                                          </li>
+                                      <li>
+                      Masterdisk
+                      <span class="muted"> — Edited At</span>                                          </li>
+                                      <li>
+                      Masterdisk
+                      <span class="muted"> — Mixed At</span>                                          </li>
+                                      <li>
+                      Masterdisk
+                      <span class="muted"> — Mastered At</span>                                          </li>
+                                  </ul>
+              </div>
+            </div>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Barcodes</strong>
+                <ul>
+                                      <li>0 7599-25900-1 3</li>
+                                      <li>075992590013 <span class="muted">(Barcode As Scanned)</span></li>
+                                  </ul>
+              </div>
+            </div>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Identifiers</strong>
+                <ul>
+                                      <li>Matrix / Runout: MASTERDISK DMM 1-25900-A SR1-DMM SP 1-1 <span class="muted">(Side 1 Etched)</span></li>
+                                      <li>Matrix / Runout: MASTERDISK DMM 1-25900-B SR1-DMM SP 1-1 <span class="muted">(Side 2 Etched)</span></li>
+                                      <li>Rights Society: BMI</li>
+                                      <li>SPARS Code: ADD</li>
+                                  </ul>
+              </div>
+            </div>
+                  </div>
+      </div>
+
+            <!-- Lightbox overlay -->
+      <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog">
+        <div class="lb-inner">
+          <button class="lb-close" aria-label="Close">✕</button>
+          <button class="lb-prev" aria-label="Previous">◀</button>
+          <img class="lb-img" src="" alt="Full-size image" />
+          <button class="lb-next" aria-label="Next">▶</button>
+          <div class="lb-counter">1 / 6</div>
+        </div>
+      </div>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', function(){
+          const images = [
+            '..\/images\/678373\/cf4fc7379f0d6d54c588677c137b7f196e408bb7.jpg', '..\/images\/678373\/ff4b53d13905acf536a7ebf36a36819642719411.jpg', '..\/images\/678373\/72615b4bfa1060c588aaec65a13de96e2d5abb20.jpg', '..\/images\/678373\/4f268d3fd61e686ca53884ccaebb22d5d52c7fb3.jpg', '..\/images\/678373\/1b1995b0e8158b7d7a3c2e580dd6b4bc4ee780d6.jpg', '..\/images\/678373\/f6f957901198f87081718f47c7f2a1849a00993a.jpg'          ];
+          const main = document.getElementById('main-cover');
+          const thumbs = document.querySelectorAll('.thumb');
+          const lb = document.getElementById('lightbox');
+          const lbImg = lb ? lb.querySelector('.lb-img') : null;
+          const lbClose = lb ? lb.querySelector('.lb-close') : null;
+          const lbPrev = lb ? lb.querySelector('.lb-prev') : null;
+          const lbNext = lb ? lb.querySelector('.lb-next') : null;
+          const lbCounter = lb ? lb.querySelector('.lb-counter') : null;
+          let idx = parseInt(main?.getAttribute('data-idx') || '0', 10) || 0;
+
+          function updateMain(to){
+            if (!main) return;
+            const i = Math.max(0, Math.min(images.length - 1, to));
+            if (images[i] && main.getAttribute('src') !== images[i]) {
+              main.setAttribute('src', images[i]);
+            }
+            main.setAttribute('data-idx', String(i));
+            idx = i;
+          }
+
+          function openLightbox(startIdx){
+            if (!lb || !lbImg) return;
+            idx = Math.max(0, Math.min(images.length - 1, startIdx));
+            lbImg.src = images[idx];
+            if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length;
+            lb.classList.add('open');
+            lb.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+          }
+          function closeLightbox(){
+            if (!lb) return;
+            lb.classList.remove('open');
+            lb.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+          }
+          function next(){ idx = (idx + 1) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
+          function prev(){ idx = (idx - 1 + images.length) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
+
+          // Thumbnail click: swap main and set index; Shift+Click opens lightbox
+          thumbs.forEach(function(btn){
+            btn.addEventListener('click', function(e){
+              const i = parseInt(this.getAttribute('data-idx') || '0', 10) || 0;
+              if (e.shiftKey) { openLightbox(i); return; }
+              updateMain(i);
+            });
+          });
+
+          // Main cover click: open lightbox on current index
+          if (main) {
+            main.addEventListener('click', function(){
+              const i = parseInt(main.getAttribute('data-idx') || '0', 10) || 0;
+              openLightbox(i);
+            });
+          }
+
+          // Lightbox interactions
+          lbClose?.addEventListener('click', closeLightbox);
+          lbPrev?.addEventListener('click', prev);
+          lbNext?.addEventListener('click', next);
+          lbImg?.addEventListener('click', next); // click image to advance
+          lb?.addEventListener('click', function(e){ if (e.target === lb) closeLightbox(); });
+
+          // Keyboard support
+          document.addEventListener('keydown', function(e){
+            if (!lb || !lb.classList.contains('open')) return;
+            if (e.key === 'Escape') { e.preventDefault(); closeLightbox(); }
+            else if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+          });
+
+          // Ensure initial main index reflects the list
+          if (images.length > 0 && main) {
+            let initial = images.indexOf(main.getAttribute('src'));
+            if (initial < 0) initial = 0;
+            main.setAttribute('data-idx', String(initial));
+          }
+        });
+      </script>
+            </div>
+
+  
+  <footer class="site-footer muted" style="text-align:center;margin:24px 0 8px 0;font-size:.9rem;">
+  Powered by Discogs API & Coffee Since 2025 | Lovingly Crafted in Boise, Idaho
+</footer>
+</body>
+</html>

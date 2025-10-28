@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Beatles — Sgt. Pepper&#039;s Lonely Hearts Club Band</title>
+    <style>
+    :root { --bg:#0b0b0c; --card:#16171a; --text:#e7e7ea; --muted:#a0a3aa; --accent:#67e8f9; --overlay: rgba(0,0,0,.9); }
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif}
+    .wrap{max-width:1000px;margin:40px auto;padding:0 20px}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .layout{display:grid;grid-template-columns:280px 1fr;gap:24px}
+    .card{background:var(--card);border-radius:12px;overflow:hidden}
+    .cover{width:100%;aspect-ratio:1/1;object-fit:cover;background:#222;cursor:zoom-in}
+    .meta{padding:16px}
+    .muted{color:var(--muted)}
+    h1{margin:0 0 8px 0;font-size:1.6rem}
+
+    /* Lightbox */
+    .lightbox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--overlay);z-index:1000}
+    .lightbox.open{display:flex}
+    .lb-inner{position:relative;max-width:95vw;max-height:95vh;display:flex;align-items:center;justify-content:center}
+    .lb-img{max-width:95vw;max-height:95vh;object-fit:contain;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+    .lb-close{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:999px;width:40px;height:40px;cursor:pointer;font-size:20px}
+    .lb-nav{position:absolute;top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center}
+    .lb-prev,.lb-next{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:999px;width:44px;height:44px;cursor:pointer;font-size:20px}
+    .lb-prev{left:-60px}
+    .lb-next{right:-60px}
+    .lb-counter{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);color:#fff;background:rgba(0,0,0,.5);padding:4px 10px;border-radius:999px;font-size:.9rem}
+
+    @media (max-width: 800px){
+      .layout{grid-template-columns:1fr}
+      .lb-prev{left:10px}
+      .lb-next{right:10px}
+    }
+  </style>
+</head>
+<body>
+  
+    <div class="wrap">
+    <p><a href="../index.html">← Back</a></p>
+          <div class="layout">
+        <div>
+          <div class="card">
+                          <img id="main-cover" class="cover" src="../images/10334343/892e51287917b6dce2e20e4e3e81ec198017f5c5.jpg" alt="Sgt. Pepper&#039;s Lonely Hearts Club Band cover" data-idx="0" />
+                      </div>
+                      <div class="thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+                              <button class="thumb" data-url="../images/10334343/892e51287917b6dce2e20e4e3e81ec198017f5c5.jpg" data-idx="0" title="Image 1" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10334343/892e51287917b6dce2e20e4e3e81ec198017f5c5.jpg" alt="thumb 1" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:1" />
+                </button>
+                              <button class="thumb" data-url="../images/10334343/60c336447ffdfbd5572797023aec84eb9eb1b969.jpg" data-idx="1" title="Image 2" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10334343/60c336447ffdfbd5572797023aec84eb9eb1b969.jpg" alt="thumb 2" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/10334343/e7e4334aaceece77d743fffd96dcc95cc2583918.jpg" data-idx="2" title="Image 3" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10334343/e7e4334aaceece77d743fffd96dcc95cc2583918.jpg" alt="thumb 3" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/10334343/ea366e7dbc3bc151c3d96c510110124c24c5b361.jpg" data-idx="3" title="Image 4" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10334343/ea366e7dbc3bc151c3d96c510110124c24c5b361.jpg" alt="thumb 4" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/10334343/38d702dba4462116b5eb28306e5d6dafafbddfd6.jpg" data-idx="4" title="Image 5" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10334343/38d702dba4462116b5eb28306e5d6dafafbddfd6.jpg" alt="thumb 5" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/10334343/55943f7f2a1da17b691efd7965192ba1513fa9d4.jpg" data-idx="5" title="Image 6" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10334343/55943f7f2a1da17b691efd7965192ba1513fa9d4.jpg" alt="thumb 6" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/10334343/e9592d52599928e4f040bcfa1c5fb698194a4880.jpg" data-idx="6" title="Image 7" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10334343/e9592d52599928e4f040bcfa1c5fb698194a4880.jpg" alt="thumb 7" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/10334343/fffa440602f11aee3588e83243e6d8bebddd5f80.jpg" data-idx="7" title="Image 8" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10334343/fffa440602f11aee3588e83243e6d8bebddd5f80.jpg" alt="thumb 8" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/10334343/ef816f79a32c7e15120f4c6b6b023829c648588d.jpg" data-idx="8" title="Image 9" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10334343/ef816f79a32c7e15120f4c6b6b023829c648588d.jpg" alt="thumb 9" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/10334343/f913402f49e94f70adcfd685794515de9c292199.jpg" data-idx="9" title="Image 10" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10334343/f913402f49e94f70adcfd685794515de9c292199.jpg" alt="thumb 10" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/10334343/c8f93c660b7caa403f7d7b8cee2cee44ff05f0b8.jpg" data-idx="10" title="Image 11" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10334343/c8f93c660b7caa403f7d7b8cee2cee44ff05f0b8.jpg" alt="thumb 11" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/10334343/7be2346530afe3beeed163bcacfd1fc516568362.jpg" data-idx="11" title="Image 12" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10334343/7be2346530afe3beeed163bcacfd1fc516568362.jpg" alt="thumb 12" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/10334343/4e947cd48e35c6bba1ec700bfc417e4f2074b882.jpg" data-idx="12" title="Image 13" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10334343/4e947cd48e35c6bba1ec700bfc417e4f2074b882.jpg" alt="thumb 13" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/10334343/2ab97881c120a8a7ce5c8df46fcf3d6f0949d12d.jpg" data-idx="13" title="Image 14" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10334343/2ab97881c120a8a7ce5c8df46fcf3d6f0949d12d.jpg" alt="thumb 14" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                              <button class="thumb" data-url="../images/10334343/d5d46b7418fd74404dcc284ffc4e90ad89852f64.jpg" data-idx="14" title="Image 15" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10334343/d5d46b7418fd74404dcc284ffc4e90ad89852f64.jpg" alt="thumb 15" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                </button>
+                          </div>
+                  </div>
+        <div>
+          <h1>Sgt. Pepper&#039;s Lonely Hearts Club Band</h1>
+          <p class="muted">The Beatles • 2017</p>
+          <p class="muted">Worldwide</p>
+                      <p style="margin:8px 0;">
+              <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Rock</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Pop</span>              <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Rock &amp; Roll</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Psychedelic Rock</span>            </p>
+          
+                      <p class="muted">Formats:
+                              Vinyl (Anniversary Edition, ½ Speed Mastered, Gatefold)                          </p>
+          
+                      <p class="muted">Labels:
+              Parlophone (PCS 7027), Apple Records (0602557455342), Universal Music Group (0602557455342)            </p>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Tracklist</strong>
+                <ol>
+                                      <li>A1 — Sgt. Pepper&#039;s Lonely Hearts Club Band <span class="muted">(1:57)</span></li>
+                                      <li>A2 — With A Little Help From My Friends <span class="muted">(2:34)</span></li>
+                                      <li>A3 — Lucy In The Sky With Diamonds <span class="muted">(3:21)</span></li>
+                                      <li>A4 — Getting Better <span class="muted">(2:42)</span></li>
+                                      <li>A5 — Fixing A Hole <span class="muted">(2:29)</span></li>
+                                      <li>A6 — She&#039;s Leaving Home <span class="muted">(3:19)</span></li>
+                                      <li>A7 — Being For The Benefit Of Mr. Kite! <span class="muted">(2:35)</span></li>
+                                      <li>B1 — Within You Without You <span class="muted">(4:57)</span></li>
+                                      <li>B2 — When I&#039;m Sixty-Four <span class="muted">(2:34)</span></li>
+                                      <li>B3 — Lovely Rita <span class="muted">(2:39)</span></li>
+                                      <li>B4 — Good Morning Good Morning <span class="muted">(2:30)</span></li>
+                                      <li>B5 — Sgt. Pepper&#039;s Lonely Hearts Club Band (Reprise) <span class="muted">(1:17)</span></li>
+                                      <li>B6 — A Day In The Life <span class="muted">(4:55)</span></li>
+                                      <li> — The Sgt. Pepper Sessions</li>
+                                      <li>C1 — Sgt. Pepper&#039;s Lonely Hearts Club Band (Take 9) <span class="muted">(2:38)</span></li>
+                                      <li>C2 — With A Little Help From My Friends (Takes 1 And 2) <span class="muted">(3:19)</span></li>
+                                      <li>C3 — Lucy In The Sky With Diamonds (Take 1) <span class="muted">(4:00)</span></li>
+                                      <li>C4 — Getting Better (Take 1) <span class="muted">(2:20)</span></li>
+                                      <li>C5 — Fixing A Hole (Take 3) <span class="muted">(3:29)</span></li>
+                                      <li>C6 — She&#039;s Leaving Home (Take 1) <span class="muted">(3:50)</span></li>
+                                      <li>C7 — Being For The Benefit Of Mr. Kite! (Take 4) <span class="muted">(3:25)</span></li>
+                                      <li>D1 — Within You Without You (Take 1) <span class="muted">(5:34)</span></li>
+                                      <li>D2 — When I&#039;m Sixty-Four (Take 2) <span class="muted">(3:03)</span></li>
+                                      <li>D3 — Lovely Rita (Take 9) <span class="muted">(3:05)</span></li>
+                                      <li>D4 — Good Morning Good Morning (Take 8) <span class="muted">(2:49)</span></li>
+                                      <li>D5 — Sgt. Pepper&#039;s Lonely Hearts Club Band (Reprise) (Take 8) <span class="muted">(1:57)</span></li>
+                                      <li>D6 — A Day In The Life (Take 1 And Hummed Last Chord) <span class="muted">(4:51)</span></li>
+                                  </ol>
+              </div>
+            </div>
+          
+          
+          
+          <div class="card" style="margin-top:16px;">
+            <div class="meta">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                <strong>My Notes</strong>
+                <button id="editToggle" type="button" title="Edit" style="background:transparent;color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:4px 8px;cursor:pointer;font-size:.9rem">Edit</button>
+              </div>
+
+              
+              <div id="notesView" style="margin-top:8px">
+                                                  <div class="muted">(none)</div>
+                              </div>
+
+              <form id="notesForm" method="post" action="/release/save" style="display:none; margin-top:8px; flex-direction:column; gap:8px">
+                              <input type="hidden" name="_token" value="" />
+                <input type="hidden" name="release_id" value="10334343" />
+                <input type="hidden" name="return" value="../index.html" />
+                <label>Rating
+                  <select name="rating" style="background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:6px 8px">
+                    <option value="">—</option>
+                                          <option value="0" >0/5</option>
+                                          <option value="1" >1/5</option>
+                                          <option value="2" >2/5</option>
+                                          <option value="3" >3/5</option>
+                                          <option value="4" >4/5</option>
+                                          <option value="5" >5/5</option>
+                                      </select>
+                </label>
+                <label>Notes
+                  <textarea name="notes" rows="4" style="width:100%;background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:8px"></textarea>
+                </label>
+                <div>
+                  <button type="submit" style="background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:8px 12px;cursor:pointer">Save to Discogs</button>
+                  <span class="muted" style="margin-left:8px">This queues a background job. Run <code>php bin/console sync:push</code> to process.</span>
+                </div>
+                <p class="muted" style="margin:6px 0 0 0; font-size:.9rem">Note: your rating and notes are stored on your personal Discogs collection entry for this release. They do not appear on the public release page.</p>
+              </form>
+
+              <script>
+                (function(){
+                  const btn = document.getElementById('editToggle');
+                  const form = document.getElementById('notesForm');
+                  const view = document.getElementById('notesView');
+                  if (!btn || !form || !view) return;
+                  function setOpen(open){
+                    form.style.display = open ? 'flex' : 'none';
+                    view.style.display = open ? 'none' : 'block';
+                    btn.textContent = open ? 'Cancel' : 'Edit';
+                  }
+                  btn.addEventListener('click', function(){
+                    const open = form.style.display === 'none';
+                    setOpen(open);
+                  });
+                  // If page loaded with ?edit=1, open form
+                  const q = new URLSearchParams(window.location.search);
+                  if (q.get('edit') === '1') setOpen(true);
+                })();
+              </script>
+            </div>
+          </div>
+
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Credits</strong>
+                <ul>
+                                      <li>
+                      Darren Evans
+                      <span class="muted">— Art Direction</span>                                          </li>
+                                      <li>
+                      Madame Tussauds
+                      <span class="muted">— Assemblage [Wax Figures]</span>                                          </li>
+                                      <li>
+                      Jann Haworth
+                      <span class="muted">— Assemblage, Set Designer</span>                                          </li>
+                                      <li>
+                      Peter Blake
+                      <span class="muted">— Assemblage, Set Designer</span>                                          </li>
+                                      <li>
+                      Adam Sharp
+                      <span class="muted">— Coordinator [Mix Coordination]</span>                                          </li>
+                                      <li>
+                      M C Productions
+                      <span class="muted">— Cover</span>                                          </li>
+                                      <li>
+                      The Apple
+                      <span class="muted">— Cover</span>                                          </li>
+                                      <li>
+                      Kevin Howlett
+                      <span class="muted">— Edited By</span>                                          </li>
+                                      <li>
+                      Aaron Bremner
+                      <span class="muted">— Edited By [Photo Editing], Research</span>                                          </li>
+                                      <li>
+                      Dorcas Lynn
+                      <span class="muted">— Edited By [Photo Editing], Research</span>                                          </li>
+                                      <li>
+                      Miles Showell
+                      <span class="muted">— Engineer [Mastering]</span>                                          </li>
+                                      <li>
+                      Adrian Ibbetson
+                      <span class="muted">— Engineer [Principal]</span>                      <span class="muted"> (tracks: A6, C5)</span>                    </li>
+                                      <li>
+                      Geoff Emerick
+                      <span class="muted">— Engineer [Principal]</span>                      <span class="muted"> (tracks: A4)</span>                    </li>
+                                      <li>
+                      Ken Townsend
+                      <span class="muted">— Engineer [Principal]</span>                      <span class="muted"> (tracks: A4, C4)</span>                    </li>
+                                      <li>
+                      Malcolm Addey
+                      <span class="muted">— Engineer [Principal]</span>                      <span class="muted"> (tracks: A4, C4)</span>                    </li>
+                                      <li>
+                      Peter Vince
+                      <span class="muted">— Engineer [Principal]</span>                      <span class="muted"> (tracks: A4)</span>                    </li>
+                                      <li>
+                      Graham Kirkby
+                      <span class="muted">— Engineer [Second]</span>                      <span class="muted"> (tracks: A5, C4)</span>                    </li>
+                                      <li>
+                      Ken Scott
+                      <span class="muted">— Engineer [Second]</span>                      <span class="muted"> (tracks: A5, A7)</span>                    </li>
+                                      <li>
+                      Phil McDonald
+                      <span class="muted">— Engineer [Second]</span>                      <span class="muted"> (tracks: B2, B6, D2)</span>                    </li>
+                                      <li>
+                      Richard Lush
+                      <span class="muted">— Engineer [Second]</span>                      <span class="muted"> (tracks: A5, A7, B6)</span>                    </li>
+                                      <li>
+                      Jeff Jones
+                      <span class="muted">— Executive-Producer</span>                                          </li>
+                                      <li>
+                      Miles Showell
+                      <span class="muted">— Lacquer Cut By</span>                                          </li>
+                                      <li>
+                      George Martin
+                      <span class="muted">— Liner Notes [1987]</span>                                          </li>
+                                      <li>
+                      Giles Martin
+                      <span class="muted">— Liner Notes [2017]</span>                                          </li>
+                                      <li>
+                      Paul McCartney
+                      <span class="muted">— Liner Notes [2017]</span>                                          </li>
+                                      <li>
+                      Greg McAllister
+                      <span class="muted">— Mixed By [Mix Assistant]</span>                                          </li>
+                                      <li>
+                      Matt Mysko
+                      <span class="muted">— Mixed By [Mix Assistant]</span>                                          </li>
+                                      <li>
+                      Sam OKell
+                      <span class="muted">— Mixed By [Mix Engineer]</span>                                          </li>
+                                      <li>
+                      Mike Leander
+                      <span class="muted">— Orchestrated By [Orchestration]</span>                      <span class="muted"> (tracks: A7)</span>                    </li>
+                                      <li>
+                      Apple Corps Ltd.
+                      <span class="muted">— Other [Image Acknowledgements]</span>                                          </li>
+                                      <li>
+                      Michael Cooper
+                      <span class="muted">— Other [Image Acknowledgements], Photography By</span>                                          </li>
+                                      <li>
+                      Giles Martin
+                      <span class="muted">— Producer [Mix], Mixed By</span>                                          </li>
+                                      <li>
+                      George Martin
+                      <span class="muted">— Producer, Orchestrated By</span>                                          </li>
+                                      <li>
+                      Guy Hayden
+                      <span class="muted">— Project Manager [Project Producers]</span>                                          </li>
+                                      <li>
+                      Jonathan Clyde
+                      <span class="muted">— Project Manager [Project Producers]</span>                                          </li>
+                                      <li>
+                      Mike Heatley
+                      <span class="muted">— Research</span>                                          </li>
+                                      <li>
+                      James Clarke
+                      <span class="muted">— Restoration [Audio]</span>                                          </li>
+                                      <li>
+                      Matthew Cocker
+                      <span class="muted">— Transferred By [Transfer Engineer]</span>                                          </li>
+                                      <li>
+                      George Harrison
+                      <span class="muted">— Written-By</span>                      <span class="muted"> (tracks: B1, D1)</span>                    </li>
+                                      <li>
+                      Lennon-McCartney
+                      <span class="muted">— Written-By</span>                      <span class="muted"> (tracks: A1 to A7, B2 to B6, C1 to C7, D2 to D6)</span>                    </li>
+                                  </ul>
+              </div>
+            </div>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Companies</strong>
+                <ul>
+                                      <li>
+                      Universal Music Group
+                      <span class="muted"> — Record Company</span>                                          </li>
+                                      <li>
+                      Calderstone Productions Limited
+                      <span class="muted"> — Phonographic Copyright (p)</span>                                          </li>
+                                      <li>
+                      Apple Corps Ltd.
+                      <span class="muted"> — Phonographic Copyright (p)</span>                                          </li>
+                                      <li>
+                      Calderstone Productions Limited
+                      <span class="muted"> — Copyright (c)</span>                                          </li>
+                                      <li>
+                      Apple Corps Ltd.
+                      <span class="muted"> — Copyright (c)</span>                                          </li>
+                                      <li>
+                      Optimal Media GmbH
+                      <span class="muted"> — Pressed By</span>                                          </li>
+                                      <li>
+                      Optimal Media GmbH
+                      <span class="muted"> — Pressed By</span>                                          </li>
+                                      <li>
+                      Sony/ATV Music Publishing LLC
+                      <span class="muted"> — Published By</span>                                          </li>
+                                      <li>
+                      Abbey Road Studios
+                      <span class="muted"> — Mastered At</span>                                          </li>
+                                      <li>
+                      Abbey Road Studios
+                      <span class="muted"> — Lacquer Cut At</span>                                          </li>
+                                      <li>
+                      Universal International Music B.V.
+                      <span class="muted"> — Record Company</span>                                          </li>
+                                      <li>
+                      E.M.I. Records
+                      <span class="muted"> — Record Company</span>                                          </li>
+                                      <li>
+                      The Gramophone Co. Ltd.
+                      <span class="muted"> — Record Company</span>                                          </li>
+                                      <li>
+                      Northern Songs Ltd.
+                      <span class="muted"> — Copyright (c)</span>                                          </li>
+                                      <li>
+                      EMI Studios
+                      <span class="muted"> — Recorded At</span>                                          </li>
+                                      <li>
+                      Abbey Road Studios
+                      <span class="muted"> — Recorded At</span>                                          </li>
+                                      <li>
+                      Regent Sound Studios
+                      <span class="muted"> — Recorded At</span>                                          </li>
+                                  </ul>
+              </div>
+            </div>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Barcodes</strong>
+                <ul>
+                                      <li>6 02557 45534 2 <span class="muted">(Text, on sticker)</span></li>
+                                      <li>0602557455342 <span class="muted">(Scanned, on sticker)</span></li>
+                                  </ul>
+              </div>
+            </div>
+          
+                      <div class="card" style="margin-top:16px;">
+              <div class="meta"><strong>Identifiers</strong>
+                <ul>
+                                      <li>Label Code: LC01846</li>
+                                      <li>Rights Society: SDRM BIEM</li>
+                                      <li>Other: 0602557455397 <span class="muted">(Catalog # LP1)</span></li>
+                                      <li>Other: 0602557455403 <span class="muted">(Catalog # LP2)</span></li>
+                                      <li>Matrix / Runout: BH71657-01 A1 MILES. ABBEY ROAD 1/2 SPEED. 5745539 Λ Λ Λ  <span class="muted">(Runout side A, variant 1)</span></li>
+                                      <li>Matrix / Runout: BH71657-01 B1 MILES. ABBEY ROAD 1/2 SPEED. 5745539 Λ Λ Λ <span class="muted">(Runout side B, variant 1)</span></li>
+                                      <li>Matrix / Runout: BH71985-01 A1 MILES. ABBEY ROAD 1/2 SPEED. 5745540 <span class="muted">(Runout side C, variant 1)</span></li>
+                                      <li>Matrix / Runout: BH71985-01 B1 MILES. ABBEY ROAD 1/2 SPEED. 5745540 <span class="muted">(Runout side D, variant 1)</span></li>
+                                      <li>Matrix / Runout: BH71657-01 A1 MILES.ABBEY ROAD 1/2 SPEED. 5745539 IV Λ <span class="muted">(Runout side A, variant 2)</span></li>
+                                      <li>Matrix / Runout: BH71657-01 B1 vvx MILES.ABBEY ROAD 1/2 SPEED. 5745539 <span class="muted">(Runout side B, variant 2)</span></li>
+                                      <li>Matrix / Runout: BH71985-01 A1 MILES.ABBEY ROAD 1/2 SPEED. 5745540 5TI <span class="muted">(Runout side C, variant 2)</span></li>
+                                      <li>Matrix / Runout: BH71985-01 B1 MILES.ABBEY ROAD 1/2 SPEED. 5745540 <span class="muted">(Runout side D, variant 2)</span></li>
+                                      <li>Matrix / Runout: BH71657-01 A1 MILES. ABBEY ROAD 1/2 SPEED. 5745539 =vΛ <span class="muted">(Runout side A, variant 3)</span></li>
+                                      <li>Matrix / Runout: BH71657-01 B1 MILES. ABBEY ROAD 1/2 SPEED. 5745539 xΛΛ <span class="muted">(Runout side B, variant 3)</span></li>
+                                      <li>Matrix / Runout: BH71985-01 A1 MILES.ABBEY ROAD 1/2 SPEED. 5745540  <span class="muted">(Runout side C, variant 3)</span></li>
+                                      <li>Matrix / Runout: BH71985-01 B1 MILES.ABBEY ROAD 1/2 SPEED. 5745540 XI 2 <span class="muted">(Runout side D, variant 3)</span></li>
+                                      <li>Matrix / Runout: BH71657-01 A1 MILES.ABBEY ROAD 1/2 SPEED. V IT 5745539 <span class="muted">(Runout side A, variant 4)</span></li>
+                                      <li>Matrix / Runout: BH71657-01 B1 MILES. ABBEY ROAD 1/2 SPEED. 5745539 -1 <span class="muted">(Runout side B, variant 4)</span></li>
+                                      <li>Matrix / Runout: BH71985-01 A1 MILES. ABBEY ROAD 1/2 SPEED. 5745540 <span class="muted">(Runout side C, variant 4)</span></li>
+                                      <li>Matrix / Runout: BH71985-01 B1 MILES. ABBEY ROAD 1/2 SPEED. 5745540 IIΛ <span class="muted">(Runout side D, variant 4)</span></li>
+                                      <li>Matrix / Runout: BH71657-01 A1 1Λ MILES.ABBEY ROAD 1/2 SPEED. 5745539 <span class="muted">(Runout side A, variant 5)</span></li>
+                                      <li>Matrix / Runout: BH71657-01 B1 +1 MILES. ABBEY ROAD 1/2 SPEED. 5745539 <span class="muted">(Runout side B, variant 5)</span></li>
+                                      <li>Matrix / Runout: BH71985-01 A1 MILES. ABBEY ROAD 1/2 SPEED. 5745540 <span class="muted">(Runout side C, variant 5)</span></li>
+                                      <li>Matrix / Runout: BH71985-01 B1 MILES. ABBEY ROAD 1/2 SPEED. 5745540 <span class="muted">(Runout side D, variant 5)</span></li>
+                                      <li>Matrix / Runout: BH71657-01 A1 MILES. ABBEY ROAD 1/2 SPEED. 5745539 = I Λ <span class="muted">(Runout side A, variant 6)</span></li>
+                                      <li>Matrix / Runout: BH71657-01 B1 MILES. ABBEY ROAD 1/2 SPEED. V I - 5745539 <span class="muted">(Runout side B, variant 6)</span></li>
+                                      <li>Matrix / Runout: BH71985-01 A1 MILES. ABBEY ROAD 1/2 SPEED. 5745540 = = S <span class="muted">(Runout side C, variant 6)</span></li>
+                                      <li>Matrix / Runout: BH71985-01 B1 MILES. ABBEY ROAD 1/2 SPEED. △ Λ 5745540 <span class="muted">(Runout side D, variant 6)</span></li>
+                                      <li>Matrix / Runout: BH71657-01 A1 MILES. ABBEY ROAD 1/2 SPEED. 5745539  XIΛ  <span class="muted">(Runout side A, variant 7)</span></li>
+                                      <li>Matrix / Runout: BH71657-01 B1 MILES. ABBEY ROAD 1/2 SPEED. VI+ 5745539  <span class="muted">(Runout side B, variant 7)</span></li>
+                                      <li>Matrix / Runout: BH71985-01 A1 MILES. ABBEY ROAD 1/2 SPEED. 5745540 <span class="muted">(Runout side C, variant 7)</span></li>
+                                      <li>Matrix / Runout: BH71985-01 B1 MILES. ABBEY ROAD 1/2 SPEED. 5745540 IIΛ <span class="muted">(Runout side D, variant 7)</span></li>
+                                  </ul>
+              </div>
+            </div>
+                  </div>
+      </div>
+
+            <!-- Lightbox overlay -->
+      <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog">
+        <div class="lb-inner">
+          <button class="lb-close" aria-label="Close">✕</button>
+          <button class="lb-prev" aria-label="Previous">◀</button>
+          <img class="lb-img" src="" alt="Full-size image" />
+          <button class="lb-next" aria-label="Next">▶</button>
+          <div class="lb-counter">1 / 15</div>
+        </div>
+      </div>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', function(){
+          const images = [
+            '..\/images\/10334343\/892e51287917b6dce2e20e4e3e81ec198017f5c5.jpg', '..\/images\/10334343\/60c336447ffdfbd5572797023aec84eb9eb1b969.jpg', '..\/images\/10334343\/e7e4334aaceece77d743fffd96dcc95cc2583918.jpg', '..\/images\/10334343\/ea366e7dbc3bc151c3d96c510110124c24c5b361.jpg', '..\/images\/10334343\/38d702dba4462116b5eb28306e5d6dafafbddfd6.jpg', '..\/images\/10334343\/55943f7f2a1da17b691efd7965192ba1513fa9d4.jpg', '..\/images\/10334343\/e9592d52599928e4f040bcfa1c5fb698194a4880.jpg', '..\/images\/10334343\/fffa440602f11aee3588e83243e6d8bebddd5f80.jpg', '..\/images\/10334343\/ef816f79a32c7e15120f4c6b6b023829c648588d.jpg', '..\/images\/10334343\/f913402f49e94f70adcfd685794515de9c292199.jpg', '..\/images\/10334343\/c8f93c660b7caa403f7d7b8cee2cee44ff05f0b8.jpg', '..\/images\/10334343\/7be2346530afe3beeed163bcacfd1fc516568362.jpg', '..\/images\/10334343\/4e947cd48e35c6bba1ec700bfc417e4f2074b882.jpg', '..\/images\/10334343\/2ab97881c120a8a7ce5c8df46fcf3d6f0949d12d.jpg', '..\/images\/10334343\/d5d46b7418fd74404dcc284ffc4e90ad89852f64.jpg'          ];
+          const main = document.getElementById('main-cover');
+          const thumbs = document.querySelectorAll('.thumb');
+          const lb = document.getElementById('lightbox');
+          const lbImg = lb ? lb.querySelector('.lb-img') : null;
+          const lbClose = lb ? lb.querySelector('.lb-close') : null;
+          const lbPrev = lb ? lb.querySelector('.lb-prev') : null;
+          const lbNext = lb ? lb.querySelector('.lb-next') : null;
+          const lbCounter = lb ? lb.querySelector('.lb-counter') : null;
+          let idx = parseInt(main?.getAttribute('data-idx') || '0', 10) || 0;
+
+          function updateMain(to){
+            if (!main) return;
+            const i = Math.max(0, Math.min(images.length - 1, to));
+            if (images[i] && main.getAttribute('src') !== images[i]) {
+              main.setAttribute('src', images[i]);
+            }
+            main.setAttribute('data-idx', String(i));
+            idx = i;
+          }
+
+          function openLightbox(startIdx){
+            if (!lb || !lbImg) return;
+            idx = Math.max(0, Math.min(images.length - 1, startIdx));
+            lbImg.src = images[idx];
+            if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length;
+            lb.classList.add('open');
+            lb.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+          }
+          function closeLightbox(){
+            if (!lb) return;
+            lb.classList.remove('open');
+            lb.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+          }
+          function next(){ idx = (idx + 1) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
+          function prev(){ idx = (idx - 1 + images.length) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
+
+          // Thumbnail click: swap main and set index; Shift+Click opens lightbox
+          thumbs.forEach(function(btn){
+            btn.addEventListener('click', function(e){
+              const i = parseInt(this.getAttribute('data-idx') || '0', 10) || 0;
+              if (e.shiftKey) { openLightbox(i); return; }
+              updateMain(i);
+            });
+          });
+
+          // Main cover click: open lightbox on current index
+          if (main) {
+            main.addEventListener('click', function(){
+              const i = parseInt(main.getAttribute('data-idx') || '0', 10) || 0;
+              openLightbox(i);
+            });
+          }
+
+          // Lightbox interactions
+          lbClose?.addEventListener('click', closeLightbox);
+          lbPrev?.addEventListener('click', prev);
+          lbNext?.addEventListener('click', next);
+          lbImg?.addEventListener('click', next); // click image to advance
+          lb?.addEventListener('click', function(e){ if (e.target === lb) closeLightbox(); });
+
+          // Keyboard support
+          document.addEventListener('keydown', function(e){
+            if (!lb || !lb.classList.contains('open')) return;
+            if (e.key === 'Escape') { e.preventDefault(); closeLightbox(); }
+            else if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+            else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+          });
+
+          // Ensure initial main index reflects the list
+          if (images.length > 0 && main) {
+            let initial = images.indexOf(main.getAttribute('src'));
+            if (initial < 0) initial = 0;
+            main.setAttribute('data-idx', String(initial));
+          }
+        });
+      </script>
+            </div>
+
+  
+  <footer class="site-footer muted" style="text-align:center;margin:24px 0 8px 0;font-size:.9rem;">
+  Powered by Discogs API & Coffee Since 2025 | Lovingly Crafted in Boise, Idaho
+</footer>
+</body>
+</html>
