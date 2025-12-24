@@ -4,14 +4,242 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{% block title %}{{ title|default('My Music Collection') }}{% endblock %}</title>
+  <style>
+    :root {
+      --bg: #0b0b0c;
+      --card: #16171a;
+      --text: #e7e7ea;
+      --muted: #a0a3aa;
+      --accent: #67e8f9;
+      --border: #2a2b2f;
+      --header-bg: rgba(11, 11, 12, 0.8);
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    .content-wrap {
+      margin-top: 24px;
+      margin-bottom: 24px;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .muted { color: var(--muted); }
+
+    /* Layout Helpers */
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .gap-4 { gap: 16px; }
+    .gap-2 { gap: 8px; }
+
+    /* Common Components */
+    .btn-small {
+      font-size: .8rem;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--card);
+      color: var(--text);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-small:hover { border-color: var(--accent); text-decoration: none; }
+
+    /* Common Header Components */
+    .main-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--header-bg);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-content {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    /* Desktop Nav */
+    .desktop-nav { display: flex; align-items: center; gap: 20px; }
+    @media (max-width: 768px) { .desktop-nav { display: none; } }
+
+    /* Account Dropdown */
+    .dropdown { position: relative; display: inline-block; }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background: var(--card);
+      min-width: 160px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      padding: 8px 0;
+      z-index: 101;
+    }
+    .dropdown:hover .dropdown-content { display: block; }
+    .dropdown-item {
+      display: block;
+      padding: 8px 16px;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .dropdown-item:hover { background: rgba(255,255,255,0.05); }
+
+    /* Mobile Nav / Hamburger */
+    .mobile-nav-toggle {
+      display: none;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 8px;
+    }
+    @media (max-width: 768px) { .mobile-nav-toggle { display: block; } }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 65px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg);
+      z-index: 99;
+      padding: 20px;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .mobile-menu.active { display: flex; }
+    .mobile-menu .nav-item {
+        display: block;
+        padding: 12px 16px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: var(--text);
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .mobile-menu .nav-item:hover { border-color: var(--accent); }
+
+    /* Breadcrumbs */
+    .breadcrumbs {
+      padding: 12px 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    .breadcrumbs a { color: var(--muted); }
+    .breadcrumbs span { margin: 0 8px; opacity: 0.5; }
+
+    /* Utility Bar (Mobile Sticky Search/Sort) */
+    .utility-bar {
+        display: none;
+        position: sticky;
+        top: 65px;
+        z-index: 90;
+        background: var(--bg);
+        padding: 8px 20px;
+        border-bottom: 1px solid var(--border);
+    }
+    @media (max-width: 768px) {
+        .utility-bar.is-visible { display: block; }
+    }
+  </style>
   {% block styles %}{% endblock %}
 </head>
 <body>
+  <header class="main-header">
+    <div class="wrap">
+      <div class="header-content">
+        <a href="/" class="logo">My Music</a>
+
+        <div class="desktop-nav">
+          <a href="/?view=collection" class="muted">Collection</a>
+          <a href="/?view=wantlist" class="muted">Wantlist</a>
+          <a href="/random" class="muted">Surprise Me</a>
+          {% if auth_user %}
+            <div class="dropdown">
+              <a href="#" class="muted" style="display:flex;align-items:center;gap:4px">
+                {{ auth_user.username }}
+                <small>▼</small>
+              </a>
+              <div class="dropdown-content">
+                <a href="/stats" class="dropdown-item">Stats</a>
+                <a href="/settings" class="dropdown-item">Settings</a>
+                <a href="/about" class="dropdown-item">About</a>
+                <hr style="border:0;border-top:1px solid var(--border);margin:4px 0">
+                <form method="post" action="/logout" style="margin:0">
+                  <input type="hidden" name="_token" value="{{ csrf_token }}">
+                  <button type="submit" class="dropdown-item" style="width:100%;text-align:left;background:transparent;border:0;cursor:pointer;color:inherit;font:inherit">Sign out</button>
+                </form>
+              </div>
+            </div>
+          {% else %}
+            <a href="/login" class="muted">Sign in</a>
+          {% endif %}
+        </div>
+
+        <button class="mobile-nav-toggle" id="mobile-toggle" aria-label="Toggle menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="/?view=collection" class="nav-item">Collection</a>
+    <a href="/?view=wantlist" class="nav-item">Wantlist</a>
+    <a href="/random" class="nav-item">Surprise Me</a>
+    <a href="/stats" class="nav-item">Stats</a>
+    <a href="/settings" class="nav-item">Settings</a>
+    <a href="/about" class="nav-item">About</a>
+    {% if auth_user %}
+      <form method="post" action="/logout" style="margin-top:auto">
+        <input type="hidden" name="_token" value="{{ csrf_token }}">
+        <button type="submit" class="nav-item" style="width:100%;text-align:left;cursor:pointer;font:inherit">Sign out</button>
+      </form>
+    {% else %}
+      <a href="/login" class="nav-item" style="margin-top:auto;text-align:center;background:var(--accent);color:#000;font-weight:bold">Sign in</a>
+    {% endif %}
+  </div>
+
+  <div class="wrap">
+    {% block breadcrumbs %}
+    {% endblock %}
+  </div>
+
   {% block header %}{% endblock %}
 
   {% block content %}{% endblock %}
 
   {% block scripts %}{% endblock %}
+  <script>
+    document.getElementById('mobile-toggle')?.addEventListener('click', function() {
+      document.getElementById('mobile-menu').classList.toggle('active');
+      this.textContent = document.getElementById('mobile-menu').classList.contains('active') ? '✕' : '☰';
+    });
+  </script>
 
   {% include 'partials/footer.html.twig' %}
 </body>
