@@ -5,6 +5,7 @@ namespace App\Http;
 
 use App\Http\Middleware\RateLimiterMiddleware;
 use App\Http\Middleware\RetryMiddleware;
+use App\Http\Middleware\HealthCheckMiddleware;
 use App\Infrastructure\KvStore;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;

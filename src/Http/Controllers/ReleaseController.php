@@ -3,8 +3,11 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Domain\Repositories\CollectionRepositoryInterface;
+use App\Domain\Repositories\ReleaseRepositoryInterface;
 use App\Http\DiscogsHttpClient;
 use App\Infrastructure\KvStore;
+use App\Http\Validation\Validator;
 use PDO;
 use Twig\Environment;
 
@@ -12,16 +15,17 @@ class ReleaseController extends BaseController
 {
     public function __construct(
         Environment $twig,
-        private PDO $pdo
+        private PDO $pdo,
+        private ReleaseRepositoryInterface $releaseRepository,
+        private CollectionRepositoryInterface $collectionRepository,
+        Validator $validator
     ) {
-        parent::__construct($twig);
+        parent::__construct($twig, $validator);
     }
 
     public function show(int $rid, ?array $currentUser): void
     {
-        $stmt = $this->pdo->prepare("SELECT r.* FROM releases r WHERE r.id = :id");
-        $stmt->execute([':id' => $rid]);
-        $release = $stmt->fetch() ?: null;
+        $release = $this->releaseRepository->findById($rid);
 
         $imageUrl = null;
         $images = [];
@@ -45,9 +49,7 @@ class ReleaseController extends BaseController
         ];
 
         if ($release) {
-            $imgStmt = $this->pdo->prepare('SELECT source_url, local_path FROM images WHERE release_id = :rid ORDER BY id ASC');
-            $imgStmt->execute([':rid' => $rid]);
-            $rows = $imgStmt->fetchAll();
+            $rows = $this->releaseRepository->getImages($rid);
             $baseDirFs = dirname(dirname(dirname(__DIR__)));
             $primaryUrl = $release['cover_url'] ?: ($release['thumb_url'] ?? null);
             foreach ($rows as $row) {
@@ -90,9 +92,7 @@ class ReleaseController extends BaseController
 
             $username = $currentUser['discogs_username'] ?? null;
             if ($username) {
-                $ci = $this->pdo->prepare('SELECT notes, rating FROM collection_items WHERE release_id = :rid AND username = :u ORDER BY added DESC LIMIT 1');
-                $ci->execute([':rid' => $rid, ':u' => $username]);
-                $ciRow = $ci->fetch();
+                $ciRow = $this->collectionRepository->findCollectionItem($rid, $username);
                 if ($ciRow) {
                     $details['in_collection'] = true;
                     $userNotes = $ciRow['notes'] ?? null;
@@ -113,9 +113,7 @@ class ReleaseController extends BaseController
                     $details['user_rating'] = isset($ciRow['rating']) ? (int)$ciRow['rating'] : null;
                 }
 
-                $wi = $this->pdo->prepare('SELECT notes, rating FROM wantlist_items WHERE release_id = :rid AND username = :u LIMIT 1');
-                $wi->execute([':rid' => $rid, ':u' => $username]);
-                $wiRow = $wi->fetch();
+                $wiRow = $this->collectionRepository->findWantlistItem($rid, $username);
                 if ($wiRow) {
                     $details['in_wantlist'] = true;
                     if (!$details['in_collection']) {
@@ -160,6 +158,10 @@ class ReleaseController extends BaseController
         $rid = (int)($_POST['release_id'] ?? 0);
         if (!$this->isCsrfValid()) { $this->redirect('/release/' . $rid . '?saved=invalid_csrf'); }
 
+        if (!$this->validator->validate($_POST, ['release_id' => 'required|numeric'])) {
+            $this->redirect('/release/' . $rid . '?saved=invalid_data');
+        }
+
         $rating = isset($_POST['rating']) && $_POST['rating'] !== '' ? max(0, min(5, (int)$_POST['rating'])) : null;
         $notes = isset($_POST['notes']) ? trim((string)$_POST['notes']) : null;
         $mediaCondition = isset($_POST['media_condition']) ? trim((string)$_POST['media_condition']) : null;
@@ -170,41 +172,54 @@ class ReleaseController extends BaseController
         $ok = false; $msg = 'queued';
         if ($rid > 0 && $username) {
             if ($action === 'update_collection') {
-                $ci = $this->pdo->prepare('SELECT instance_id FROM collection_items WHERE release_id = :rid AND username = :u ORDER BY added DESC LIMIT 1');
-                $ci->execute([':rid' => $rid, ':u' => $username]);
-                $iid = (int)($ci->fetchColumn() ?: 0);
+                $ciRow = $this->collectionRepository->findCollectionItem($rid, $username);
+                $iid = (int)($ciRow['instance_id'] ?? 0);
                 if ($iid > 0) {
-                    $this->pdo->beginTransaction();
+                    $this->collectionRepository->beginTransaction();
                     try {
-                        $sel = $this->pdo->prepare('SELECT id FROM push_queue WHERE status = "pending" AND instance_id = :iid AND action = "update_collection" LIMIT 1');
-                        $sel->execute([':iid' => $iid]);
-                        $jobId = $sel->fetchColumn();
-                        if ($jobId) {
-                            $upd = $this->pdo->prepare('UPDATE push_queue SET rating = :rating, notes = :notes, media_condition = :mc, sleeve_condition = :sc, attempts = 0, last_error = NULL, created_at = strftime("%Y-%m-%dT%H:%M:%fZ", "now") WHERE id = :id');
-                            $upd->execute([':rating' => $rating, ':notes' => $notes, ':mc' => $mediaCondition, ':sc' => $sleeveCondition, ':id' => $jobId]);
+                        $job = $this->collectionRepository->findPendingPushJob($iid, 'update_collection');
+                        if ($job) {
+                            $this->collectionRepository->updatePushQueue((int)$job['id'], [
+                                'rating' => $rating,
+                                'notes' => $notes,
+                                'media_condition' => $mediaCondition,
+                                'sleeve_condition' => $sleeveCondition
+                            ]);
                         } else {
-                            $ins = $this->pdo->prepare('INSERT INTO push_queue (instance_id, release_id, username, rating, notes, media_condition, sleeve_condition, action) VALUES (:iid, :rid, :u, :rating, :notes, :mc, :sc, :action)');
-                            $ins->execute([':iid' => $iid, ':rid' => $rid, ':u' => $username, ':rating' => $rating, ':notes' => $notes, ':mc' => $mediaCondition, ':sc' => $sleeveCondition, ':action' => $action]);
+                            $this->collectionRepository->addToPushQueue([
+                                'instance_id' => $iid,
+                                'release_id' => $rid,
+                                'username' => $username,
+                                'rating' => $rating,
+                                'notes' => $notes,
+                                'media_condition' => $mediaCondition,
+                                'sleeve_condition' => $sleeveCondition,
+                                'action' => $action
+                            ]);
                         }
-                        $this->pdo->commit();
+                        $this->collectionRepository->commit();
                         $ok = true;
-                    } catch (\Throwable $e) { $this->pdo->rollBack(); $ok = false; $msg = 'error'; }
+                    } catch (\Throwable $e) { $this->collectionRepository->rollBack(); $ok = false; $msg = 'error'; }
                 } else { $msg = 'no_instance'; }
             } elseif (in_array($action, ['add_want', 'remove_want', 'want_to_collection'])) {
-                $this->pdo->beginTransaction();
+                $this->collectionRepository->beginTransaction();
                 try {
-                    $ins = $this->pdo->prepare('INSERT INTO push_queue (instance_id, release_id, username, action) VALUES (:iid, :rid, :u, :action)');
-                    $ins->execute([':iid' => 0, ':rid' => $rid, ':u' => $username, ':action' => $action]);
-                    if ($action === 'remove_want') {
-                        $del = $this->pdo->prepare('DELETE FROM wantlist_items WHERE release_id = :rid AND username = :u');
-                        $del->execute([':rid' => $rid, ':u' => $username]);
-                    } elseif ($action === 'want_to_collection') {
-                        $del = $this->pdo->prepare('DELETE FROM wantlist_items WHERE release_id = :rid AND username = :u');
-                        $del->execute([':rid' => $rid, ':u' => $username]);
+                    $this->collectionRepository->addToPushQueue([
+                        'instance_id' => 0,
+                        'release_id' => $rid,
+                        'username' => $username,
+                        'rating' => null,
+                        'notes' => null,
+                        'media_condition' => null,
+                        'sleeve_condition' => null,
+                        'action' => $action
+                    ]);
+                    if ($action === 'remove_want' || $action === 'want_to_collection') {
+                        $this->collectionRepository->removeFromWantlist($rid, $username);
                     }
-                    $this->pdo->commit();
+                    $this->collectionRepository->commit();
                     $ok = true;
-                } catch (\Throwable $e) { $this->pdo->rollBack(); $ok = false; $msg = 'error'; }
+                } catch (\Throwable $e) { $this->collectionRepository->rollBack(); $ok = false; $msg = 'error'; }
             }
         } else { $msg = 'invalid'; }
 
@@ -225,6 +240,10 @@ class ReleaseController extends BaseController
         $ret = (string)($_POST['return'] ?? '/');
         $username = (string)$currentUser['discogs_username'];
 
+        if (!$this->validator->validate($_POST, ['release_id' => 'required|numeric'])) {
+            $this->redirect($ret);
+        }
+
         if ($rid > 0 && $username) {
             $discogsClient = new DiscogsHttpClient('MyMusicCollection/1.0', $currentUser['discogs_token'], new KvStore($this->pdo));
             $http = $discogsClient->client();
@@ -242,16 +261,32 @@ class ReleaseController extends BaseController
                     $thumb = $data['thumb'] ?? null;
                     $cover = $data['images'][0]['uri'] ?? $data['cover_image'] ?? null;
 
-                    $cReleases = $this->pdo->prepare('INSERT INTO releases (id, title, artist, year, thumb_url, cover_url, imported_at, updated_at, raw_json) VALUES (:id, :title, :artist, :year, :thumb_url, :cover_url, :imported_at, :updated_at, :raw_json) ON CONFLICT(id) DO UPDATE SET title = COALESCE(excluded.title, releases.title), artist = COALESCE(excluded.artist, releases.artist), year = COALESCE(excluded.year, releases.year), thumb_url = COALESCE(excluded.thumb_url, releases.thumb_url), cover_url = COALESCE(excluded.cover_url, releases.cover_url), updated_at = excluded.updated_at, raw_json = COALESCE(excluded.raw_json, releases.raw_json)');
-                    $cReleases->execute([':id' => $rid, ':title' => $title, ':artist' => $artistSummary, ':year' => $year, ':thumb_url' => $thumb, ':cover_url' => $cover, ':imported_at' => $now, ':updated_at' => $now, ':raw_json' => json_encode($data, JSON_UNESCAPED_SLASHES)]);
+                    $this->releaseRepository->save([
+                        ':id' => $rid,
+                        ':title' => $title,
+                        ':artist' => $artistSummary,
+                        ':year' => $year,
+                        ':thumb_url' => $thumb,
+                        ':cover_url' => $cover,
+                        ':imported_at' => $now,
+                        ':updated_at' => $now,
+                        ':raw_json' => json_encode($data, JSON_UNESCAPED_SLASHES)
+                    ]);
 
                     $pushAction = ($action === 'add_collection') ? 'add_collection' : 'add_want';
-                    $ins = $this->pdo->prepare('INSERT INTO push_queue (instance_id, release_id, username, action) VALUES (:iid, :rid, :u, :action)');
-                    $ins->execute([':iid' => 0, ':rid' => $rid, ':u' => $username, ':action' => $pushAction]);
+                    $this->collectionRepository->addToPushQueue([
+                        'instance_id' => 0,
+                        'release_id' => $rid,
+                        'username' => $username,
+                        'rating' => null,
+                        'notes' => null,
+                        'media_condition' => null,
+                        'sleeve_condition' => null,
+                        'action' => $pushAction
+                    ]);
 
                     if ($action === 'add_want') {
-                        $insWant = $this->pdo->prepare('INSERT OR IGNORE INTO wantlist_items (username, release_id, added) VALUES (:u, :rid, :added)');
-                        $insWant->execute([':u' => $username, ':rid' => $rid, ':added' => $now]);
+                        $this->collectionRepository->addToWantlist($rid, $username, $now);
                     }
                 }
             } catch (\Throwable $e) { /* Error handling */ }

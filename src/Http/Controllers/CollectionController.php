@@ -3,9 +3,12 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Domain\Repositories\CollectionRepositoryInterface;
+use App\Domain\Repositories\ReleaseRepositoryInterface;
 use App\Domain\Search\QueryParser;
 use App\Http\DiscogsHttpClient;
 use App\Infrastructure\KvStore;
+use App\Http\Validation\Validator;
 use PDO;
 use Twig\Environment;
 
@@ -14,9 +17,12 @@ class CollectionController extends BaseController
     public function __construct(
         Environment $twig,
         private PDO $pdo,
-        private QueryParser $queryParser
+        private QueryParser $queryParser,
+        private ReleaseRepositoryInterface $releaseRepository,
+        private CollectionRepositoryInterface $collectionRepository,
+        Validator $validator
     ) {
-        parent::__construct($twig);
+        parent::__construct($twig, $validator);
     }
 
     public function index(?array $currentUser): void
@@ -40,9 +46,7 @@ class CollectionController extends BaseController
         $usernameFilter = (string)$currentUser['discogs_username'];
 
         // Fetch saved searches for the sidebar
-        $st = $this->pdo->prepare('SELECT id, name, query FROM saved_searches WHERE user_id = :uid ORDER BY name ASC');
-        $st->execute([':uid' => $currentUser['id']]);
-        $savedSearches = $st->fetchAll();
+        $savedSearches = $this->collectionRepository->getSavedSearches((int)$currentUser['id']);
 
         $page = max(1, (int)($_GET['page'] ?? 1));
         $perPage = max(1, min(60, (int)($_GET['per_page'] ?? 24)));
@@ -86,99 +90,18 @@ class CollectionController extends BaseController
         if ($q !== '') {
             $useFts = ($match !== '');
             if ($useFts) {
-                $cntSql = "SELECT COUNT(DISTINCT r.id) FROM releases_fts f JOIN releases r ON r.id = f.rowid WHERE releases_fts MATCH :m AND EXISTS (SELECT 1 FROM $itemsTable ci WHERE ci.release_id = r.id AND ci.username = :u)";
-                if ($yearFrom !== null) $cntSql .= " AND r.year >= :y1";
-                if ($yearTo !== null) $cntSql .= " AND r.year <= :y2";
-                $cnt = $this->pdo->prepare($cntSql);
-                $cnt->bindValue(':m', $match);
-                $cnt->bindValue(':u', $usernameFilter);
-                if ($yearFrom !== null) $cnt->bindValue(':y1', $yearFrom, \PDO::PARAM_INT);
-                if ($yearTo !== null) $cnt->bindValue(':y2', $yearTo, \PDO::PARAM_INT);
-                $cnt->execute();
-                $total = (int)$cnt->fetchColumn();
+                $total = $this->releaseRepository->countSearch($match, $yearFrom, $yearTo, $usernameFilter, $itemsTable);
                 $totalPages = $total > 0 ? (int)ceil($total / $perPage) : 1;
-
-                $sql = "SELECT r.id, r.title, r.artist, r.year, r.thumb_url, r.cover_url,
-                    (SELECT local_path FROM images i WHERE i.release_id = r.id AND i.source_url = r.cover_url ORDER BY id ASC LIMIT 1) AS primary_local_path,
-                    (SELECT local_path FROM images i WHERE i.release_id = r.id ORDER BY id ASC LIMIT 1) AS any_local_path,
-                    (SELECT MAX(ci2.added) FROM $itemsTable ci2 WHERE ci2.release_id = r.id AND ci2.username = :u) AS added_at,
-                    (SELECT MAX(ci3.rating) FROM $itemsTable ci3 WHERE ci3.release_id = r.id AND ci3.username = :u) AS rating
-                FROM releases_fts f
-                JOIN releases r ON r.id = f.rowid
-                WHERE releases_fts MATCH :match" .
-                ($yearFrom !== null ? " AND r.year >= :y1" : "") .
-                ($yearTo !== null ? " AND r.year <= :y2" : "") .
-                " AND EXISTS (SELECT 1 FROM $itemsTable ci WHERE ci.release_id = r.id AND ci.username = :u)
-                GROUP BY r.id
-                ORDER BY r.id DESC
-                LIMIT :limit OFFSET :offset";
-                $stmt = $this->pdo->prepare($sql);
-                $stmt->bindValue(':match', $match);
-                $stmt->bindValue(':u', $usernameFilter);
-                if ($yearFrom !== null) $stmt->bindValue(':y1', $yearFrom, \PDO::PARAM_INT);
-                if ($yearTo !== null) $stmt->bindValue(':y2', $yearTo, \PDO::PARAM_INT);
-                $stmt->bindValue(':limit', $perPage, \PDO::PARAM_INT);
-                $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
-                $stmt->execute();
-                $rows = $stmt->fetchAll();
+                $rows = $this->releaseRepository->search($match, $yearFrom, $yearTo, $usernameFilter, $itemsTable, $perPage, $offset);
             } else {
-                $cntSql = "SELECT COUNT(DISTINCT r.id) FROM releases r WHERE 1=1 AND EXISTS (SELECT 1 FROM $itemsTable ci WHERE ci.release_id = r.id AND ci.username = :u)";
-                if ($yearFrom !== null) $cntSql .= " AND r.year >= :y1";
-                if ($yearTo !== null) $cntSql .= " AND r.year <= :y2";
-                $cnt = $this->pdo->prepare($cntSql);
-                $cnt->bindValue(':u', $usernameFilter);
-                if ($yearFrom !== null) $cnt->bindValue(':y1', $yearFrom, \PDO::PARAM_INT);
-                if ($yearTo !== null) $cnt->bindValue(':y2', $yearTo, \PDO::PARAM_INT);
-                $cnt->execute();
-                $total = (int)$cnt->fetchColumn();
+                $total = $this->releaseRepository->countSearch('', $yearFrom, $yearTo, $usernameFilter, $itemsTable);
                 $totalPages = $total > 0 ? (int)ceil($total / $perPage) : 1;
-
-                $sql = "SELECT r.id, r.title, r.artist, r.year, r.thumb_url, r.cover_url,
-                    (SELECT local_path FROM images i WHERE i.release_id = r.id AND i.source_url = r.cover_url ORDER BY id ASC LIMIT 1) AS primary_local_path,
-                    (SELECT local_path FROM images i WHERE i.release_id = r.id ORDER BY id ASC LIMIT 1) AS any_local_path,
-                    (SELECT MAX(ci2.added) FROM $itemsTable ci2 WHERE ci2.release_id = r.id AND ci2.username = :u) AS added_at,
-                    (SELECT MAX(ci3.rating) FROM $itemsTable ci3 WHERE ci3.release_id = r.id AND ci3.username = :u) AS rating
-                FROM releases r
-                WHERE 1=1" .
-                ($yearFrom !== null ? " AND r.year >= :y1" : "") .
-                ($yearTo !== null ? " AND r.year <= :y2" : "") .
-                " AND EXISTS (SELECT 1 FROM $itemsTable ci WHERE ci.release_id = r.id AND ci.username = :u)
-                GROUP BY r.id
-                ORDER BY r.id DESC
-                LIMIT :limit OFFSET :offset";
-                $stmt = $this->pdo->prepare($sql);
-                $stmt->bindValue(':u', $usernameFilter);
-                if ($yearFrom !== null) $stmt->bindValue(':y1', $yearFrom, \PDO::PARAM_INT);
-                if ($yearTo !== null) $stmt->bindValue(':y2', $yearTo, \PDO::PARAM_INT);
-                $stmt->bindValue(':limit', $perPage, \PDO::PARAM_INT);
-                $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
-                $stmt->execute();
-                $rows = $stmt->fetchAll();
+                $rows = $this->releaseRepository->search('', $yearFrom, $yearTo, $usernameFilter, $itemsTable, $perPage, $offset);
             }
         } else {
-            $cnt = $this->pdo->prepare("SELECT COUNT(DISTINCT r.id) FROM releases r WHERE EXISTS (SELECT 1 FROM $itemsTable ci WHERE ci.release_id = r.id AND ci.username = :u)");
-            $cnt->bindValue(':u', $usernameFilter);
-            $cnt->execute();
-            $total = (int)$cnt->fetchColumn();
+            $total = $this->releaseRepository->countAll($usernameFilter, $itemsTable);
             $totalPages = $total > 0 ? (int)ceil($total / $perPage) : 1;
-
-            $sql = "SELECT r.id, r.title, r.artist, r.year, r.thumb_url, r.cover_url,
-                (SELECT local_path FROM images i WHERE i.release_id = r.id AND i.source_url = r.cover_url ORDER BY id ASC LIMIT 1) AS primary_local_path,
-                (SELECT local_path FROM images i WHERE i.release_id = r.id ORDER BY id ASC LIMIT 1) AS any_local_path,
-                (SELECT MAX(ci2.added) FROM $itemsTable ci2 WHERE ci2.release_id = r.id AND ci2.username = :u) AS added_at,
-                (SELECT MAX(ci3.rating) FROM $itemsTable ci3 WHERE ci3.release_id = r.id AND ci3.username = :u) AS rating
-            FROM releases r
-            WHERE EXISTS (SELECT 1 FROM $itemsTable ci WHERE ci.release_id = r.id AND ci.username = :u)
-            GROUP BY r.id
-            ORDER BY $orderBy
-            LIMIT :limit OFFSET :offset";
-
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->bindValue(':u', $usernameFilter);
-            $stmt->bindValue(':limit', $perPage, \PDO::PARAM_INT);
-            $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
-            $stmt->execute();
-            $rows = $stmt->fetchAll();
+            $rows = $this->releaseRepository->getAll($usernameFilter, $itemsTable, $orderBy, $perPage, $offset);
         }
 
         $items = [];
@@ -234,40 +157,11 @@ class CollectionController extends BaseController
         if (empty($currentUser['discogs_username'])) { $this->redirect('/settings'); }
         $username = (string)$currentUser['discogs_username'];
 
-        $st = $this->pdo->prepare('SELECT COUNT(DISTINCT release_id) FROM collection_items WHERE username = :u');
-        $st->execute([':u' => $username]);
-        $totalCount = (int)$st->fetchColumn();
+        $stats = $this->collectionRepository->getCollectionStats($username);
 
-        $st = $this->pdo->prepare('SELECT r.artist, COUNT(*) as count FROM collection_items ci JOIN releases r ON r.id = ci.release_id WHERE ci.username = :u GROUP BY r.artist ORDER BY count DESC LIMIT 10');
-        $st->execute([':u' => $username]);
-        $topArtists = $st->fetchAll();
-
-        $topGenres = [];
-        try {
-            $st = $this->pdo->prepare('SELECT j.value as genre, COUNT(*) as count FROM collection_items ci JOIN releases r ON r.id = ci.release_id, json_each(r.genres) j WHERE ci.username = :u GROUP BY genre ORDER BY count DESC LIMIT 10');
-            $st->execute([':u' => $username]);
-            $topGenres = $st->fetchAll();
-        } catch (\Throwable $e) {}
-
-        $st = $this->pdo->prepare('SELECT (r.year / 10) * 10 as decade, COUNT(*) as count FROM collection_items ci JOIN releases r ON r.id = ci.release_id WHERE ci.username = :u AND r.year > 0 GROUP BY decade ORDER BY decade ASC');
-        $st->execute([':u' => $username]);
-        $decades = $st->fetchAll();
-
-        $formats = [];
-        try {
-            $st = $this->pdo->prepare('SELECT json_extract(j.value, "$.name") as format_name, COUNT(*) as count FROM collection_items ci JOIN releases r ON r.id = ci.release_id, json_each(r.formats) j WHERE ci.username = :u GROUP BY format_name ORDER BY count DESC');
-            $st->execute([':u' => $username]);
-            $formats = $st->fetchAll();
-        } catch (\Throwable $e) {}
-
-        $this->render('stats.html.twig', [
+        $this->render('stats.html.twig', array_merge([
             'title' => 'Collection Statistics',
-            'total_count' => $totalCount,
-            'top_artists' => $topArtists,
-            'top_genres' => $topGenres,
-            'decades' => $decades,
-            'formats' => $formats,
-        ]);
+        ], $stats));
     }
 
     public function random(?array $currentUser): void
@@ -275,9 +169,7 @@ class CollectionController extends BaseController
         if (!$currentUser) { $this->redirect('/login'); }
         if (empty($currentUser['discogs_username'])) { $this->redirect('/settings'); }
         $username = (string)$currentUser['discogs_username'];
-        $st = $this->pdo->prepare('SELECT release_id FROM collection_items WHERE username = :u ORDER BY RANDOM() LIMIT 1');
-        $st->execute([':u' => $username]);
-        $rid = $st->fetchColumn();
+        $rid = $this->collectionRepository->getRandomReleaseId($username);
         if ($rid) {
             $this->redirect('/release/' . $rid);
         } else {

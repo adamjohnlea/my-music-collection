@@ -45,10 +45,8 @@ if (empty($_SESSION['csrf'])) {
 // Auth context
 $currentUser = null;
 if (isset($_SESSION['uid'])) {
-    $pdo = $container->get(PDO::class);
-    $st = $pdo->prepare('SELECT id, username, email, discogs_username, discogs_token_enc, discogs_search_exclude_title FROM auth_users WHERE id = :id');
-    $st->execute([':id' => (int)$_SESSION['uid']]);
-    $row = $st->fetch();
+    $userRepo = $container->get(\App\Domain\Repositories\UserRepositoryInterface::class);
+    $row = $userRepo->findById((int)$_SESSION['uid']);
     if ($row) {
         $crypto = $container->get(\App\Infrastructure\Crypto::class);
         $currentUser = [
@@ -67,34 +65,57 @@ $twig = $container->get(Environment::class);
 $twig->addGlobal('auth_user', $currentUser);
 $twig->addGlobal('csrf_token', $_SESSION['csrf'] ?? '');
 
-// Simple Router
-$uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+// Router
+$dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
+    $r->addRoute(['GET', 'POST'], '/login', [AuthController::class, 'login']);
+    $r->addRoute(['GET', 'POST'], '/register', [AuthController::class, 'register']);
+    $r->addRoute(['GET', 'POST'], '/logout', [AuthController::class, 'logout']);
+    $r->addRoute(['GET', 'POST'], '/settings', [AuthController::class, 'settings']);
+    $r->addRoute('GET', '/about', [CollectionController::class, 'about']);
+    $r->addRoute('GET', '/stats', [CollectionController::class, 'stats']);
+    $r->addRoute('GET', '/random', [CollectionController::class, 'random']);
+    $r->addRoute('POST', '/release/save', [ReleaseController::class, 'save']);
+    $r->addRoute('POST', '/release/add', [ReleaseController::class, 'add']);
+    $r->addRoute('GET', '/release/{id:\d+}', [ReleaseController::class, 'show']);
+    $r->addRoute('POST', '/saved-searches', [SearchController::class, 'save']);
+    $r->addRoute('POST', '/saved-searches/delete', [SearchController::class, 'delete']);
+    $r->addRoute('GET', '/', [CollectionController::class, 'index']);
+});
 
-if ($uri === '/login') {
-    $container->get(AuthController::class)->login();
-} elseif ($uri === '/register') {
-    $container->get(AuthController::class)->register();
-} elseif ($uri === '/logout') {
-    $container->get(AuthController::class)->logout();
-} elseif ($uri === '/settings') {
-    $container->get(AuthController::class)->settings($currentUser);
-} elseif ($uri === '/about') {
-    $container->get(CollectionController::class)->about();
-} elseif ($uri === '/stats') {
-    $container->get(CollectionController::class)->stats($currentUser);
-} elseif ($uri === '/random') {
-    $container->get(CollectionController::class)->random($currentUser);
-} elseif ($uri === '/release/save') {
-    $container->get(ReleaseController::class)->save($currentUser);
-} elseif ($uri === '/release/add') {
-    $container->get(ReleaseController::class)->add($currentUser);
-} elseif (preg_match('#^/release/(\d+)#', $uri, $m)) {
-    $container->get(ReleaseController::class)->show((int)$m[1], $currentUser);
-} elseif ($uri === '/saved-searches') {
-    $container->get(SearchController::class)->save($currentUser);
-} elseif ($uri === '/saved-searches/delete') {
-    $container->get(SearchController::class)->delete($currentUser);
-} else {
-    // Default home / collection grid
-    $container->get(CollectionController::class)->index($currentUser);
+$httpMethod = $_SERVER['REQUEST_METHOD'];
+$uri = $_SERVER['REQUEST_URI'];
+
+if (false !== $pos = strpos($uri, '?')) {
+    $uri = substr($uri, 0, $pos);
+}
+$uri = rawurldecode($uri);
+
+$routeInfo = $dispatcher->dispatch($httpMethod, $uri);
+switch ($routeInfo[0]) {
+    case FastRoute\Dispatcher::NOT_FOUND:
+        http_response_code(404);
+        echo "404 Not Found";
+        break;
+    case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
+        $allowedMethods = $routeInfo[1];
+        http_response_code(405);
+        echo "405 Method Not Allowed";
+        break;
+    case FastRoute\Dispatcher::FOUND:
+        $handler = $routeInfo[1];
+        $vars = $routeInfo[2];
+        $controller = $container->get($handler[0]);
+        $method = $handler[1];
+        
+        // Match existing signatures
+        if ($handler[0] === ReleaseController::class && $method === 'show') {
+            $controller->show((int)$vars['id'], $currentUser);
+        } elseif ($handler[0] === AuthController::class && $method === 'settings') {
+            $controller->settings($currentUser);
+        } elseif (in_array($handler[0], [CollectionController::class, SearchController::class, ReleaseController::class, AuthController::class])) {
+            $controller->$method($currentUser);
+        } else {
+            $controller->$method();
+        }
+        break;
 }

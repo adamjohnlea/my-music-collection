@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Domain\Repositories\UserRepositoryInterface;
 use App\Infrastructure\Crypto;
 use App\Infrastructure\KvStore;
+use App\Http\Validation\Validator;
 use PDO;
 use Twig\Environment;
 
@@ -13,9 +15,11 @@ class AuthController extends BaseController
     public function __construct(
         Environment $twig,
         private PDO $pdo,
-        private Crypto $crypto
+        private Crypto $crypto,
+        private UserRepositoryInterface $userRepository,
+        Validator $validator
     ) {
-        parent::__construct($twig);
+        parent::__construct($twig, $validator);
     }
 
     public function login(): void
@@ -31,9 +35,7 @@ class AuthController extends BaseController
             }
             $usernameOrEmail = trim((string)($_POST['username'] ?? ''));
             $password = (string)($_POST['password'] ?? '');
-            $st = $this->pdo->prepare('SELECT id, password_hash FROM auth_users WHERE username = :u OR email = :u');
-            $st->execute([':u' => $usernameOrEmail]);
-            $row = $st->fetch();
+            $row = $this->userRepository->findByUsernameOrEmail($usernameOrEmail);
             if ($row && password_verify($password, (string)$row['password_hash'])) {
                 session_regenerate_id(true);
                 $_SESSION['uid'] = (int)$row['id'];
@@ -80,15 +82,12 @@ class AuthController extends BaseController
             if (strlen($password) < 8) $errors[] = 'Password must be at least 8 characters';
             if ($password !== $confirm) $errors[] = 'Passwords do not match';
             if (!$errors) {
-                $exists = $this->pdo->prepare('SELECT 1 FROM auth_users WHERE username = :u OR email = :e');
-                $exists->execute([':u' => $username, ':e' => $email]);
-                if ($exists->fetchColumn()) {
+                if ($this->userRepository->exists($username, $email)) {
                     $errors[] = 'Username or email already in use';
                 } else {
                     $hash = password_hash($password, PASSWORD_DEFAULT);
-                    $ins = $this->pdo->prepare('INSERT INTO auth_users (username, email, password_hash) VALUES (:u, :e, :p)');
-                    $ins->execute([':u' => $username, ':e' => $email, ':p' => $hash]);
-                    $_SESSION['uid'] = (int)$this->pdo->lastInsertId();
+                    $newUserId = $this->userRepository->create($username, $email, $hash);
+                    $_SESSION['uid'] = $newUserId;
                     $this->redirect('/settings');
                 }
             }
@@ -139,8 +138,7 @@ class AuthController extends BaseController
                     $error = 'Both Discogs username and token are required';
                 } else {
                     $enc = $this->crypto->encrypt($discogsToken);
-                    $up = $this->pdo->prepare('UPDATE auth_users SET discogs_username = :u, discogs_token_enc = :t, discogs_search_exclude_title = :et, updated_at = CURRENT_TIMESTAMP WHERE id = :id');
-                    $up->execute([':u' => $discogsUsername, ':t' => $enc, ':et' => (int)$excludeTitle, ':id' => (int)$currentUser['id']]);
+                    $this->userRepository->updateDiscogsCredentials((int)$currentUser['id'], $discogsUsername, $enc, $excludeTitle);
                     $saved = true;
                 }
             }

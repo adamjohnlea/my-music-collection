@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Domain\Repositories\CollectionRepositoryInterface;
+use App\Http\Validation\Validator;
 use PDO;
 use Twig\Environment;
 
@@ -10,9 +12,11 @@ class SearchController extends BaseController
 {
     public function __construct(
         Environment $twig,
-        private PDO $pdo
+        private PDO $pdo,
+        private CollectionRepositoryInterface $collectionRepository,
+        Validator $validator
     ) {
-        parent::__construct($twig);
+        parent::__construct($twig, $validator);
     }
 
     public function save(?array $currentUser): void
@@ -22,12 +26,12 @@ class SearchController extends BaseController
             if (!$this->isCsrfValid()) {
                 $this->redirect('/?error=csrf');
             }
+            if (!$this->validator->validate($_POST, ['name' => 'required', 'q' => 'required'])) {
+                $this->redirect('/?error=invalid_data');
+            }
             $name = trim((string)($_POST['name'] ?? ''));
             $query = trim((string)($_POST['q'] ?? ''));
-            if ($name !== '' && $query !== '') {
-                $st = $this->pdo->prepare('INSERT INTO saved_searches (user_id, name, query) VALUES (:uid, :name, :query)');
-                $st->execute([':uid' => $currentUser['id'], ':name' => $name, ':query' => $query]);
-            }
+            $this->collectionRepository->saveSearch((int)$currentUser['id'], $name, $query);
             $this->redirect('/?q=' . urlencode($query));
         }
     }
@@ -40,8 +44,7 @@ class SearchController extends BaseController
                 $this->redirect('/?error=csrf');
             }
             $id = (int)($_POST['id'] ?? 0);
-            $st = $this->pdo->prepare('DELETE FROM saved_searches WHERE id = :id AND user_id = :uid');
-            $st->execute([':id' => $id, ':uid' => $currentUser['id']]);
+            $this->collectionRepository->deleteSearch($id, (int)$currentUser['id']);
             $this->redirect('/');
         }
     }
