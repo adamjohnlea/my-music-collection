@@ -105,6 +105,39 @@ $requireLogin = function() use ($currentUser) {
 $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 
 // Auth routes
+if ($uri === '/saved-searches') {
+    $requireLogin();
+    if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
+        if (!$csrfValid()) {
+            header('Location: /?error=csrf');
+            exit;
+        }
+        $name = trim((string)($_POST['name'] ?? ''));
+        $query = trim((string)($_POST['q'] ?? ''));
+        if ($name !== '' && $query !== '') {
+            $st = $pdo->prepare('INSERT INTO saved_searches (user_id, name, query) VALUES (:uid, :name, :query)');
+            $st->execute([':uid' => $currentUser['id'], ':name' => $name, ':query' => $query]);
+        }
+        header('Location: /?q=' . urlencode($query));
+        exit;
+    }
+}
+
+if ($uri === '/saved-searches/delete') {
+    $requireLogin();
+    if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
+        if (!$csrfValid()) {
+            header('Location: /?error=csrf');
+            exit;
+        }
+        $id = (int)($_POST['id'] ?? 0);
+        $st = $pdo->prepare('DELETE FROM saved_searches WHERE id = :id AND user_id = :uid');
+        $st->execute([':id' => $id, ':uid' => $currentUser['id']]);
+        header('Location: /');
+        exit;
+    }
+}
+
 if ($uri === '/register') {
     if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
         if (!$csrfValid()) {
@@ -653,6 +686,11 @@ if (empty($currentUser['discogs_username'])) {
 }
 $usernameFilter = (string)$currentUser['discogs_username'];
 
+// Fetch saved searches for the sidebar
+$st = $pdo->prepare('SELECT id, name, query FROM saved_searches WHERE user_id = :uid ORDER BY name ASC');
+$st->execute([':uid' => $currentUser['id']]);
+$savedSearches = $st->fetchAll();
+
 $page = max(1, (int)($_GET['page'] ?? 1));
 $perPage = max(1, min(60, (int)($_GET['per_page'] ?? 24)));
 $sort = (string)($_GET['sort'] ?? 'added_desc');
@@ -755,6 +793,7 @@ if ($isDiscogs && !empty($currentUser['discogs_username'])) {
             'q' => $q,
             'view' => 'discogs',
             'chips' => $chips,
+            'saved_searches' => $savedSearches,
         ]);
         exit;
     } catch (\Throwable $e) {
@@ -933,4 +972,5 @@ echo $twig->render('home.html.twig', [
     'q' => $q,
     'view' => $view,
     'chips' => $chips,
+    'saved_searches' => $savedSearches,
 ]);

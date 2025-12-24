@@ -72,16 +72,20 @@ class SyncPushCommand extends Command
                 $resp = $client->client()->request('GET', sprintf('users/%s/collection/fields', rawurlencode($username)), ['timeout' => 20]);
                 if ($resp->getStatusCode() >= 200 && $resp->getStatusCode() < 300) {
                     $data = json_decode((string)$resp->getBody(), true);
-                    if (is_array($data)) {
-                        foreach ($data as $field) {
+                    if (is_array($data) && isset($data['fields']) && is_array($data['fields'])) {
+                        foreach ($data['fields'] as $field) {
                             $name = isset($field['name']) ? strtolower((string)$field['name']) : '';
                             if ($name === 'notes' && isset($field['id'])) { $notesFieldId = (int)$field['id']; break; }
                         }
                     }
                 }
+                if ($notesFieldId === null) {
+                    $output->writeln('<comment>Warning: Could not resolve "Notes" field ID from Discogs. Falling back to default field 3.</comment>');
+                    $notesFieldId = 3; // Discogs default for Notes is usually 3
+                }
             } catch (\Throwable $e) {
-                // Non-fatal; we'll skip notes if we can't resolve field id
-                $notesFieldId = null;
+                $output->writeln('<comment>Warning: Failed to fetch collection fields: ' . $e->getMessage() . '. Using default field 3.</comment>');
+                $notesFieldId = 3;
             }
         }
 
@@ -131,8 +135,12 @@ class SyncPushCommand extends Command
                         $folderId = 1;
                     }
 
-                    $notesToSend = ($sendNotes && $notes !== null && $notesFieldId !== null) ? $notes : null;
+                    $notesToSend = ($sendNotes && $notes !== null) ? $notes : null;
                     $res = $writer->updateInstance($u, $rid, $iid, $folderId, $rating, $notesToSend, $notesFieldId);
+                    
+                    if ($res['ok'] && $notesToSend !== null) {
+                        $output->writeln("  <info>-> Notes pushed to field ID $notesFieldId</info>");
+                    }
                 }
 
                 if ($res['ok']) {

@@ -73,6 +73,11 @@ class MigrationRunner
                 $this->setVersion('10');
                 $version = '10';
             }
+            if ($version === '10') {
+                $this->migrateToV11();
+                $this->setVersion('11');
+                $version = '11';
+            }
 
             $this->pdo->commit();
 
@@ -339,6 +344,19 @@ class MigrationRunner
     {
         // Add discogs_search_exclude_title setting to auth_users
         $this->pdo->exec("ALTER TABLE auth_users ADD COLUMN discogs_search_exclude_title INTEGER NOT NULL DEFAULT 0");
+    }
+
+    private function migrateToV11(): void
+    {
+        // saved_searches table
+        $this->pdo->exec("CREATE TABLE IF NOT EXISTS saved_searches (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            query TEXT NOT NULL,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES auth_users(id)
+        )");
     }
 
     public function rebuildSearch(): void
