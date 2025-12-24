@@ -81,6 +81,8 @@
                 </optgroup>
               </select>
             </span>
+            <a href="/random" class="muted" style="margin-left:8px">Surprise Me</a>
+            <a href="/stats" class="muted" style="margin-left:8px">Stats</a>
             <a href="/about" class="muted about-link" style="margin-left:8px">About</a>
           </form>
           <nav style="display:flex;gap:10px;align-items:center;flex:0 0 auto">
@@ -102,6 +104,8 @@
         </div>
       {% else %}
         <nav style="display:flex;gap:10px;align-items:center">
+          <a href="/random" class="muted">Surprise Me</a>
+          <a href="/stats" class="muted">Stats</a>
           <a href="/about" class="muted">About</a>
           {% if auth_user %}
             <a href="/settings">Settings</a>

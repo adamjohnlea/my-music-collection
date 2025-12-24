@@ -236,6 +236,94 @@ if ($uri === '/about') {
     exit;
 }
 
+if ($uri === '/random') {
+    $requireLogin();
+    if (empty($currentUser['discogs_username'])) { header('Location: /settings'); exit; }
+    $username = (string)$currentUser['discogs_username'];
+    
+    $st = $pdo->prepare('SELECT release_id FROM collection_items WHERE username = :u ORDER BY RANDOM() LIMIT 1');
+    $st->execute([':u' => $username]);
+    $rid = $st->fetchColumn();
+    
+    if ($rid) {
+        header('Location: /release/' . $rid);
+    } else {
+        header('Location: /');
+    }
+    exit;
+}
+
+if ($uri === '/stats') {
+    $requireLogin();
+    if (empty($currentUser['discogs_username'])) { header('Location: /settings'); exit; }
+    $username = (string)$currentUser['discogs_username'];
+
+    // 1. Total count
+    $st = $pdo->prepare('SELECT COUNT(DISTINCT release_id) FROM collection_items WHERE username = :u');
+    $st->execute([':u' => $username]);
+    $totalCount = (int)$st->fetchColumn();
+
+    // 2. Top Artists
+    $st = $pdo->prepare('SELECT r.artist, COUNT(*) as count FROM collection_items ci JOIN releases r ON r.id = ci.release_id WHERE ci.username = :u GROUP BY r.artist ORDER BY count DESC LIMIT 10');
+    $st->execute([':u' => $username]);
+    $topArtists = $st->fetchAll();
+
+    // 3. Top Genres (using json_each)
+    $topGenres = [];
+    try {
+        $st = $pdo->prepare('
+            SELECT j.value as genre, COUNT(*) as count 
+            FROM collection_items ci 
+            JOIN releases r ON r.id = ci.release_id, 
+            json_each(r.genres) j 
+            WHERE ci.username = :u 
+            GROUP BY genre 
+            ORDER BY count DESC 
+            LIMIT 10
+        ');
+        $st->execute([':u' => $username]);
+        $topGenres = $st->fetchAll();
+    } catch (\Throwable $e) {}
+
+    // 4. Decades
+    $st = $pdo->prepare('
+        SELECT (r.year / 10) * 10 as decade, COUNT(*) as count 
+        FROM collection_items ci 
+        JOIN releases r ON r.id = ci.release_id 
+        WHERE ci.username = :u AND r.year > 0
+        GROUP BY decade 
+        ORDER BY decade ASC
+    ');
+    $st->execute([':u' => $username]);
+    $decades = $st->fetchAll();
+
+    // 5. Formats
+    $formats = [];
+    try {
+        $st = $pdo->prepare('
+            SELECT json_extract(j.value, "$.name") as format_name, COUNT(*) as count 
+            FROM collection_items ci 
+            JOIN releases r ON r.id = ci.release_id, 
+            json_each(r.formats) j 
+            WHERE ci.username = :u 
+            GROUP BY format_name 
+            ORDER BY count DESC
+        ');
+        $st->execute([':u' => $username]);
+        $formats = $st->fetchAll();
+    } catch (\Throwable $e) {}
+
+    echo $twig->render('stats.html.twig', [
+        'title' => 'Collection Statistics',
+        'total_count' => $totalCount,
+        'top_artists' => $topArtists,
+        'top_genres' => $topGenres,
+        'decades' => $decades,
+        'formats' => $formats,
+    ]);
+    exit;
+}
+
 if ($uri === '/release/save' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     // Handle enqueueing a push job to Discogs for rating/notes
     $rid = (int)($_POST['release_id'] ?? 0);

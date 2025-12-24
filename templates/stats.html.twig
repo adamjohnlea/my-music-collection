@@ -1,0 +1,104 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block styles %}
+  <style>
+    :root { --bg:#0b0b0c; --card:#16171a; --text:#e7e7ea; --muted:#a0a3aa; --accent:#67e8f9; }
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif}
+    .wrap{max-width:1000px;margin:40px auto;padding:0 20px}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;gap:20px;flex-wrap:wrap}
+    h1{font-size:1.8rem;margin:0}
+    h2{font-size:1.2rem;margin:0 0 16px 0;color:var(--accent)}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:24px}
+    .card{background:var(--card);border-radius:12px;padding:20px;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+    .stat-row{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+    .stat-label{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .stat-bar-wrap{flex:2;background:#2a2b2f;height:8px;border-radius:4px;overflow:hidden}
+    .stat-bar{background:var(--accent);height:100%;border-radius:4px}
+    .stat-count{flex:0 0 40px;text-align:right;font-size:.9rem;color:var(--muted)}
+    .big-num{font-size:3rem;font-weight:700;color:var(--accent);margin-bottom:4px}
+    .muted{color:var(--muted)}
+    .nav-links{display:flex;gap:16px}
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="wrap">
+    <header>
+      <div>
+        <p style="margin:0 0 4px 0"><a href="/">← Back to Collection</a></p>
+        <h1>{{ title }}</h1>
+      </div>
+      <nav class="nav-links">
+        <a href="/random">Surprise Me</a>
+        <a href="/settings">Settings</a>
+      </nav>
+    </header>
+
+    <div class="grid">
+      <div class="card" style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center">
+        <div class="big-num">{{ total_count }}</div>
+        <div class="muted">Total Releases</div>
+      </div>
+
+      <div class="card">
+        <h2>Top Artists</h2>
+        {% for a in top_artists %}
+          <div class="stat-row">
+            <div class="stat-label" title="{{ a.artist }}">{{ a.artist|strip_discogs_suffix }}</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: {{ (a.count / top_artists[0].count * 100)|round }}%"></div>
+            </div>
+            <div class="stat-count">{{ a.count }}</div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="card">
+        <h2>Top Genres</h2>
+        {% for g in top_genres %}
+          <div class="stat-row">
+            <div class="stat-label">{{ g.genre }}</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: {{ (g.count / top_genres[0].count * 100)|round }}%"></div>
+            </div>
+            <div class="stat-count">{{ g.count }}</div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="card">
+        <h2>Decades</h2>
+        {% set max_decade = 0 %}
+        {% for d in decades %}{% if d.count > max_decade %}{% set max_decade = d.count %}{% endif %}{% endfor %}
+        {% for d in decades %}
+          <div class="stat-row">
+            <div class="stat-label">{{ d.decade }}s</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: {{ (d.count / max_decade * 100)|round }}%"></div>
+            </div>
+            <div class="stat-count">{{ d.count }}</div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="card">
+        <h2>Formats</h2>
+        {% set max_format = 0 %}
+        {% if formats %}{% set max_format = formats[0].count %}{% endif %}
+        {% for f in formats %}
+          <div class="stat-row">
+            <div class="stat-label">{{ f.format_name }}</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: {{ (f.count / max_format * 100)|round }}%"></div>
+            </div>
+            <div class="stat-count">{{ f.count }}</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+{% endblock %}

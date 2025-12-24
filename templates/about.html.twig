@@ -17,7 +17,13 @@
 
 {% block content %}
   <div class="wrap">
-    <p><a href="/">← Back</a></p>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <p style="margin:0"><a href="/">← Back</a></p>
+      <nav style="display:flex;gap:12px">
+        <a href="/random" class="muted">Surprise Me</a>
+        <a href="/stats" class="muted">Stats</a>
+      </nav>
+    </div>
     <div class="card">
       <div class="meta">
         <h1 style="margin-top:0">About</h1>
