@@ -368,6 +368,8 @@ if ($uri === '/release/save' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST'
     if (!$csrfValid()) { header('Location: /release/' . $rid . '?saved=invalid_csrf'); exit; }
     $rating = isset($_POST['rating']) && $_POST['rating'] !== '' ? max(0, min(5, (int)$_POST['rating'])) : null;
     $notes = isset($_POST['notes']) ? trim((string)$_POST['notes']) : null;
+    $mediaCondition = isset($_POST['media_condition']) ? trim((string)$_POST['media_condition']) : null;
+    $sleeveCondition = isset($_POST['sleeve_condition']) ? trim((string)$_POST['sleeve_condition']) : null;
     $action = (string)($_POST['action'] ?? 'update_collection');
 
     // Require logged-in with Discogs settings to queue updates
@@ -388,11 +390,11 @@ if ($uri === '/release/save' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST'
                     $sel->execute([':iid' => $iid]);
                     $jobId = $sel->fetchColumn();
                     if ($jobId) {
-                        $upd = $pdo->prepare('UPDATE push_queue SET rating = :rating, notes = :notes, attempts = 0, last_error = NULL, created_at = strftime("%Y-%m-%dT%H:%M:%fZ", "now") WHERE id = :id');
-                        $upd->execute([':rating' => $rating, ':notes' => $notes, ':id' => $jobId]);
+                        $upd = $pdo->prepare('UPDATE push_queue SET rating = :rating, notes = :notes, media_condition = :mc, sleeve_condition = :sc, attempts = 0, last_error = NULL, created_at = strftime("%Y-%m-%dT%H:%M:%fZ", "now") WHERE id = :id');
+                        $upd->execute([':rating' => $rating, ':notes' => $notes, ':mc' => $mediaCondition, ':sc' => $sleeveCondition, ':id' => $jobId]);
                     } else {
-                        $ins = $pdo->prepare('INSERT INTO push_queue (instance_id, release_id, username, rating, notes, action) VALUES (:iid, :rid, :u, :rating, :notes, :action)');
-                        $ins->execute([':iid' => $iid, ':rid' => $rid, ':u' => $username, ':rating' => $rating, ':notes' => $notes, ':action' => $action]);
+                        $ins = $pdo->prepare('INSERT INTO push_queue (instance_id, release_id, username, rating, notes, media_condition, sleeve_condition, action) VALUES (:iid, :rid, :u, :rating, :notes, :mc, :sc, :action)');
+                        $ins->execute([':iid' => $iid, ':rid' => $rid, ':u' => $username, ':rating' => $rating, ':notes' => $notes, ':mc' => $mediaCondition, ':sc' => $sleeveCondition, ':action' => $action]);
                     }
                     $pdo->commit();
                     $ok = true;
@@ -441,6 +443,8 @@ if ($uri === '/release/save' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST'
         'saved' => ($ok ? $msg : $msg),
         'sr' => $rating,
         'sn' => $notes,
+        'smc' => $mediaCondition,
+        'ssc' => $sleeveCondition,
     ]);
     $qs .= ($ret ? ('&return=' . rawurlencode($ret)) : '');
     header('Location: /release/' . $rid . '?' . $qs);
@@ -606,10 +610,17 @@ if (preg_match('#^/release/(\d+)#', $uri, $m)) {
                 if ($userNotes && is_string($userNotes) && str_starts_with($userNotes, '[')) {
                     $maybe = json_decode($userNotes, true);
                     if (is_array($maybe)) {
-                        $userNotes = implode("\n\n", array_map(function($n){ return is_array($n) && isset($n['value']) ? (string)$n['value'] : (is_string($n) ? $n : ''); }, $maybe));
+                        foreach ($maybe as $n) {
+                            $fid = (int)($n['field_id'] ?? 0);
+                            $val = (string)($n['value'] ?? '');
+                            if ($fid === 1) $details['user_media_condition'] = $val;
+                            elseif ($fid === 2) $details['user_sleeve_condition'] = $val;
+                            elseif ($fid === 3) $details['user_notes'] = $val;
+                        }
                     }
+                } else {
+                    $details['user_notes'] = $userNotes ?: null;
                 }
-                $details['user_notes'] = $userNotes ?: null;
                 $details['user_rating'] = isset($ciRow['rating']) ? (int)$ciRow['rating'] : null;
             }
 
@@ -627,10 +638,15 @@ if (preg_match('#^/release/(\d+)#', $uri, $m)) {
             if (isset($_GET['sr']) && $_GET['sr'] !== '') {
                 $details['user_rating'] = (int)$_GET['sr'];
             }
-            if (array_key_exists('sn', $_GET)) {
+    if (array_key_exists('sn', $_GET)) {
                 $sn = (string)$_GET['sn'];
-                // Accept empty string to allow clearing notes
                 $details['user_notes'] = $sn;
+            }
+            if (array_key_exists('smc', $_GET)) {
+                $details['user_media_condition'] = (string)$_GET['smc'];
+            }
+            if (array_key_exists('ssc', $_GET)) {
+                $details['user_sleeve_condition'] = (string)$_GET['ssc'];
             }
         }
     }

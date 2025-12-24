@@ -182,6 +182,12 @@
                 {% if details.user_rating is not null %}
                   <div class="muted" style="margin-bottom:6px">Rating: {{ details.user_rating }}/5</div>
                 {% endif %}
+                {% if details.user_media_condition %}
+                  <div class="muted" style="margin-bottom:6px">Media Condition: {{ details.user_media_condition }}</div>
+                {% endif %}
+                {% if details.user_sleeve_condition %}
+                  <div class="muted" style="margin-bottom:6px">Sleeve Condition: {{ details.user_sleeve_condition }}</div>
+                {% endif %}
                 {% if details.user_notes %}
                   <div style="white-space:pre-wrap" class="muted">{{ details.user_notes }}</div>
                 {% elseif details.in_collection %}
@@ -200,6 +206,22 @@
                       <option value="">—</option>
                       {% for r in [0,1,2,3,4,5] %}
                         <option value="{{ r }}" {% if details.user_rating is not null and details.user_rating == r %}selected{% endif %}>{{ r }}/5</option>
+                      {% endfor %}
+                    </select>
+                  </label>
+                  <label>Media Condition
+                    <select name="media_condition" style="background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:6px 8px">
+                      <option value="">—</option>
+                      {% for opt in ['Mint (M)', 'Near Mint (NM or M-)', 'Very Good Plus (VG+)', 'Very Good (VG)', 'Good Plus (G+)', 'Good (G)', 'Fair (F)', 'Poor (P)'] %}
+                        <option value="{{ opt }}" {% if details.user_media_condition == opt %}selected{% endif %}>{{ opt }}</option>
+                      {% endfor %}
+                    </select>
+                  </label>
+                  <label>Sleeve Condition
+                    <select name="sleeve_condition" style="background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:6px 8px">
+                      <option value="">—</option>
+                      {% for opt in ['Mint (M)', 'Near Mint (NM or M-)', 'Very Good Plus (VG+)', 'Very Good (VG)', 'Good Plus (G+)', 'Good (G)', 'Fair (F)', 'Poor (P)', 'Generic', 'No Cover'] %}
+                        <option value="{{ opt }}" {% if details.user_sleeve_condition == opt %}selected{% endif %}>{{ opt }}</option>
                       {% endfor %}
                     </select>
                   </label>

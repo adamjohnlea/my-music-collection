@@ -90,7 +90,7 @@ class SyncPushCommand extends Command
         }
 
         // Fetch a batch of pending jobs
-        $stmt = $pdo->query("SELECT id, instance_id, release_id, username, rating, notes, attempts, action FROM push_queue WHERE status = 'pending' ORDER BY created_at ASC, id ASC LIMIT 50");
+        $stmt = $pdo->query("SELECT id, instance_id, release_id, username, rating, notes, media_condition, sleeve_condition, attempts, action FROM push_queue WHERE status = 'pending' ORDER BY created_at ASC, id ASC LIMIT 50");
         $jobs = $stmt->fetchAll();
         if (!$jobs) {
             $output->writeln('<info>No pending jobs.</info>');
@@ -105,6 +105,8 @@ class SyncPushCommand extends Command
             $u = (string)$job['username'];
             $rating = isset($job['rating']) ? (int)$job['rating'] : null;
             $notes = $job['notes'] !== null ? (string)$job['notes'] : null;
+            $mediaCondition = $job['media_condition'] !== null ? (string)$job['media_condition'] : null;
+            $sleeveCondition = $job['sleeve_condition'] !== null ? (string)$job['sleeve_condition'] : null;
             $action = (string)($job['action'] ?? 'update_collection');
 
             try {
@@ -135,11 +137,23 @@ class SyncPushCommand extends Command
                         $folderId = 1;
                     }
 
-                    $notesToSend = ($sendNotes && $notes !== null) ? $notes : null;
-                    $res = $writer->updateInstance($u, $rid, $iid, $folderId, $rating, $notesToSend, $notesFieldId);
+                    $fields = [];
+                    if ($sendNotes && $notes !== null) {
+                        $fields[$notesFieldId] = $notes;
+                    }
+                    if ($mediaCondition !== null) {
+                        $fields[1] = $mediaCondition; // Field 1 is Media Condition
+                    }
+                    if ($sleeveCondition !== null) {
+                        $fields[2] = $sleeveCondition; // Field 2 is Sleeve Condition
+                    }
+
+                    $res = $writer->updateInstance($u, $rid, $iid, $folderId, $rating, $fields);
                     
-                    if ($res['ok'] && $notesToSend !== null) {
-                        $output->writeln("  <info>-> Notes pushed to field ID $notesFieldId</info>");
+                    if ($res['ok']) {
+                        if (isset($fields[$notesFieldId])) $output->writeln("  <info>-> Notes pushed to field ID $notesFieldId</info>");
+                        if (isset($fields[1])) $output->writeln("  <info>-> Media Condition pushed to field ID 1</info>");
+                        if (isset($fields[2])) $output->writeln("  <info>-> Sleeve Condition pushed to field ID 2</info>");
                     }
                 }
 
