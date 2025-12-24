@@ -6,13 +6,12 @@
   "require": {
     "php": "^8.4",
     "guzzlehttp/guzzle": "^7.9",
+    "league/flysystem": "^3.24",
+    "monolog/monolog": "^3.7",
+    "php-di/php-di": "^7.1",
     "symfony/console": "^7.1",
     "twig/twig": "^3.10",
-    "monolog/monolog": "^3.7",
-    "vlucas/phpdotenv": "^5.6",
-    "league/flysystem": "^3.24"
-  },
-  "require-dev": {
+    "vlucas/phpdotenv": "^5.6"
   },
   "autoload": {
     "psr-4": {
