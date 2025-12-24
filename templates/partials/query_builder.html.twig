@@ -1,0 +1,115 @@
+<div id="query-builder" style="display:none; background:var(--card); border:1px solid #2a2b2f; border-radius:12px; padding:16px; margin-bottom:16px;">
+    <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end;">
+        <div style="flex:1; min-width:150px;">
+            <label style="display:block; font-size:0.8rem; color:var(--muted); margin-bottom:4px;">Field</label>
+            <select id="qb-field" class="sort-select" style="width:100%" onchange="updateQbInputs()">
+                <option value="artist">Artist</option>
+                <option value="title">Title</option>
+                <option value="year">Year / Range</option>
+                <option value="genre">Genre</option>
+                <option value="style">Style</option>
+                <option value="label">Label / Cat#</option>
+                <option value="format">Format</option>
+                <option value="country">Country</option>
+                <option value="credit">Credit</option>
+                <option value="company">Company</option>
+                <option value="barcode">Barcode / ID</option>
+                <option value="notes">Notes</option>
+                <option value="discogs">Discogs (Live)</option>
+            </select>
+        </div>
+        
+        <div id="qb-value-container" style="flex:2; min-width:200px;">
+            <label style="display:block; font-size:0.8rem; color:var(--muted); margin-bottom:4px;">Value</label>
+            <input type="text" id="qb-value" class="search-input" placeholder="Enter value...">
+        </div>
+
+        <div id="qb-year-container" style="display:none; flex:2; min-width:200px; gap:8px; align-items:center;">
+            <div style="flex:1;">
+                <label style="display:block; font-size:0.8rem; color:var(--muted); margin-bottom:4px;">From</label>
+                <input type="number" id="qb-year-from" class="search-input" placeholder="1970">
+            </div>
+            <div style="padding-top:24px;">..</div>
+            <div style="flex:1;">
+                <label style="display:block; font-size:0.8rem; color:var(--muted); margin-bottom:4px;">To</label>
+                <input type="number" id="qb-year-to" class="search-input" placeholder="1979">
+            </div>
+        </div>
+
+        <button type="button" class="btn-small" onclick="addToQuery()" style="height:40px; padding:0 20px;">+</button>
+    </div>
+</div>
+
+<script>
+function updateQbInputs() {
+    const field = document.getElementById('qb-field').value;
+    const valContainer = document.getElementById('qb-value-container');
+    const yearContainer = document.getElementById('qb-year-container');
+    
+    if (field === 'year') {
+        valContainer.style.display = 'none';
+        yearContainer.style.display = 'flex';
+    } else {
+        valContainer.style.display = 'block';
+        yearContainer.style.display = 'none';
+    }
+}
+
+function addToQuery() {
+    const field = document.getElementById('qb-field').value;
+    const searchInput = document.getElementById('search-input');
+    let currentQ = searchInput.value.trim();
+    let newPart = '';
+
+    if (field === 'year') {
+        const from = document.getElementById('qb-year-from').value.trim();
+        const to = document.getElementById('qb-year-to').value.trim();
+        if (from && to) {
+            newPart = `year:${from}..${to}`;
+        } else if (from) {
+            newPart = `year:${from}`;
+        } else if (to) {
+            newPart = `year:${to}`;
+        }
+    } else if (field === 'discogs') {
+        const val = document.getElementById('qb-value').value.trim();
+        if (val) {
+            const formattedVal = val.includes(' ') ? `"${val}"` : val;
+            newPart = `discogs:${formattedVal}`;
+        } else {
+            // Allow empty discogs: prefix as a flag
+            if (!currentQ.toLowerCase().includes('discogs:')) {
+                newPart = 'discogs:';
+            }
+        }
+    } else {
+        const val = document.getElementById('qb-value').value.trim();
+        if (val) {
+            // Quote if it contains spaces
+            const formattedVal = val.includes(' ') ? `"${val}"` : val;
+            newPart = `${field}:${formattedVal}`;
+        }
+    }
+
+    if (newPart) {
+        searchInput.value = (currentQ ? currentQ + ' ' : '') + newPart;
+        // Reset inputs
+        document.getElementById('qb-value').value = '';
+        document.getElementById('qb-year-from').value = '';
+        document.getElementById('qb-year-to').value = '';
+        searchInput.focus();
+    }
+}
+
+function toggleQueryBuilder() {
+    const qb = document.getElementById('query-builder');
+    const btn = document.getElementById('qb-toggle');
+    if (qb.style.display === 'none') {
+        qb.style.display = 'block';
+        btn.classList.add('active');
+    } else {
+        qb.style.display = 'none';
+        btn.classList.remove('active');
+    }
+}
+</script>

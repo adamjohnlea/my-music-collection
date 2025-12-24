@@ -38,25 +38,25 @@ class SqliteReleaseRepository implements ReleaseRepositoryInterface
         return $st->fetchColumn() ?: null;
     }
 
-    public function search(string $match, ?int $yearFrom, ?int $yearTo, string $username, string $itemsTable, int $limit, int $offset): array
+    public function search(string $match, ?int $yearFrom, ?int $yearTo, string $username, string $itemsTable, string $orderBy, int $limit, int $offset): array
     {
+        $hasMatch = $match !== '';
         $sql = "SELECT r.id, r.title, r.artist, r.year, r.thumb_url, r.cover_url,
             (SELECT local_path FROM images i WHERE i.release_id = r.id AND i.source_url = r.cover_url ORDER BY id ASC LIMIT 1) AS primary_local_path,
             (SELECT local_path FROM images i WHERE i.release_id = r.id ORDER BY id ASC LIMIT 1) AS any_local_path,
             (SELECT MAX(ci2.added) FROM $itemsTable ci2 WHERE ci2.release_id = r.id AND ci2.username = :u) AS added_at,
             (SELECT MAX(ci3.rating) FROM $itemsTable ci3 WHERE ci3.release_id = r.id AND ci3.username = :u) AS rating
-        FROM releases_fts f
-        JOIN releases r ON r.id = f.rowid
-        WHERE releases_fts MATCH :match" .
+        FROM " . ($hasMatch ? "releases_fts f JOIN releases r ON r.id = f.rowid" : "releases r") . "
+        WHERE " . ($hasMatch ? "releases_fts MATCH :match" : "1=1") .
         ($yearFrom !== null ? " AND r.year >= :y1" : "") .
         ($yearTo !== null ? " AND r.year <= :y2" : "") .
         " AND EXISTS (SELECT 1 FROM $itemsTable ci WHERE ci.release_id = r.id AND ci.username = :u)
         GROUP BY r.id
-        ORDER BY r.id DESC
+        ORDER BY $orderBy
         LIMIT :limit OFFSET :offset";
 
         $stmt = $this->pdo->prepare($sql);
-        $stmt->bindValue(':match', $match);
+        if ($hasMatch) $stmt->bindValue(':match', $match);
         $stmt->bindValue(':u', $username);
         if ($yearFrom !== null) $stmt->bindValue(':y1', $yearFrom, PDO::PARAM_INT);
         if ($yearTo !== null) $stmt->bindValue(':y2', $yearTo, PDO::PARAM_INT);
@@ -68,12 +68,13 @@ class SqliteReleaseRepository implements ReleaseRepositoryInterface
 
     public function countSearch(string $match, ?int $yearFrom, ?int $yearTo, string $username, string $itemsTable): int
     {
-        $sql = "SELECT COUNT(DISTINCT r.id) FROM releases_fts f JOIN releases r ON r.id = f.rowid WHERE releases_fts MATCH :m AND EXISTS (SELECT 1 FROM $itemsTable ci WHERE ci.release_id = r.id AND ci.username = :u)";
+        $hasMatch = $match !== '';
+        $sql = "SELECT COUNT(DISTINCT r.id) FROM " . ($hasMatch ? "releases_fts f JOIN releases r ON r.id = f.rowid" : "releases r") . " WHERE " . ($hasMatch ? "releases_fts MATCH :m" : "1=1") . " AND EXISTS (SELECT 1 FROM $itemsTable ci WHERE ci.release_id = r.id AND ci.username = :u)";
         if ($yearFrom !== null) $sql .= " AND r.year >= :y1";
         if ($yearTo !== null) $sql .= " AND r.year <= :y2";
         
         $st = $this->pdo->prepare($sql);
-        $st->bindValue(':m', $match);
+        if ($hasMatch) $st->bindValue(':m', $match);
         $st->bindValue(':u', $username);
         if ($yearFrom !== null) $st->bindValue(':y1', $yearFrom, PDO::PARAM_INT);
         if ($yearTo !== null) $st->bindValue(':y2', $yearTo, PDO::PARAM_INT);

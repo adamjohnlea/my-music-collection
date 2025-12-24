@@ -52,6 +52,8 @@
     .sidebar-toggle-btn:hover{color:var(--accent);border-color:var(--accent);background:rgba(255,255,255,.05)}
     .sidebar-toggle-btn svg{width:20px;height:20px;fill:currentColor}
 
+    #qb-toggle.active { background: var(--accent); color: #000; border-color: var(--accent); }
+
     .mobile-chips{display:none;gap:8px;overflow-x:auto;padding-bottom:12px;margin-bottom:16px;scrollbar-width:none}
     .mobile-chips::-webkit-scrollbar{display:none}
     .chip{white-space:nowrap;background:var(--card);border:1px solid #2a2b2f;padding:6px 14px;border-radius:20px;font-size:.9rem;color:var(--text);text-decoration:none}
@@ -88,6 +90,7 @@
           <form id="search-form" class="toolbar" method="get" action="/">
             <div style="display:flex;gap:8px;width:100%">
               <input id="search-input" class="search-input" type="text" name="q" value="{{ q|default('')|e }}" placeholder="Search artist:miles year:1980..1989 barcode:…" />
+              <button type="button" id="qb-toggle" class="btn-small" onclick="toggleQueryBuilder()" title="Toggle Search Builder" style="height:40px">Advanced</button>
               {% if q is defined and q %}
                 <button type="button" class="btn-small" onclick="saveSearch()" title="Save as Smart Collection" style="height:40px">Save</button>
               {% endif %}
@@ -149,7 +152,15 @@
 
 {% block content %}
   <div class="wrap content-wrap">
+    {% if error is defined or app.request.query.get('error') %}
+      <div style="background:rgba(255, 68, 68, 0.1); border-left: 4px solid #ff4444; padding: 12px; margin-bottom: 16px;">
+        <p style="margin:0; color:#ff4444; font-weight:bold;">Error</p>
+        <p style="margin:8px 0 0 0; font-size: 0.9rem;">{{ error|default(app.request.query.get('error')) }}</p>
+      </div>
+    {% endif %}
+
     {% if not welcome and not needs_setup %}
+      {% include 'partials/query_builder.html.twig' %}
       <div class="mobile-chips">
         <a href="/" class="chip {{ q == '' ? 'active' : '' }}">All Items</a>
         {% if saved_searches is defined %}

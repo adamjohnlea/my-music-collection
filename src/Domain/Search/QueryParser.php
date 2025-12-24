@@ -18,8 +18,24 @@ final class QueryParser
         $q = trim($q);
         // Normalize: remove any whitespace immediately after a field prefix like artist:, year:, label:, etc.
         // This turns 'year: 1980' into 'year:1980' so parsing is consistent.
-        $q = preg_replace('/(\b\w+):\s+/', '$1:', $q);
-        if ($q === '') return ['match' => '', 'chips' => []];
+        $q = (string)preg_replace('/(\b\w+):\s+/', '$1:', $q);
+
+        $isDiscogsSearch = false;
+        if (preg_match('/(?i)\bdiscogs:\s*/', $q, $m)) {
+            $isDiscogsSearch = true;
+            $q = (string)preg_replace('/(?i)\bdiscogs:\s*/', '', $q, 1);
+        }
+
+        if ($q === '') {
+            return [
+                'match' => '',
+                'chips' => [],
+                'filters' => [],
+                'is_discogs' => $isDiscogsSearch,
+                'year_from' => null,
+                'year_to' => null
+            ];
+        }
 
         $tokens = [];
         $buf = '';
@@ -52,30 +68,25 @@ final class QueryParser
 
         $ftsParts = [];
         $chips = [];
+        $filters = [];
         $yearFrom = null; $yearTo = null;
         $general = [];
-        $isDiscogsSearch = false;
 
         foreach ($tokens as $tok) {
             $tok = trim($tok);
             if ($tok === '') continue;
-
-            // discogs search prefix
-            if (str_starts_with(strtolower($tok), 'discogs:')) {
-                $isDiscogsSearch = true;
-                $tok = substr($tok, 8);
-                if ($tok === '') continue;
-            }
 
             // year filter
             if (str_starts_with(strtolower($tok), 'year:')) {
                 $range = substr($tok, 5);
                 if (preg_match('/^(\d{4})\.\.(\d{4})$/', $range, $m)) {
                     $yearFrom = (int)$m[1]; $yearTo = (int)$m[2];
+                    $filters['year'] = $m[1].'..'.$m[2];
                     $chips[] = ['label' => 'Year '.$m[1].'–'.$m[2]];
                     continue;
                 } elseif (preg_match('/^(\d{4})$/', $range, $m)) {
                     $yearFrom = (int)$m[1]; $yearTo = (int)$m[1];
+                    $filters['year'] = $m[1];
                     $chips[] = ['label' => 'Year '.$m[1]];
                     continue;
                 }
@@ -86,6 +97,8 @@ final class QueryParser
                 $key = strtolower($m[1]);
                 $val = trim($m[2]);
                 if ($val === '') continue;
+                $cleanVal = trim($val, '"');
+                $filters[$key] = $cleanVal;
                 $quoted = $val;
                 if ($quoted[0] !== '"') {
                     // add prefix wildcard to last term if not quoted
@@ -96,10 +109,10 @@ final class QueryParser
                     if ($key === 'notes') {
                         $ftsParts[] = $col.':'.$quoted;
                         $ftsParts[] = 'user_notes:'.$quoted;
-                        $chips[] = ['label' => 'Notes: '.trim($val, '"')];
+                        $chips[] = ['label' => 'Notes: '.$cleanVal];
                     } else {
                         $ftsParts[] = $col.':'.$quoted;
-                        $chips[] = ['label' => ucfirst($key).': '.trim($val, '"')];
+                        $chips[] = ['label' => ucfirst($key).': '.$cleanVal];
                     }
                     continue;
                 }
@@ -115,6 +128,7 @@ final class QueryParser
 
         if ($general) {
             $ftsParts = array_merge($general, $ftsParts);
+            $filters['q'] = implode(' ', array_map(fn($t) => trim($t, '"*'), $general));
         }
 
         $match = implode(' ', $ftsParts);
@@ -123,6 +137,7 @@ final class QueryParser
             'year_from' => $yearFrom,
             'year_to' => $yearTo,
             'chips' => $chips,
+            'filters' => $filters,
             'is_discogs' => $isDiscogsSearch,
         ];
     }

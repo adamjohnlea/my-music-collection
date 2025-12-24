@@ -63,10 +63,13 @@ class CollectionController extends BaseController
         $yearFrom = $parsed['year_from'] ?? null;
         $yearTo = $parsed['year_to'] ?? null;
         $chips = $parsed['chips'] ?? [];
+        $filters = $parsed['filters'] ?? [];
         $isDiscogs = $parsed['is_discogs'] ?? false;
+        
+        file_put_contents('debug.log', "q: $q, isDiscogs: " . ($isDiscogs ? 'true' : 'false') . ", username: " . ($currentUser['discogs_username'] ?? 'NULL') . "\n", FILE_APPEND);
 
         if ($isDiscogs && !empty($currentUser['discogs_username'])) {
-            $this->handleDiscogsSearch($currentUser, $usernameFilter, $q, $page, $perPage, $sort, $chips, $savedSearches);
+            $this->handleDiscogsSearch($currentUser, $usernameFilter, $q, $filters, $page, $perPage, $sort, $chips, $savedSearches);
             return;
         }
 
@@ -96,11 +99,11 @@ class CollectionController extends BaseController
             if ($useFts) {
                 $total = $this->releaseRepository->countSearch($match, $yearFrom, $yearTo, $usernameFilter, $itemsTable);
                 $totalPages = $total > 0 ? (int)ceil($total / $perPage) : 1;
-                $rows = $this->releaseRepository->search($match, $yearFrom, $yearTo, $usernameFilter, $itemsTable, $perPage, $offset);
+                $rows = $this->releaseRepository->search($match, $yearFrom, $yearTo, $usernameFilter, $itemsTable, $orderBy, $perPage, $offset);
             } else {
                 $total = $this->releaseRepository->countSearch('', $yearFrom, $yearTo, $usernameFilter, $itemsTable);
                 $totalPages = $total > 0 ? (int)ceil($total / $perPage) : 1;
-                $rows = $this->releaseRepository->search('', $yearFrom, $yearTo, $usernameFilter, $itemsTable, $perPage, $offset);
+                $rows = $this->releaseRepository->search('', $yearFrom, $yearTo, $usernameFilter, $itemsTable, $orderBy, $perPage, $offset);
             }
         } else {
             $total = $this->releaseRepository->countAll($usernameFilter, $itemsTable);
@@ -184,20 +187,40 @@ class CollectionController extends BaseController
         $this->render('about.html.twig', ['title' => 'About this app']);
     }
 
-    private function handleDiscogsSearch(array $currentUser, string $usernameFilter, string $q, int $page, int $perPage, string $sort, array $chips, array $savedSearches): void
+    private function handleDiscogsSearch(array $currentUser, string $usernameFilter, string $q, array $filters, int $page, int $perPage, string $sort, array $chips, array $savedSearches): void
     {
         $discogsClient = new DiscogsHttpClient('MyMusicCollection/1.0', $currentUser['discogs_token'], new KvStore($this->pdo));
         $http = $discogsClient->client();
-        $searchQuery = preg_replace('/discogs:\s*/i', '', $q);
+        
+        // Map our internal filter keys to Discogs API search parameters
+        $params = [
+            'type' => 'release',
+            'per_page' => $perPage,
+            'page' => $page,
+        ];
+
+        foreach ($filters as $key => $val) {
+            // Discogs API supports these parameters
+            if (in_array($key, ['q', 'artist', 'title', 'label', 'genre', 'style', 'country', 'format', 'catno', 'barcode', 'year'])) {
+                if ($key === 'year') {
+                    // Convert 1980..1985 to 1980-1985 for Discogs API compatibility
+                    $val = str_replace('..', '-', $val);
+                }
+                $params[$key] = $val;
+            } else {
+                // For unknown fields, append to the general 'q' parameter
+                $params['q'] = ($params['q'] ?? '') . " $key:$val";
+            }
+        }
+        
+        if (empty($params['q']) && count($params) <= 3) {
+            // If no specific filters, we might need a default search term if Discogs requires one
+            // but usually at least one parameter is present if $filters is not empty
+        }
 
         try {
             $resp = $http->request('GET', 'database/search', [
-                'query' => [
-                    'q' => $searchQuery,
-                    'type' => 'release',
-                    'per_page' => $perPage,
-                    'page' => $page,
-                ],
+                'query' => $params,
             ]);
             $json = json_decode((string)$resp->getBody(), true);
             $results = $json['results'] ?? [];
@@ -249,7 +272,7 @@ class CollectionController extends BaseController
                 'saved_searches' => $savedSearches,
             ]);
         } catch (\Throwable $e) {
-            $this->redirect('/');
+            $this->redirect('/?error=' . urlencode($e->getMessage()));
         }
     }
 }
