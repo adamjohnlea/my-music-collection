@@ -113,7 +113,6 @@
               </select>
             </div>
           </form>
-          <div class="muted stats">{{ total|default(0) }} items{% if q is defined and q %} • Search: “{{ q }}”{% endif %}</div>
         </div>
       {% endif %}
     </header>
@@ -134,9 +133,17 @@
 
 {% block breadcrumbs %}
   <nav class="breadcrumbs">
-    <a href="/">Home</a>
-    <span>/</span>
-    {{ view|capitalize|default('Collection') }}
+    <div>
+      <a href="/">Home</a>
+      <span>/</span>
+      {{ view|capitalize|default('Collection') }}
+    </div>
+    {% if total is defined %}
+      <div class="muted" style="font-size: 0.85rem">
+        {{ total|default(0) }} items
+        {% if q is defined and q %} • Search: “{{ q }}”{% endif %}
+      </div>
+    {% endif %}
   </nav>
 {% endblock %}
 

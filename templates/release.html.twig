@@ -52,11 +52,13 @@
 
 {% block breadcrumbs %}
   <nav class="breadcrumbs">
-    <a href="/">Home</a>
-    <span>/</span>
-    <a href="/?view={{ details.in_wantlist ? 'wantlist' : 'collection' }}">{{ details.in_wantlist ? 'Wantlist' : 'Collection' }}</a>
-    <span>/</span>
-    {{ release.title }}
+    <div>
+      <a href="/">Home</a>
+      <span>/</span>
+      <a href="/?view={{ details.in_wantlist ? 'wantlist' : 'collection' }}">{{ details.in_wantlist ? 'Wantlist' : 'Collection' }}</a>
+      <span>/</span>
+      {{ release.title }}
+    </div>
   </nav>
 {% endblock %}
 
