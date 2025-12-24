@@ -54,10 +54,18 @@ final class QueryParser
         $chips = [];
         $yearFrom = null; $yearTo = null;
         $general = [];
+        $isDiscogsSearch = false;
 
         foreach ($tokens as $tok) {
             $tok = trim($tok);
             if ($tok === '') continue;
+
+            // discogs search prefix
+            if (str_starts_with(strtolower($tok), 'discogs:')) {
+                $isDiscogsSearch = true;
+                $tok = substr($tok, 8);
+                if ($tok === '') continue;
+            }
 
             // year filter
             if (str_starts_with(strtolower($tok), 'year:')) {
@@ -115,6 +123,7 @@ final class QueryParser
             'year_from' => $yearFrom,
             'year_to' => $yearTo,
             'chips' => $chips,
+            'is_discogs' => $isDiscogsSearch,
         ];
     }
 }

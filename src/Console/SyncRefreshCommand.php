@@ -99,6 +99,14 @@ class SyncRefreshCommand extends Command
             }
         }
 
+        // Also refresh wantlist (simple full scan for now, or we could add since-logic there too)
+        $output->writeln('<info>Refreshing wantlist …</info>');
+        $wantImporter = new \App\Sync\WantlistImporter($http, $pdo, $kv, $imgDir);
+        $wantImporter->importAll($username, 100, function (int $page, int $count, ?int $totalPages) use ($output) {
+            $label = $totalPages ? "$page/$totalPages" : (string)$page;
+            $output->writeln(sprintf('  - Page %s: %d items', $label, $count));
+        });
+
         if ($newSince) {
             $kv->set('refresh:last_added', $newSince);
         }

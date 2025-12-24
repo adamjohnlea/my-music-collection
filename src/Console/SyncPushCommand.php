@@ -60,6 +60,7 @@ class SyncPushCommand extends Command
         $kv = new KvStore($pdo);
         $client = new DiscogsHttpClient($ua, $token, $kv);
         $writer = new DiscogsCollectionWriter($client);
+        $wantWriter = new \App\Http\DiscogsWantlistWriter($client);
 
         // Feature flag: only push notes when explicitly enabled
         $sendNotes = (($_ENV['PUSH_NOTES'] ?? $_SERVER['PUSH_NOTES'] ?? getenv('PUSH_NOTES')) === '1');
@@ -85,7 +86,7 @@ class SyncPushCommand extends Command
         }
 
         // Fetch a batch of pending jobs
-        $stmt = $pdo->query("SELECT id, instance_id, release_id, username, rating, notes, attempts FROM push_queue WHERE status = 'pending' ORDER BY created_at ASC, id ASC LIMIT 50");
+        $stmt = $pdo->query("SELECT id, instance_id, release_id, username, rating, notes, attempts, action FROM push_queue WHERE status = 'pending' ORDER BY created_at ASC, id ASC LIMIT 50");
         $jobs = $stmt->fetchAll();
         if (!$jobs) {
             $output->writeln('<info>No pending jobs.</info>');
@@ -100,29 +101,45 @@ class SyncPushCommand extends Command
             $u = (string)$job['username'];
             $rating = isset($job['rating']) ? (int)$job['rating'] : null;
             $notes = $job['notes'] !== null ? (string)$job['notes'] : null;
-
-            // Determine folder_id for this instance; required by Discogs endpoint
-            $folderId = 0;
-            $fs = $pdo->prepare('SELECT folder_id FROM collection_items WHERE instance_id = :iid LIMIT 1');
-            $fs->execute([':iid' => $iid]);
-            $fRow = $fs->fetch();
-            if ($fRow && isset($fRow['folder_id'])) {
-                $folderId = (int)$fRow['folder_id'];
-            }
-            if ($folderId <= 0) {
-                // Discogs typically uses folder 1 for the default folder; fallback to 1 if unknown
-                $folderId = 1;
-            }
+            $action = (string)($job['action'] ?? 'update_collection');
 
             try {
-                $notesToSend = ($sendNotes && $notes !== null && $notesFieldId !== null) ? $notes : null;
-                $res = $writer->updateInstance($u, $rid, $iid, $folderId, $rating, $notesToSend, $notesFieldId);
+                if ($action === 'add_want') {
+                    $res = $wantWriter->addToWantlist($u, $rid);
+                } elseif ($action === 'add_collection') {
+                    $res = $wantWriter->addToCollection($u, $rid);
+                } elseif ($action === 'remove_want') {
+                    $res = $wantWriter->removeFromWantlist($u, $rid);
+                } elseif ($action === 'want_to_collection') {
+                    // Chained action: add to collection, then remove from wantlist
+                    $res = $wantWriter->addToCollection($u, $rid);
+                    if ($res['ok']) {
+                        $res = $wantWriter->removeFromWantlist($u, $rid);
+                    }
+                } else {
+                    // Default: update_collection
+                    // Determine folder_id for this instance; required by Discogs endpoint
+                    $folderId = 0;
+                    $fs = $pdo->prepare('SELECT folder_id FROM collection_items WHERE instance_id = :iid LIMIT 1');
+                    $fs->execute([':iid' => $iid]);
+                    $fRow = $fs->fetch();
+                    if ($fRow && isset($fRow['folder_id'])) {
+                        $folderId = (int)$fRow['folder_id'];
+                    }
+                    if ($folderId <= 0) {
+                        // Discogs typically uses folder 1 for the default folder; fallback to 1 if unknown
+                        $folderId = 1;
+                    }
+
+                    $notesToSend = ($sendNotes && $notes !== null && $notesFieldId !== null) ? $notes : null;
+                    $res = $writer->updateInstance($u, $rid, $iid, $folderId, $rating, $notesToSend, $notesFieldId);
+                }
+
                 if ($res['ok']) {
                     $upd = $pdo->prepare("UPDATE push_queue SET status='done', attempts = attempts + 1, last_error = NULL WHERE id = :id");
                     $upd->execute([':id' => $id]);
                     $processed++;
-                    $extra = $notesToSend !== null ? ' notes=1' : '';
-                    $output->writeln("<info>OK</info> #$id release=$rid instance=$iid folder=$folderId code=".$res['code'].$extra);
+                    $output->writeln("<info>OK</info> #$id action=$action release=$rid");
                 } else {
                     // store concise error for diagnostics
                     $body = trim($res['body'] ?? '');
@@ -131,7 +148,7 @@ class SyncPushCommand extends Command
                     $upd = $pdo->prepare("UPDATE push_queue SET attempts = attempts + 1, last_error = :err, status = CASE WHEN attempts + 1 >= 5 THEN 'failed' ELSE status END WHERE id = :id");
                     $upd->execute([':id' => $id, ':err' => $err]);
                     $failed++;
-                    $output->writeln("<error>FAIL</error> #$id release=$rid instance=$iid folder=$folderId code=".($res['code'] ?? 0));
+                    $output->writeln("<error>FAIL</error> #$id action=$action release=$rid code=".($res['code'] ?? 0));
                 }
             } catch (\Throwable $e) {
                 $upd = $pdo->prepare("UPDATE push_queue SET attempts = attempts + 1, last_error = :err, status = CASE WHEN attempts + 1 >= 5 THEN 'failed' ELSE status END WHERE id = :id");

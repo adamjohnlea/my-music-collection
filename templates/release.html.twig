@@ -38,11 +38,12 @@
 
 {% block content %}
   <div class="wrap">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <p style="margin:0"><a href="{{ back_url|default('/') }}">← Back</a></p>
-      <nav style="display:flex;gap:12px">
-        <a href="/random" class="muted">Surprise Me</a>
-        <a href="/stats" class="muted">Stats</a>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+      <p style="margin:0"><a href="{{ back_url|default('/') }}" style="background:var(--card);border:1px solid #2a2b2f;padding:6px 12px;border-radius:8px;color:var(--text);font-size:.9rem;text-decoration:none">← Back</a></p>
+      <nav style="display:flex;gap:12px;align-items:center">
+        <a href="/random" class="muted" style="font-size:.9rem">Surprise Me</a>
+        <a href="/stats" class="muted" style="font-size:.9rem">Stats</a>
+        <a href="/about" class="muted" style="font-size:.9rem">About</a>
       </nav>
     </div>
     {% if release %}
@@ -126,14 +127,55 @@
           <div class="card" style="margin-top:16px;">
             <div class="meta">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                <strong>Discogs Status</strong>
+              </div>
+              <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+                {% if details.in_collection %}
+                  <span class="muted" style="border:1px solid #2a2b2f;border-radius:8px;padding:4px 10px;background:rgba(103,232,249,.1)">In Collection</span>
+                {% else %}
+                  <form method="post" action="/release/save" style="margin:0">
+                    <input type="hidden" name="_token" value="{{ csrf_token }}" />
+                    <input type="hidden" name="release_id" value="{{ release.id }}" />
+                    <input type="hidden" name="action" value="want_to_collection" />
+                    <input type="hidden" name="return" value="{{ back_url|default('/') }}" />
+                    <button type="submit" style="background:var(--card);color:var(--accent);border:1px solid #2a2b2f;border-radius:8px;padding:6px 10px;cursor:pointer">Add to Collection</button>
+                  </form>
+                {% endif %}
+
+                {% if details.in_wantlist %}
+                  <span class="muted" style="border:1px solid #2a2b2f;border-radius:8px;padding:4px 10px;background:rgba(255,255,255,.05)">In Wantlist</span>
+                  <form method="post" action="/release/save" style="margin:0">
+                    <input type="hidden" name="_token" value="{{ csrf_token }}" />
+                    <input type="hidden" name="release_id" value="{{ release.id }}" />
+                    <input type="hidden" name="action" value="remove_want" />
+                    <input type="hidden" name="return" value="{{ back_url|default('/') }}" />
+                    <button type="submit" class="muted" style="background:transparent;border:1px solid #2a2b2f;border-radius:8px;padding:6px 10px;cursor:pointer;color:inherit">Remove from Wantlist</button>
+                  </form>
+                {% elseif not details.in_collection %}
+                  <form method="post" action="/release/save" style="margin:0">
+                    <input type="hidden" name="_token" value="{{ csrf_token }}" />
+                    <input type="hidden" name="release_id" value="{{ release.id }}" />
+                    <input type="hidden" name="action" value="add_want" />
+                    <input type="hidden" name="return" value="{{ back_url|default('/') }}" />
+                    <button type="submit" class="muted" style="background:transparent;border:1px solid #2a2b2f;border-radius:8px;padding:6px 10px;cursor:pointer;color:inherit">Add to Wantlist</button>
+                  </form>
+                {% endif %}
+              </div>
+              <p class="muted" style="margin:8px 0 0 0;font-size:.85rem">Actions are queued and will be synced to Discogs in the background.</p>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:16px;">
+            <div class="meta">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
                 <strong>My Notes</strong>
-                {% if not static_export %}
+                {% if not static_export and details.in_collection %}
                   <button id="editToggle" type="button" title="Edit" style="background:transparent;color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:4px 8px;cursor:pointer;font-size:.9rem">Edit</button>
                 {% endif %}
               </div>
 
               {% if saved %}
-                <div class="muted" style="margin-top:6px">Saved: {{ saved }}</div>
+                <div class="muted" style="margin-top:6px">Status: {{ saved }}</div>
               {% endif %}
 
               <div id="notesView" style="margin-top:8px">
@@ -142,15 +184,16 @@
                 {% endif %}
                 {% if details.user_notes %}
                   <div style="white-space:pre-wrap" class="muted">{{ details.user_notes }}</div>
-                {% else %}
+                {% elseif details.in_collection %}
                   <div class="muted">(none)</div>
                 {% endif %}
               </div>
 
-              {% if not static_export %}
+              {% if not static_export and details.in_collection %}
                 <form id="notesForm" method="post" action="/release/save" style="display:none; margin-top:8px; flex-direction:column; gap:8px">
-                                <input type="hidden" name="_token" value="{{ csrf_token }}" />
+                  <input type="hidden" name="_token" value="{{ csrf_token }}" />
                   <input type="hidden" name="release_id" value="{{ release.id }}" />
+                  <input type="hidden" name="action" value="update_collection" />
                   <input type="hidden" name="return" value="{{ back_url|default('/') }}" />
                   <label>Rating
                     <select name="rating" style="background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:6px 8px">

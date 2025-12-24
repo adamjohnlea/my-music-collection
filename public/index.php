@@ -10,6 +10,7 @@ use Dotenv\Dotenv;
 use App\Infrastructure\KvStore;
 use App\Http\DiscogsHttpClient;
 use App\Sync\CollectionImporter;
+use App\Sync\WantlistImporter;
 use App\Sync\ReleaseEnricher;
 use App\Images\ImageCache;
 use App\Domain\Search\QueryParser;
@@ -74,8 +75,8 @@ $appKey = $env('APP_KEY');
 $crypto = new Crypto($appKey, dirname(__DIR__));
 
 $currentUser = null;
-if (isset($_SESSION['uid'])) {
-    $st = $pdo->prepare('SELECT id, username, email, discogs_username, discogs_token_enc FROM auth_users WHERE id = :id');
+    if (isset($_SESSION['uid'])) {
+    $st = $pdo->prepare('SELECT id, username, email, discogs_username, discogs_token_enc, discogs_search_exclude_title FROM auth_users WHERE id = :id');
     $st->execute([':id' => (int)$_SESSION['uid']]);
     $row = $st->fetch();
     if ($row) {
@@ -85,6 +86,7 @@ if (isset($_SESSION['uid'])) {
             'email' => (string)$row['email'],
             'discogs_username' => $row['discogs_username'] ? (string)$row['discogs_username'] : null,
             'discogs_token' => $row['discogs_token_enc'] ? $crypto->decrypt((string)$row['discogs_token_enc']) : null,
+            'discogs_search_exclude_title' => (bool)($row['discogs_search_exclude_title'] ?? false),
         ];
     }
 }
@@ -200,6 +202,7 @@ if ($uri === '/settings') {
     $requireLogin();
     $discogsUsername = $currentUser['discogs_username'] ?? '';
     $discogsToken = $currentUser['discogs_token'] ?? '';
+    $excludeTitle = (bool)($currentUser['discogs_search_exclude_title'] ?? false);
     $saved = false; $error = null;
     if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
         if (!$csrfValid()) {
@@ -207,12 +210,13 @@ if ($uri === '/settings') {
         } else {
         $discogsUsername = trim((string)($_POST['discogs_username'] ?? ''));
         $discogsToken = trim((string)($_POST['discogs_token'] ?? ''));
+        $excludeTitle = isset($_POST['discogs_search_exclude_title']) && $_POST['discogs_search_exclude_title'] === '1';
         if ($discogsUsername === '' || $discogsToken === '') {
             $error = 'Both Discogs username and token are required';
         } else {
             $enc = $crypto->encrypt($discogsToken);
-            $up = $pdo->prepare('UPDATE auth_users SET discogs_username = :u, discogs_token_enc = :t, updated_at = CURRENT_TIMESTAMP WHERE id = :id');
-            $up->execute([':u' => $discogsUsername, ':t' => $enc, ':id' => (int)$currentUser['id']]);
+            $up = $pdo->prepare('UPDATE auth_users SET discogs_username = :u, discogs_token_enc = :t, discogs_search_exclude_title = :et, updated_at = CURRENT_TIMESTAMP WHERE id = :id');
+            $up->execute([':u' => $discogsUsername, ':t' => $enc, ':et' => (int)$excludeTitle, ':id' => (int)$currentUser['id']]);
             $saved = true;
         }
     }
@@ -221,6 +225,7 @@ if ($uri === '/settings') {
         'title' => 'Settings',
         'discogs_username' => $discogsUsername,
         'discogs_token' => $discogsToken,
+        'discogs_search_exclude_title' => $excludeTitle,
         'saved' => $saved,
         'error' => $error,
     ]);
@@ -330,37 +335,65 @@ if ($uri === '/release/save' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST'
     if (!$csrfValid()) { header('Location: /release/' . $rid . '?saved=invalid_csrf'); exit; }
     $rating = isset($_POST['rating']) && $_POST['rating'] !== '' ? max(0, min(5, (int)$_POST['rating'])) : null;
     $notes = isset($_POST['notes']) ? trim((string)$_POST['notes']) : null;
+    $action = (string)($_POST['action'] ?? 'update_collection');
+
     // Require logged-in with Discogs settings to queue updates
     if (!$currentUser || empty($currentUser['discogs_username'])) { header('Location: /login?return=' . rawurlencode('/release/'.$rid)); exit; }
     $username = (string)$currentUser['discogs_username'];
     $ok = false; $msg = 'queued';
     if ($rid > 0 && $username) {
-        // Find latest instance for this release
-        $ci = $pdo->prepare('SELECT instance_id FROM collection_items WHERE release_id = :rid AND username = :u ORDER BY added DESC LIMIT 1');
-        $ci->execute([':rid' => $rid, ':u' => $username]);
-        $iid = (int)($ci->fetchColumn() ?: 0);
-        if ($iid > 0) {
-            // Upsert logic: if there is a pending job for same instance, update it; else insert new
+        if ($action === 'update_collection') {
+            // Find latest instance for this release
+            $ci = $pdo->prepare('SELECT instance_id FROM collection_items WHERE release_id = :rid AND username = :u ORDER BY added DESC LIMIT 1');
+            $ci->execute([':rid' => $rid, ':u' => $username]);
+            $iid = (int)($ci->fetchColumn() ?: 0);
+            if ($iid > 0) {
+                // Upsert logic: if there is a pending job for same instance, update it; else insert new
+                $pdo->beginTransaction();
+                try {
+                    $sel = $pdo->prepare('SELECT id FROM push_queue WHERE status = "pending" AND instance_id = :iid AND action = "update_collection" LIMIT 1');
+                    $sel->execute([':iid' => $iid]);
+                    $jobId = $sel->fetchColumn();
+                    if ($jobId) {
+                        $upd = $pdo->prepare('UPDATE push_queue SET rating = :rating, notes = :notes, attempts = 0, last_error = NULL, created_at = strftime("%Y-%m-%dT%H:%M:%fZ", "now") WHERE id = :id');
+                        $upd->execute([':rating' => $rating, ':notes' => $notes, ':id' => $jobId]);
+                    } else {
+                        $ins = $pdo->prepare('INSERT INTO push_queue (instance_id, release_id, username, rating, notes, action) VALUES (:iid, :rid, :u, :rating, :notes, :action)');
+                        $ins->execute([':iid' => $iid, ':rid' => $rid, ':u' => $username, ':rating' => $rating, ':notes' => $notes, ':action' => $action]);
+                    }
+                    $pdo->commit();
+                    $ok = true;
+                } catch (\Throwable $e) {
+                    $pdo->rollBack();
+                    $ok = false; $msg = 'error';
+                }
+            } else {
+                $msg = 'no_instance';
+            }
+        } elseif (in_array($action, ['add_want', 'remove_want', 'want_to_collection'])) {
             $pdo->beginTransaction();
             try {
-                $sel = $pdo->prepare('SELECT id FROM push_queue WHERE status = "pending" AND instance_id = :iid LIMIT 1');
-                $sel->execute([':iid' => $iid]);
-                $jobId = $sel->fetchColumn();
-                if ($jobId) {
-                    $upd = $pdo->prepare('UPDATE push_queue SET rating = :rating, notes = :notes, attempts = 0, last_error = NULL, created_at = strftime("%Y-%m-%dT%H:%M:%fZ", "now") WHERE id = :id');
-                    $upd->execute([':rating' => $rating, ':notes' => $notes, ':id' => $jobId]);
-                } else {
-                    $ins = $pdo->prepare('INSERT INTO push_queue (instance_id, release_id, username, rating, notes) VALUES (:iid, :rid, :u, :rating, :notes)');
-                    $ins->execute([':iid' => $iid, ':rid' => $rid, ':u' => $username, ':rating' => $rating, ':notes' => $notes]);
+                // For wantlist actions, we don't necessarily have an instance_id yet (or at all)
+                $ins = $pdo->prepare('INSERT INTO push_queue (instance_id, release_id, username, action) VALUES (:iid, :rid, :u, :action)');
+                $ins->execute([':iid' => 0, ':rid' => $rid, ':u' => $username, ':action' => $action]);
+                
+                // Optimistic local UI update
+                if ($action === 'remove_want') {
+                    $del = $pdo->prepare('DELETE FROM wantlist_items WHERE release_id = :rid AND username = :u');
+                    $del->execute([':rid' => $rid, ':u' => $username]);
+                } elseif ($action === 'want_to_collection') {
+                    $del = $pdo->prepare('DELETE FROM wantlist_items WHERE release_id = :rid AND username = :u');
+                    $del->execute([':rid' => $rid, ':u' => $username]);
+                    // We don't have the instance_id yet, so we can't fully add it to collection_items locally with all details,
+                    // but the next sync will pick it up.
                 }
+                
                 $pdo->commit();
                 $ok = true;
             } catch (\Throwable $e) {
                 $pdo->rollBack();
                 $ok = false; $msg = 'error';
             }
-        } else {
-            $msg = 'no_instance';
         }
     } else {
         $msg = 'invalid';
@@ -378,6 +411,68 @@ if ($uri === '/release/save' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST'
     ]);
     $qs .= ($ret ? ('&return=' . rawurlencode($ret)) : '');
     header('Location: /release/' . $rid . '?' . $qs);
+    exit;
+}
+
+if ($uri === '/release/add' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
+    $requireLogin();
+    if (!$csrfValid()) { header('Location: /'); exit; }
+    
+    $rid = (int)($_POST['release_id'] ?? 0);
+    $action = (string)($_POST['action'] ?? 'add_collection');
+    $ret = (string)($_POST['return'] ?? '/');
+    $username = (string)$currentUser['discogs_username'];
+
+    if ($rid > 0 && $username) {
+        // 1. Fetch release info from Discogs if we don't have it or need it
+        $discogsClient = new DiscogsHttpClient('MyMusicCollection/1.0', $currentUser['discogs_token'], new KvStore($pdo));
+        $http = $discogsClient->client();
+        
+        try {
+            $resp = $http->request('GET', sprintf('releases/%d', $rid));
+            if ($resp->getStatusCode() === 200) {
+                $data = json_decode((string)$resp->getBody(), true);
+                
+                // 2. Save basic info to 'releases' table
+                $now = gmdate('c');
+                $title = $data['title'] ?? null;
+                $artists = $data['artists'] ?? [];
+                $names = [];
+                foreach ($artists as $a) { $n = $a['name'] ?? null; if ($n) $names[] = $n; }
+                $artistSummary = $names ? implode(', ', $names) : null;
+                $year = isset($data['year']) ? (int)$data['year'] : null;
+                $thumb = $data['thumb'] ?? null;
+                $cover = $data['images'][0]['uri'] ?? $data['cover_image'] ?? null;
+
+                $cReleases = $pdo->prepare('INSERT INTO releases (id, title, artist, year, thumb_url, cover_url, imported_at, updated_at, raw_json) VALUES (:id, :title, :artist, :year, :thumb_url, :cover_url, :imported_at, :updated_at, :raw_json) ON CONFLICT(id) DO UPDATE SET title = COALESCE(excluded.title, releases.title), artist = COALESCE(excluded.artist, releases.artist), year = COALESCE(excluded.year, releases.year), thumb_url = COALESCE(excluded.thumb_url, releases.thumb_url), cover_url = COALESCE(excluded.cover_url, releases.cover_url), updated_at = excluded.updated_at, raw_json = COALESCE(excluded.raw_json, releases.raw_json)');
+                $cReleases->execute([
+                    ':id' => $rid,
+                    ':title' => $title,
+                    ':artist' => $artistSummary,
+                    ':year' => $year,
+                    ':thumb_url' => $thumb,
+                    ':cover_url' => $cover,
+                    ':imported_at' => $now,
+                    ':updated_at' => $now,
+                    ':raw_json' => json_encode($data, JSON_UNESCAPED_SLASHES),
+                ]);
+
+                // 3. Queue the action
+                $pushAction = ($action === 'add_collection') ? 'add_collection' : 'add_want';
+                $ins = $pdo->prepare('INSERT INTO push_queue (instance_id, release_id, username, action) VALUES (:iid, :rid, :u, :action)');
+                $ins->execute([':iid' => 0, ':rid' => $rid, ':u' => $username, ':action' => $pushAction]);
+
+                // 4. Optimistic local update for wantlist if that was the action
+                if ($action === 'add_want') {
+                    $insWant = $pdo->prepare('INSERT OR IGNORE INTO wantlist_items (username, release_id, added) VALUES (:u, :rid, :added)');
+                    $insWant->execute([':u' => $username, ':rid' => $rid, ':added' => $now]);
+                }
+            }
+        } catch (\Throwable $e) {
+            // Error handling
+        }
+    }
+    header('Location: ' . $ret);
     exit;
 }
 
@@ -404,6 +499,8 @@ if (preg_match('#^/release/(\d+)#', $uri, $m)) {
         'user_rating' => null,
         'barcodes' => [],
         'other_identifiers' => [],
+        'in_collection' => false,
+        'in_wantlist' => false,
     ];
 
     if ($release) {
@@ -471,6 +568,7 @@ if (preg_match('#^/release/(\d+)#', $uri, $m)) {
             $ci->execute([':rid' => $rid, ':u' => $username]);
             $ciRow = $ci->fetch();
             if ($ciRow) {
+                $details['in_collection'] = true;
                 $userNotes = $ciRow['notes'] ?? null;
                 if ($userNotes && is_string($userNotes) && str_starts_with($userNotes, '[')) {
                     $maybe = json_decode($userNotes, true);
@@ -480,6 +578,17 @@ if (preg_match('#^/release/(\d+)#', $uri, $m)) {
                 }
                 $details['user_notes'] = $userNotes ?: null;
                 $details['user_rating'] = isset($ciRow['rating']) ? (int)$ciRow['rating'] : null;
+            }
+
+            $wi = $pdo->prepare('SELECT notes, rating FROM wantlist_items WHERE release_id = :rid AND username = :u LIMIT 1');
+            $wi->execute([':rid' => $rid, ':u' => $username]);
+            $wiRow = $wi->fetch();
+            if ($wiRow) {
+                $details['in_wantlist'] = true;
+                if (!$details['in_collection']) {
+                    $details['user_notes'] = $wiRow['notes'] ?: null;
+                    $details['user_rating'] = isset($wiRow['rating']) ? (int)$wiRow['rating'] : null;
+                }
             }
             // If pending values were just submitted (sr/sn), override for display so the user sees their edits immediately
             if (isset($_GET['sr']) && $_GET['sr'] !== '') {
@@ -548,6 +657,7 @@ $page = max(1, (int)($_GET['page'] ?? 1));
 $perPage = max(1, min(60, (int)($_GET['per_page'] ?? 24)));
 $sort = (string)($_GET['sort'] ?? 'added_desc');
 $q = trim((string)($_GET['q'] ?? ''));
+$view = (string)($_GET['view'] ?? 'collection'); // 'collection' or 'wantlist'
 
 // Parse advanced search (field prefixes + year range) into an FTS MATCH and numeric filters
 $parsed = (new QueryParser())->parse($q);
@@ -555,6 +665,102 @@ $match = $parsed['match'] ?? '';
 $yearFrom = $parsed['year_from'] ?? null;
 $yearTo = $parsed['year_to'] ?? null;
 $chips = $parsed['chips'] ?? [];
+$isDiscogs = $parsed['is_discogs'] ?? false;
+
+if ($isDiscogs && !empty($currentUser['discogs_username'])) {
+    $discogsClient = new DiscogsHttpClient('MyMusicCollection/1.0', $currentUser['discogs_token'], new KvStore($pdo));
+    $http = $discogsClient->client();
+    
+    // Remove "discogs:" from the query for the actual API call
+    $searchQuery = preg_replace('/discogs:\s*/i', '', $q);
+    
+    try {
+        $resp = $http->request('GET', 'database/search', [
+            'query' => [
+                'q' => $searchQuery,
+                'type' => 'release',
+                'per_page' => $perPage,
+                'page' => $page,
+            ],
+        ]);
+        
+        $body = (string)$resp->getBody();
+        $json = json_decode($body, true);
+        $results = $json['results'] ?? [];
+        $pagination = $json['pagination'] ?? [];
+        $total = $pagination['items'] ?? 0;
+        $totalPages = $pagination['pages'] ?? 1;
+
+        $items = [];
+        $excludeByTitle = (bool)($currentUser['discogs_search_exclude_title'] ?? false);
+        
+        foreach ($results as $res) {
+            $rid = (int)$res['id'];
+            $resTitle = $res['title'] ?? '';
+            
+            // Check local status by ID
+            $st = $pdo->prepare('SELECT 1 FROM collection_items WHERE release_id = :rid AND username = :u');
+            $st->execute([':rid' => $rid, ':u' => $usernameFilter]);
+            $inCollection = (bool)$st->fetchColumn();
+            
+            $st = $pdo->prepare('SELECT 1 FROM wantlist_items WHERE release_id = :rid AND username = :u');
+            $st->execute([':rid' => $rid, ':u' => $usernameFilter]);
+            $inWantlist = (bool)$st->fetchColumn();
+
+            // Skip items that are already in collection or wantlist (by ID)
+            if ($inCollection || $inWantlist) {
+                continue;
+            }
+
+            // Optional: Skip items that match an existing title in the collection or wantlist
+            if ($excludeByTitle && $resTitle !== '') {
+                // Discogs search results for 'release' often return "Artist - Title" in the title field.
+                // Our local 'releases' table stores artist and title separately.
+                // We check against both the title alone AND the combined "Artist - Title" to be safe.
+                $st = $pdo->prepare('
+                    SELECT 1 FROM releases r 
+                    WHERE (r.title = :title COLLATE NOCASE OR (r.artist || " - " || r.title) = :title COLLATE NOCASE)
+                    AND (
+                        EXISTS (SELECT 1 FROM collection_items ci WHERE ci.release_id = r.id AND ci.username = :u)
+                        OR EXISTS (SELECT 1 FROM wantlist_items wi WHERE wi.release_id = r.id AND wi.username = :u)
+                    )
+                    LIMIT 1
+                ');
+                $st->execute([':title' => $resTitle, ':u' => $usernameFilter]);
+                if ($st->fetchColumn()) {
+                    continue;
+                }
+            }
+
+            $items[] = [
+                'id' => $rid,
+                'title' => $res['title'] ?? '',
+                'artist' => '', // Discogs search results often combine artist - title in title
+                'year' => isset($res['year']) ? (int)$res['year'] : null,
+                'image' => $res['thumb'] ?? $res['cover_image'] ?? null,
+                'in_collection' => $inCollection,
+                'in_wantlist' => $inWantlist,
+                'is_discogs_result' => true,
+            ];
+        }
+
+        echo $twig->render('home.html.twig', [
+            'title' => 'Discogs Search Results',
+            'items' => $items,
+            'page' => $page,
+            'per_page' => $perPage,
+            'total_pages' => $totalPages,
+            'total' => $total,
+            'sort' => $sort,
+            'q' => $q,
+            'view' => 'discogs',
+            'chips' => $chips,
+        ]);
+        exit;
+    } catch (\Throwable $e) {
+        // Fallback to local search or show error?
+    }
+}
 
 // Whitelist of ORDER BY clauses to prevent SQL injection
 $sorts = [
@@ -582,8 +788,9 @@ if ($q !== '') {
     $useFts = ($match !== '');
 
     if ($useFts) {
+        $itemsTable = $view === 'wantlist' ? 'wantlist_items' : 'collection_items';
         // Count total matches (with optional year filters)
-        $cntSql = "SELECT COUNT(DISTINCT r.id) FROM releases_fts f JOIN releases r ON r.id = f.rowid WHERE releases_fts MATCH :m AND EXISTS (SELECT 1 FROM collection_items ci WHERE ci.release_id = r.id AND ci.username = :u)";
+        $cntSql = "SELECT COUNT(DISTINCT r.id) FROM releases_fts f JOIN releases r ON r.id = f.rowid WHERE releases_fts MATCH :m AND EXISTS (SELECT 1 FROM $itemsTable ci WHERE ci.release_id = r.id AND ci.username = :u)";
         if ($yearFrom !== null) $cntSql .= " AND r.year >= :y1";
         if ($yearTo !== null) $cntSql .= " AND r.year <= :y2";
         $cnt = $pdo->prepare($cntSql);
@@ -598,14 +805,14 @@ if ($q !== '') {
         $sql = "SELECT r.id, r.title, r.artist, r.year, r.thumb_url, r.cover_url,
             (SELECT local_path FROM images i WHERE i.release_id = r.id AND i.source_url = r.cover_url ORDER BY id ASC LIMIT 1) AS primary_local_path,
             (SELECT local_path FROM images i WHERE i.release_id = r.id ORDER BY id ASC LIMIT 1) AS any_local_path,
-            (SELECT MAX(ci2.added) FROM collection_items ci2 WHERE ci2.release_id = r.id AND ci2.username = :u) AS added_at,
-            (SELECT MAX(ci3.rating) FROM collection_items ci3 WHERE ci3.release_id = r.id AND ci3.username = :u) AS rating
+            (SELECT MAX(ci2.added) FROM $itemsTable ci2 WHERE ci2.release_id = r.id AND ci2.username = :u) AS added_at,
+            (SELECT MAX(ci3.rating) FROM $itemsTable ci3 WHERE ci3.release_id = r.id AND ci3.username = :u) AS rating
         FROM releases_fts f
         JOIN releases r ON r.id = f.rowid
         WHERE releases_fts MATCH :match" .
         ($yearFrom !== null ? " AND r.year >= :y1" : "") .
         ($yearTo !== null ? " AND r.year <= :y2" : "") .
-        " AND EXISTS (SELECT 1 FROM collection_items ci WHERE ci.release_id = r.id AND ci.username = :u)
+        " AND EXISTS (SELECT 1 FROM $itemsTable ci WHERE ci.release_id = r.id AND ci.username = :u)
         GROUP BY r.id
         ORDER BY r.id DESC
         LIMIT :limit OFFSET :offset";
@@ -619,8 +826,9 @@ if ($q !== '') {
         $stmt->execute();
         $rows = $stmt->fetchAll();
     } else {
+        $itemsTable = $view === 'wantlist' ? 'wantlist_items' : 'collection_items';
         // Year-only (or filters that produced no FTS terms): do non-FTS search with just year filters
-        $cntSql = "SELECT COUNT(DISTINCT r.id) FROM releases r WHERE 1=1 AND EXISTS (SELECT 1 FROM collection_items ci WHERE ci.release_id = r.id AND ci.username = :u)";
+        $cntSql = "SELECT COUNT(DISTINCT r.id) FROM releases r WHERE 1=1 AND EXISTS (SELECT 1 FROM $itemsTable ci WHERE ci.release_id = r.id AND ci.username = :u)";
         if ($yearFrom !== null) $cntSql .= " AND r.year >= :y1";
         if ($yearTo !== null) $cntSql .= " AND r.year <= :y2";
         $cnt = $pdo->prepare($cntSql);
@@ -634,13 +842,13 @@ if ($q !== '') {
         $sql = "SELECT r.id, r.title, r.artist, r.year, r.thumb_url, r.cover_url,
             (SELECT local_path FROM images i WHERE i.release_id = r.id AND i.source_url = r.cover_url ORDER BY id ASC LIMIT 1) AS primary_local_path,
             (SELECT local_path FROM images i WHERE i.release_id = r.id ORDER BY id ASC LIMIT 1) AS any_local_path,
-            (SELECT MAX(ci2.added) FROM collection_items ci2 WHERE ci2.release_id = r.id AND ci2.username = :u) AS added_at,
-            (SELECT MAX(ci3.rating) FROM collection_items ci3 WHERE ci3.release_id = r.id AND ci3.username = :u) AS rating
+            (SELECT MAX(ci2.added) FROM $itemsTable ci2 WHERE ci2.release_id = r.id AND ci2.username = :u) AS added_at,
+            (SELECT MAX(ci3.rating) FROM $itemsTable ci3 WHERE ci3.release_id = r.id AND ci3.username = :u) AS rating
         FROM releases r
         WHERE 1=1" .
         ($yearFrom !== null ? " AND r.year >= :y1" : "") .
         ($yearTo !== null ? " AND r.year <= :y2" : "") .
-        " AND EXISTS (SELECT 1 FROM collection_items ci WHERE ci.release_id = r.id AND ci.username = :u)
+        " AND EXISTS (SELECT 1 FROM $itemsTable ci WHERE ci.release_id = r.id AND ci.username = :u)
         GROUP BY r.id
         ORDER BY r.id DESC
         LIMIT :limit OFFSET :offset";
@@ -654,8 +862,9 @@ if ($q !== '') {
         $rows = $stmt->fetchAll();
     }
 } else {
+    $itemsTable = $view === 'wantlist' ? 'wantlist_items' : 'collection_items';
     // Default listing (no query): per-user collection only
-    $cnt = $pdo->prepare('SELECT COUNT(DISTINCT r.id) FROM releases r WHERE EXISTS (SELECT 1 FROM collection_items ci WHERE ci.release_id = r.id AND ci.username = :u)');
+    $cnt = $pdo->prepare("SELECT COUNT(DISTINCT r.id) FROM releases r WHERE EXISTS (SELECT 1 FROM $itemsTable ci WHERE ci.release_id = r.id AND ci.username = :u)");
     $cnt->bindValue(':u', $usernameFilter);
     $cnt->execute();
     $total = (int)$cnt->fetchColumn();
@@ -664,10 +873,10 @@ if ($q !== '') {
     $sql = "SELECT r.id, r.title, r.artist, r.year, r.thumb_url, r.cover_url,
         (SELECT local_path FROM images i WHERE i.release_id = r.id AND i.source_url = r.cover_url ORDER BY id ASC LIMIT 1) AS primary_local_path,
         (SELECT local_path FROM images i WHERE i.release_id = r.id ORDER BY id ASC LIMIT 1) AS any_local_path,
-        (SELECT MAX(ci2.added) FROM collection_items ci2 WHERE ci2.release_id = r.id AND ci2.username = :u) AS added_at,
-        (SELECT MAX(ci3.rating) FROM collection_items ci3 WHERE ci3.release_id = r.id AND ci3.username = :u) AS rating
+        (SELECT MAX(ci2.added) FROM $itemsTable ci2 WHERE ci2.release_id = r.id AND ci2.username = :u) AS added_at,
+        (SELECT MAX(ci3.rating) FROM $itemsTable ci3 WHERE ci3.release_id = r.id AND ci3.username = :u) AS rating
     FROM releases r
-    WHERE EXISTS (SELECT 1 FROM collection_items ci WHERE ci.release_id = r.id AND ci.username = :u)
+    WHERE EXISTS (SELECT 1 FROM $itemsTable ci WHERE ci.release_id = r.id AND ci.username = :u)
     GROUP BY r.id
     ORDER BY $orderBy
     LIMIT :limit OFFSET :offset";
@@ -714,7 +923,7 @@ foreach ($rows as $r) {
 }
 
 echo $twig->render('home.html.twig', [
-    'title' => 'My Music Collection',
+    'title' => $view === 'wantlist' ? 'My Wantlist' : 'My Music Collection',
     'items' => $items,
     'page' => $page,
     'per_page' => $perPage,
@@ -722,5 +931,6 @@ echo $twig->render('home.html.twig', [
     'total' => $total,
     'sort' => $sort,
     'q' => $q,
+    'view' => $view,
     'chips' => $chips,
 ]);

@@ -63,6 +63,16 @@ class MigrationRunner
                 $this->setVersion('8');
                 $version = '8';
             }
+            if ($version === '8') {
+                $this->migrateToV9();
+                $this->setVersion('9');
+                $version = '9';
+            }
+            if ($version === '9') {
+                $this->migrateToV10();
+                $this->setVersion('10');
+                $version = '10';
+            }
 
             $this->pdo->commit();
 
@@ -303,6 +313,32 @@ class MigrationRunner
         // Mark releases after enrichment to avoid reprocessing items with legitimately missing notes
         $this->pdo->exec("ALTER TABLE releases ADD COLUMN enriched_at TEXT");
         // Optional backfill: none — we allow the next enrich run to set this.
+    }
+
+    private function migrateToV9(): void
+    {
+        // wantlist_items
+        $this->pdo->exec('CREATE TABLE IF NOT EXISTS wantlist_items (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL,
+            release_id INTEGER NOT NULL,
+            notes TEXT,
+            rating INTEGER,
+            added TEXT,
+            raw_json TEXT,
+            UNIQUE (username, release_id)
+        )');
+
+        // Add action column to push_queue to support different types of actions
+        $this->pdo->exec("ALTER TABLE push_queue ADD COLUMN action TEXT NOT NULL DEFAULT 'update_collection'");
+        // Backfill existing jobs to 'update_collection' (already the default, but being explicit)
+        $this->pdo->exec("UPDATE push_queue SET action = 'update_collection' WHERE action IS NULL OR action = ''");
+    }
+
+    private function migrateToV10(): void
+    {
+        // Add discogs_search_exclude_title setting to auth_users
+        $this->pdo->exec("ALTER TABLE auth_users ADD COLUMN discogs_search_exclude_title INTEGER NOT NULL DEFAULT 0");
     }
 
     public function rebuildSearch(): void

@@ -7,8 +7,16 @@
     :root { --bg:#0b0b0c; --card:#16171a; --text:#e7e7ea; --muted:#a0a3aa; --accent:#67e8f9; }
     html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif}
     .wrap{max-width:1200px;margin:40px auto;padding:0 20px}
-    header{position:sticky;top:0;z-index:10;backdrop-filter:blur(6px);background:rgba(11,11,12,.7);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin:-16px -20px 24px -20px;padding:16px 20px}
-    h1{font-size:1.5rem;margin:0}
+    header{position:sticky;top:0;z-index:10;backdrop-filter:blur(6px);background:rgba(11,11,12,.7);margin:-16px -20px 24px -20px;padding:16px 20px}
+    .header-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+    .header-bottom{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+    h1{font-size:1.4rem;margin:0}
+    .stats{font-size:.9rem}
+    .nav-group{display:flex;align-items:center;gap:16px}
+    .view-tabs{display:flex;gap:4px;background:#1a1b1f;padding:4px;border-radius:10px}
+    .view-tab{padding:6px 14px;border-radius:8px;font-size:.95rem;font-weight:500;color:var(--muted);text-decoration:none}
+    .view-tab:hover{color:var(--text)}
+    .view-tab.active{background:var(--card);color:var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.2)}
     .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px}
     .card{background:var(--card);border-radius:12px;overflow:hidden}
     .cover{aspect-ratio:1/1;width:100%;object-fit:cover;background:linear-gradient(90deg,#1a1b1f 25%,#22242a 37%,#1a1b1f 63%);background-size:400% 100%;animation:shimmer 1.2s infinite}
@@ -18,14 +26,20 @@
     .title{font-weight:600}
     .artist{color:var(--muted);font-size:.9rem}
     .muted{color:var(--muted)}
+    .action-btns{display:flex;gap:4px;margin-top:8px}
+    .btn-small{font-size:.8rem;padding:4px 8px;border:1px solid #2a2b2f;border-radius:6px;background:var(--card);color:var(--text);cursor:pointer;text-decoration:none}
+    .btn-small:hover:not(:disabled){border-color:var(--accent)}
+    .btn-small:disabled{opacity:.5;cursor:not-allowed}
     nav{display:flex;justify-content:center;gap:12px;margin-top:20px}
     a{color:var(--accent);text-decoration:none}
     a:hover{text-decoration:underline}
     /* Toolbar */
     .toolbar{display:flex;gap:8px;align-items:center;margin:0;flex-wrap:wrap}
-    .search-input{background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:8px 12px;width:360px;max-width:100%}
+    .search-input{background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:10px;padding:8px 14px;width:400px;max-width:100%;font-size:.95rem}
+    .search-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 1px rgba(103,232,249,.2)}
     .sort-wrap{display:flex;gap:8px;align-items:center}
-    .sort-select{background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:8px;padding:8px 8px}
+    .sort-select{background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:10px;padding:8px 12px;font-size:.9rem;cursor:pointer}
+    .sort-select:focus{outline:none;border-color:var(--accent)}
     /* Modern pagination */
     .pagination{display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap}
     .page-btn{display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:0 12px;border-radius:12px;border:1px solid #2a2b2f;background:var(--card);color:var(--text);text-decoration:none;font-weight:600}
@@ -38,10 +52,16 @@
     @media (max-width: 640px){
       .wrap{margin:20px auto}
       header{gap:12px}
-      .muted.stats{width:100%;order:1}
-      .toolbar{width:100%;order:2}
+      .header-top{flex-direction:column;align-items:flex-start}
+      .header-bottom{flex-direction:column;align-items:stretch}
+      .nav-group{width:100%;justify-content:space-between}
+      .view-tabs{width:100%}
+      .view-tab{flex:1;text-align:center}
+      .muted.stats{width:100%;margin-top:4px}
+      .toolbar{width:100%;flex-direction:column;align-items:stretch}
       .search-input{width:100%}
-      .sort-wrap{width:100%;justify-content:flex-start;margin-top:4px}
+      .sort-wrap{width:100%}
+      .sort-select{width:100%}
       .about-link{order:3;margin-left:0}
       /* Make pagination sticky at the bottom with safe-area */
       .pagination{position:sticky;bottom:calc(8px + env(safe-area-inset-bottom));background:rgba(11,11,12,.8);backdrop-filter:blur(8px);padding:8px 12px;border-radius:14px;border:1px solid #2a2b2f}
@@ -54,24 +74,52 @@
 {% block header %}
   <div class="wrap">
     <header>
-      <h1><a href="/" style="color:inherit;text-decoration:none">{{ title }}</a></h1>
+      <div class="header-top">
+        <h1><a href="/" style="color:inherit;text-decoration:none">{{ title }}</a></h1>
+        <div class="nav-group">
+          {% if auth_user %}
+            <div style="display:flex;gap:12px;align-items:center">
+              <a href="/random" class="muted" title="Surprise Me">Surprise Me</a>
+              <a href="/stats" class="muted" title="Stats">Stats</a>
+              <a href="/about" class="muted about-link" title="About">About</a>
+              <div style="width:1px;height:16px;background:#2a2b2f;margin:0 4px"></div>
+              <span class="muted" style="font-size:.9rem">{{ auth_user.username }}</span>
+              <a href="/settings" class="muted" title="Account settings">Settings</a>
+              <form method="post" action="/logout" style="margin:0">
+                <input type="hidden" name="_token" value="{{ csrf_token }}">
+                <button type="submit" class="muted" style="background:transparent;border:1px solid #2a2b2f;border-radius:8px;padding:4px 10px;cursor:pointer;color:inherit;font-size:.85rem">Sign out</button>
+              </form>
+            </div>
+          {% else %}
+            <a href="/about" class="muted">About</a>
+            <a href="/login" class="muted">Sign in</a>
+          {% endif %}
+        </div>
+      </div>
+
       {% if auth_user and not welcome and not needs_setup %}
-        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;width:100%">
-          <div class="muted stats">{{ total|default(0) }} items{% if q is defined and q %} • Search: “{{ q }}”{% endif %}</div>
-          <form id="search-form" class="toolbar" method="get" action="/" style="flex:1 1 auto">
+        <div class="header-bottom">
+          <div class="nav-group">
+            <nav class="view-tabs">
+              <a href="/?view=collection" class="view-tab {{ view=='collection' or view is not defined ? 'active' : '' }}">Collection</a>
+              <a href="/?view=wantlist" class="view-tab {{ view=='wantlist' ? 'active' : '' }}">Wantlist</a>
+            </nav>
+            <div class="muted stats" style="padding-top:20px">{{ total|default(0) }} items{% if q is defined and q %} • Search: “{{ q }}”{% endif %}</div>
+          </div>
+
+          <form id="search-form" class="toolbar" method="get" action="/">
             <input id="search-input" class="search-input" type="text" name="q" value="{{ q|default('')|e }}" placeholder="Search artist:miles year:1980..1989 barcode:…" />
-            <input type="hidden" name="page" value="{{ page }}" />
+            <input type="hidden" name="view" value="{{ view|default('collection') }}" />
             <input type="hidden" name="per_page" value="{{ per_page }}" />
             <span class="sort-wrap">
-              <label for="sort" class="muted" style="font-size:.9rem">Sort</label>
               <select id="sort" class="sort-select" name="sort" onchange="this.form.submit()">
-                <optgroup label="Collection">
+                <optgroup label="Sort by">
                   <option value="added_desc" {{ sort=='added_desc'?'selected':'' }}>Added (newest)</option>
                   <option value="added_asc" {{ sort=='added_asc'?'selected':'' }}>Added (oldest)</option>
-                  <option value="rating_desc" {{ sort=='rating_desc'?'selected':'' }}>Rating (high→low)</option>
-                  <option value="rating_asc" {{ sort=='rating_asc'?'selected':'' }}>Rating (low→high)</option>
-                </optgroup>
-                <optgroup label="Release">
+                  {% if view != 'wantlist' %}
+                    <option value="rating_desc" {{ sort=='rating_desc'?'selected':'' }}>Rating (high→low)</option>
+                    <option value="rating_asc" {{ sort=='rating_asc'?'selected':'' }}>Rating (low→high)</option>
+                  {% endif %}
                   <option value="year_desc" {{ sort=='year_desc'?'selected':'' }}>Year (newest)</option>
                   <option value="year_asc" {{ sort=='year_asc'?'selected':'' }}>Year (oldest)</option>
                   <option value="artist_asc" {{ sort=='artist_asc'?'selected':'' }}>Artist (A→Z)</option>
@@ -81,43 +129,17 @@
                 </optgroup>
               </select>
             </span>
-            <a href="/random" class="muted" style="margin-left:8px">Surprise Me</a>
-            <a href="/stats" class="muted" style="margin-left:8px">Stats</a>
-            <a href="/about" class="muted about-link" style="margin-left:8px">About</a>
           </form>
-          <nav style="display:flex;gap:10px;align-items:center;flex:0 0 auto">
-            <span class="muted" title="Signed in as">{{ auth_user.username }}</span>
-            <a href="/settings" title="Account settings">Settings</a>
-            <form method="post" action="/logout" style="margin:0">
-              <input type="hidden" name="_token" value="{{ csrf_token }}">
-              <button type="submit" class="muted" style="background:transparent;border:1px solid #2a2b2f;border-radius:8px;padding:6px 10px;cursor:pointer;color:inherit">Sign out</button>
-            </form>
-          </nav>
-          {% if chips is defined and chips %}
-            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;width:100%">
-              {% for c in chips %}
-                <span class="muted" style="border:1px solid #2a2b2f;border-radius:999px;padding:2px 10px">{{ c.label }}</span>
-              {% endfor %}
-              <a href="/?per_page={{ per_page }}&sort={{ sort }}" class="muted" style="margin-left:4px">Clear</a>
-            </div>
-          {% endif %}
         </div>
-      {% else %}
-        <nav style="display:flex;gap:10px;align-items:center">
-          <a href="/random" class="muted">Surprise Me</a>
-          <a href="/stats" class="muted">Stats</a>
-          <a href="/about" class="muted">About</a>
-          {% if auth_user %}
-            <a href="/settings">Settings</a>
-            <form method="post" action="/logout" style="margin:0">
-              <input type="hidden" name="_token" value="{{ csrf_token }}">
-              <button type="submit" class="muted" style="background:transparent;border:1px solid #2a2b2f;border-radius:8px;padding:6px 10px;cursor:pointer;color:inherit">Sign out</button>
-            </form>
-          {% else %}
-            <a href="/register">Register</a>
-            <a href="/login">Sign in</a>
-          {% endif %}
-        </nav>
+
+        {% if chips is defined and chips %}
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;width:100%">
+            {% for c in chips %}
+              <span class="muted" style="border:1px solid #2a2b2f;border-radius:999px;padding:2px 10px;font-size:.85rem">{{ c.label }}</span>
+            {% endfor %}
+            <a href="/?view={{ view }}&per_page={{ per_page }}&sort={{ sort }}" class="muted" style="margin-left:4px;font-size:.85rem">Clear</a>
+          </div>
+        {% endif %}
       {% endif %}
     </header>
   </div>
@@ -144,7 +166,7 @@
     {% elseif items is not defined or items|length == 0 %}
       <p class="muted">No items to display. If you already ran the sync, try refreshing. Otherwise run: <code>php bin/console sync:initial</code>.</p>
     {% else %}
-      {% set return_to = '/?per_page=' ~ per_page ~ '&sort=' ~ sort ~ '&page=' ~ page ~ (q is defined and q ? '&q=' ~ (q|url_encode) : '') %}
+      {% set return_to = '/?view=' ~ (view|default('collection')) ~ '&per_page=' ~ per_page ~ '&sort=' ~ sort ~ '&page=' ~ page ~ (q is defined and q ? '&q=' ~ (q|url_encode) : '') %}
       <div class="grid">
         {% for it in items %}
           <div class="card" title="{{ it.title }} — {{ it.artist|strip_discogs_suffix }}">
@@ -158,13 +180,47 @@
               </a>
             {% endif %}
             <div class="meta">
-              <div class="title"><a href="/release/{{ it.id }}?return={{ return_to|url_encode }}">{{ it.title }}</a></div>
+              <div class="title">
+                {% if it.is_discogs_result %}
+                  <span title="Discogs Result" style="cursor:help">🌐</span>
+                {% endif %}
+                <a href="/release/{{ it.id }}?return={{ return_to|url_encode }}">{{ it.title }}</a>
+              </div>
               <div class="artist">
-                <a href="/?per_page={{ per_page }}&sort={{ sort }}&q={{ ('artist:\"' ~ it.artist ~ '\"')|url_encode }}">{{ it.artist|strip_discogs_suffix }}</a>
+                {% if it.is_discogs_result %}
+                  {# artist name is often included in title for discogs search results #}
+                {% else %}
+                  <a href="/?view={{ view|default('collection') }}&per_page={{ per_page }}&sort={{ sort }}&q={{ ('artist:\"' ~ it.artist ~ '\"')|url_encode }}">{{ it.artist|strip_discogs_suffix }}</a>
+                {% endif %}
                 {% if it.year %}
-                  • <a href="/?per_page={{ per_page }}&sort={{ sort }}&q={{ ('year:' ~ it.year)|url_encode }}">{{ it.year }}</a>
+                  {% if not it.is_discogs_result %} • {% endif %}
+                  <a href="/?view={{ view|default('collection') }}&per_page={{ per_page }}&sort={{ sort }}&q={{ ('year:' ~ it.year)|url_encode }}">{{ it.year }}</a>
                 {% endif %}
               </div>
+              
+              {% if it.is_discogs_result %}
+                <div class="action-btns">
+                  <form method="post" action="/release/add">
+                    <input type="hidden" name="_token" value="{{ csrf_token }}">
+                    <input type="hidden" name="release_id" value="{{ it.id }}">
+                    <input type="hidden" name="action" value="add_collection">
+                    <input type="hidden" name="return" value="{{ return_to }}">
+                    <button type="submit" class="btn-small" {{ it.in_collection or it.in_wantlist ? 'disabled' : '' }}>+ Collection</button>
+                  </form>
+                  <form method="post" action="/release/add">
+                    <input type="hidden" name="_token" value="{{ csrf_token }}">
+                    <input type="hidden" name="release_id" value="{{ it.id }}">
+                    <input type="hidden" name="action" value="add_want">
+                    <input type="hidden" name="return" value="{{ return_to }}">
+                    <button type="submit" class="btn-small" {{ it.in_collection or it.in_wantlist ? 'disabled' : '' }}>+ Wantlist</button>
+                  </form>
+                </div>
+                {% if it.in_collection %}
+                  <div class="muted" style="font-size:.75rem;margin-top:4px">Already in Collection</div>
+                {% elseif it.in_wantlist %}
+                  <div class="muted" style="font-size:.75rem;margin-top:4px">Already in Wantlist</div>
+                {% endif %}
+              {% endif %}
             </div>
           </div>
         {% endfor %}
@@ -172,7 +228,7 @@
 
       {% if total_pages is defined and total_pages > 1 %}
         <nav aria-label="Pagination" style="margin-top:28px">
-          {% set base = '/?per_page=' ~ per_page ~ '&sort=' ~ sort ~ (q is defined and q ? '&q=' ~ (q|url_encode) : '') %}
+          {% set base = '/?view=' ~ (view|default('collection')) ~ '&per_page=' ~ per_page ~ '&sort=' ~ sort ~ (q is defined and q ? '&q=' ~ (q|url_encode) : '') %}
           {% set hasPrev = page > 1 %}
           {% set hasNext = page < total_pages %}
           {% set prev = page - 1 %}

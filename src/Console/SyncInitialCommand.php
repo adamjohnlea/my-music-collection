@@ -88,18 +88,30 @@ class SyncInitialCommand extends Command
         $http = (new DiscogsHttpClient($userAgent, $token, $kv))->client();
         $output->writeln('<comment>HTTP client configured for Discogs API.</comment>');
 
-        // Run importer
+        // Run importers
         // Store relative image paths in DB (e.g., public/images/...)
         $imgDir = $config->env('IMG_DIR', 'public/images') ?? 'public/images';
         $importer = new CollectionImporter($http, $pdo, $kv, $imgDir);
-        $output->writeln(sprintf('<info>Starting import for user %s …</info>', $username));
+        $wantImporter = new \App\Sync\WantlistImporter($http, $pdo, $kv, $imgDir);
+
+        $output->writeln(sprintf('<info>Starting collection import for user %s …</info>', $username));
         $totalImported = 0;
         $importer->importAll($username, 100, function (int $page, int $count, ?int $totalPages) use ($output, &$totalImported) {
             $totalImported += $count;
             $label = $totalPages ? "$page/$totalPages" : (string)$page;
             $output->writeln(sprintf('  - Page %s: %d items', $label, $count));
         });
-        $output->writeln(sprintf('<info>Import complete. %d items processed.</info>', $totalImported));
+        $output->writeln(sprintf('<info>Collection import complete. %d items processed.</info>', $totalImported));
+
+        $output->writeln(sprintf('<info>Starting wantlist import for user %s …</info>', $username));
+        $totalWants = 0;
+        $wantImporter->importAll($username, 100, function (int $page, int $count, ?int $totalPages) use ($output, &$totalWants) {
+            $totalWants += $count;
+            $label = $totalPages ? "$page/$totalPages" : (string)$page;
+            $output->writeln(sprintf('  - Page %s: %d items', $label, $count));
+        });
+        $output->writeln(sprintf('<info>Wantlist import complete. %d items processed.</info>', $totalWants));
+
         $output->writeln('<comment>Next: download local cover images with</comment> <info>php bin/console images:backfill --limit=200</info>');
 
         return self::SUCCESS;

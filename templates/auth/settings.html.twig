@@ -66,6 +66,10 @@
             <label>Discogs user token</label>
             <input type="password" name="discogs_token" value="{{ discogs_token|default('') }}" autocomplete="off">
           </div>
+          <div style="display:flex;align-items:center;gap:10px;margin:8px 0">
+            <input type="checkbox" name="discogs_search_exclude_title" value="1" id="exclude_title" {{ discogs_search_exclude_title ? 'checked' : '' }} style="width:auto">
+            <label for="exclude_title" style="font-weight:normal;cursor:pointer">Exclude Discogs search results that match existing release titles in my collection/wantlist</label>
+          </div>
           <div class="actions">
             <button type="submit">Save</button>
             <a href="/">Back to home</a>

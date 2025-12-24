@@ -29,6 +29,7 @@
     .page-btn.is-current{background:linear-gradient(135deg,#222631,#1a1d24);border-color:#3a3d44;box-shadow:0 0 0 1px rgba(103,232,249,.2) inset;color:#fff}
     .page-btn.is-disabled{opacity:.5;pointer-events:none}
     .page-ellipsis{color:var(--muted);padding:0 6px}
+    .stats{font-size:.9rem}
     @media (max-width: 640px){
       .wrap{margin:20px auto}
       header{gap:12px}
@@ -49,7 +50,7 @@
     <header>
       <h1><a href="./" style="color:inherit;text-decoration:none">{{ title }}</a></h1>
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;width:100%">
-        <div id="stats" class="muted stats">{{ total|default(0) }} items</div>
+        <div id="stats" class="muted stats" style="padding-top:20px">{{ total|default(0) }} items</div>
         <form id="search-form" class="toolbar" method="get" action="./" style="flex:1 1 auto">
           <input id="search-input" class="search-input" type="text" name="q" value="{{ q|default('')|e }}" placeholder="Search artist:miles year:1980..1989 barcode:…" />
           <input type="hidden" name="page" value="1" />
