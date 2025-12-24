@@ -62,6 +62,7 @@ class CollectionController extends BaseController
         $match = $parsed['match'] ?? '';
         $yearFrom = $parsed['year_from'] ?? null;
         $yearTo = $parsed['year_to'] ?? null;
+        $masterId = $parsed['master_id'] ?? null;
         $chips = $parsed['chips'] ?? [];
         $filters = $parsed['filters'] ?? [];
         $isDiscogs = $parsed['is_discogs'] ?? false;
@@ -95,16 +96,9 @@ class CollectionController extends BaseController
         $itemsTable = $view === 'wantlist' ? 'wantlist_items' : 'collection_items';
 
         if ($q !== '') {
-            $useFts = ($match !== '');
-            if ($useFts) {
-                $total = $this->releaseRepository->countSearch($match, $yearFrom, $yearTo, $usernameFilter, $itemsTable);
-                $totalPages = $total > 0 ? (int)ceil($total / $perPage) : 1;
-                $rows = $this->releaseRepository->search($match, $yearFrom, $yearTo, $usernameFilter, $itemsTable, $orderBy, $perPage, $offset);
-            } else {
-                $total = $this->releaseRepository->countSearch('', $yearFrom, $yearTo, $usernameFilter, $itemsTable);
-                $totalPages = $total > 0 ? (int)ceil($total / $perPage) : 1;
-                $rows = $this->releaseRepository->search('', $yearFrom, $yearTo, $usernameFilter, $itemsTable, $orderBy, $perPage, $offset);
-            }
+            $total = $this->releaseRepository->countSearch($match, $yearFrom, $yearTo, $masterId, $usernameFilter, $itemsTable);
+            $totalPages = $total > 0 ? (int)ceil($total / $perPage) : 1;
+            $rows = $this->releaseRepository->search($match, $yearFrom, $yearTo, $masterId, $usernameFilter, $itemsTable, $orderBy, $perPage, $offset);
         } else {
             $total = $this->releaseRepository->countAll($usernameFilter, $itemsTable);
             $totalPages = $total > 0 ? (int)ceil($total / $perPage) : 1;
@@ -194,14 +188,19 @@ class CollectionController extends BaseController
         
         // Map our internal filter keys to Discogs API search parameters
         $params = [
-            'type' => 'release',
             'per_page' => $perPage,
             'page' => $page,
         ];
 
+        if (isset($filters['type'])) {
+            $params['type'] = $filters['type'];
+        } else {
+            $params['type'] = 'release';
+        }
+
         foreach ($filters as $key => $val) {
             // Discogs API supports these parameters
-            if (in_array($key, ['q', 'artist', 'title', 'label', 'genre', 'style', 'country', 'format', 'catno', 'barcode', 'year'])) {
+            if (in_array($key, ['q', 'artist', 'title', 'label', 'genre', 'style', 'country', 'format', 'catno', 'barcode', 'year', 'type', 'master'])) {
                 if ($key === 'year') {
                     // Convert 1980..1985 to 1980-1985 for Discogs API compatibility
                     $val = str_replace('..', '-', $val);

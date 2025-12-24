@@ -38,7 +38,7 @@ class SqliteReleaseRepository implements ReleaseRepositoryInterface
         return $st->fetchColumn() ?: null;
     }
 
-    public function search(string $match, ?int $yearFrom, ?int $yearTo, string $username, string $itemsTable, string $orderBy, int $limit, int $offset): array
+    public function search(string $match, ?int $yearFrom, ?int $yearTo, ?int $masterId, string $username, string $itemsTable, string $orderBy, int $limit, int $offset): array
     {
         $hasMatch = $match !== '';
         $sql = "SELECT r.id, r.title, r.artist, r.year, r.thumb_url, r.cover_url,
@@ -50,6 +50,7 @@ class SqliteReleaseRepository implements ReleaseRepositoryInterface
         WHERE " . ($hasMatch ? "releases_fts MATCH :match" : "1=1") .
         ($yearFrom !== null ? " AND r.year >= :y1" : "") .
         ($yearTo !== null ? " AND r.year <= :y2" : "") .
+        ($masterId !== null ? " AND r.master_id = :mid" : "") .
         " AND EXISTS (SELECT 1 FROM $itemsTable ci WHERE ci.release_id = r.id AND ci.username = :u)
         GROUP BY r.id
         ORDER BY $orderBy
@@ -60,24 +61,27 @@ class SqliteReleaseRepository implements ReleaseRepositoryInterface
         $stmt->bindValue(':u', $username);
         if ($yearFrom !== null) $stmt->bindValue(':y1', $yearFrom, PDO::PARAM_INT);
         if ($yearTo !== null) $stmt->bindValue(':y2', $yearTo, PDO::PARAM_INT);
+        if ($masterId !== null) $stmt->bindValue(':mid', $masterId, PDO::PARAM_INT);
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function countSearch(string $match, ?int $yearFrom, ?int $yearTo, string $username, string $itemsTable): int
+    public function countSearch(string $match, ?int $yearFrom, ?int $yearTo, ?int $masterId, string $username, string $itemsTable): int
     {
         $hasMatch = $match !== '';
         $sql = "SELECT COUNT(DISTINCT r.id) FROM " . ($hasMatch ? "releases_fts f JOIN releases r ON r.id = f.rowid" : "releases r") . " WHERE " . ($hasMatch ? "releases_fts MATCH :m" : "1=1") . " AND EXISTS (SELECT 1 FROM $itemsTable ci WHERE ci.release_id = r.id AND ci.username = :u)";
         if ($yearFrom !== null) $sql .= " AND r.year >= :y1";
         if ($yearTo !== null) $sql .= " AND r.year <= :y2";
+        if ($masterId !== null) $sql .= " AND r.master_id = :mid";
         
         $st = $this->pdo->prepare($sql);
         if ($hasMatch) $st->bindValue(':m', $match);
         $st->bindValue(':u', $username);
         if ($yearFrom !== null) $st->bindValue(':y1', $yearFrom, PDO::PARAM_INT);
         if ($yearTo !== null) $st->bindValue(':y2', $yearTo, PDO::PARAM_INT);
+        if ($masterId !== null) $st->bindValue(':mid', $masterId, PDO::PARAM_INT);
         $st->execute();
         return (int)$st->fetchColumn();
     }

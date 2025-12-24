@@ -4,3 +4,25 @@ q: devo, isDiscogs: false, username: aj_vinyl_and_music
 q: discogs: artist:devo, isDiscogs: true, username: aj_vinyl_and_music
 q: discogs: artist:devo year:1983..1984, isDiscogs: true, username: aj_vinyl_and_music
 q: , isDiscogs: false, username: aj_vinyl_and_music
+q: , isDiscogs: false, username: aj_vinyl_and_music
+q: , isDiscogs: false, username: aj_vinyl_and_music
+q: discogs: artist:devo year:1982, isDiscogs: true, username: aj_vinyl_and_music
+q: discogs: artist:devo year:1982, isDiscogs: true, username: aj_vinyl_and_music
+q: discogs: artist:devo year:1982, isDiscogs: true, username: aj_vinyl_and_music
+q: discogs: artist:devo year:1982, isDiscogs: true, username: aj_vinyl_and_music
+q: discogs: artist:devo year:1982 title:"oh no it's devo", isDiscogs: true, username: aj_vinyl_and_music
+q: , isDiscogs: false, username: aj_vinyl_and_music
+q: , isDiscogs: false, username: aj_vinyl_and_music
+q: , isDiscogs: false, username: aj_vinyl_and_music
+q: , isDiscogs: false, username: aj_vinyl_and_music
+q: discogs: barcode:0075992585415, isDiscogs: true, username: aj_vinyl_and_music
+q: , isDiscogs: false, username: aj_vinyl_and_music
+q: discogs: artist:devo year:1982 type:master, isDiscogs: true, username: aj_vinyl_and_music
+q: , isDiscogs: false, username: aj_vinyl_and_music
+q: devo, isDiscogs: false, username: aj_vinyl_and_music
+q: jack white, isDiscogs: false, username: aj_vinyl_and_music
+q: artist: jack white, isDiscogs: false, username: aj_vinyl_and_music
+q: , isDiscogs: false, username: aj_vinyl_and_music
+q: discogs: artist:devo year:1982 type:master, isDiscogs: true, username: aj_vinyl_and_music
+q: discogs: artist:devo year:1982 type:release, isDiscogs: true, username: aj_vinyl_and_music
+q: , isDiscogs: false, username: aj_vinyl_and_music

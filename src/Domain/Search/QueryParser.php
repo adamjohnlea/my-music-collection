@@ -64,17 +64,31 @@ final class QueryParser
             'identifier' => 'identifier_text',
             'barcode' => 'identifier_text',
             'notes' => 'release_notes', // also search user_notes separately
+            'type' => 'type', // dummy mapping for filters
         ];
 
         $ftsParts = [];
         $chips = [];
         $filters = [];
         $yearFrom = null; $yearTo = null;
+        $masterId = null;
         $general = [];
 
         foreach ($tokens as $tok) {
             $tok = trim($tok);
             if ($tok === '') continue;
+
+            // master filter (special case for numeric-only master)
+            if (preg_match('/^master:(\d+)$/i', $tok, $m)) {
+                $val = $m[1];
+                $masterId = (int)$val;
+                $filters['master'] = $val;
+                // Note: master_id is NOT an FTS column, so we just add it to filters.
+                // It will be handled as a general filter for Discogs search.
+                // For local search, FTS won't find it unless we add it to FTS table.
+                $chips[] = ['label' => 'Master: ' . $val];
+                continue;
+            }
 
             // year filter
             if (str_starts_with(strtolower($tok), 'year:')) {
@@ -105,6 +119,10 @@ final class QueryParser
                     if (!str_contains($quoted, ' ') && !str_ends_with($quoted, '*')) $quoted .= '*';
                 }
                 if (isset($colMap[$key])) {
+                    if ($key === 'type') {
+                        $chips[] = ['label' => 'Type: '.$cleanVal];
+                        continue;
+                    }
                     $col = $colMap[$key];
                     if ($key === 'notes') {
                         $ftsParts[] = $col.':'.$quoted;
@@ -136,6 +154,7 @@ final class QueryParser
             'match' => $match,
             'year_from' => $yearFrom,
             'year_to' => $yearTo,
+            'master_id' => $masterId,
             'chips' => $chips,
             'filters' => $filters,
             'is_discogs' => $isDiscogsSearch,
