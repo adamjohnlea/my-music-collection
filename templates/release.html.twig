@@ -68,6 +68,31 @@
       <p style="margin:0"><a href="{{ back_url|default('/') }}" style="background:var(--card);border:1px solid #2a2b2f;padding:6px 12px;border-radius:8px;color:var(--text);font-size:.9rem;text-decoration:none">← Back</a></p>
     </div>
     {% if release %}
+      {% if saved %}
+        <div id="flash-message" style="margin-bottom:24px; padding:12px 16px; border-radius:8px; background:{% if saved == 'queued' %}rgba(16,185,129,.1){% else %}rgba(239,68,68,.1){% endif %}; border:1px solid {% if saved == 'queued' %}#10b981{% else %}#ef4444{% endif %}; color:{% if saved == 'queued' %}#10b981{% else %}#ef4444{% endif %};">
+          {% if saved == 'queued' %}
+            Changes queued for Discogs sync.
+          {% elseif saved == 'invalid_csrf' %}
+            Invalid security token. Please try again.
+          {% elseif saved == 'invalid_data' %}
+            Invalid data submitted.
+          {% elseif saved == 'no_instance' %}
+            Release instance not found in your collection.
+          {% else %}
+            An error occurred while saving your changes.
+          {% endif %}
+        </div>
+        <script>
+          setTimeout(() => {
+            const flash = document.getElementById('flash-message');
+            if (flash) {
+              flash.style.transition = 'opacity 0.5s ease-out';
+              flash.style.opacity = '0';
+              setTimeout(() => flash.remove(), 500);
+            }
+          }, 5000);
+        </script>
+      {% endif %}
       <div class="layout">
         <div>
           <div class="carousel-container" id="carousel">
@@ -409,6 +434,14 @@
               contents.forEach(c => c.classList.toggle('active', c.id === `tab-${target}`));
             });
           });
+
+          // Handle tab parameter in URL
+          const urlParams = new URLSearchParams(window.location.search);
+          const activeTab = urlParams.get('tab');
+          if (activeTab) {
+            const tabEl = document.querySelector(`.tab[data-tab="${activeTab}"]`);
+            if (tabEl) tabEl.click();
+          }
 
           // Swipe support for carousel (basic)
           let startX = 0;

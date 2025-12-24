@@ -144,6 +144,7 @@ class ReleaseController extends BaseController
             'images' => $images,
             'details' => $details,
             'saved' => $_GET['saved'] ?? null,
+            'tab' => $_GET['tab'] ?? null,
             'back_url' => $backUrl,
         ]);
     }
@@ -225,7 +226,7 @@ class ReleaseController extends BaseController
 
         $ret = null;
         if (isset($_POST['return']) && is_string($_POST['return']) && str_starts_with($_POST['return'], '/')) $ret = $_POST['return'];
-        $qs = http_build_query(['saved' => ($ok ? $msg : $msg), 'sr' => $rating, 'sn' => $notes, 'smc' => $mediaCondition, 'ssc' => $sleeveCondition]);
+        $qs = http_build_query(['saved' => ($ok ? $msg : $msg), 'tab' => 'status', 'sr' => $rating, 'sn' => $notes, 'smc' => $mediaCondition, 'ssc' => $sleeveCondition]);
         if ($ret) $qs .= '&return=' . rawurlencode($ret);
         $this->redirect('/release/' . $rid . '?' . $qs);
     }

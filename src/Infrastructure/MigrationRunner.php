@@ -84,6 +84,11 @@ class MigrationRunner
                 $this->setVersion('12');
                 $version = '12';
             }
+            if ($version === '12') {
+                $this->migrateToV13();
+                $this->setVersion('13');
+                $version = '13';
+            }
 
             $this->pdo->commit();
 
@@ -381,6 +386,13 @@ class MigrationRunner
         $this->pdo->exec("DROP TABLE IF EXISTS users");
 
         $this->pdo->exec("PRAGMA foreign_keys = ON");
+    }
+
+    private function migrateToV13(): void
+    {
+        // Add media_condition and sleeve_condition to push_queue
+        $this->pdo->exec("ALTER TABLE push_queue ADD COLUMN media_condition TEXT");
+        $this->pdo->exec("ALTER TABLE push_queue ADD COLUMN sleeve_condition TEXT");
     }
 
     public function rebuildSearch(): void
