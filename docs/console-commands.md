@@ -14,7 +14,7 @@ Commands overview
 - sync:enrich — fetch full release details and augment existing rows.
 - images:backfill — download missing local cover images with throttling/quotas.
 - search:rebuild — rebuild the FTS index from current DB data.
-- sync:push — push queued rating/notes changes to Discogs.
+- sync:push — push queued rating/note/condition changes to Discogs.
 
 Note: All commands resolve DB_PATH to an absolute path outside public/ and run migrations at startup via MigrationRunner, which creates/updates tables and ensures the FTS schema is healthy.
 
@@ -155,15 +155,13 @@ Destructive actions?
 
 sync:push (src/Console/SyncPushCommand.php)
 Purpose
-- Sends queued changes (rating and optionally notes) back to Discogs for collection instances.
+- Sends queued changes (rating, media/sleeve condition, and personal notes) back to Discogs for collection instances.
 
 Functions in this command
 - execute(input, output): int
   - Loads .env (if present), resolves DB path, runs migrations.
   - Validates DISCOGS_USERNAME and DISCOGS_USER_TOKEN.
   - Creates KvStore, DiscogsHttpClient, and DiscogsCollectionWriter.
-  - Feature flag PUSH_NOTES=1 enables sending notes; otherwise only ratings are sent.
-  - If sending notes, resolves the field_id of the built-in Notes field via users/{username}/collection/fields.
   - Fetches up to 50 pending jobs from push_queue.
   - For each job:
     - Looks up folder_id for the instance from collection_items (fallback to 1 if unknown).
