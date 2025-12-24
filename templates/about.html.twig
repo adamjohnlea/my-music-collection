@@ -36,11 +36,11 @@
       <div class="meta">
         <h2 style="margin:0 0 8px 0; font-size:1.2rem;">How it works</h2>
         <ol style="margin:0 0 0 20px; padding:0;">
-          <li>Initial sync: we call the Discogs API <code>/users/{username}/collection/folders/0/releases</code> to import your collection into a local SQLite database.</li>
+          <li>Initial sync: we call the Discogs API to import your collection and wantlist into a local SQLite database.</li>
           <li>Local-first UI: the web app reads only from your database and local images for fast, offline‑friendly browsing.</li>
-          <li>Optional enrichment: when you choose, we fetch full release details from <code>/releases/{id}</code> (tracklist, genres/styles, credits, companies, identifiers, notes, videos) and store them locally.</li>
+          <li>Optional enrichment: when you choose, we fetch full release details from the Discogs API (tracklist, genres/styles, credits, companies, identifiers, notes, videos) and store them locally.</li>
           <li>Image cache: cover and gallery images are downloaded to <code>public/images/</code> with a conservative throttle (≈1 req/sec, ≤1000/day).</li>
-          <li>Incremental refresh: an optional job updates only items added/changed since your last run.</li>
+          <li>Incremental refresh: an optional job updates only items added/changed since your last run (both collection and wantlist).</li>
         </ol>
       </div>
     </div>
@@ -52,6 +52,11 @@
           <li>Fast, local browsing from SQLite + cached images (no live API calls during normal use).</li>
           <li>Smart rate limiting and retries that respect Discogs headers and Retry‑After.</li>
           <li>Full release details (optional) including tracklist, credits, companies, identifiers, videos, and notes.</li>
+          <li>Wantlist support: view and manage your Discogs wantlist locally.</li>
+          <li>Smart Collections: save any search as a shortcut in your sidebar for quick access.</li>
+          <li>Collection Statistics: view insights on your collection by artist, genre, decade, and format.</li>
+          <li>Randomizer: use the "Surprise Me" button to pick a random release from your collection.</li>
+          <li>Live Search: find releases on Discogs and add them to your collection or wantlist directly.</li>
           <li>Image gallery with a lightbox viewer; collection grid prefers the original cover image.</li>
           <li>Powerful search (SQLite FTS5): search by artist, title, label, format, genre/style, country, year, identifiers (barcode/catno/matrix), credits/companies, and notes.</li>
           <li>Useful sorts: Added date, Year, Artist, Title, Rating (with stable tie‑breakers).</li>
@@ -120,13 +125,14 @@
     <div class="card" style="margin-top:16px;">
       <div class="meta">
         <h2 style="margin:0 0 8px 0; font-size:1.2rem;">Commands</h2>
-        <ul>
-          <li><code>php bin/console sync:initial</code> — initial import</li>
+        <ul style="margin:0 0 0 20px; padding:0;">
+          <li><code>php bin/console sync:initial</code> — initial import (collection and wantlist)</li>
           <li><code>php bin/console sync:refresh</code> — incremental refresh (new/changed items)</li>
           <li><code>php bin/console sync:enrich --limit=100</code> — fetch full release details</li>
           <li><code>php bin/console images:backfill --limit=200</code> — download covers to local cache</li>
           <li><code>php bin/console search:rebuild</code> — rebuild search index</li>
-          <li><code>php bin/console sync:push</code> — push queued rating changes to Discogs</li>
+          <li><code>php bin/console sync:push</code> — push queued rating/note/collection changes to Discogs</li>
+          <li><code>php bin/console export:static</code> — generate a portable static site</li>
         </ul>
       </div>
     </div>
@@ -134,14 +140,15 @@
     <div class="card" style="margin-top:16px;">
       <div class="meta">
         <h2 style="margin:0 0 8px 0; font-size:1.2rem;">What’s new</h2>
-        <p class="muted" style="margin-top:0">Last updated: 2025-09-18 14:39</p>
+        <p class="muted" style="margin-top:0">Last updated: 2025-12-24 01:30</p>
         <ul style="margin:0 0 0 20px; padding:0;">
-          <li>Ratings push to Discogs: edit rating on a release, then run <code>php bin/console sync:push</code> to sync.</li>
-          <li>Personal notes are local-only: editable/searchable in the app; not sent to Discogs.</li>
-          <li>Cleaner release page: single “My Notes” card with inline Edit/Save (no more two stacked sections).</li>
-          <li>Collection grid links: artist name now links to <code>artist:"…"</code> search; year links to <code>year:YYYY</code>.</li>
-          <li>Discogs suffix cleanup: display hides trailing numeric disambiguation like <code>(2)</code> for artists/labels.</li>
-          <li>Push queue and CLI: background job queue with retries and clearer error diagnostics.</li>
+          <li>Wantlist support: Initial sync and refresh now include your Discogs wantlist. Toggle between Collection and Wantlist in the header.</li>
+          <li>Live Discogs Search: Search the Discogs database directly (use <code>discogs:</code> prefix or the button) and add releases to your local DB.</li>
+          <li>Smart Collections: Save your frequent searches as shortcuts in the sidebar.</li>
+          <li>Statistics page: Visualize your collection's composition by artist, genre, decade, and format.</li>
+          <li>Randomizer: "Surprise Me" button to help you pick what to listen to.</li>
+          <li>Static Site Generator: Export your collection as a portable static site using <code>php bin/console export:static</code>.</li>
+          <li>Ratings and notes push: Edit ratings and notes locally and push them to Discogs via <code>php bin/console sync:push</code>.</li>
         </ul>
       </div>
     </div>

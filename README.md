@@ -7,12 +7,17 @@ Local‑first Discogs collection viewer written in PHP 8.4. Imports your collect
 ## Features
 - Local‑first: SQLite database + cached images (no API calls during normal browsing)
 - Discogs‑aware HTTP client: header‑driven rate limiting + robust retries
-- Initial sync and incremental refresh
+- Initial sync and incremental refresh of your Collection and Wantlist
 - Optional enrichment with full release details (tracklist, credits, companies, identifiers, notes, videos)
 - Image cache with 1 req/sec throttle and 1000/day cap (persisted)
 - Search anything (SQLite FTS5) with field prefixes and year ranges
 - Sorting: Added date (default), Year, Artist, Title, Rating
 - Clean, responsive UI with a lightbox gallery and sticky header
+- Smart Collections: save your searches as sidebar shortcuts
+- Statistics: visualization of your collection by artist, genre, decade, and format
+- Randomizer: "Surprise Me" button to pick a random release from your collection
+- Live Discogs Search: find and add releases directly to your collection or wantlist from the web UI
+- Static Site Generator: export your collection as a standalone, portable web app
 
 ## Prerequisites
 - PHP 8.4 (Herd recommended)
@@ -44,7 +49,7 @@ php -S 127.0.0.1:8000 -t public
 ```
 Open http://127.0.0.1:8000/ → Register, sign in, then go to Settings and save your Discogs username and user token (encrypted at rest).
 
-4) Initial sync (creates DB and imports your collection)
+4) Initial sync (creates DB and imports your collection and wantlist)
 ```
 php bin/console sync:initial
 ```
@@ -52,7 +57,7 @@ Important: You must be signed in (step 3). If the database already contains data
 ```
 php bin/console sync:refresh
 ```
-This preserves any enriched details and updates basic fields incrementally.
+This preserves any enriched details and updates basic fields for both collection and wantlist incrementally.
 
 5) Optional: enrich releases with full details
 ```
@@ -114,13 +119,13 @@ One search box with field prefixes and ranges. Examples:
 - Personal notes: Notes are local‑only in this app. They are stored in your local SQLite database and searchable here, but they are not sent to Discogs.
 
 ## Commands overview
-- php bin/console sync:initial — initial import
-- php bin/console sync:refresh [--pages=N | --since=ISO8601] — incremental refresh
-- php bin/console sync:enrich [--limit=N | --id=RELEASE_ID] — full details
-- php bin/console images:backfill [--limit=N] — download covers to local cache
-- php bin/console search:rebuild — rebuild FTS index
-- php bin/console sync:push — push queued rating changes to Discogs
-- php bin/console export:static [--out=dist] [--base-url=/] [--copy-images] [--chunk-size=N] — generate a static site of your collection
+- `php bin/console sync:initial` — initial import of collection and wantlist
+- `php bin/console sync:refresh [--pages=N | --since=ISO8601]` — incremental refresh
+- `php bin/console sync:enrich [--limit=N | --id=RELEASE_ID]` — full details
+- `php bin/console images:backfill [--limit=N]` — download covers to local cache
+- `php bin/console search:rebuild` — rebuild FTS index
+- `php bin/console sync:push` — push queued rating/note/collection changes to Discogs
+- `php bin/console export:static [--out=dist] [--base-url=/] [--copy-images] [--chunk-size=N]` — generate a static site of your collection
 
 For a function‑by‑function breakdown and safety notes for each command, see docs/console-commands.md
 
