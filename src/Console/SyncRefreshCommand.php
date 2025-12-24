@@ -38,29 +38,16 @@ class SyncRefreshCommand extends Command
         (new MigrationRunner($storage->pdo()))->run();
         $pdo = $storage->pdo();
 
-        // Use the currently logged-in user (from kv_store)
+        // Resolve Discogs credentials from config
+        $username = $config->getDiscogsUsername();
+        $token = $config->getDiscogsToken();
+
+        if (!$username || !$token) {
+            $output->writeln('<error>Discogs credentials (DISCOGS_USERNAME and DISCOGS_TOKEN) not found in .env</error>');
+            return 2;
+        }
+
         $kv = new KvStore($pdo);
-        $uidStr = $kv->get('current_user_id', '');
-        $uid = (int)($uidStr ?: '0');
-        if ($uid <= 0) {
-            $output->writeln('<error>No user is logged in. Please sign in via the web app first.</error>');
-            return 2;
-        }
-        $appKey = $config->getAppKey();
-        $crypto = new \App\Infrastructure\Crypto($appKey, $baseDir);
-        $st = $pdo->prepare('SELECT discogs_username, discogs_token_enc FROM auth_users WHERE id = :id');
-        $st->execute([':id' => $uid]);
-        $row = $st->fetch();
-        $username = $row && $row['discogs_username'] ? (string)$row['discogs_username'] : '';
-        $token = '';
-        if ($row && $row['discogs_token_enc']) {
-            $dec = $crypto->decrypt((string)$row['discogs_token_enc']);
-            $token = $dec ?: '';
-        }
-        if ($username === '' || $token === '') {
-            $output->writeln('<error>Your Discogs credentials are not configured. Go to /settings and save your Discogs username and token.</error>');
-            return 2;
-        }
 
         // Reuse KvStore for rate limiting and cursors
         $http = (new DiscogsHttpClient($userAgent, $token, $kv))->client();
@@ -134,6 +121,9 @@ class SyncRefreshCommand extends Command
         $code = $resp->getStatusCode();
         $body = (string)$resp->getBody();
         if ($code !== 200) {
+            if ($code === 404 && str_contains($body, 'User does not exist')) {
+                throw new \RuntimeException(sprintf("Discogs API error: User '%s' does not exist or may have been deleted. Please check DISCOGS_USERNAME in your .env file.", $username));
+            }
             throw new \RuntimeException("Discogs API error: HTTP $code body=$body");
         }
         $json = json_decode($body, true, flags: JSON_THROW_ON_ERROR);

@@ -22,6 +22,7 @@ class MigrationRunner
             $stmt = $this->pdo->prepare('SELECT v FROM kv_store WHERE k = :k');
             $stmt->execute([':k' => 'schema_version']);
             $version = $stmt->fetchColumn() ?: '0';
+            $stmt->closeCursor();
 
             if ($version === '0') {
                 $this->migrateToV1();
@@ -77,6 +78,11 @@ class MigrationRunner
                 $this->migrateToV11();
                 $this->setVersion('11');
                 $version = '11';
+            }
+            if ($version === '11') {
+                $this->migrateToV12();
+                $this->setVersion('12');
+                $version = '12';
             }
 
             $this->pdo->commit();
@@ -357,6 +363,24 @@ class MigrationRunner
             created_at TEXT DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES auth_users(id)
         )");
+    }
+
+    private function migrateToV12(): void
+    {
+        // Drop auth_users table and migrate saved_searches to not depend on it
+        // Since we are moving to single-user, we can just hardcode user_id 1 or remove it.
+        // For simplicity and to avoid complex table recreation, we just drop the FK and keep user_id for now, 
+        // but we delete the auth_users table.
+
+        // Disable foreign keys temporarily to allow dropping the table if it's referenced
+        $this->pdo->exec("PRAGMA foreign_keys = OFF");
+        
+        $this->pdo->exec("DROP TABLE IF EXISTS auth_users");
+        
+        // Also remove the old 'users' table if it exists (from V1)
+        $this->pdo->exec("DROP TABLE IF EXISTS users");
+
+        $this->pdo->exec("PRAGMA foreign_keys = ON");
     }
 
     public function rebuildSearch(): void

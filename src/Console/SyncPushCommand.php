@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Console;
 
+use App\Infrastructure\Config;
 use App\Http\DiscogsCollectionWriter;
 use App\Http\DiscogsHttpClient;
 use App\Infrastructure\KvStore;
@@ -18,43 +19,22 @@ class SyncPushCommand extends Command
 {
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $config = new Config();
         $baseDir = dirname(__DIR__, 2);
-        $envFile = $baseDir.'/.env';
-        if (is_file($envFile)) {
-            \Dotenv\Dotenv::createImmutable($baseDir)->load();
-        }
-        $dbPath = $_ENV['DB_PATH'] ?? $_SERVER['DB_PATH'] ?? getenv('DB_PATH') ?? 'var/app.db';
-        if (!($dbPath !== '' && ($dbPath[0] === DIRECTORY_SEPARATOR || preg_match('#^[A-Za-z]:[\\/]#', $dbPath)))) {
-            $dbPath = $baseDir . '/' . ltrim($dbPath, '/');
-        }
+        $dbPath = $config->getDbPath($baseDir);
+        $ua = $config->getUserAgent('MyDiscogsApp/0.1 (+push)');
+
         $storage = new Storage($dbPath);
         (new MigrationRunner($storage->pdo()))->run();
         $pdo = $storage->pdo();
 
-        $ua = $_ENV['USER_AGENT'] ?? $_SERVER['USER_AGENT'] ?? getenv('USER_AGENT') ?? 'MyDiscogsApp/0.1 (+push)';
+        // Resolve Discogs credentials from config
+        $username = $config->getDiscogsUsername();
+        $token = $config->getDiscogsToken();
 
-        // Use current logged-in user (from kv_store)
-        $kv = new KvStore($pdo);
-        $uidStr = $kv->get('current_user_id', '');
-        $uid = (int)($uidStr ?: '0');
-        if ($uid <= 0) {
-            $output->writeln('<error>No user is logged in. Please sign in via the web app first.</error>');
-            return Command::INVALID;
-        }
-        $appKey = $_ENV['APP_KEY'] ?? $_SERVER['APP_KEY'] ?? getenv('APP_KEY') ?: null;
-        $crypto = new \App\Infrastructure\Crypto($appKey, $baseDir);
-        $st = $pdo->prepare('SELECT discogs_username, discogs_token_enc FROM auth_users WHERE id = :id');
-        $st->execute([':id' => $uid]);
-        $row = $st->fetch();
-        $username = $row && $row['discogs_username'] ? (string)$row['discogs_username'] : '';
-        $token = '';
-        if ($row && $row['discogs_token_enc']) {
-            $dec = $crypto->decrypt((string)$row['discogs_token_enc']);
-            $token = $dec ?: '';
-        }
-        if ($username === '' || $token === '') {
-            $output->writeln('<error>Your Discogs credentials are not configured. Go to /settings and save your Discogs username and token.</error>');
-            return Command::INVALID;
+        if (!$username || !$token) {
+            $output->writeln('<error>Discogs credentials (DISCOGS_USERNAME and DISCOGS_TOKEN) not found in .env</error>');
+            return 2;
         }
 
         $kv = new KvStore($pdo);
@@ -63,13 +43,17 @@ class SyncPushCommand extends Command
         $wantWriter = new \App\Http\DiscogsWantlistWriter($client);
 
         // Feature flag: only push notes when explicitly enabled
-        $sendNotes = (($_ENV['PUSH_NOTES'] ?? $_SERVER['PUSH_NOTES'] ?? getenv('PUSH_NOTES')) === '1');
+        $sendNotes = ($config->env('PUSH_NOTES') === '1');
 
         // Resolve the field_id for the built-in "Notes" collection field (only if pushing notes)
         $notesFieldId = null;
         if ($sendNotes) {
             try {
                 $resp = $client->client()->request('GET', sprintf('users/%s/collection/fields', rawurlencode($username)), ['timeout' => 20]);
+                if ($resp->getStatusCode() === 404) {
+                    $output->writeln(sprintf('<error>Discogs API error: User \'%s\' does not exist or may have been deleted. Please check DISCOGS_USERNAME in your .env file.</error>', $username));
+                    return 2;
+                }
                 if ($resp->getStatusCode() >= 200 && $resp->getStatusCode() < 300) {
                     $data = json_decode((string)$resp->getBody(), true);
                     if (is_array($data) && isset($data['fields']) && is_array($data['fields'])) {

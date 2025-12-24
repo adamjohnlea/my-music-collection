@@ -35,28 +35,13 @@ class SyncInitialCommand extends Command
         (new MigrationRunner($storage->pdo()))->run();
         $pdo = $storage->pdo();
 
-        // Resolve currently logged-in user from kv_store
-        $kv = new KvStore($pdo);
-        $uidStr = $kv->get('current_user_id', '');
-        $uid = (int)($uidStr ?: '0');
-        if ($uid <= 0) {
-            $output->writeln('<error>No user is logged in. Please sign in via the web app first.</error>');
+        // Resolve Discogs credentials from config
+        $username = $config->getDiscogsUsername();
+        $token = $config->getDiscogsToken();
+
+        if (!$username || !$token) {
+            $output->writeln('<error>Discogs credentials (DISCOGS_USERNAME and DISCOGS_TOKEN) not found in .env</error>');
             return 2;
-        }
-        $appKey = $config->getAppKey();
-        $crypto = new \App\Infrastructure\Crypto($appKey, $baseDir);
-        $st = $pdo->prepare('SELECT discogs_username, discogs_token_enc FROM auth_users WHERE id = :id');
-        $st->execute([':id' => $uid]);
-        $row = $st->fetch();
-        $username = $row && $row['discogs_username'] ? (string)$row['discogs_username'] : '';
-        $token = '';
-        if ($row && $row['discogs_token_enc']) {
-            $dec = $crypto->decrypt((string)$row['discogs_token_enc']);
-            $token = $dec ?: '';
-        }
-        if ($username === '' || $token === '') {
-            $output->writeln('<error>Your Discogs credentials are not configured. Go to /settings and save your Discogs username and token.</error>');
-            return 2; // invalid
         }
         $output->writeln('<info>Database ready.</info>');
 
@@ -87,6 +72,18 @@ class SyncInitialCommand extends Command
         // Init HTTP client with limiter/retry
         $http = (new DiscogsHttpClient($userAgent, $token, $kv))->client();
         $output->writeln('<comment>HTTP client configured for Discogs API.</comment>');
+
+        // Pre-flight check: Verify if the user exists on Discogs
+        $output->writeln(sprintf('<info>Verifying Discogs user "%s" …</info>', $username));
+        $checkResp = $http->request('GET', sprintf('users/%s', rawurlencode($username)));
+        if ($checkResp->getStatusCode() === 404) {
+            $output->writeln(sprintf('<error>Discogs API error: User "%s" does not exist or may have been deleted. Please check DISCOGS_USERNAME in your .env file.</error>', $username));
+            return 2;
+        }
+        if ($checkResp->getStatusCode() !== 200) {
+            $output->writeln(sprintf('<error>Discogs API error: HTTP %d while verifying user.</error>', $checkResp->getStatusCode()));
+            return 2;
+        }
 
         // Run importers
         // Store relative image paths in DB (e.g., public/images/...)

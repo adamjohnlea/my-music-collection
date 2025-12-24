@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 use App\Infrastructure\ContainerFactory;
 use App\Infrastructure\MigrationRunner;
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\ReleaseController;
 use App\Http\Controllers\SearchController;
@@ -43,21 +42,20 @@ if (empty($_SESSION['csrf'])) {
 }
 
 // Auth context
+$config = new \App\Infrastructure\Config();
+$discogsUsername = $config->getDiscogsUsername();
+$discogsToken = $config->getDiscogsToken();
+
 $currentUser = null;
-if (isset($_SESSION['uid'])) {
-    $userRepo = $container->get(\App\Domain\Repositories\UserRepositoryInterface::class);
-    $row = $userRepo->findById((int)$_SESSION['uid']);
-    if ($row) {
-        $crypto = $container->get(\App\Infrastructure\Crypto::class);
-        $currentUser = [
-            'id' => (int)$row['id'],
-            'username' => (string)$row['username'],
-            'email' => (string)$row['email'],
-            'discogs_username' => $row['discogs_username'] ? (string)$row['discogs_username'] : null,
-            'discogs_token' => $row['discogs_token_enc'] ? $crypto->decrypt((string)$row['discogs_token_enc']) : null,
-            'discogs_search_exclude_title' => (bool)($row['discogs_search_exclude_title'] ?? false),
-        ];
-    }
+if ($discogsUsername && $discogsToken) {
+    $currentUser = [
+        'id' => 1, // Single user mode
+        'username' => 'admin',
+        'email' => 'admin@example.com',
+        'discogs_username' => $discogsUsername,
+        'discogs_token' => $discogsToken,
+        'discogs_search_exclude_title' => (bool)$config->env('DISCOGS_SEARCH_EXCLUDE_TITLE', '0'),
+    ];
 }
 
 // Global Twig variables
@@ -67,10 +65,6 @@ $twig->addGlobal('csrf_token', $_SESSION['csrf'] ?? '');
 
 // Router
 $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
-    $r->addRoute(['GET', 'POST'], '/login', [AuthController::class, 'login']);
-    $r->addRoute(['GET', 'POST'], '/register', [AuthController::class, 'register']);
-    $r->addRoute(['GET', 'POST'], '/logout', [AuthController::class, 'logout']);
-    $r->addRoute(['GET', 'POST'], '/settings', [AuthController::class, 'settings']);
     $r->addRoute('GET', '/about', [CollectionController::class, 'about']);
     $r->addRoute('GET', '/stats', [CollectionController::class, 'stats']);
     $r->addRoute('GET', '/random', [CollectionController::class, 'random']);
@@ -110,9 +104,7 @@ switch ($routeInfo[0]) {
         // Match existing signatures
         if ($handler[0] === ReleaseController::class && $method === 'show') {
             $controller->show((int)$vars['id'], $currentUser);
-        } elseif ($handler[0] === AuthController::class && $method === 'settings') {
-            $controller->settings($currentUser);
-        } elseif (in_array($handler[0], [CollectionController::class, SearchController::class, ReleaseController::class, AuthController::class])) {
+        } elseif (in_array($handler[0], [CollectionController::class, SearchController::class, ReleaseController::class])) {
             $controller->$method($currentUser);
         } else {
             $controller->$method();

@@ -45,6 +45,9 @@ class WantlistImporter
         $code = $resp->getStatusCode();
         $body = (string)$resp->getBody();
         if ($code !== 200) {
+            if ($code === 404) {
+                throw new \RuntimeException(sprintf("Discogs API error: User '%s' does not exist or may have been deleted. Please check DISCOGS_USERNAME in your .env file.", $username));
+            }
             throw new \RuntimeException("Discogs API error: HTTP $code body=$body");
         }
         $json = json_decode($body, true, flags: JSON_THROW_ON_ERROR);

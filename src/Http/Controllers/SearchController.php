@@ -21,7 +21,7 @@ class SearchController extends BaseController
 
     public function save(?array $currentUser): void
     {
-        if (!$currentUser) { $this->redirect('/login'); }
+        if (!$currentUser) { $this->redirect('/'); }
         if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
             if (!$this->isCsrfValid()) {
                 $this->redirect('/?error=csrf');
@@ -38,7 +38,7 @@ class SearchController extends BaseController
 
     public function delete(?array $currentUser): void
     {
-        if (!$currentUser) { $this->redirect('/login'); }
+        if (!$currentUser) { $this->redirect('/'); }
         if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
             if (!$this->isCsrfValid()) {
                 $this->redirect('/?error=csrf');

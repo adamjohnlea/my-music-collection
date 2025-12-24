@@ -150,9 +150,9 @@ class ReleaseController extends BaseController
 
     public function save(?array $currentUser): void
     {
-        if (!$currentUser || empty($currentUser['discogs_username'])) {
+        if (!$currentUser) {
             $rid = (int)($_POST['release_id'] ?? 0);
-            $this->redirect('/login?return=' . rawurlencode('/release/'.$rid));
+            $this->redirect('/');
         }
 
         $rid = (int)($_POST['release_id'] ?? 0);
@@ -232,7 +232,7 @@ class ReleaseController extends BaseController
 
     public function add(?array $currentUser): void
     {
-        if (!$currentUser) { $this->redirect('/login'); }
+        if (!$currentUser) { $this->redirect('/'); }
         if (!$this->isCsrfValid()) { $this->redirect('/'); }
 
         $rid = (int)($_POST['release_id'] ?? 0);

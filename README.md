@@ -23,10 +23,10 @@ Local‑first Discogs collection viewer written in PHP 8.4. Imports your collect
 - PHP 8.4 (Herd recommended)
 - Composer
 - A Discogs account with a personal access token.
-  - Credentials are saved in the web app Settings per user (not in .env).
+  - To get a token: Go to [Discogs Developer Settings](https://www.discogs.com/settings/developers), click **"Generate new token"**, and copy the result.
 
 ## Quick start
-1) Copy `.env.example` to `.env` and fill values (no Discogs credentials here):
+1) Copy `.env.example` to `.env` and fill values (including your Discogs credentials):
 
 ```
 USER_AGENT="MyDiscogsApp/0.1 (+contact: you@example.com)"
@@ -34,8 +34,10 @@ DB_PATH=var/app.db
 IMG_DIR=public/images
 APP_ENV=dev
 APP_DEBUG=1
-# Optional: encryption key for securing web credentials. If omitted, a random key is generated at var/app.key (0600 perms).
-# APP_KEY=base64:...
+
+# Discogs Credentials
+DISCOGS_USERNAME=your_username
+DISCOGS_TOKEN=your_personal_access_token
 ```
 
 2) Install dependencies
@@ -43,17 +45,17 @@ APP_DEBUG=1
 composer install
 ```
 
-3) Run the web app and create your account
+3) Run the web app
 ```
 php -S 127.0.0.1:8000 -t public
 ```
-Open http://127.0.0.1:8000/ → Register, sign in, then go to Settings and save your Discogs username and user token (encrypted at rest).
+Open http://127.0.0.1:8000/
 
 4) Initial sync (creates DB and imports your collection and wantlist)
 ```
 php bin/console sync:initial
 ```
-Important: You must be signed in (step 3). If the database already contains data, `sync:initial` refuses to run unless you pass `--force`. For ongoing usage, prefer:
+Important: If the database already contains data, `sync:initial` refuses to run unless you pass `--force`. For ongoing usage, prefer:
 ```
 php bin/console sync:refresh
 ```
@@ -83,24 +85,6 @@ php bin/console sync:refresh --since=2024-01-01T00:00:00Z
 php bin/console search:rebuild
 ```
 
-## Accounts and settings (web)
-The web app supports user accounts with per‑user Discogs credentials.
-- Registration: visit /register to create an account with a unique username, unique email, and password + confirmation.
-- Login: visit /login to sign in. A session cookie is used.
-- Settings: after logging in, visit /settings to save your Discogs username and user token. The token is encrypted at rest using an app key.
-
-Encryption key
-- The app reads APP_KEY from .env. If absent, it auto‑generates a random key and stores it at var/app.key (600 permissions).
-- Encryption uses libsodium (secretbox) when available; otherwise OpenSSL AES‑256‑GCM.
-
-How credentials are used
-- The web UI reads your logged‑in user’s Discogs username to look up your local collection notes and ratings.
-- When you edit ratings/notes from the web UI, jobs are queued with your Discogs username. Use the CLI command below to push changes to Discogs.
-
-CLI credentials
-- Console commands use the currently signed‑in web user’s Discogs credentials (from the database; token decrypted via APP_KEY). If no one is signed in, commands refuse to run and prompt you to sign in first.
-- .env overrides for Discogs credentials are not supported.
-
 ## Search tips
 One search box with field prefixes and ranges. Examples:
 - miles davis kind of blue — free text across artist/title/tracklist/etc.
@@ -109,6 +93,7 @@ One search box with field prefixes and ranges. Examples:
 - label:"blue note" catno:BST-84003
 - barcode:0602527 — identifiers (also matrix/runout, ASIN, etc.)
 - notes:"first press" — searches release notes and your personal notes
+- discogs:miles davis — search the live Discogs database to add new releases to your collection
 
 ## Sorting
 - Default: Added (newest first)
@@ -140,7 +125,7 @@ For a function‑by‑function breakdown and safety notes for each command, see 
   - Personal notes are local‑only in this app. They are saved in your local database and searchable here, but they do not sync to Discogs or appear on the public release page.
 
 ## Troubleshooting
-- Empty home page after setup? Ensure both CLI and web use the same DB path (`var/app.db`) and that you are signed in, then run `sync:initial`.
+- Empty home page after setup? Ensure both CLI and web use the same DB path (`var/app.db`) and that you have configured your Discogs credentials in `.env`, then run `sync:initial`.
 - Images not local? Run `images:backfill` and refresh the page.
 - Missing notes/credits? Run `sync:enrich`; it targets releases that have not yet been enriched.
 - Search feels off? Run `search:rebuild` to repopulate the FTS index.

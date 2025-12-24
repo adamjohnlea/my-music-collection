@@ -54,4 +54,14 @@ final class Config
     {
         return $this->env('APP_KEY');
     }
+
+    public function getDiscogsUsername(): ?string
+    {
+        return $this->env('DISCOGS_USERNAME');
+    }
+
+    public function getDiscogsToken(): ?string
+    {
+        return $this->env('DISCOGS_TOKEN');
+    }
 }

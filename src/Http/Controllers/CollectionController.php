@@ -27,18 +27,22 @@ class CollectionController extends BaseController
 
     public function index(?array $currentUser): void
     {
-        if (!$currentUser) {
-            $this->render('home.html.twig', [
-                'title' => 'My Music Collection',
-                'welcome' => true,
-            ]);
-            return;
-        }
+        $config = new \App\Infrastructure\Config();
+        $username = $config->getDiscogsUsername();
+        $token = $config->getDiscogsToken();
 
-        if (empty($currentUser['discogs_username'])) {
+        $isMissingCredentials = (
+            !$username ||
+            !$token ||
+            $username === 'your_username' ||
+            $token === 'your_personal_access_token'
+        );
+
+        if (!$currentUser || $isMissingCredentials) {
             $this->render('home.html.twig', [
                 'title' => 'My Music Collection',
                 'needs_setup' => true,
+                'missing_credentials' => $isMissingCredentials,
             ]);
             return;
         }
@@ -153,8 +157,7 @@ class CollectionController extends BaseController
 
     public function stats(?array $currentUser): void
     {
-        if (!$currentUser) { $this->redirect('/login'); }
-        if (empty($currentUser['discogs_username'])) { $this->redirect('/settings'); }
+        if (!$currentUser) { $this->redirect('/'); }
         $username = (string)$currentUser['discogs_username'];
 
         $stats = $this->collectionRepository->getCollectionStats($username);
@@ -166,8 +169,7 @@ class CollectionController extends BaseController
 
     public function random(?array $currentUser): void
     {
-        if (!$currentUser) { $this->redirect('/login'); }
-        if (empty($currentUser['discogs_username'])) { $this->redirect('/settings'); }
+        if (!$currentUser) { $this->redirect('/'); }
         $username = (string)$currentUser['discogs_username'];
         $rid = $this->collectionRepository->getRandomReleaseId($username);
         if ($rid) {

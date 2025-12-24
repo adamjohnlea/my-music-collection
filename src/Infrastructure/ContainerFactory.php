@@ -3,10 +3,8 @@ declare(strict_types=1);
 
 namespace App\Infrastructure;
 
-use App\Domain\Repositories\UserRepositoryInterface;
 use App\Domain\Repositories\ReleaseRepositoryInterface;
 use App\Domain\Repositories\CollectionRepositoryInterface;
-use App\Infrastructure\Persistence\SqliteUserRepository;
 use App\Infrastructure\Persistence\SqliteReleaseRepository;
 use App\Infrastructure\Persistence\SqliteCollectionRepository;
 use App\Http\Validation\Validator;
@@ -50,13 +48,6 @@ class ContainerFactory
                 ]);
                 $twig->addExtension(new DiscogsFilters());
                 return $twig;
-            },
-            Crypto::class => function(ContainerInterface $c) {
-                $env = $c->get('env');
-                return new Crypto($env('APP_KEY'), dirname(dirname(__DIR__)));
-            },
-            UserRepositoryInterface::class => function(ContainerInterface $c) {
-                return new SqliteUserRepository($c->get(PDO::class));
             },
             ReleaseRepositoryInterface::class => function(ContainerInterface $c) {
                 return new SqliteReleaseRepository($c->get(PDO::class));

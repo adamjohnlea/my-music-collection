@@ -83,7 +83,7 @@
 {% block header %}
   <div class="wrap">
     <header>
-      {% if auth_user and not welcome and not needs_setup %}
+      {% if not welcome and not needs_setup %}
         <div class="header-bottom">
           <form id="search-form" class="toolbar" method="get" action="/">
             <div style="display:flex;gap:8px;width:100%">
@@ -149,7 +149,7 @@
 
 {% block content %}
   <div class="wrap content-wrap">
-    {% if auth_user and not welcome and not needs_setup %}
+    {% if not welcome and not needs_setup %}
       <div class="mobile-chips">
         <a href="/" class="chip {{ q == '' ? 'active' : '' }}">All Items</a>
         {% if saved_searches is defined %}
@@ -195,15 +195,27 @@
         {% if welcome %}
           <div class="card"><div class="meta">
             <h2 style="margin:0 0 8px 0">Welcome</h2>
-            <p class="muted">Browse your Discogs collection locally, fast. Create an account to get started.</p>
-            <p><a href="/register">Create an account</a> or <a href="/login">Sign in</a>. Learn more on the <a href="/about">About</a> page.</p>
+            <p class="muted">Browse your Discogs collection locally, fast.</p>
+            <p>Learn more on the <a href="/about">About</a> page.</p>
           </div></div>
         {% elseif needs_setup %}
           <div class="card"><div class="meta">
             <h2 style="margin:0 0 8px 0">Connect your Discogs account</h2>
-            <p class="muted">To show your collection here, add your Discogs username and user token on the Settings page, then run the initial sync from the terminal.</p>
+            {% if missing_credentials %}
+              <div style="background:rgba(255, 68, 68, 0.1); border-left: 4px solid #ff4444; padding: 12px; margin-bottom: 16px;">
+                <p style="margin:0; color:#ff4444; font-weight:bold;">Action Required: Discogs credentials missing</p>
+                <p style="margin:8px 0 0 0; font-size: 0.9rem;">The default placeholders are still in your <code>.env</code> file. You must add your actual Discogs username and personal access token.</p>
+                <p style="margin:8px 0 0 0; font-size: 0.85rem; color: var(--muted);">
+                  <strong>How to get your token:</strong><br>
+                  1. Log in to <a href="https://www.discogs.com/settings/developers" target="_blank" rel="noopener">Discogs Developer Settings</a>.<br>
+                  2. Click <strong>"Generate new token"</strong>.<br>
+                  3. Copy the token and paste it into your <code>.env</code> file as <code>DISCOGS_TOKEN</code>.
+                </p>
+              </div>
+            {% endif %}
+            <p class="muted">To show your collection here, add your Discogs username and user token to your <code>.env</code> file, then run the initial sync from the terminal.</p>
             <ol style="margin:0 0 0 20px;padding:0">
-              <li>Go to <a href="/settings">Settings</a> and enter your Discogs username and user token.</li>
+              <li>Add <code>DISCOGS_USERNAME</code> and <code>DISCOGS_TOKEN</code> to your <code>.env</code> file.</li>
               <li>From your project folder, run: <code>php bin/console sync:initial</code></li>
               <li>Come back here to browse your collection.</li>
             </ol>

@@ -183,26 +183,8 @@
           <a href="/?view=collection" class="muted">Collection</a>
           <a href="/?view=wantlist" class="muted">Wantlist</a>
           <a href="/random" class="muted">Surprise Me</a>
-          {% if auth_user %}
-            <div class="dropdown">
-              <a href="#" class="muted" style="display:flex;align-items:center;gap:4px">
-                {{ auth_user.username }}
-                <small>▼</small>
-              </a>
-              <div class="dropdown-content">
-                <a href="/stats" class="dropdown-item">Stats</a>
-                <a href="/settings" class="dropdown-item">Settings</a>
-                <a href="/about" class="dropdown-item">About</a>
-                <hr style="border:0;border-top:1px solid var(--border);margin:4px 0">
-                <form method="post" action="/logout" style="margin:0">
-                  <input type="hidden" name="_token" value="{{ csrf_token }}">
-                  <button type="submit" class="dropdown-item" style="width:100%;text-align:left;background:transparent;border:0;cursor:pointer;color:inherit;font:inherit">Sign out</button>
-                </form>
-              </div>
-            </div>
-          {% else %}
-            <a href="/login" class="muted">Sign in</a>
-          {% endif %}
+          <a href="/stats" class="muted">Stats</a>
+          <a href="/about" class="muted">About</a>
         </div>
 
         <button class="mobile-nav-toggle" id="mobile-toggle" aria-label="Toggle menu">☰</button>
@@ -215,16 +197,7 @@
     <a href="/?view=wantlist" class="nav-item">Wantlist</a>
     <a href="/random" class="nav-item">Surprise Me</a>
     <a href="/stats" class="nav-item">Stats</a>
-    <a href="/settings" class="nav-item">Settings</a>
     <a href="/about" class="nav-item">About</a>
-    {% if auth_user %}
-      <form method="post" action="/logout" style="margin-top:auto">
-        <input type="hidden" name="_token" value="{{ csrf_token }}">
-        <button type="submit" class="nav-item" style="width:100%;text-align:left;cursor:pointer;font:inherit">Sign out</button>
-      </form>
-    {% else %}
-      <a href="/login" class="nav-item" style="margin-top:auto;text-align:center;background:var(--accent);color:#000;font-weight:bold">Sign in</a>
-    {% endif %}
   </div>
 
   <div class="wrap">
