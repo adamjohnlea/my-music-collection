@@ -64,4 +64,14 @@ final class Config
     {
         return $this->env('DISCOGS_TOKEN');
     }
+
+    public function hasValidCredentials(): bool
+    {
+        $username = $this->getDiscogsUsername();
+        $token = $this->getDiscogsToken();
+
+        return $username && $token && 
+               $username !== 'your_username' && 
+               $token !== 'your_personal_access_token';
+    }
 }

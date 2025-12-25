@@ -2,41 +2,36 @@
 
 {% block title %}Setup - My Music Collection{% endblock %}
 
-{% block body %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="card-title mb-0">Welcome to My Music Collection</h3>
+{% block content %}
+<div class="wrap content-wrap">
+    <div style="max-width: 600px; margin: 40px auto; background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+        <div style="padding: 24px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.02);">
+            <h1 style="margin: 0; font-size: 1.5rem; color: var(--accent);">Welcome to My Music Collection</h1>
+        </div>
+        <div style="padding: 24px;">
+            <p class="muted" style="margin-top: 0;">To get started, please enter your Discogs credentials. You can find or create your Personal Access Token in your <a href="https://www.discogs.com/settings/developers" target="_blank" rel="noopener">Discogs Developer Settings</a>.</p>
+            
+            {% if error %}
+                <div style="background: rgba(255, 68, 68, 0.1); border-left: 4px solid #ff4444; padding: 12px; margin-bottom: 20px; color: #ff4444;">
+                    {{ error }}
                 </div>
-                <div class="card-body">
-                    <p>To get started, please enter your Discogs credentials. You can find or create your Personal Access Token in your <a href="https://www.discogs.com/settings/developers" target="_blank">Discogs Developer Settings</a>.</p>
-                    
-                    {% if error %}
-                        <div class="alert alert-danger">
-                            {{ error }}
-                        </div>
-                    {% endif %}
+            {% endif %}
 
-                    <form method="POST" action="/setup/save">
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Discogs Username</label>
-                            <input type="text" name="username" id="username" class="form-control" required placeholder="e.g. music_lover_99">
-                        </div>
-                        <div class="mb-3">
-                            <label for="token" class="form-label">Discogs Personal Access Token</label>
-                            <input type="password" name="token" id="token" class="form-control" required placeholder="Paste your token here">
-                        </div>
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">Save and Finish Setup</button>
-                        </div>
-                    </form>
+            <form method="POST" action="/setup/save">
+                <input type="hidden" name="_token" value="{{ csrf_token }}">
+                <div style="margin-bottom: 20px;">
+                    <label for="username" style="display: block; margin-bottom: 8px; font-weight: 600;">Discogs Username</label>
+                    <input type="text" name="username" id="username" style="width: 100%; background: #0b0b0c; border: 1px solid var(--border); border-radius: 8px; padding: 10px; color: var(--text); box-sizing: border-box;" required placeholder="e.g. music_lover_99">
                 </div>
-                <div class="card-footer text-muted small">
-                    Note: This will create a <code>.env</code> file in your application root.
+                <div style="margin-bottom: 24px;">
+                    <label for="token" style="display: block; margin-bottom: 8px; font-weight: 600;">Discogs Personal Access Token</label>
+                    <input type="password" name="token" id="token" style="width: 100%; background: #0b0b0c; border: 1px solid var(--border); border-radius: 8px; padding: 10px; color: var(--text); box-sizing: border-box;" required placeholder="Paste your token here">
                 </div>
-            </div>
+                <button type="submit" style="width: 100%; background: var(--accent); color: #000; border: none; border-radius: 8px; padding: 12px; font-weight: 700; cursor: pointer; font-size: 1rem;">Save and Finish Setup</button>
+            </form>
+        </div>
+        <div style="padding: 16px 24px; background: rgba(0,0,0,0.2); border-top: 1px solid var(--border); font-size: 0.85rem;" class="muted">
+            Note: This will create a <code>.env</code> file in your application root.
         </div>
     </div>
 </div>

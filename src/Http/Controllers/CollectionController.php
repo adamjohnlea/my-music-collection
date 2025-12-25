@@ -28,21 +28,13 @@ class CollectionController extends BaseController
     public function index(?array $currentUser): void
     {
         $config = new \App\Infrastructure\Config();
-        $username = $config->getDiscogsUsername();
-        $token = $config->getDiscogsToken();
+        $isConfigured = $config->hasValidCredentials();
 
-        $isMissingCredentials = (
-            !$username ||
-            !$token ||
-            $username === 'your_username' ||
-            $token === 'your_personal_access_token'
-        );
-
-        if (!$currentUser || $isMissingCredentials) {
+        if (!$currentUser || !$isConfigured) {
             $this->render('home.html.twig', [
                 'title' => 'My Music Collection',
                 'needs_setup' => true,
-                'missing_credentials' => $isMissingCredentials,
+                'missing_credentials' => !$isConfigured,
             ]);
             return;
         }

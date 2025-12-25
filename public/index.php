@@ -12,6 +12,21 @@ use Twig\Environment;
 
 require __DIR__.'/../vendor/autoload.php';
 
+// Session setup
+$secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (($_SERVER['SERVER_PORT'] ?? null) == 443);
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path' => '/',
+    'secure' => $secure,
+    'httponly' => true,
+    'samesite' => 'Lax',
+]);
+if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
+
+if (empty($_SESSION['csrf'])) {
+    $_SESSION['csrf'] = bin2hex(random_bytes(32));
+}
+
 // Load environment
 $envPath = dirname(__DIR__);
 if (file_exists($envPath.'/.env')) {
@@ -22,9 +37,8 @@ if (file_exists($envPath.'/.env')) {
 
 // Check if setup is needed
 $config = new \App\Infrastructure\Config();
-$isConfigured = $config->getDiscogsToken() && $config->getDiscogsUsername();
 $uri = $_SERVER['REQUEST_URI'] ?? '/';
-if (!$isConfigured && !str_starts_with($uri, '/setup')) {
+if (!$config->hasValidCredentials() && !str_starts_with($uri, '/setup')) {
     header('Location: /setup');
     exit;
 }
@@ -34,22 +48,6 @@ $container = ContainerFactory::create();
 
 // Ensure DB migrations are run
 (new MigrationRunner($container->get(PDO::class)))->run();
-
-// Session setup
-$secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (($_SERVER['SERVER_PORT'] ?? null) == 443);
-session_set_cookie_params([
-    'lifetime' => 0,
-    'path' => '/',
-    'domain' => '',
-    'secure' => $secure,
-    'httponly' => true,
-    'samesite' => 'Lax',
-]);
-if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
-
-if (empty($_SESSION['csrf'])) {
-    $_SESSION['csrf'] = bin2hex(random_bytes(32));
-}
 
 // Auth context
 $config = new \App\Infrastructure\Config();

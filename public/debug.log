@@ -26,3 +26,5 @@ q: , isDiscogs: false, username: aj_vinyl_and_music
 q: discogs: artist:devo year:1982 type:master, isDiscogs: true, username: aj_vinyl_and_music
 q: discogs: artist:devo year:1982 type:release, isDiscogs: true, username: aj_vinyl_and_music
 q: , isDiscogs: false, username: aj_vinyl_and_music
+q: , isDiscogs: false, username: aj_vinyl_and_music
+q: , isDiscogs: false, username: aj_vinyl_and_music

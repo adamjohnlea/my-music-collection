@@ -9,14 +9,11 @@ class SetupController extends BaseController
 {
     public function index(): void
     {
-        $envFile = dirname(__DIR__, 2) . '/.env';
+        $config = new Config();
         
-        // If .env exists and has a token, we don't need setup
-        if (file_exists($envFile)) {
-            $config = new Config();
-            if ($config->getDiscogsToken() && $config->getDiscogsUsername()) {
-                $this->redirect('/');
-            }
+        // If .env exists and has valid credentials, we don't need setup
+        if ($config->hasValidCredentials()) {
+            $this->redirect('/');
         }
 
         $this->render('setup.html.twig');
@@ -26,6 +23,17 @@ class SetupController extends BaseController
     {
         $token = $_POST['token'] ?? '';
         $username = $_POST['username'] ?? '';
+        $csrfToken = $_POST['_token'] ?? '';
+
+        if (empty($csrfToken) || !hash_equals($_SESSION['csrf'] ?? '', $csrfToken)) {
+            error_log(sprintf(
+                'CSRF mismatch in SetupController. POST: %s, SESSION: %s',
+                $csrfToken,
+                $_SESSION['csrf'] ?? 'NOT_SET'
+            ));
+            $this->render('setup.html.twig', ['error' => 'Invalid CSRF token. Please try refreshing the page.']);
+            return;
+        }
 
         if (empty($token) || empty($username)) {
             $this->render('setup.html.twig', ['error' => 'All fields are required.']);
@@ -38,13 +46,21 @@ class SetupController extends BaseController
         $envContent .= "IMG_DIR=public/images\n";
         $envContent .= "APP_ENV=prod\n";
         $envContent .= "APP_DEBUG=0\n";
+        $envContent .= "PUSH_NOTES=1\n";
         $envContent .= "DISCOGS_USERNAME=$username\n";
         $envContent .= "DISCOGS_TOKEN=$token\n";
 
-        $envFile = dirname(__DIR__, 2) . '/.env';
+        $envFile = dirname(__DIR__, 3) . '/.env';
         
+        // Debug info if writing fails
         if (file_put_contents($envFile, $envContent) === false) {
-            $this->render('setup.html.twig', ['error' => 'Failed to write .env file. Please check directory permissions.']);
+            $error = 'Failed to write .env file.';
+            if (!is_writable(dirname($envFile))) {
+                $error .= ' The directory is not writable.';
+            } elseif (file_exists($envFile) && !is_writable($envFile)) {
+                $error .= ' The .env file exists but is not writable.';
+            }
+            $this->render('setup.html.twig', ['error' => $error . ' Please check directory permissions.']);
             return;
         }
         
