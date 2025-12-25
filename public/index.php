@@ -6,6 +6,7 @@ use App\Infrastructure\MigrationRunner;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\ReleaseController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SetupController;
 use Dotenv\Dotenv;
 use Twig\Environment;
 
@@ -17,6 +18,15 @@ if (file_exists($envPath.'/.env')) {
     Dotenv::createImmutable($envPath)->load();
 } elseif (file_exists($envPath.'/.env.example')) {
     Dotenv::createImmutable($envPath, '.env.example')->load();
+}
+
+// Check if setup is needed
+$config = new \App\Infrastructure\Config();
+$isConfigured = $config->getDiscogsToken() && $config->getDiscogsUsername();
+$uri = $_SERVER['REQUEST_URI'] ?? '/';
+if (!$isConfigured && !str_starts_with($uri, '/setup')) {
+    header('Location: /setup');
+    exit;
 }
 
 // Bootstrap Container
@@ -65,6 +75,8 @@ $twig->addGlobal('csrf_token', $_SESSION['csrf'] ?? '');
 
 // Router
 $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
+    $r->addRoute('GET', '/setup', [SetupController::class, 'index']);
+    $r->addRoute('POST', '/setup/save', [SetupController::class, 'save']);
     $r->addRoute('GET', '/about', [CollectionController::class, 'about']);
     $r->addRoute('GET', '/stats', [CollectionController::class, 'stats']);
     $r->addRoute('GET', '/random', [CollectionController::class, 'random']);
@@ -106,6 +118,8 @@ switch ($routeInfo[0]) {
             $controller->show((int)$vars['id'], $currentUser);
         } elseif (in_array($handler[0], [CollectionController::class, SearchController::class, ReleaseController::class])) {
             $controller->$method($currentUser);
+        } elseif ($handler[0] === SetupController::class) {
+            $controller->$method();
         } else {
             $controller->$method();
         }
