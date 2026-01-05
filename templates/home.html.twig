@@ -20,8 +20,10 @@
     nav{display:flex;justify-content:center;gap:12px;margin-top:20px}
     /* Toolbar */
     .toolbar{display:flex;gap:8px;align-items:center;margin:0;flex-wrap:wrap;flex:1}
-    .search-input{background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:10px;padding:8px 14px;width:100%;font-size:.95rem}
+    .search-input{background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:10px;padding:8px 14px;width:100%;font-size:.95rem;height:40px;box-sizing:border-box}
     .search-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 1px rgba(103,232,249,.2)}
+    .search-submit{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text);opacity:0.6;cursor:pointer;padding:4px;display:flex;align-items:center;transition:all .2s;z-index:2}
+    .search-submit:hover{color:var(--accent);opacity:1;transform:translateY(-50%) scale(1.1)}
     .sort-wrap{display:flex;gap:8px;align-items:center}
     .sort-select{background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:10px;padding:8px 12px;font-size:.9rem;cursor:pointer}
     .sort-select:focus{outline:none;border-color:var(--accent)}
@@ -89,7 +91,12 @@
         <div class="header-bottom">
           <form id="search-form" class="toolbar" method="get" action="/">
             <div style="display:flex;gap:8px;width:100%">
-              <input id="search-input" class="search-input" type="text" name="q" value="{{ q|default('')|e }}" placeholder="Search artist:miles year:1980..1989 barcode:…" />
+              <div style="position:relative;flex:1">
+                <input id="search-input" class="search-input" type="text" name="q" value="{{ q|default('')|e }}" placeholder="Search artist:miles year:1980..1989 barcode:…" style="padding-right:40px" />
+                <button type="submit" class="search-submit" title="Search">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </button>
+              </div>
               <button type="button" id="qb-toggle" class="btn-small" onclick="toggleQueryBuilder()" title="Toggle Search Builder" style="height:40px">Advanced</button>
               {% if q is defined and q %}
                 <button type="button" class="btn-small" onclick="saveSearch()" title="Save as Smart Collection" style="height:40px">Save</button>
@@ -123,7 +130,12 @@
 
   <div class="utility-bar" id="sticky-utility">
     <div style="display:flex;gap:8px">
-        <input type="text" class="search-input" placeholder="Search..." onfocus="window.scrollTo(0,0); document.getElementById('search-input').focus();">
+        <div style="position:relative;flex:1">
+            <input type="text" class="search-input" placeholder="Search..." onfocus="window.scrollTo(0,0); document.getElementById('search-input').focus();" style="padding-right:40px">
+            <button type="button" class="search-submit" title="Search" onclick="document.getElementById('search-form').submit();">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </button>
+        </div>
         <select class="sort-select" onchange="document.getElementById('sort').value = this.value; document.getElementById('search-form').submit();">
             <option value="">Sort...</option>
             <option value="added_desc">Added (newest)</option>
