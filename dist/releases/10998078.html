@@ -4,18 +4,197 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Beck — Colors</title>
+  <style>
+    :root {
+      --bg: #0b0b0c;
+      --card: #16171a;
+      --text: #e7e7ea;
+      --muted: #a0a3aa;
+      --accent: #67e8f9;
+      --border: #2a2b2f;
+      --header-bg: rgba(11, 11, 12, 0.8);
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    .content-wrap {
+      margin-top: 24px;
+      margin-bottom: 24px;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .muted { color: var(--muted); }
+
+    /* Layout Helpers */
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .gap-4 { gap: 16px; }
+    .gap-2 { gap: 8px; }
+
+    /* Common Components */
+    .btn-small {
+      font-size: .8rem;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--card);
+      color: var(--text);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-small:hover { border-color: var(--accent); text-decoration: none; }
+
+    /* Common Header Components */
+    .main-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--header-bg);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-content {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    /* Desktop Nav */
+    .desktop-nav { display: flex; align-items: center; gap: 20px; }
+    @media (max-width: 768px) { .desktop-nav { display: none; } }
+
+    /* Account Dropdown */
+    .dropdown { position: relative; display: inline-block; }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background: var(--card);
+      min-width: 160px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      padding: 8px 0;
+      z-index: 101;
+    }
+    .dropdown:hover .dropdown-content { display: block; }
+    .dropdown-item {
+      display: block;
+      padding: 8px 16px;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .dropdown-item:hover { background: rgba(255,255,255,0.05); }
+
+    /* Mobile Nav / Hamburger */
+    .mobile-nav-toggle {
+      display: none;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 8px;
+    }
+    @media (max-width: 768px) { .mobile-nav-toggle { display: block; } }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 65px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg);
+      z-index: 99;
+      padding: 20px;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .mobile-menu.active { display: flex; }
+    .mobile-menu .nav-item {
+        display: block;
+        padding: 12px 16px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: var(--text);
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .mobile-menu .nav-item:hover { border-color: var(--accent); }
+
+    /* Breadcrumbs */
+    .breadcrumbs {
+      padding: 12px 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .breadcrumbs a { color: var(--muted); }
+    .breadcrumbs span { margin: 0 8px; opacity: 0.5; }
+
+    /* Utility Bar (Mobile Sticky Search/Sort) */
+    .utility-bar {
+        display: none;
+        position: sticky;
+        top: 65px;
+        z-index: 90;
+        background: var(--bg);
+        padding: 8px 20px;
+        border-bottom: 1px solid var(--border);
+    }
+    @media (max-width: 768px) {
+        .utility-bar.is-visible { display: block; }
+    }
+  </style>
     <style>
-    :root { --bg:#0b0b0c; --card:#16171a; --text:#e7e7ea; --muted:#a0a3aa; --accent:#67e8f9; --overlay: rgba(0,0,0,.9); }
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif}
-    .wrap{max-width:1000px;margin:40px auto;padding:0 20px}
-    a{color:var(--accent);text-decoration:none}
-    a:hover{text-decoration:underline}
-    .layout{display:grid;grid-template-columns:280px 1fr;gap:24px}
+    :root { --overlay: rgba(0,0,0,.9); }
+    .layout{display:grid;grid-template-columns:1fr 1fr;gap:40px}
     .card{background:var(--card);border-radius:12px;overflow:hidden}
     .cover{width:100%;aspect-ratio:1/1;object-fit:cover;background:#222;cursor:zoom-in}
     .meta{padding:16px}
-    .muted{color:var(--muted)}
-    h1{margin:0 0 8px 0;font-size:1.6rem}
+    h1{margin:0 0 8px 0;font-size:2rem}
+
+    /* Carousel */
+    .carousel-container { position: relative; width: 100%; overflow: hidden; border-radius: 12px; }
+    .carousel-track { display: flex; transition: transform 0.3s ease-out; }
+    .carousel-slide { min-width: 100%; aspect-ratio: 1/1; }
+    .carousel-slide img { width: 100%; height: 100%; object-fit: cover; }
+    .carousel-dots { display: none; justify-content: center; gap: 8px; margin-top: 12px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); cursor: pointer; opacity: 0.5; }
+    .dot.active { background: var(--accent); opacity: 1; }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 4px; border-bottom: 1px solid #2a2b2f; margin-top: 24px; overflow-x: auto; scrollbar-width: none; }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab { padding: 12px 20px; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; white-space: nowrap; }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-content { display: none; padding-top: 20px; }
+    .tab-content.active { display: block; }
 
     /* Lightbox */
     .lightbox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--overlay);z-index:1000}
@@ -30,364 +209,500 @@
     .lb-counter{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);color:#fff;background:rgba(0,0,0,.5);padding:4px 10px;border-radius:999px;font-size:.9rem}
 
     @media (max-width: 800px){
-      .layout{grid-template-columns:1fr}
+      .layout{grid-template-columns:1fr; gap: 24px;}
+      .carousel-dots { display: flex; }
       .lb-prev{left:10px}
       .lb-next{right:10px}
+      .wrap { margin-top: 12px; }
     }
   </style>
 </head>
 <body>
-  
+  <header class="main-header">
     <div class="wrap">
-    <p><a href="../index.html">← Back</a></p>
-          <div class="layout">
+      <div class="header-content">
+        <a href="/" class="logo">My Music</a>
+
+        <div class="desktop-nav">
+          <a href="/?view=collection" class="muted">Collection</a>
+          <a href="/?view=wantlist" class="muted">Wantlist</a>
+          <a href="/random" class="muted">Surprise Me</a>
+          <a href="/stats" class="muted">Stats</a>
+          <a href="/about" class="muted">About</a>
+        </div>
+
+        <button class="mobile-nav-toggle" id="mobile-toggle" aria-label="Toggle menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="/?view=collection" class="nav-item">Collection</a>
+    <a href="/?view=wantlist" class="nav-item">Wantlist</a>
+    <a href="/random" class="nav-item">Surprise Me</a>
+    <a href="/stats" class="nav-item">Stats</a>
+    <a href="/about" class="nav-item">About</a>
+  </div>
+
+  <div class="wrap">
+      <nav class="breadcrumbs">
+    <div>
+      <a href="/">Home</a>
+      <span>/</span>
+      <a href="/?view=collection">Collection</a>
+      <span>/</span>
+      Colors
+    </div>
+  </nav>
+  </div>
+
+  
+    <div class="wrap content-wrap">
+    <div style="margin-bottom:24px">
+      <p style="margin:0"><a href="../index.html" style="background:var(--card);border:1px solid #2a2b2f;padding:6px 12px;border-radius:8px;color:var(--text);font-size:.9rem;text-decoration:none">← Back</a></p>
+    </div>
+                <div class="layout">
         <div>
-          <div class="card">
-                          <img id="main-cover" class="cover" src="../images/10998078/258bdf02e866da43d840e86f8253b038bf24d2d7.jpg" alt="Colors cover" data-idx="0" />
-                      </div>
-                      <div class="thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
-                              <button class="thumb" data-url="../images/10998078/258bdf02e866da43d840e86f8253b038bf24d2d7.jpg" data-idx="0" title="Image 1" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/10998078/258bdf02e866da43d840e86f8253b038bf24d2d7.jpg" alt="thumb 1" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:1" />
+          <div class="carousel-container" id="carousel">
+            <div class="carousel-track" id="carousel-track">
+                                                <div class="carousel-slide">
+                    <img class="cover" src="../images/10998078/258bdf02e866da43d840e86f8253b038bf24d2d7.jpg" alt="Colors cover" data-idx="0" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/10998078/b0f9b342fd6172c6901407ba8e4095f42fa7527e.jpg" alt="Colors cover" data-idx="1" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/10998078/a8f13cbe486da46ee2d6eaa8d352f3565050b5ac.jpg" alt="Colors cover" data-idx="2" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/10998078/615cc669c3901b8998148cf57555bdd1ce58e98e.jpg" alt="Colors cover" data-idx="3" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/10998078/c582f204e9654617f692f48c48f61a0615b2c3dd.jpg" alt="Colors cover" data-idx="4" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/10998078/9c9debd4aaac8fc46808fea122b2a794eac61649.jpg" alt="Colors cover" data-idx="5" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/10998078/04290eabdbacb0bfe36280c1d9b07c0e2b27bdf1.jpg" alt="Colors cover" data-idx="6" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/10998078/e4877c72d6d02250773269a9ef58a9f16f4e8c99.jpg" alt="Colors cover" data-idx="7" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/10998078/6bf7480db8d8f79f0db9b6f7d232e73e35c4d14c.jpg" alt="Colors cover" data-idx="8" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/10998078/e5049eecc17601f6067e0af8ee8575e838df8d77.jpg" alt="Colors cover" data-idx="9" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/10998078/01917ca14b0047c013b87b3f9924e944637817ad.jpg" alt="Colors cover" data-idx="10" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/10998078/2437cb740b39fad098f1ae3385a7da376ae48c9c.jpg" alt="Colors cover" data-idx="11" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/10998078/5ef901275a7f491e403433631ea16dcafa81e957.jpg" alt="Colors cover" data-idx="12" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/10998078/4f0fb9ef0d8104863d856b3591d34dc2e712ce4e.jpg" alt="Colors cover" data-idx="13" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/10998078/a22d3190a0f5b1137b8b10663e602e118a607ab6.jpg" alt="Colors cover" data-idx="14" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/10998078/7bbb5e8006f069612b98b6a1298471f486191215.jpg" alt="Colors cover" data-idx="15" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/10998078/eef7b708f8698e869d296188da1af966d4d92174.jpg" alt="Colors cover" data-idx="16" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/10998078/4dc17b952dacd3dd4f03b90761bc0f84bf56db14.jpg" alt="Colors cover" data-idx="17" />
+                  </div>
+                                          </div>
+          </div>
+                      <div class="carousel-dots" id="carousel-dots">
+                              <div class="dot active" data-idx="0"></div>
+                              <div class="dot " data-idx="1"></div>
+                              <div class="dot " data-idx="2"></div>
+                              <div class="dot " data-idx="3"></div>
+                              <div class="dot " data-idx="4"></div>
+                              <div class="dot " data-idx="5"></div>
+                              <div class="dot " data-idx="6"></div>
+                              <div class="dot " data-idx="7"></div>
+                              <div class="dot " data-idx="8"></div>
+                              <div class="dot " data-idx="9"></div>
+                              <div class="dot " data-idx="10"></div>
+                              <div class="dot " data-idx="11"></div>
+                              <div class="dot " data-idx="12"></div>
+                              <div class="dot " data-idx="13"></div>
+                              <div class="dot " data-idx="14"></div>
+                              <div class="dot " data-idx="15"></div>
+                              <div class="dot " data-idx="16"></div>
+                              <div class="dot " data-idx="17"></div>
+                          </div>
+            <div class="thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;">
+                              <button class="thumb" data-idx="0" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10998078/258bdf02e866da43d840e86f8253b038bf24d2d7.jpg" alt="thumb 1" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:1" />
                 </button>
-                              <button class="thumb" data-url="../images/10998078/b0f9b342fd6172c6901407ba8e4095f42fa7527e.jpg" data-idx="1" title="Image 2" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/10998078/b0f9b342fd6172c6901407ba8e4095f42fa7527e.jpg" alt="thumb 2" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="1" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10998078/b0f9b342fd6172c6901407ba8e4095f42fa7527e.jpg" alt="thumb 2" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/10998078/a8f13cbe486da46ee2d6eaa8d352f3565050b5ac.jpg" data-idx="2" title="Image 3" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/10998078/a8f13cbe486da46ee2d6eaa8d352f3565050b5ac.jpg" alt="thumb 3" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="2" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10998078/a8f13cbe486da46ee2d6eaa8d352f3565050b5ac.jpg" alt="thumb 3" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/10998078/615cc669c3901b8998148cf57555bdd1ce58e98e.jpg" data-idx="3" title="Image 4" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/10998078/615cc669c3901b8998148cf57555bdd1ce58e98e.jpg" alt="thumb 4" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="3" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10998078/615cc669c3901b8998148cf57555bdd1ce58e98e.jpg" alt="thumb 4" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/10998078/c582f204e9654617f692f48c48f61a0615b2c3dd.jpg" data-idx="4" title="Image 5" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/10998078/c582f204e9654617f692f48c48f61a0615b2c3dd.jpg" alt="thumb 5" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="4" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10998078/c582f204e9654617f692f48c48f61a0615b2c3dd.jpg" alt="thumb 5" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/10998078/9c9debd4aaac8fc46808fea122b2a794eac61649.jpg" data-idx="5" title="Image 6" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/10998078/9c9debd4aaac8fc46808fea122b2a794eac61649.jpg" alt="thumb 6" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="5" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10998078/9c9debd4aaac8fc46808fea122b2a794eac61649.jpg" alt="thumb 6" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/10998078/04290eabdbacb0bfe36280c1d9b07c0e2b27bdf1.jpg" data-idx="6" title="Image 7" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/10998078/04290eabdbacb0bfe36280c1d9b07c0e2b27bdf1.jpg" alt="thumb 7" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="6" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10998078/04290eabdbacb0bfe36280c1d9b07c0e2b27bdf1.jpg" alt="thumb 7" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/10998078/e4877c72d6d02250773269a9ef58a9f16f4e8c99.jpg" data-idx="7" title="Image 8" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/10998078/e4877c72d6d02250773269a9ef58a9f16f4e8c99.jpg" alt="thumb 8" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="7" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10998078/e4877c72d6d02250773269a9ef58a9f16f4e8c99.jpg" alt="thumb 8" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/10998078/6bf7480db8d8f79f0db9b6f7d232e73e35c4d14c.jpg" data-idx="8" title="Image 9" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/10998078/6bf7480db8d8f79f0db9b6f7d232e73e35c4d14c.jpg" alt="thumb 9" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="8" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10998078/6bf7480db8d8f79f0db9b6f7d232e73e35c4d14c.jpg" alt="thumb 9" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/10998078/e5049eecc17601f6067e0af8ee8575e838df8d77.jpg" data-idx="9" title="Image 10" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/10998078/e5049eecc17601f6067e0af8ee8575e838df8d77.jpg" alt="thumb 10" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="9" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10998078/e5049eecc17601f6067e0af8ee8575e838df8d77.jpg" alt="thumb 10" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/10998078/01917ca14b0047c013b87b3f9924e944637817ad.jpg" data-idx="10" title="Image 11" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/10998078/01917ca14b0047c013b87b3f9924e944637817ad.jpg" alt="thumb 11" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="10" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10998078/01917ca14b0047c013b87b3f9924e944637817ad.jpg" alt="thumb 11" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/10998078/2437cb740b39fad098f1ae3385a7da376ae48c9c.jpg" data-idx="11" title="Image 12" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/10998078/2437cb740b39fad098f1ae3385a7da376ae48c9c.jpg" alt="thumb 12" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="11" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10998078/2437cb740b39fad098f1ae3385a7da376ae48c9c.jpg" alt="thumb 12" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/10998078/5ef901275a7f491e403433631ea16dcafa81e957.jpg" data-idx="12" title="Image 13" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/10998078/5ef901275a7f491e403433631ea16dcafa81e957.jpg" alt="thumb 13" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="12" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10998078/5ef901275a7f491e403433631ea16dcafa81e957.jpg" alt="thumb 13" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/10998078/4f0fb9ef0d8104863d856b3591d34dc2e712ce4e.jpg" data-idx="13" title="Image 14" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/10998078/4f0fb9ef0d8104863d856b3591d34dc2e712ce4e.jpg" alt="thumb 14" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="13" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10998078/4f0fb9ef0d8104863d856b3591d34dc2e712ce4e.jpg" alt="thumb 14" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/10998078/a22d3190a0f5b1137b8b10663e602e118a607ab6.jpg" data-idx="14" title="Image 15" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/10998078/a22d3190a0f5b1137b8b10663e602e118a607ab6.jpg" alt="thumb 15" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="14" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10998078/a22d3190a0f5b1137b8b10663e602e118a607ab6.jpg" alt="thumb 15" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/10998078/7bbb5e8006f069612b98b6a1298471f486191215.jpg" data-idx="15" title="Image 16" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/10998078/7bbb5e8006f069612b98b6a1298471f486191215.jpg" alt="thumb 16" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="15" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10998078/7bbb5e8006f069612b98b6a1298471f486191215.jpg" alt="thumb 16" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/10998078/eef7b708f8698e869d296188da1af966d4d92174.jpg" data-idx="16" title="Image 17" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/10998078/eef7b708f8698e869d296188da1af966d4d92174.jpg" alt="thumb 17" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="16" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10998078/eef7b708f8698e869d296188da1af966d4d92174.jpg" alt="thumb 17" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/10998078/4dc17b952dacd3dd4f03b90761bc0f84bf56db14.jpg" data-idx="17" title="Image 18" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/10998078/4dc17b952dacd3dd4f03b90761bc0f84bf56db14.jpg" alt="thumb 18" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="17" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/10998078/4dc17b952dacd3dd4f03b90761bc0f84bf56db14.jpg" alt="thumb 18" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                           </div>
                   </div>
         <div>
           <h1>Colors</h1>
-          <p class="muted">Beck • 2017</p>
+          <p class="muted" style="font-size:1.2rem">Beck • 2017</p>
           <p class="muted">US</p>
-                      <p style="margin:8px 0;">
-              <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Electronic</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Rock</span>              <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Dance-pop</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">New Wave</span>            </p>
-          
-                      <p class="muted">Formats:
-                              Vinyl (Yellow Transparent)                          </p>
-          
+          <div style="margin:16px 0; display:flex; gap:8px; flex-wrap:wrap">
+            <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Electronic</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Rock</span>            <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Dance-pop</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">New Wave</span>          </div>
+
                       <p class="muted">Labels:
               Fonograf Records (B002724101), Capitol Records (B002724101)            </p>
           
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Tracklist</strong>
-                <ol>
-                                      <li>A1 — Colors</li>
-                                      <li>A2 — Seventh Heaven</li>
-                                      <li>A3 — I&#039;m So Free</li>
-                                      <li>A4 — Dear Life</li>
-                                      <li>A5 — No Distraction</li>
-                                      <li>B1 — Dreams</li>
-                                      <li>B2 — Wow</li>
-                                      <li>B3 — Up All Night</li>
-                                      <li>B4 — Square One</li>
-                                      <li>B5 — Fix Me</li>
-                                  </ol>
-              </div>
-            </div>
-          
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Videos</strong>
-                <ul>
-                                      <li><a href="https://www.youtube.com/watch?v=oTM3YPTYNo0" target="_blank" rel="noopener">Beck - Dreams (Official Audio)</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=i7RSYX3giQI" target="_blank" rel="noopener">Beck - Seventh Heaven (Audio)</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=pSzMQ99k6MA" target="_blank" rel="noopener">Beck - I&#039;m So Free (Unofficial Video)</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=ERoS6y5zE0Y" target="_blank" rel="noopener">Beck - Dear Life (Lyric Video)</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=1AQwfNRedOQ" target="_blank" rel="noopener">Beck - No Distraction (Audio)</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=pyCkhPTU13w" target="_blank" rel="noopener">Beck - Wow (Official Music Video)</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=Tj08Ni3tklw" target="_blank" rel="noopener">Beck - Up All Night (Official Music Video)</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=PM2cBVUwJf4" target="_blank" rel="noopener">Beck - Square One (Audio)</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=ya6CQrFacIY" target="_blank" rel="noopener">Beck - Fix Me (Official Music Video)</a></li>
-                                  </ul>
-              </div>
-            </div>
-          
-          
-          <div class="card" style="margin-top:16px;">
-            <div class="meta">
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-                <strong>My Notes</strong>
-                              </div>
-
-              
-              <div id="notesView" style="margin-top:8px">
-                                                  <div class="muted">(none)</div>
-                              </div>
-
-                          </div>
+          <div class="tabs" id="release-tabs">
+            <div class="tab active" data-tab="tracks">Tracks</div>
+            <div class="tab" data-tab="details">Details</div>
+            <div class="tab" data-tab="credits">Credits</div>
+            <div class="tab" data-tab="status">Status & Notes</div>
           </div>
 
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Credits</strong>
-                <ul>
-                                      <li>
-                      Geoff Osika
-                      <span class="muted">— Acoustic Bass [Bass]</span>                                          </li>
-                                      <li>
-                      Nico Abondolo
-                      <span class="muted">— Acoustic Bass [Bass]</span>                                          </li>
-                                      <li>
-                      Beck Hansen
-                      <span class="muted">— Arranged By [Album Strings]</span>                                          </li>
-                                      <li>
-                      David Campbell
-                      <span class="muted">— Arranged By [Album Strings]</span>                                          </li>
-                                      <li>
-                      Eric Byers
-                      <span class="muted">— Cello</span>                                          </li>
-                                      <li>
-                      Suzie Katayama
-                      <span class="muted">— Cello</span>                                          </li>
-                                      <li>
-                      Tim Landauer
-                      <span class="muted">— Cello</span>                                          </li>
-                                      <li>
-                      Steve Richards
-                      <span class="muted">— Cello [Principal]</span>                                          </li>
-                                      <li>
-                      David Campbell
-                      <span class="muted">— Conductor</span>                                          </li>
-                                      <li>
-                      Suzie Katayama
-                      <span class="muted">— Contractor</span>                                          </li>
-                                      <li>
-                      Christopher Lee Lyons
-                      <span class="muted">— Design [Assistance]</span>                                          </li>
-                                      <li>
-                      Beck Hansen
-                      <span class="muted">— Design, Art Direction</span>                                          </li>
-                                      <li>
-                      Jimmy Turrell
-                      <span class="muted">— Design, Art Direction</span>                                          </li>
-                                      <li>
-                      Steve Stacey
-                      <span class="muted">— Design, Art Direction</span>                                          </li>
-                                      <li>
-                      Alex Pasco
-                      <span class="muted">— Engineer</span>                                          </li>
-                                      <li>
-                      Beck Hansen
-                      <span class="muted">— Engineer</span>                                          </li>
-                                      <li>
-                      Cassidy Turbin
-                      <span class="muted">— Engineer</span>                                          </li>
-                                      <li>
-                      Cole M.G.N.
-                      <span class="muted">— Engineer</span>                                          </li>
-                                      <li>
-                      Darrell Thorp
-                      <span class="muted">— Engineer</span>                                          </li>
-                                      <li>
-                      David Greenbaum
-                      <span class="muted">— Engineer</span>                                          </li>
-                                      <li>
-                      Florian Lagatta
-                      <span class="muted">— Engineer</span>                                          </li>
-                                      <li>
-                      Greg Kurstin
-                      <span class="muted">— Engineer</span>                                          </li>
-                                      <li>
-                      Jesse Shatkin
-                      <span class="muted">— Engineer</span>                                          </li>
-                                      <li>
-                      John Hanes
-                      <span class="muted">— Engineer</span>                                          </li>
-                                      <li>
-                      Julian Burg
-                      <span class="muted">— Engineer</span>                                          </li>
-                                      <li>
-                      Greg Kurstin
-                      <span class="muted">— Guitar, Bass, Drums, Piano, Synthesizer, Clavinet, Electric Piano [Rhodes], Mellotron, Marimba, Organ, Percussion</span>                                          </li>
-                                      <li>
-                      Chris Bellman
-                      <span class="muted">— Mastered By</span>                                          </li>
-                                      <li>
-                      Emily Lazar
-                      <span class="muted">— Mastered By</span>                                          </li>
-                                      <li>
-                      Randy Merrill
-                      <span class="muted">— Mastered By</span>                                          </li>
-                                      <li>
-                      Tom Coyne
-                      <span class="muted">— Mastered By</span>                                          </li>
-                                      <li>
-                      Beck Hansen
-                      <span class="muted">— Mixed By</span>                      <span class="muted"> (tracks: B1, B3)</span>                    </li>
-                                      <li>
-                      Greg Kurstin
-                      <span class="muted">— Mixed By</span>                      <span class="muted"> (tracks: A4, B1, B3)</span>                    </li>
-                                      <li>
-                      Serban Ghenea
-                      <span class="muted">— Mixed By</span>                      <span class="muted"> (tracks: A1 to A3, A5, B2, B4, B5)</span>                    </li>
-                                      <li>
-                      Cassidy Turbin
-                      <span class="muted">— Mixed By [With]</span>                      <span class="muted"> (tracks: B1, B3)</span>                    </li>
-                                      <li>
-                      Darrell Thorp
-                      <span class="muted">— Mixed By [With]</span>                      <span class="muted"> (tracks: B1, B3)</span>                    </li>
-                                      <li>
-                      David Greenbaum
-                      <span class="muted">— Mixed By [With]</span>                      <span class="muted"> (tracks: B1, B3)</span>                    </li>
-                                      <li>
-                      Péter Hapák
-                      <span class="muted">— Photography By [Cover Photo]</span>                                          </li>
-                                      <li>
-                      Eliot Lee Hazel
-                      <span class="muted">— Photography By [Interior Photo]</span>                                          </li>
-                                      <li>
-                      Beck Hansen
-                      <span class="muted">— Producer</span>                                          </li>
-                                      <li>
-                      Cole M.G.N.
-                      <span class="muted">— Producer</span>                      <span class="muted"> (tracks: B2)</span>                    </li>
-                                      <li>
-                      Greg Kurstin
-                      <span class="muted">— Producer</span>                      <span class="muted"> (tracks: A1 to B1, B3, B4)</span>                    </li>
-                                      <li>
-                      Darrin McCann
-                      <span class="muted">— Viola</span>                                          </li>
-                                      <li>
-                      Matt Funes
-                      <span class="muted">— Viola</span>                                          </li>
-                                      <li>
-                      Andrew Duckles
-                      <span class="muted">— Viola [Principal]</span>                                          </li>
-                                      <li>
-                      Josefina Vergara
-                      <span class="muted">— Violin</span>                                          </li>
-                                      <li>
-                      Mario DeLeon
-                      <span class="muted">— Violin</span>                                          </li>
-                                      <li>
-                      Michele Richards
-                      <span class="muted">— Violin</span>                                          </li>
-                                      <li>
-                      Natalie Leggett
-                      <span class="muted">— Violin</span>                                          </li>
-                                      <li>
-                      Sara Parkins
-                      <span class="muted">— Violin</span>                                          </li>
-                                      <li>
-                      Songa Lee
-                      <span class="muted">— Violin</span>                                          </li>
-                                      <li>
-                      Tereza Stanislav
-                      <span class="muted">— Violin</span>                                          </li>
-                                      <li>
-                      Charlie Bisharat
-                      <span class="muted">— Violin [Concert Masters]</span>                                          </li>
-                                      <li>
-                      Beck Hansen
-                      <span class="muted">— Vocals, Guitar, Piano, Electric Piano [Rhodes], Organ, Synthesizer, Bass, Glockenspiel, Percussion</span>                                          </li>
-                                      <li>
-                      Andrew Wyatt
-                      <span class="muted">— Written-By</span>                      <span class="muted"> (tracks: B1)</span>                    </li>
-                                      <li>
-                      Beck Hansen
-                      <span class="muted">— Written-By</span>                                          </li>
-                                      <li>
-                      Cole M.G.N.
-                      <span class="muted">— Written-By</span>                      <span class="muted"> (tracks: B2)</span>                    </li>
-                                      <li>
-                      Greg Kurstin
-                      <span class="muted">— Written-By</span>                      <span class="muted"> (tracks: A1 to B1, B3, B4)</span>                    </li>
-                                  </ul>
+          <div id="tab-tracks" class="tab-content active">
+                          <div class="card">
+                <div class="meta">
+                  <ol style="margin:0; padding-left:20px">
+                                          <li style="margin-bottom:8px">A1 — Colors</li>
+                                          <li style="margin-bottom:8px">A2 — Seventh Heaven</li>
+                                          <li style="margin-bottom:8px">A3 — I&#039;m So Free</li>
+                                          <li style="margin-bottom:8px">A4 — Dear Life</li>
+                                          <li style="margin-bottom:8px">A5 — No Distraction</li>
+                                          <li style="margin-bottom:8px">B1 — Dreams</li>
+                                          <li style="margin-bottom:8px">B2 — Wow</li>
+                                          <li style="margin-bottom:8px">B3 — Up All Night</li>
+                                          <li style="margin-bottom:8px">B4 — Square One</li>
+                                          <li style="margin-bottom:8px">B5 — Fix Me</li>
+                                      </ol>
+                </div>
               </div>
+                      </div>
+
+          <div id="tab-details" class="tab-content">
+            <div class="card">
+                <div class="meta">
+                                            <p class="muted"><strong>Formats:</strong>
+                                                    Vinyl (Yellow Transparent)                                                </p>
+                                        
+                    
+                                            <p><strong>Videos:</strong></p>
+                        <ul style="margin:0; padding-left:20px">
+                                                    <li><a href="https://www.youtube.com/watch?v=oTM3YPTYNo0" target="_blank" rel="noopener">Beck - Dreams (Official Audio)</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=i7RSYX3giQI" target="_blank" rel="noopener">Beck - Seventh Heaven (Audio)</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=pSzMQ99k6MA" target="_blank" rel="noopener">Beck - I&#039;m So Free (Unofficial Video)</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=ERoS6y5zE0Y" target="_blank" rel="noopener">Beck - Dear Life (Lyric Video)</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=1AQwfNRedOQ" target="_blank" rel="noopener">Beck - No Distraction (Audio)</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=pyCkhPTU13w" target="_blank" rel="noopener">Beck - Wow (Official Music Video)</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=Tj08Ni3tklw" target="_blank" rel="noopener">Beck - Up All Night (Official Music Video)</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=PM2cBVUwJf4" target="_blank" rel="noopener">Beck - Square One (Audio)</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=ya6CQrFacIY" target="_blank" rel="noopener">Beck - Fix Me (Official Music Video)</a></li>
+                                                </ul>
+                    
+                                            <p><strong>Barcodes:</strong></p>
+                        <ul style="margin:0; padding-left:20px" class="muted">
+                                                    <li>6 02557 88220 9 (Text)</li>
+                                                    <li>602557882209 (Scanned)</li>
+                                                </ul>
+                                    </div>
             </div>
-          
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Companies</strong>
-                <ul>
-                                      <li>
-                      Fonograf Records
-                      <span class="muted"> — Phonographic Copyright (p)</span>                                          </li>
-                                      <li>
-                      Fonograf Records
-                      <span class="muted"> — Copyright (c)</span>                                          </li>
-                                      <li>
-                      UMG Recordings, Inc.
-                      <span class="muted"> — Licensed To</span>                                          </li>
-                                      <li>
-                      Furnace MFG
-                      <span class="muted"> — Manufactured By</span>                                          </li>
-                                      <li>
-                      Pallas USA
-                      <span class="muted"> — Manufactured By</span>                                          </li>
-                                      <li>
-                      Capitol Records
-                      <span class="muted"> — Manufactured For</span>                                          </li>
-                                      <li>
-                      Schallplattenfabrik Pallas GmbH
-                      <span class="muted"> — Pressed By</span>                                          </li>
-                                  </ul>
-              </div>
+          </div>
+
+          <div id="tab-credits" class="tab-content">
+                             <div class="card">
+                    <div class="meta">
+                                                    <p><strong>Credits:</strong></p>
+                            <ul style="margin:0; padding-left:20px" class="muted">
+                                                            <li style="margin-bottom:4px">
+                                Geoff Osika
+                                 — Acoustic Bass [Bass]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Nico Abondolo
+                                 — Acoustic Bass [Bass]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Beck Hansen
+                                 — Arranged By [Album Strings]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                David Campbell
+                                 — Arranged By [Album Strings]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Eric Byers
+                                 — Cello                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Suzie Katayama
+                                 — Cello                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Tim Landauer
+                                 — Cello                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Steve Richards
+                                 — Cello [Principal]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                David Campbell
+                                 — Conductor                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Suzie Katayama
+                                 — Contractor                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Christopher Lee Lyons
+                                 — Design [Assistance]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Beck Hansen
+                                 — Design, Art Direction                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Jimmy Turrell
+                                 — Design, Art Direction                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Steve Stacey
+                                 — Design, Art Direction                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Alex Pasco
+                                 — Engineer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Beck Hansen
+                                 — Engineer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Cassidy Turbin
+                                 — Engineer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Cole M.G.N.
+                                 — Engineer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Darrell Thorp
+                                 — Engineer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                David Greenbaum
+                                 — Engineer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Florian Lagatta
+                                 — Engineer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Greg Kurstin
+                                 — Engineer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Jesse Shatkin
+                                 — Engineer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                John Hanes
+                                 — Engineer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Julian Burg
+                                 — Engineer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Greg Kurstin
+                                 — Guitar, Bass, Drums, Piano, Synthesizer, Clavinet, Electric Piano [Rhodes], Mellotron, Marimba, Organ, Percussion                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Chris Bellman
+                                 — Mastered By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Emily Lazar
+                                 — Mastered By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Randy Merrill
+                                 — Mastered By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Tom Coyne
+                                 — Mastered By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Beck Hansen
+                                 — Mixed By                                 (tracks: B1, B3)                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Greg Kurstin
+                                 — Mixed By                                 (tracks: A4, B1, B3)                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Serban Ghenea
+                                 — Mixed By                                 (tracks: A1 to A3, A5, B2, B4, B5)                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Cassidy Turbin
+                                 — Mixed By [With]                                 (tracks: B1, B3)                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Darrell Thorp
+                                 — Mixed By [With]                                 (tracks: B1, B3)                                </li>
+                                                            <li style="margin-bottom:4px">
+                                David Greenbaum
+                                 — Mixed By [With]                                 (tracks: B1, B3)                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Péter Hapák
+                                 — Photography By [Cover Photo]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Eliot Lee Hazel
+                                 — Photography By [Interior Photo]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Beck Hansen
+                                 — Producer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Cole M.G.N.
+                                 — Producer                                 (tracks: B2)                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Greg Kurstin
+                                 — Producer                                 (tracks: A1 to B1, B3, B4)                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Darrin McCann
+                                 — Viola                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Matt Funes
+                                 — Viola                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Andrew Duckles
+                                 — Viola [Principal]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Josefina Vergara
+                                 — Violin                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Mario DeLeon
+                                 — Violin                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Michele Richards
+                                 — Violin                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Natalie Leggett
+                                 — Violin                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Sara Parkins
+                                 — Violin                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Songa Lee
+                                 — Violin                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Tereza Stanislav
+                                 — Violin                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Charlie Bisharat
+                                 — Violin [Concert Masters]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Beck Hansen
+                                 — Vocals, Guitar, Piano, Electric Piano [Rhodes], Organ, Synthesizer, Bass, Glockenspiel, Percussion                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Andrew Wyatt
+                                 — Written-By                                 (tracks: B1)                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Beck Hansen
+                                 — Written-By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Cole M.G.N.
+                                 — Written-By                                 (tracks: B2)                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Greg Kurstin
+                                 — Written-By                                 (tracks: A1 to B1, B3, B4)                                </li>
+                                                        </ul>
+                        
+                                                    <p style="margin-top:16px"><strong>Companies:</strong></p>
+                            <ul style="margin:0; padding-left:20px" class="muted">
+                                                            <li style="margin-bottom:4px">
+                                Fonograf Records
+                                 — Phonographic Copyright (p)                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Fonograf Records
+                                 — Copyright (c)                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                UMG Recordings, Inc.
+                                 — Licensed To                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Furnace MFG
+                                 — Manufactured By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Pallas USA
+                                 — Manufactured By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Capitol Records
+                                 — Manufactured For                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Schallplattenfabrik Pallas GmbH
+                                 — Pressed By                                                                </li>
+                                                        </ul>
+                                            </div>
+                </div>
+                       </div>
+
+          <div id="tab-status" class="tab-content">
+            <div class="card">
+                <div class="meta">
+                    <div style="margin-bottom:16px">
+                        <strong>Discogs Status</strong>
+                        <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+                                                        <form method="post" action="/release/save" style="margin:0">
+                                <input type="hidden" name="_token" value="" />
+                                <input type="hidden" name="release_id" value="10998078" />
+                                <input type="hidden" name="action" value="want_to_collection" />
+                                <input type="hidden" name="return" value="../index.html" />
+                                <button type="submit" style="background:var(--card);color:var(--accent);border:1px solid #2a2b2f;border-radius:8px;padding:6px 10px;cursor:pointer">Add to Collection</button>
+                            </form>
+                            
+                                                        <form method="post" action="/release/save" style="margin:0">
+                                <input type="hidden" name="_token" value="" />
+                                <input type="hidden" name="release_id" value="10998078" />
+                                <input type="hidden" name="action" value="add_want" />
+                                <input type="hidden" name="return" value="../index.html" />
+                                <button type="submit" class="muted" style="background:transparent;border:1px solid #2a2b2f;border-radius:8px;padding:6px 10px;cursor:pointer;color:inherit">Add to Wantlist</button>
+                            </form>
+                                                    </div>
+                    </div>
+
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                        <strong>My Notes</strong>
+                                            </div>
+
+                    <div id="notesView" style="margin-top:8px">
+                                                                                                                    </div>
+                                                         </div>
             </div>
-          
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Barcodes</strong>
-                <ul>
-                                      <li>6 02557 88220 9 <span class="muted">(Text)</span></li>
-                                      <li>602557882209 <span class="muted">(Scanned)</span></li>
-                                  </ul>
-              </div>
-            </div>
-          
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Identifiers</strong>
-                <ul>
-                                      <li>Matrix / Runout: B002678501-A 2 CB <span class="muted">(A-side etched)</span></li>
-                                      <li>Matrix / Runout: B002678501-B 2 CB  <span class="muted">(B-side etched)</span></li>
-                                      <li>Matrix / Runout: -44624- P. USA <span class="muted">(Both sides stamped)</span></li>
-                                  </ul>
-              </div>
-            </div>
-                  </div>
+          </div>
+        </div>
       </div>
 
             <!-- Lightbox overlay -->
@@ -405,7 +720,8 @@
         document.addEventListener('DOMContentLoaded', function(){
           const images = [
             '..\/images\/10998078\/258bdf02e866da43d840e86f8253b038bf24d2d7.jpg', '..\/images\/10998078\/b0f9b342fd6172c6901407ba8e4095f42fa7527e.jpg', '..\/images\/10998078\/a8f13cbe486da46ee2d6eaa8d352f3565050b5ac.jpg', '..\/images\/10998078\/615cc669c3901b8998148cf57555bdd1ce58e98e.jpg', '..\/images\/10998078\/c582f204e9654617f692f48c48f61a0615b2c3dd.jpg', '..\/images\/10998078\/9c9debd4aaac8fc46808fea122b2a794eac61649.jpg', '..\/images\/10998078\/04290eabdbacb0bfe36280c1d9b07c0e2b27bdf1.jpg', '..\/images\/10998078\/e4877c72d6d02250773269a9ef58a9f16f4e8c99.jpg', '..\/images\/10998078\/6bf7480db8d8f79f0db9b6f7d232e73e35c4d14c.jpg', '..\/images\/10998078\/e5049eecc17601f6067e0af8ee8575e838df8d77.jpg', '..\/images\/10998078\/01917ca14b0047c013b87b3f9924e944637817ad.jpg', '..\/images\/10998078\/2437cb740b39fad098f1ae3385a7da376ae48c9c.jpg', '..\/images\/10998078\/5ef901275a7f491e403433631ea16dcafa81e957.jpg', '..\/images\/10998078\/4f0fb9ef0d8104863d856b3591d34dc2e712ce4e.jpg', '..\/images\/10998078\/a22d3190a0f5b1137b8b10663e602e118a607ab6.jpg', '..\/images\/10998078\/7bbb5e8006f069612b98b6a1298471f486191215.jpg', '..\/images\/10998078\/eef7b708f8698e869d296188da1af966d4d92174.jpg', '..\/images\/10998078\/4dc17b952dacd3dd4f03b90761bc0f84bf56db14.jpg'          ];
-          const main = document.getElementById('main-cover');
+          const track = document.getElementById('carousel-track');
+          const dots = document.querySelectorAll('.dot');
           const thumbs = document.querySelectorAll('.thumb');
           const lb = document.getElementById('lightbox');
           const lbImg = lb ? lb.querySelector('.lb-img') : null;
@@ -413,16 +729,12 @@
           const lbPrev = lb ? lb.querySelector('.lb-prev') : null;
           const lbNext = lb ? lb.querySelector('.lb-next') : null;
           const lbCounter = lb ? lb.querySelector('.lb-counter') : null;
-          let idx = parseInt(main?.getAttribute('data-idx') || '0', 10) || 0;
+          let idx = 0;
 
-          function updateMain(to){
-            if (!main) return;
-            const i = Math.max(0, Math.min(images.length - 1, to));
-            if (images[i] && main.getAttribute('src') !== images[i]) {
-              main.setAttribute('src', images[i]);
-            }
-            main.setAttribute('data-idx', String(i));
-            idx = i;
+          function updateCarousel(to){
+            idx = Math.max(0, Math.min(images.length - 1, to));
+            if (track) track.style.transform = `translateX(-${idx * 100}%)`;
+            dots.forEach((d, i) => d.classList.toggle('active', i === idx));
           }
 
           function openLightbox(startIdx){
@@ -440,54 +752,92 @@
             lb.setAttribute('aria-hidden', 'true');
             document.body.style.overflow = '';
           }
-          function next(){ idx = (idx + 1) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
-          function prev(){ idx = (idx - 1 + images.length) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
+          function next(){ idx = (idx + 1) % images.length; if (lb.classList.contains('open')) { lbImg.src = images[idx]; lbCounter.textContent = (idx + 1) + ' / ' + images.length; } else { updateCarousel(idx); } }
+          function prev(){ idx = (idx - 1 + images.length) % images.length; if (lb.classList.contains('open')) { lbImg.src = images[idx]; lbCounter.textContent = (idx + 1) + ' / ' + images.length; } else { updateCarousel(idx); } }
 
-          // Thumbnail click: swap main and set index; Shift+Click opens lightbox
-          thumbs.forEach(function(btn){
-            btn.addEventListener('click', function(e){
-              const i = parseInt(this.getAttribute('data-idx') || '0', 10) || 0;
-              if (e.shiftKey) { openLightbox(i); return; }
-              updateMain(i);
-            });
+          // Carousel dot/thumb clicks
+          dots.forEach(d => d.addEventListener('click', () => updateCarousel(parseInt(d.dataset.idx))));
+          thumbs.forEach(t => t.addEventListener('click', () => updateCarousel(parseInt(t.dataset.idx))));
+
+          // Lightbox trigger on carousel image click
+          document.querySelectorAll('.carousel-slide img').forEach(img => {
+            img.addEventListener('click', () => openLightbox(parseInt(img.dataset.idx)));
           });
-
-          // Main cover click: open lightbox on current index
-          if (main) {
-            main.addEventListener('click', function(){
-              const i = parseInt(main.getAttribute('data-idx') || '0', 10) || 0;
-              openLightbox(i);
-            });
-          }
 
           // Lightbox interactions
           lbClose?.addEventListener('click', closeLightbox);
           lbPrev?.addEventListener('click', prev);
           lbNext?.addEventListener('click', next);
-          lbImg?.addEventListener('click', next); // click image to advance
+          lbImg?.addEventListener('click', next);
           lb?.addEventListener('click', function(e){ if (e.target === lb) closeLightbox(); });
 
-          // Keyboard support
+          // Keyboard
           document.addEventListener('keydown', function(e){
             if (!lb || !lb.classList.contains('open')) return;
-            if (e.key === 'Escape') { e.preventDefault(); closeLightbox(); }
-            else if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
-            else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+            if (e.key === 'Escape') closeLightbox();
+            else if (e.key === 'ArrowRight') next();
+            else if (e.key === 'ArrowLeft') prev();
           });
 
-          // Ensure initial main index reflects the list
-          if (images.length > 0 && main) {
-            let initial = images.indexOf(main.getAttribute('src'));
-            if (initial < 0) initial = 0;
-            main.setAttribute('data-idx', String(initial));
+          // Tabs
+          const tabs = document.querySelectorAll('.tab');
+          const contents = document.querySelectorAll('.tab-content');
+          tabs.forEach(t => {
+            t.addEventListener('click', () => {
+              const target = t.dataset.tab;
+              tabs.forEach(t2 => t2.classList.toggle('active', t2 === t));
+              contents.forEach(c => c.classList.toggle('active', c.id === `tab-${target}`));
+            });
+          });
+
+          // Handle tab parameter in URL
+          const urlParams = new URLSearchParams(window.location.search);
+          const activeTab = urlParams.get('tab');
+          if (activeTab) {
+            const tabEl = document.querySelector(`.tab[data-tab="${activeTab}"]`);
+            if (tabEl) tabEl.click();
           }
+
+          // Swipe support for carousel (basic)
+          let startX = 0;
+          track?.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+          track?.addEventListener('touchend', e => {
+            const diff = startX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) {
+              if (diff > 0) next(); else prev();
+            }
+          });
+
+          // Notes Toggle
+          (function(){
+            const btn = document.getElementById('editToggle');
+            const form = document.getElementById('notesForm');
+            const view = document.getElementById('notesView');
+            if (!btn || !form || !view) return;
+            btn.addEventListener('click', function(){
+                const open = form.style.display === 'none';
+                form.style.display = open ? 'flex' : 'none';
+                view.style.display = open ? 'none' : 'block';
+                btn.textContent = open ? 'Cancel' : 'Edit';
+                if (open) {
+                    // Switch to status tab if not active
+                    document.querySelector('.tab[data-tab="status"]').click();
+                }
+            });
+          })();
         });
       </script>
             </div>
 
-  
+    <script>
+    document.getElementById('mobile-toggle')?.addEventListener('click', function() {
+      document.getElementById('mobile-menu').classList.toggle('active');
+      this.textContent = document.getElementById('mobile-menu').classList.contains('active') ? '✕' : '☰';
+    });
+  </script>
+
   <footer class="site-footer muted" style="text-align:center;margin:24px 0 8px 0;font-size:.9rem;">
-  Powered by Discogs API & Coffee Since 2025 | Lovingly Crafted in Boise, Idaho
+  Powered by Discogs API & Coffee Since 2026 | Lovingly Crafted in Boise, Idaho
 </footer>
 </body>
 </html>

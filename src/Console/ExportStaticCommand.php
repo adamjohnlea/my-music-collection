@@ -159,17 +159,31 @@ class ExportStaticCommand extends Command
     private function resolveUsername(\PDO $pdo): ?string
     {
         try {
+            // 1) Try kv_store (populated when logged in via web)
             // kv_store uses columns `k` and `v`
             $st = $pdo->query("SELECT v FROM kv_store WHERE k = 'current_user_id' LIMIT 1");
             $uid = (int)($st->fetchColumn() ?: 0);
-            if ($uid <= 0) return null;
-            $st2 = $pdo->prepare('SELECT discogs_username FROM auth_users WHERE id = :id');
-            $st2->execute([':id' => $uid]);
-            $u = $st2->fetchColumn();
-            return $u ? (string)$u : null;
+            if ($uid > 0) {
+                // NOTE: auth_users table was removed in V12 migration for single-user mode.
+                // If we still have a uid, we might be in an old state or using a different auth mechanism.
+                // But wait, if auth_users is gone, the query below will fail.
+                $st2 = $pdo->prepare('SELECT discogs_username FROM auth_users WHERE id = :id');
+                $st2->execute([':id' => $uid]);
+                $u = $st2->fetchColumn();
+                if ($u) return (string)$u;
+            }
         } catch (\Throwable $e) {
-            return null;
+            // Table might not exist or column missing, ignore and fall back
         }
+
+        // 2) Fallback to .env config
+        $config = new Config();
+        $username = $config->getDiscogsUsername();
+        if ($username && $username !== 'your_username') {
+            return $username;
+        }
+
+        return null;
     }
 
     private function fetchAllReleases(\PDO $pdo, string $username, string $baseDir, string $baseUrl): array

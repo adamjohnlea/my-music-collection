@@ -4,18 +4,197 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>R.E.M. — Unplugged 1991</title>
+  <style>
+    :root {
+      --bg: #0b0b0c;
+      --card: #16171a;
+      --text: #e7e7ea;
+      --muted: #a0a3aa;
+      --accent: #67e8f9;
+      --border: #2a2b2f;
+      --header-bg: rgba(11, 11, 12, 0.8);
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    .content-wrap {
+      margin-top: 24px;
+      margin-bottom: 24px;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .muted { color: var(--muted); }
+
+    /* Layout Helpers */
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .gap-4 { gap: 16px; }
+    .gap-2 { gap: 8px; }
+
+    /* Common Components */
+    .btn-small {
+      font-size: .8rem;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--card);
+      color: var(--text);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-small:hover { border-color: var(--accent); text-decoration: none; }
+
+    /* Common Header Components */
+    .main-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--header-bg);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-content {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    /* Desktop Nav */
+    .desktop-nav { display: flex; align-items: center; gap: 20px; }
+    @media (max-width: 768px) { .desktop-nav { display: none; } }
+
+    /* Account Dropdown */
+    .dropdown { position: relative; display: inline-block; }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background: var(--card);
+      min-width: 160px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      padding: 8px 0;
+      z-index: 101;
+    }
+    .dropdown:hover .dropdown-content { display: block; }
+    .dropdown-item {
+      display: block;
+      padding: 8px 16px;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .dropdown-item:hover { background: rgba(255,255,255,0.05); }
+
+    /* Mobile Nav / Hamburger */
+    .mobile-nav-toggle {
+      display: none;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 8px;
+    }
+    @media (max-width: 768px) { .mobile-nav-toggle { display: block; } }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 65px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg);
+      z-index: 99;
+      padding: 20px;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .mobile-menu.active { display: flex; }
+    .mobile-menu .nav-item {
+        display: block;
+        padding: 12px 16px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: var(--text);
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .mobile-menu .nav-item:hover { border-color: var(--accent); }
+
+    /* Breadcrumbs */
+    .breadcrumbs {
+      padding: 12px 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .breadcrumbs a { color: var(--muted); }
+    .breadcrumbs span { margin: 0 8px; opacity: 0.5; }
+
+    /* Utility Bar (Mobile Sticky Search/Sort) */
+    .utility-bar {
+        display: none;
+        position: sticky;
+        top: 65px;
+        z-index: 90;
+        background: var(--bg);
+        padding: 8px 20px;
+        border-bottom: 1px solid var(--border);
+    }
+    @media (max-width: 768px) {
+        .utility-bar.is-visible { display: block; }
+    }
+  </style>
     <style>
-    :root { --bg:#0b0b0c; --card:#16171a; --text:#e7e7ea; --muted:#a0a3aa; --accent:#67e8f9; --overlay: rgba(0,0,0,.9); }
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif}
-    .wrap{max-width:1000px;margin:40px auto;padding:0 20px}
-    a{color:var(--accent);text-decoration:none}
-    a:hover{text-decoration:underline}
-    .layout{display:grid;grid-template-columns:280px 1fr;gap:24px}
+    :root { --overlay: rgba(0,0,0,.9); }
+    .layout{display:grid;grid-template-columns:1fr 1fr;gap:40px}
     .card{background:var(--card);border-radius:12px;overflow:hidden}
     .cover{width:100%;aspect-ratio:1/1;object-fit:cover;background:#222;cursor:zoom-in}
     .meta{padding:16px}
-    .muted{color:var(--muted)}
-    h1{margin:0 0 8px 0;font-size:1.6rem}
+    h1{margin:0 0 8px 0;font-size:2rem}
+
+    /* Carousel */
+    .carousel-container { position: relative; width: 100%; overflow: hidden; border-radius: 12px; }
+    .carousel-track { display: flex; transition: transform 0.3s ease-out; }
+    .carousel-slide { min-width: 100%; aspect-ratio: 1/1; }
+    .carousel-slide img { width: 100%; height: 100%; object-fit: cover; }
+    .carousel-dots { display: none; justify-content: center; gap: 8px; margin-top: 12px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); cursor: pointer; opacity: 0.5; }
+    .dot.active { background: var(--accent); opacity: 1; }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 4px; border-bottom: 1px solid #2a2b2f; margin-top: 24px; overflow-x: auto; scrollbar-width: none; }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab { padding: 12px 20px; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; white-space: nowrap; }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-content { display: none; padding-top: 20px; }
+    .tab-content.active { display: block; }
 
     /* Lightbox */
     .lightbox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--overlay);z-index:1000}
@@ -30,450 +209,592 @@
     .lb-counter{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);color:#fff;background:rgba(0,0,0,.5);padding:4px 10px;border-radius:999px;font-size:.9rem}
 
     @media (max-width: 800px){
-      .layout{grid-template-columns:1fr}
+      .layout{grid-template-columns:1fr; gap: 24px;}
+      .carousel-dots { display: flex; }
       .lb-prev{left:10px}
       .lb-next{right:10px}
+      .wrap { margin-top: 12px; }
     }
   </style>
 </head>
 <body>
-  
+  <header class="main-header">
     <div class="wrap">
-    <p><a href="../index.html">← Back</a></p>
-          <div class="layout">
+      <div class="header-content">
+        <a href="/" class="logo">My Music</a>
+
+        <div class="desktop-nav">
+          <a href="/?view=collection" class="muted">Collection</a>
+          <a href="/?view=wantlist" class="muted">Wantlist</a>
+          <a href="/random" class="muted">Surprise Me</a>
+          <a href="/stats" class="muted">Stats</a>
+          <a href="/about" class="muted">About</a>
+        </div>
+
+        <button class="mobile-nav-toggle" id="mobile-toggle" aria-label="Toggle menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="/?view=collection" class="nav-item">Collection</a>
+    <a href="/?view=wantlist" class="nav-item">Wantlist</a>
+    <a href="/random" class="nav-item">Surprise Me</a>
+    <a href="/stats" class="nav-item">Stats</a>
+    <a href="/about" class="nav-item">About</a>
+  </div>
+
+  <div class="wrap">
+      <nav class="breadcrumbs">
+    <div>
+      <a href="/">Home</a>
+      <span>/</span>
+      <a href="/?view=collection">Collection</a>
+      <span>/</span>
+      Unplugged 1991
+    </div>
+  </nav>
+  </div>
+
+  
+    <div class="wrap content-wrap">
+    <div style="margin-bottom:24px">
+      <p style="margin:0"><a href="../index.html" style="background:var(--card);border:1px solid #2a2b2f;padding:6px 12px;border-radius:8px;color:var(--text);font-size:.9rem;text-decoration:none">← Back</a></p>
+    </div>
+                <div class="layout">
         <div>
-          <div class="card">
-                          <img id="main-cover" class="cover" src="../images/6044872/b6323995d4f5c6bb82083cef52c65b3e2618d9e7.jpg" alt="Unplugged 1991 cover" data-idx="0" />
-                      </div>
-                      <div class="thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
-                              <button class="thumb" data-url="../images/6044872/b6323995d4f5c6bb82083cef52c65b3e2618d9e7.jpg" data-idx="0" title="Image 1" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/6044872/b6323995d4f5c6bb82083cef52c65b3e2618d9e7.jpg" alt="thumb 1" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:1" />
+          <div class="carousel-container" id="carousel">
+            <div class="carousel-track" id="carousel-track">
+                                                <div class="carousel-slide">
+                    <img class="cover" src="../images/6044872/b6323995d4f5c6bb82083cef52c65b3e2618d9e7.jpg" alt="Unplugged 1991 cover" data-idx="0" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/6044872/6a52757d457dbcebbbf59b4d57b98fe0f69a0eff.jpg" alt="Unplugged 1991 cover" data-idx="1" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/6044872/4f4643e80e78b8a74258b11ddaa4f6547ebf4ad4.jpg" alt="Unplugged 1991 cover" data-idx="2" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/6044872/aa2927ecfe89d232cdf7aaf1094f4503a6c94423.jpg" alt="Unplugged 1991 cover" data-idx="3" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/6044872/09466b6db31a59864ca1cde98fd6df875444d966.jpg" alt="Unplugged 1991 cover" data-idx="4" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/6044872/7850ca2c075297312dde766f1ab0fb698cc5450c.jpg" alt="Unplugged 1991 cover" data-idx="5" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/6044872/7b8d07a406e2ce125e869750bf985f36df65a44d.jpg" alt="Unplugged 1991 cover" data-idx="6" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/6044872/ef81f97c43113a4fc90204b9f078b887dda6495d.jpg" alt="Unplugged 1991 cover" data-idx="7" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/6044872/5bdd27c3f2e77078fc0fc351b5011b87130b46a3.jpg" alt="Unplugged 1991 cover" data-idx="8" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/6044872/bc30d7080562ad9162f2ac3137a5af15120e8d00.jpg" alt="Unplugged 1991 cover" data-idx="9" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/6044872/63e8a238c0049489c475adc91f64c39e8b4ece92.jpg" alt="Unplugged 1991 cover" data-idx="10" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/6044872/249efd9e435f0bcbd6eaca1b5fc5619dfcb41960.jpg" alt="Unplugged 1991 cover" data-idx="11" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/6044872/d3af7cf00f8f13a233b1be35437b77d9492a50e1.jpg" alt="Unplugged 1991 cover" data-idx="12" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/6044872/ead9717bb1bc3e44f8c2614e597d9a9e1ad194d1.jpg" alt="Unplugged 1991 cover" data-idx="13" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/6044872/326b037d3581fa45c6186931f7eccc9eb6c10462.jpg" alt="Unplugged 1991 cover" data-idx="14" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/6044872/66c81a21ed1d23ba2d1db1d23416862fbdc3345e.jpg" alt="Unplugged 1991 cover" data-idx="15" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/6044872/93edf55f8052489fa0d2d9ac9ffdf910860a1caf.jpg" alt="Unplugged 1991 cover" data-idx="16" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/6044872/e76c4cfd01d7cd5e053c492bdb2c5971420a7f53.jpg" alt="Unplugged 1991 cover" data-idx="17" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/6044872/7a40e05174145d25b20abdadb25b73f60a9f40c8.jpg" alt="Unplugged 1991 cover" data-idx="18" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/6044872/9060d0981f8702970e0f6b5e1db82fe20f2a6f01.jpg" alt="Unplugged 1991 cover" data-idx="19" />
+                  </div>
+                                          </div>
+          </div>
+                      <div class="carousel-dots" id="carousel-dots">
+                              <div class="dot active" data-idx="0"></div>
+                              <div class="dot " data-idx="1"></div>
+                              <div class="dot " data-idx="2"></div>
+                              <div class="dot " data-idx="3"></div>
+                              <div class="dot " data-idx="4"></div>
+                              <div class="dot " data-idx="5"></div>
+                              <div class="dot " data-idx="6"></div>
+                              <div class="dot " data-idx="7"></div>
+                              <div class="dot " data-idx="8"></div>
+                              <div class="dot " data-idx="9"></div>
+                              <div class="dot " data-idx="10"></div>
+                              <div class="dot " data-idx="11"></div>
+                              <div class="dot " data-idx="12"></div>
+                              <div class="dot " data-idx="13"></div>
+                              <div class="dot " data-idx="14"></div>
+                              <div class="dot " data-idx="15"></div>
+                              <div class="dot " data-idx="16"></div>
+                              <div class="dot " data-idx="17"></div>
+                              <div class="dot " data-idx="18"></div>
+                              <div class="dot " data-idx="19"></div>
+                          </div>
+            <div class="thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;">
+                              <button class="thumb" data-idx="0" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/6044872/b6323995d4f5c6bb82083cef52c65b3e2618d9e7.jpg" alt="thumb 1" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:1" />
                 </button>
-                              <button class="thumb" data-url="../images/6044872/6a52757d457dbcebbbf59b4d57b98fe0f69a0eff.jpg" data-idx="1" title="Image 2" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/6044872/6a52757d457dbcebbbf59b4d57b98fe0f69a0eff.jpg" alt="thumb 2" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="1" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/6044872/6a52757d457dbcebbbf59b4d57b98fe0f69a0eff.jpg" alt="thumb 2" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/6044872/4f4643e80e78b8a74258b11ddaa4f6547ebf4ad4.jpg" data-idx="2" title="Image 3" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/6044872/4f4643e80e78b8a74258b11ddaa4f6547ebf4ad4.jpg" alt="thumb 3" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="2" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/6044872/4f4643e80e78b8a74258b11ddaa4f6547ebf4ad4.jpg" alt="thumb 3" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/6044872/aa2927ecfe89d232cdf7aaf1094f4503a6c94423.jpg" data-idx="3" title="Image 4" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/6044872/aa2927ecfe89d232cdf7aaf1094f4503a6c94423.jpg" alt="thumb 4" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="3" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/6044872/aa2927ecfe89d232cdf7aaf1094f4503a6c94423.jpg" alt="thumb 4" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/6044872/09466b6db31a59864ca1cde98fd6df875444d966.jpg" data-idx="4" title="Image 5" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/6044872/09466b6db31a59864ca1cde98fd6df875444d966.jpg" alt="thumb 5" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="4" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/6044872/09466b6db31a59864ca1cde98fd6df875444d966.jpg" alt="thumb 5" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/6044872/7850ca2c075297312dde766f1ab0fb698cc5450c.jpg" data-idx="5" title="Image 6" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/6044872/7850ca2c075297312dde766f1ab0fb698cc5450c.jpg" alt="thumb 6" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="5" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/6044872/7850ca2c075297312dde766f1ab0fb698cc5450c.jpg" alt="thumb 6" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/6044872/7b8d07a406e2ce125e869750bf985f36df65a44d.jpg" data-idx="6" title="Image 7" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/6044872/7b8d07a406e2ce125e869750bf985f36df65a44d.jpg" alt="thumb 7" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="6" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/6044872/7b8d07a406e2ce125e869750bf985f36df65a44d.jpg" alt="thumb 7" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/6044872/ef81f97c43113a4fc90204b9f078b887dda6495d.jpg" data-idx="7" title="Image 8" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/6044872/ef81f97c43113a4fc90204b9f078b887dda6495d.jpg" alt="thumb 8" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="7" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/6044872/ef81f97c43113a4fc90204b9f078b887dda6495d.jpg" alt="thumb 8" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/6044872/5bdd27c3f2e77078fc0fc351b5011b87130b46a3.jpg" data-idx="8" title="Image 9" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/6044872/5bdd27c3f2e77078fc0fc351b5011b87130b46a3.jpg" alt="thumb 9" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="8" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/6044872/5bdd27c3f2e77078fc0fc351b5011b87130b46a3.jpg" alt="thumb 9" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/6044872/bc30d7080562ad9162f2ac3137a5af15120e8d00.jpg" data-idx="9" title="Image 10" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/6044872/bc30d7080562ad9162f2ac3137a5af15120e8d00.jpg" alt="thumb 10" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="9" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/6044872/bc30d7080562ad9162f2ac3137a5af15120e8d00.jpg" alt="thumb 10" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/6044872/63e8a238c0049489c475adc91f64c39e8b4ece92.jpg" data-idx="10" title="Image 11" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/6044872/63e8a238c0049489c475adc91f64c39e8b4ece92.jpg" alt="thumb 11" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="10" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/6044872/63e8a238c0049489c475adc91f64c39e8b4ece92.jpg" alt="thumb 11" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/6044872/249efd9e435f0bcbd6eaca1b5fc5619dfcb41960.jpg" data-idx="11" title="Image 12" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/6044872/249efd9e435f0bcbd6eaca1b5fc5619dfcb41960.jpg" alt="thumb 12" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="11" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/6044872/249efd9e435f0bcbd6eaca1b5fc5619dfcb41960.jpg" alt="thumb 12" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/6044872/d3af7cf00f8f13a233b1be35437b77d9492a50e1.jpg" data-idx="12" title="Image 13" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/6044872/d3af7cf00f8f13a233b1be35437b77d9492a50e1.jpg" alt="thumb 13" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="12" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/6044872/d3af7cf00f8f13a233b1be35437b77d9492a50e1.jpg" alt="thumb 13" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/6044872/ead9717bb1bc3e44f8c2614e597d9a9e1ad194d1.jpg" data-idx="13" title="Image 14" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/6044872/ead9717bb1bc3e44f8c2614e597d9a9e1ad194d1.jpg" alt="thumb 14" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="13" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/6044872/ead9717bb1bc3e44f8c2614e597d9a9e1ad194d1.jpg" alt="thumb 14" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/6044872/326b037d3581fa45c6186931f7eccc9eb6c10462.jpg" data-idx="14" title="Image 15" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/6044872/326b037d3581fa45c6186931f7eccc9eb6c10462.jpg" alt="thumb 15" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="14" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/6044872/326b037d3581fa45c6186931f7eccc9eb6c10462.jpg" alt="thumb 15" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/6044872/66c81a21ed1d23ba2d1db1d23416862fbdc3345e.jpg" data-idx="15" title="Image 16" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/6044872/66c81a21ed1d23ba2d1db1d23416862fbdc3345e.jpg" alt="thumb 16" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="15" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/6044872/66c81a21ed1d23ba2d1db1d23416862fbdc3345e.jpg" alt="thumb 16" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/6044872/93edf55f8052489fa0d2d9ac9ffdf910860a1caf.jpg" data-idx="16" title="Image 17" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/6044872/93edf55f8052489fa0d2d9ac9ffdf910860a1caf.jpg" alt="thumb 17" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="16" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/6044872/93edf55f8052489fa0d2d9ac9ffdf910860a1caf.jpg" alt="thumb 17" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/6044872/e76c4cfd01d7cd5e053c492bdb2c5971420a7f53.jpg" data-idx="17" title="Image 18" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/6044872/e76c4cfd01d7cd5e053c492bdb2c5971420a7f53.jpg" alt="thumb 18" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="17" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/6044872/e76c4cfd01d7cd5e053c492bdb2c5971420a7f53.jpg" alt="thumb 18" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/6044872/7a40e05174145d25b20abdadb25b73f60a9f40c8.jpg" data-idx="18" title="Image 19" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/6044872/7a40e05174145d25b20abdadb25b73f60a9f40c8.jpg" alt="thumb 19" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="18" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/6044872/7a40e05174145d25b20abdadb25b73f60a9f40c8.jpg" alt="thumb 19" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/6044872/9060d0981f8702970e0f6b5e1db82fe20f2a6f01.jpg" data-idx="19" title="Image 20" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/6044872/9060d0981f8702970e0f6b5e1db82fe20f2a6f01.jpg" alt="thumb 20" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="19" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/6044872/9060d0981f8702970e0f6b5e1db82fe20f2a6f01.jpg" alt="thumb 20" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                           </div>
                   </div>
         <div>
           <h1>Unplugged 1991</h1>
-          <p class="muted">R.E.M. • 2014</p>
+          <p class="muted" style="font-size:1.2rem">R.E.M. • 2014</p>
           <p class="muted">US</p>
-                      <p style="margin:8px 0;">
-              <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Rock</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Pop</span>              <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Acoustic</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Alternative Rock</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Indie Rock</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Pop Rock</span>            </p>
-          
-                      <p class="muted">Formats:
-                              Vinyl                          </p>
-          
+          <div style="margin:16px 0; display:flex; gap:8px; flex-wrap:wrap">
+            <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Rock</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Pop</span>            <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Acoustic</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Alternative Rock</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Indie Rock</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Pop Rock</span>          </div>
+
                       <p class="muted">Labels:
               Rhino Records (R1-544353), MTV Music Television (R1-544353)            </p>
           
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Tracklist</strong>
-                <ol>
-                                      <li>A1 — Half A World Away <span class="muted">(3:58)</span></li>
-                                      <li>A2 — Disturbance At The Heron House <span class="muted">(3:47)</span></li>
-                                      <li>A3 — Radio Song <span class="muted">(4:19)</span></li>
-                                      <li>A4 — Low <span class="muted">(5:10)</span></li>
-                                      <li>B1 — Perfect Circle <span class="muted">(4:14)</span></li>
-                                      <li>B2 — Fall On Me <span class="muted">(3:22)</span></li>
-                                      <li>B3 — Belong <span class="muted">(4:30)</span></li>
-                                      <li>B4 — Love Is All Around <span class="muted">(3:22)</span></li>
-                                      <li>C1 — It&#039;s The End Of The World As We Know It (And I Feel Fine) <span class="muted">(4:36)</span></li>
-                                      <li>C2 — Losing My Religion <span class="muted">(4:54)</span></li>
-                                      <li>C3 — Pop Song 89 <span class="muted">(3:29)</span></li>
-                                      <li>C4 — Endgame <span class="muted">(3:42)</span></li>
-                                      <li>D1 — Fretless <span class="muted">(5:33)</span></li>
-                                      <li>D2 — Swan Swan H <span class="muted">(3:00)</span></li>
-                                      <li>D3 — Rotary 11 <span class="muted">(1:49)</span></li>
-                                      <li>D4 — Get Up <span class="muted">(2:54)</span></li>
-                                      <li>D5 — World Leader Pretend <span class="muted">(4:57)</span></li>
-                                  </ol>
-              </div>
-            </div>
-          
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Videos</strong>
-                <ul>
-                                      <li><a href="https://www.youtube.com/watch?v=9up949r2NJY" target="_blank" rel="noopener">REM - Unplugged ( 7 Songs  Live On  MTV 4/28/1991  Stereo  )</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=9up949r2NJY" target="_blank" rel="noopener">REM - Unplugged ( 7 Songs  Live On  MTV 4/28/1991  Stereo  )</a></li>
-                                  </ul>
-              </div>
-            </div>
-          
-          
-          <div class="card" style="margin-top:16px;">
-            <div class="meta">
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-                <strong>My Notes</strong>
-                              </div>
-
-              
-              <div id="notesView" style="margin-top:8px">
-                                                  <div class="muted">(none)</div>
-                              </div>
-
-                          </div>
+          <div class="tabs" id="release-tabs">
+            <div class="tab active" data-tab="tracks">Tracks</div>
+            <div class="tab" data-tab="details">Details</div>
+            <div class="tab" data-tab="credits">Credits</div>
+            <div class="tab" data-tab="status">Status & Notes</div>
           </div>
 
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Credits</strong>
-                <ul>
-                                      <li>
-                      Bertis Downs IV
-                      <span class="muted">— Advisor</span>                                          </li>
-                                      <li>
-                      Carol Field
-                      <span class="muted">— Art Direction</span>                                          </li>
-                                      <li>
-                      Bill Berry
-                      <span class="muted">— Band [R.E.M.]</span>                                          </li>
-                                      <li>
-                      Michael Stipe
-                      <span class="muted">— Band [R.E.M.]</span>                                          </li>
-                                      <li>
-                      Mike Mills
-                      <span class="muted">— Band [R.E.M.]</span>                                          </li>
-                                      <li>
-                      Peter Buck
-                      <span class="muted">— Band [R.E.M.]</span>                                          </li>
-                                      <li>
-                      Charlie Huntley
-                      <span class="muted">— Camera Operator [Cameras]</span>                                          </li>
-                                      <li>
-                      Jake Ostroff
-                      <span class="muted">— Camera Operator [Cameras]</span>                                          </li>
-                                      <li>
-                      Manny Rodriguez
-                      <span class="muted">— Camera Operator [Cameras]</span>                                          </li>
-                                      <li>
-                      Steve Yaconetti
-                      <span class="muted">— Camera Operator [Cameras]</span>                                          </li>
-                                      <li>
-                      Tom Ucciferri
-                      <span class="muted">— Camera Operator [Cameras]</span>                                          </li>
-                                      <li>
-                      John Lynn
-                      <span class="muted">— Coordinator [Instrument Coordinator]</span>                                          </li>
-                                      <li>
-                      Jim Burns
-                      <span class="muted">— Created By [MTV Unplugged Created By]</span>                                          </li>
-                                      <li>
-                      Robert Small
-                      <span class="muted">— Created By [MTV Unplugged Created By]</span>                                          </li>
-                                      <li>
-                      Drory Yellin
-                      <span class="muted">— Crew [Utility]</span>                                          </li>
-                                      <li>
-                      Kelly Britt
-                      <span class="muted">— Crew [Utility]</span>                                          </li>
-                                      <li>
-                      Sig Sigworth
-                      <span class="muted">— Curated By [Project Curator]</span>                                          </li>
-                                      <li>
-                      Chris Bilheimer
-                      <span class="muted">— Design [Package Design By]</span>                                          </li>
-                                      <li>
-                      Michael Stipe
-                      <span class="muted">— Design [Package Design By]</span>                                          </li>
-                                      <li>
-                      Mitch Geller
-                      <span class="muted">— Directed By [Technical Director]</span>                                          </li>
-                                      <li>
-                      Scott Litt
-                      <span class="muted">— Engineer [Audio Engineer]</span>                                          </li>
-                                      <li>
-                      Al Centrella
-                      <span class="muted">— Engineer [Audio]</span>                                          </li>
-                                      <li>
-                      Fritz Lang
-                      <span class="muted">— Engineer [Audio]</span>                                          </li>
-                                      <li>
-                      Jeremy Darby
-                      <span class="muted">— Engineer [Monitor Mixer]</span>                                          </li>
-                                      <li>
-                      Matty Randazzo
-                      <span class="muted">— Engineer [Video]</span>                                          </li>
-                                      <li>
-                      Joel Gallen
-                      <span class="muted">— Executive-Producer</span>                                          </li>
-                                      <li>
-                      Beth McCarthy
-                      <span class="muted">— Film Director [Associate Director]</span>                                          </li>
-                                      <li>
-                      Milton Lage
-                      <span class="muted">— Film Director [Directed By]</span>                                          </li>
-                                      <li>
-                      Jackson
-                      <span class="muted">— Grip</span>                                          </li>
-                                      <li>
-                      Bruce Balton
-                      <span class="muted">— Grip [Crane Grips]</span>                                          </li>
-                                      <li>
-                      Rob Balton
-                      <span class="muted">— Grip [Crane Grips]</span>                                          </li>
-                                      <li>
-                      Peter Holsapple
-                      <span class="muted">— Guest [With]</span>                                          </li>
-                                      <li>
-                      Chris Bellman
-                      <span class="muted">— Lacquer Cut By</span>                                          </li>
-                                      <li>
-                      Alan Adelman
-                      <span class="muted">— Lighting [Lighting Designer]</span>                                          </li>
-                                      <li>
-                      Patricia Regan
-                      <span class="muted">— Make-Up</span>                                          </li>
-                                      <li>
-                      Cynthia Fuchs
-                      <span class="muted">— Management [Director Of Facilities]</span>                                          </li>
-                                      <li>
-                      Nick Varacalli
-                      <span class="muted">— Management [Technical Manager]</span>                                          </li>
-                                      <li>
-                      Chris Bellman
-                      <span class="muted">— Mastered By</span>                                          </li>
-                                      <li>
-                      David Vanderheyden
-                      <span class="muted">— Mixed By [Audio Mixer]</span>                                          </li>
-                                      <li>
-                      Chris Edwards
-                      <span class="muted">— Other [Band Support]</span>                                          </li>
-                                      <li>
-                      Jenette Prymas
-                      <span class="muted">— Other [Interns]</span>                                          </li>
-                                      <li>
-                      John Wroten
-                      <span class="muted">— Other [Interns]</span>                                          </li>
-                                      <li>
-                      Anne Marie Gaynor
-                      <span class="muted">— Other [Production Assistant]</span>                                          </li>
-                                      <li>
-                      Audrey Morrissey
-                      <span class="muted">— Other [Production Assistant]</span>                                          </li>
-                                      <li>
-                      Chris Johnston
-                      <span class="muted">— Other [Production Assistant]</span>                                          </li>
-                                      <li>
-                      Chris McGhee
-                      <span class="muted">— Other [Production Assistant]</span>                                          </li>
-                                      <li>
-                      Don Jamieson
-                      <span class="muted">— Other [Production Assistant]</span>                                          </li>
-                                      <li>
-                      Ed Capuano
-                      <span class="muted">— Other [Production Assistant]</span>                                          </li>
-                                      <li>
-                      Greg Choa
-                      <span class="muted">— Other [Production Assistant]</span>                                          </li>
-                                      <li>
-                      Jay Hening
-                      <span class="muted">— Other [Production Assistant]</span>                                          </li>
-                                      <li>
-                      Karen Frank
-                      <span class="muted">— Other [Production Assistant]</span>                                          </li>
-                                      <li>
-                      Kelly Lynch
-                      <span class="muted">— Other [Production Assistant]</span>                                          </li>
-                                      <li>
-                      Loren Lyons
-                      <span class="muted">— Other [Production Assistant]</span>                                          </li>
-                                      <li>
-                      Robert Toughey
-                      <span class="muted">— Other [Production Assistant]</span>                                          </li>
-                                      <li>
-                      Valerie Sheppard
-                      <span class="muted">— Other [Production Assistant]</span>                                          </li>
-                                      <li>
-                      Bob Medve
-                      <span class="muted">— Other [Staging Services]</span>                                          </li>
-                                      <li>
-                      Terzi Staging
-                      <span class="muted">— Other [Staging Services]</span>                                          </li>
-                                      <li>
-                      Tommy Robinson
-                      <span class="muted">— Other [Staging Services]</span>                                          </li>
-                                      <li>
-                      Alex Coletti
-                      <span class="muted">— Producer</span>                                          </li>
-                                      <li>
-                      Audrey Johns
-                      <span class="muted">— Production Manager</span>                                          </li>
-                                      <li>
-                      Alex Young
-                      <span class="muted">— Project Manager [Project Management For MTV]</span>                                          </li>
-                                      <li>
-                      Kevin O&#039;Neil
-                      <span class="muted">— Project Manager [Project Management For R.E.M.]</span>                                          </li>
-                                      <li>
-                      John Cannelli
-                      <span class="muted">— Public Relations [Talent Artist Relations]</span>                                          </li>
-                                      <li>
-                      Joni Abbott
-                      <span class="muted">— Public Relations [Talent Artist Relations]</span>                                          </li>
-                                      <li>
-                      Joe Perota
-                      <span class="muted">— Stage Manager</span>                                          </li>
-                                      <li>
-                      Jack Roche
-                      <span class="muted">— Tape Op [Tape Operator]</span>                                          </li>
-                                      <li>
-                      Ernie Jew
-                      <span class="muted">— Technician [CAMremote Technician]</span>                                          </li>
-                                      <li>
-                      Bill Thompson
-                      <span class="muted">— Technician [Equipment Technician]</span>                                          </li>
-                                      <li>
-                      Mark Mytrowitz
-                      <span class="muted">— Technician [Equipment Technician]</span>                                          </li>
-                                      <li>
-                      Microwave
-                      <span class="muted">— Technician [Equipment Technician]</span>                                          </li>
-                                      <li>
-                      David Russell
-                      <span class="muted">— Tour Manager</span>                                          </li>
-                                      <li>
-                      David Ellsworth
-                      <span class="muted">— Video Editor [Assistant Editor]</span>                                          </li>
-                                      <li>
-                      Wayne Stevenson
-                      <span class="muted">— Video Editor [Editor]</span>                                          </li>
-                                      <li>
-                      Bill Berry
-                      <span class="muted">— Written-By</span>                      <span class="muted"> (tracks: A1 to B3, C1 to D5)</span>                    </li>
-                                      <li>
-                      Michael Stipe
-                      <span class="muted">— Written-By</span>                      <span class="muted"> (tracks: A1 to B3, C1 to D5)</span>                    </li>
-                                      <li>
-                      Mike Mills
-                      <span class="muted">— Written-By</span>                      <span class="muted"> (tracks: A1 to B3, C1 to D5)</span>                    </li>
-                                      <li>
-                      Peter Buck
-                      <span class="muted">— Written-By</span>                      <span class="muted"> (tracks: A1 to B3, C1 to D5)</span>                    </li>
-                                      <li>
-                      Reg Presley
-                      <span class="muted">— Written-By</span>                      <span class="muted"> (tracks: B4)</span>                    </li>
-                                  </ul>
+          <div id="tab-tracks" class="tab-content active">
+                          <div class="card">
+                <div class="meta">
+                  <ol style="margin:0; padding-left:20px">
+                                          <li style="margin-bottom:8px">A1 — Half A World Away <span class="muted">(3:58)</span></li>
+                                          <li style="margin-bottom:8px">A2 — Disturbance At The Heron House <span class="muted">(3:47)</span></li>
+                                          <li style="margin-bottom:8px">A3 — Radio Song <span class="muted">(4:19)</span></li>
+                                          <li style="margin-bottom:8px">A4 — Low <span class="muted">(5:10)</span></li>
+                                          <li style="margin-bottom:8px">B1 — Perfect Circle <span class="muted">(4:14)</span></li>
+                                          <li style="margin-bottom:8px">B2 — Fall On Me <span class="muted">(3:22)</span></li>
+                                          <li style="margin-bottom:8px">B3 — Belong <span class="muted">(4:30)</span></li>
+                                          <li style="margin-bottom:8px">B4 — Love Is All Around <span class="muted">(3:22)</span></li>
+                                          <li style="margin-bottom:8px">C1 — It&#039;s The End Of The World As We Know It (And I Feel Fine) <span class="muted">(4:36)</span></li>
+                                          <li style="margin-bottom:8px">C2 — Losing My Religion <span class="muted">(4:54)</span></li>
+                                          <li style="margin-bottom:8px">C3 — Pop Song 89 <span class="muted">(3:29)</span></li>
+                                          <li style="margin-bottom:8px">C4 — Endgame <span class="muted">(3:42)</span></li>
+                                          <li style="margin-bottom:8px">D1 — Fretless <span class="muted">(5:33)</span></li>
+                                          <li style="margin-bottom:8px">D2 — Swan Swan H <span class="muted">(3:00)</span></li>
+                                          <li style="margin-bottom:8px">D3 — Rotary 11 <span class="muted">(1:49)</span></li>
+                                          <li style="margin-bottom:8px">D4 — Get Up <span class="muted">(2:54)</span></li>
+                                          <li style="margin-bottom:8px">D5 — World Leader Pretend <span class="muted">(4:57)</span></li>
+                                      </ol>
+                </div>
               </div>
+                      </div>
+
+          <div id="tab-details" class="tab-content">
+            <div class="card">
+                <div class="meta">
+                                            <p class="muted"><strong>Formats:</strong>
+                                                    Vinyl                                                </p>
+                                        
+                    
+                                            <p><strong>Videos:</strong></p>
+                        <ul style="margin:0; padding-left:20px">
+                                                    <li><a href="https://www.youtube.com/watch?v=9up949r2NJY" target="_blank" rel="noopener">REM - Unplugged ( 7 Songs  Live On  MTV 4/28/1991  Stereo  )</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=9up949r2NJY" target="_blank" rel="noopener">REM - Unplugged ( 7 Songs  Live On  MTV 4/28/1991  Stereo  )</a></li>
+                                                </ul>
+                    
+                                            <p><strong>Barcodes:</strong></p>
+                        <ul style="margin:0; padding-left:20px" class="muted">
+                                                    <li>6 03497 89989 0 (Text)</li>
+                                                    <li>603497899890 (Scanned)</li>
+                                                </ul>
+                                    </div>
             </div>
-          
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Companies</strong>
-                <ul>
-                                      <li>
-                      R.E.M./Athens Ltd
-                      <span class="muted"> — Phonographic Copyright (p)</span>                                          </li>
-                                      <li>
-                      R.E.M./Athens Ltd
-                      <span class="muted"> — Copyright (c)</span>                                          </li>
-                                      <li>
-                      Rhino Entertainment Company
-                      <span class="muted"> — Phonographic Copyright (p)</span>                                          </li>
-                                      <li>
-                      Rhino Entertainment Company
-                      <span class="muted"> — Copyright (c)</span>                                          </li>
-                                      <li>
-                      Viacom International Inc.
-                      <span class="muted"> — Phonographic Copyright (p)</span>                                          </li>
-                                      <li>
-                      Viacom International Inc.
-                      <span class="muted"> — Copyright (c)</span>                                          </li>
-                                      <li>
-                      Rhino Entertainment Company
-                      <span class="muted"> — Marketed By</span>                                          </li>
-                                      <li>
-                      Warner Music Group
-                      <span class="muted"> — Record Company</span>                                          </li>
-                                      <li>
-                      Night Garden Music
-                      <span class="muted"> — Published By</span>                                          </li>
-                                      <li>
-                      Warner-Tamerlane Publishing Corp.
-                      <span class="muted"> — Published By</span>                                          </li>
-                                      <li>
-                      Universal - Songs Of Polygram International, Inc.
-                      <span class="muted"> — Published By</span>                                          </li>
-                                      <li>
-                      Bernie Grundman Mastering
-                      <span class="muted"> — Mastered At</span>                                          </li>
-                                  </ul>
-              </div>
+          </div>
+
+          <div id="tab-credits" class="tab-content">
+                             <div class="card">
+                    <div class="meta">
+                                                    <p><strong>Credits:</strong></p>
+                            <ul style="margin:0; padding-left:20px" class="muted">
+                                                            <li style="margin-bottom:4px">
+                                Bertis Downs IV
+                                 — Advisor                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Carol Field
+                                 — Art Direction                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Bill Berry
+                                 — Band [R.E.M.]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Michael Stipe
+                                 — Band [R.E.M.]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Mike Mills
+                                 — Band [R.E.M.]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Peter Buck
+                                 — Band [R.E.M.]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Charlie Huntley
+                                 — Camera Operator [Cameras]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Jake Ostroff
+                                 — Camera Operator [Cameras]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Manny Rodriguez
+                                 — Camera Operator [Cameras]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Steve Yaconetti
+                                 — Camera Operator [Cameras]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Tom Ucciferri
+                                 — Camera Operator [Cameras]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                John Lynn
+                                 — Coordinator [Instrument Coordinator]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Jim Burns
+                                 — Created By [MTV Unplugged Created By]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Robert Small
+                                 — Created By [MTV Unplugged Created By]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Drory Yellin
+                                 — Crew [Utility]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Kelly Britt
+                                 — Crew [Utility]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Sig Sigworth
+                                 — Curated By [Project Curator]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Chris Bilheimer
+                                 — Design [Package Design By]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Michael Stipe
+                                 — Design [Package Design By]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Mitch Geller
+                                 — Directed By [Technical Director]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Scott Litt
+                                 — Engineer [Audio Engineer]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Al Centrella
+                                 — Engineer [Audio]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Fritz Lang
+                                 — Engineer [Audio]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Jeremy Darby
+                                 — Engineer [Monitor Mixer]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Matty Randazzo
+                                 — Engineer [Video]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Joel Gallen
+                                 — Executive-Producer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Beth McCarthy
+                                 — Film Director [Associate Director]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Milton Lage
+                                 — Film Director [Directed By]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Jackson
+                                 — Grip                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Bruce Balton
+                                 — Grip [Crane Grips]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Rob Balton
+                                 — Grip [Crane Grips]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Peter Holsapple
+                                 — Guest [With]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Chris Bellman
+                                 — Lacquer Cut By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Alan Adelman
+                                 — Lighting [Lighting Designer]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Patricia Regan
+                                 — Make-Up                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Cynthia Fuchs
+                                 — Management [Director Of Facilities]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Nick Varacalli
+                                 — Management [Technical Manager]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Chris Bellman
+                                 — Mastered By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                David Vanderheyden
+                                 — Mixed By [Audio Mixer]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Chris Edwards
+                                 — Other [Band Support]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Jenette Prymas
+                                 — Other [Interns]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                John Wroten
+                                 — Other [Interns]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Anne Marie Gaynor
+                                 — Other [Production Assistant]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Audrey Morrissey
+                                 — Other [Production Assistant]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Chris Johnston
+                                 — Other [Production Assistant]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Chris McGhee
+                                 — Other [Production Assistant]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Don Jamieson
+                                 — Other [Production Assistant]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Ed Capuano
+                                 — Other [Production Assistant]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Greg Choa
+                                 — Other [Production Assistant]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Jay Hening
+                                 — Other [Production Assistant]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Karen Frank
+                                 — Other [Production Assistant]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Kelly Lynch
+                                 — Other [Production Assistant]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Loren Lyons
+                                 — Other [Production Assistant]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Robert Toughey
+                                 — Other [Production Assistant]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Valerie Sheppard
+                                 — Other [Production Assistant]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Bob Medve
+                                 — Other [Staging Services]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Terzi Staging
+                                 — Other [Staging Services]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Tommy Robinson
+                                 — Other [Staging Services]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Alex Coletti
+                                 — Producer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Audrey Johns
+                                 — Production Manager                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Alex Young
+                                 — Project Manager [Project Management For MTV]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Kevin O&#039;Neil
+                                 — Project Manager [Project Management For R.E.M.]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                John Cannelli
+                                 — Public Relations [Talent Artist Relations]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Joni Abbott
+                                 — Public Relations [Talent Artist Relations]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Joe Perota
+                                 — Stage Manager                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Jack Roche
+                                 — Tape Op [Tape Operator]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Ernie Jew
+                                 — Technician [CAMremote Technician]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Bill Thompson
+                                 — Technician [Equipment Technician]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Mark Mytrowitz
+                                 — Technician [Equipment Technician]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Microwave
+                                 — Technician [Equipment Technician]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                David Russell
+                                 — Tour Manager                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                David Ellsworth
+                                 — Video Editor [Assistant Editor]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Wayne Stevenson
+                                 — Video Editor [Editor]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Bill Berry
+                                 — Written-By                                 (tracks: A1 to B3, C1 to D5)                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Michael Stipe
+                                 — Written-By                                 (tracks: A1 to B3, C1 to D5)                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Mike Mills
+                                 — Written-By                                 (tracks: A1 to B3, C1 to D5)                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Peter Buck
+                                 — Written-By                                 (tracks: A1 to B3, C1 to D5)                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Reg Presley
+                                 — Written-By                                 (tracks: B4)                                </li>
+                                                        </ul>
+                        
+                                                    <p style="margin-top:16px"><strong>Companies:</strong></p>
+                            <ul style="margin:0; padding-left:20px" class="muted">
+                                                            <li style="margin-bottom:4px">
+                                R.E.M./Athens Ltd
+                                 — Phonographic Copyright (p)                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                R.E.M./Athens Ltd
+                                 — Copyright (c)                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Rhino Entertainment Company
+                                 — Phonographic Copyright (p)                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Rhino Entertainment Company
+                                 — Copyright (c)                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Viacom International Inc.
+                                 — Phonographic Copyright (p)                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Viacom International Inc.
+                                 — Copyright (c)                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Rhino Entertainment Company
+                                 — Marketed By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Warner Music Group
+                                 — Record Company                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Night Garden Music
+                                 — Published By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Warner-Tamerlane Publishing Corp.
+                                 — Published By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Universal - Songs Of Polygram International, Inc.
+                                 — Published By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Bernie Grundman Mastering
+                                 — Mastered At                                                                </li>
+                                                        </ul>
+                                            </div>
+                </div>
+                       </div>
+
+          <div id="tab-status" class="tab-content">
+            <div class="card">
+                <div class="meta">
+                    <div style="margin-bottom:16px">
+                        <strong>Discogs Status</strong>
+                        <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+                                                        <form method="post" action="/release/save" style="margin:0">
+                                <input type="hidden" name="_token" value="" />
+                                <input type="hidden" name="release_id" value="6044872" />
+                                <input type="hidden" name="action" value="want_to_collection" />
+                                <input type="hidden" name="return" value="../index.html" />
+                                <button type="submit" style="background:var(--card);color:var(--accent);border:1px solid #2a2b2f;border-radius:8px;padding:6px 10px;cursor:pointer">Add to Collection</button>
+                            </form>
+                            
+                                                        <form method="post" action="/release/save" style="margin:0">
+                                <input type="hidden" name="_token" value="" />
+                                <input type="hidden" name="release_id" value="6044872" />
+                                <input type="hidden" name="action" value="add_want" />
+                                <input type="hidden" name="return" value="../index.html" />
+                                <button type="submit" class="muted" style="background:transparent;border:1px solid #2a2b2f;border-radius:8px;padding:6px 10px;cursor:pointer;color:inherit">Add to Wantlist</button>
+                            </form>
+                                                    </div>
+                    </div>
+
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                        <strong>My Notes</strong>
+                                            </div>
+
+                    <div id="notesView" style="margin-top:8px">
+                                                                                                                    </div>
+                                                         </div>
             </div>
-          
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Barcodes</strong>
-                <ul>
-                                      <li>6 03497 89989 0 <span class="muted">(Text)</span></li>
-                                      <li>603497899890 <span class="muted">(Scanned)</span></li>
-                                  </ul>
-              </div>
-            </div>
-          
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Identifiers</strong>
-                <ul>
-                                      <li>Rights Society: BMI</li>
-                                      <li>Matrix / Runout: R2-541570-A CB <span class="muted">(Runout, side A, etched)</span></li>
-                                      <li>Matrix / Runout: R2-541570-B CB <span class="muted">(Runout, side B, etched)</span></li>
-                                      <li>Matrix / Runout: R2-541570-C CB <span class="muted">(Runout, side C, etched)</span></li>
-                                      <li>Matrix / Runout: R2-541570-D CB <span class="muted">(Runout, side D, etched)</span></li>
-                                  </ul>
-              </div>
-            </div>
-                  </div>
+          </div>
+        </div>
       </div>
 
             <!-- Lightbox overlay -->
@@ -491,7 +812,8 @@
         document.addEventListener('DOMContentLoaded', function(){
           const images = [
             '..\/images\/6044872\/b6323995d4f5c6bb82083cef52c65b3e2618d9e7.jpg', '..\/images\/6044872\/6a52757d457dbcebbbf59b4d57b98fe0f69a0eff.jpg', '..\/images\/6044872\/4f4643e80e78b8a74258b11ddaa4f6547ebf4ad4.jpg', '..\/images\/6044872\/aa2927ecfe89d232cdf7aaf1094f4503a6c94423.jpg', '..\/images\/6044872\/09466b6db31a59864ca1cde98fd6df875444d966.jpg', '..\/images\/6044872\/7850ca2c075297312dde766f1ab0fb698cc5450c.jpg', '..\/images\/6044872\/7b8d07a406e2ce125e869750bf985f36df65a44d.jpg', '..\/images\/6044872\/ef81f97c43113a4fc90204b9f078b887dda6495d.jpg', '..\/images\/6044872\/5bdd27c3f2e77078fc0fc351b5011b87130b46a3.jpg', '..\/images\/6044872\/bc30d7080562ad9162f2ac3137a5af15120e8d00.jpg', '..\/images\/6044872\/63e8a238c0049489c475adc91f64c39e8b4ece92.jpg', '..\/images\/6044872\/249efd9e435f0bcbd6eaca1b5fc5619dfcb41960.jpg', '..\/images\/6044872\/d3af7cf00f8f13a233b1be35437b77d9492a50e1.jpg', '..\/images\/6044872\/ead9717bb1bc3e44f8c2614e597d9a9e1ad194d1.jpg', '..\/images\/6044872\/326b037d3581fa45c6186931f7eccc9eb6c10462.jpg', '..\/images\/6044872\/66c81a21ed1d23ba2d1db1d23416862fbdc3345e.jpg', '..\/images\/6044872\/93edf55f8052489fa0d2d9ac9ffdf910860a1caf.jpg', '..\/images\/6044872\/e76c4cfd01d7cd5e053c492bdb2c5971420a7f53.jpg', '..\/images\/6044872\/7a40e05174145d25b20abdadb25b73f60a9f40c8.jpg', '..\/images\/6044872\/9060d0981f8702970e0f6b5e1db82fe20f2a6f01.jpg'          ];
-          const main = document.getElementById('main-cover');
+          const track = document.getElementById('carousel-track');
+          const dots = document.querySelectorAll('.dot');
           const thumbs = document.querySelectorAll('.thumb');
           const lb = document.getElementById('lightbox');
           const lbImg = lb ? lb.querySelector('.lb-img') : null;
@@ -499,16 +821,12 @@
           const lbPrev = lb ? lb.querySelector('.lb-prev') : null;
           const lbNext = lb ? lb.querySelector('.lb-next') : null;
           const lbCounter = lb ? lb.querySelector('.lb-counter') : null;
-          let idx = parseInt(main?.getAttribute('data-idx') || '0', 10) || 0;
+          let idx = 0;
 
-          function updateMain(to){
-            if (!main) return;
-            const i = Math.max(0, Math.min(images.length - 1, to));
-            if (images[i] && main.getAttribute('src') !== images[i]) {
-              main.setAttribute('src', images[i]);
-            }
-            main.setAttribute('data-idx', String(i));
-            idx = i;
+          function updateCarousel(to){
+            idx = Math.max(0, Math.min(images.length - 1, to));
+            if (track) track.style.transform = `translateX(-${idx * 100}%)`;
+            dots.forEach((d, i) => d.classList.toggle('active', i === idx));
           }
 
           function openLightbox(startIdx){
@@ -526,54 +844,92 @@
             lb.setAttribute('aria-hidden', 'true');
             document.body.style.overflow = '';
           }
-          function next(){ idx = (idx + 1) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
-          function prev(){ idx = (idx - 1 + images.length) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
+          function next(){ idx = (idx + 1) % images.length; if (lb.classList.contains('open')) { lbImg.src = images[idx]; lbCounter.textContent = (idx + 1) + ' / ' + images.length; } else { updateCarousel(idx); } }
+          function prev(){ idx = (idx - 1 + images.length) % images.length; if (lb.classList.contains('open')) { lbImg.src = images[idx]; lbCounter.textContent = (idx + 1) + ' / ' + images.length; } else { updateCarousel(idx); } }
 
-          // Thumbnail click: swap main and set index; Shift+Click opens lightbox
-          thumbs.forEach(function(btn){
-            btn.addEventListener('click', function(e){
-              const i = parseInt(this.getAttribute('data-idx') || '0', 10) || 0;
-              if (e.shiftKey) { openLightbox(i); return; }
-              updateMain(i);
-            });
+          // Carousel dot/thumb clicks
+          dots.forEach(d => d.addEventListener('click', () => updateCarousel(parseInt(d.dataset.idx))));
+          thumbs.forEach(t => t.addEventListener('click', () => updateCarousel(parseInt(t.dataset.idx))));
+
+          // Lightbox trigger on carousel image click
+          document.querySelectorAll('.carousel-slide img').forEach(img => {
+            img.addEventListener('click', () => openLightbox(parseInt(img.dataset.idx)));
           });
-
-          // Main cover click: open lightbox on current index
-          if (main) {
-            main.addEventListener('click', function(){
-              const i = parseInt(main.getAttribute('data-idx') || '0', 10) || 0;
-              openLightbox(i);
-            });
-          }
 
           // Lightbox interactions
           lbClose?.addEventListener('click', closeLightbox);
           lbPrev?.addEventListener('click', prev);
           lbNext?.addEventListener('click', next);
-          lbImg?.addEventListener('click', next); // click image to advance
+          lbImg?.addEventListener('click', next);
           lb?.addEventListener('click', function(e){ if (e.target === lb) closeLightbox(); });
 
-          // Keyboard support
+          // Keyboard
           document.addEventListener('keydown', function(e){
             if (!lb || !lb.classList.contains('open')) return;
-            if (e.key === 'Escape') { e.preventDefault(); closeLightbox(); }
-            else if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
-            else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+            if (e.key === 'Escape') closeLightbox();
+            else if (e.key === 'ArrowRight') next();
+            else if (e.key === 'ArrowLeft') prev();
           });
 
-          // Ensure initial main index reflects the list
-          if (images.length > 0 && main) {
-            let initial = images.indexOf(main.getAttribute('src'));
-            if (initial < 0) initial = 0;
-            main.setAttribute('data-idx', String(initial));
+          // Tabs
+          const tabs = document.querySelectorAll('.tab');
+          const contents = document.querySelectorAll('.tab-content');
+          tabs.forEach(t => {
+            t.addEventListener('click', () => {
+              const target = t.dataset.tab;
+              tabs.forEach(t2 => t2.classList.toggle('active', t2 === t));
+              contents.forEach(c => c.classList.toggle('active', c.id === `tab-${target}`));
+            });
+          });
+
+          // Handle tab parameter in URL
+          const urlParams = new URLSearchParams(window.location.search);
+          const activeTab = urlParams.get('tab');
+          if (activeTab) {
+            const tabEl = document.querySelector(`.tab[data-tab="${activeTab}"]`);
+            if (tabEl) tabEl.click();
           }
+
+          // Swipe support for carousel (basic)
+          let startX = 0;
+          track?.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+          track?.addEventListener('touchend', e => {
+            const diff = startX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) {
+              if (diff > 0) next(); else prev();
+            }
+          });
+
+          // Notes Toggle
+          (function(){
+            const btn = document.getElementById('editToggle');
+            const form = document.getElementById('notesForm');
+            const view = document.getElementById('notesView');
+            if (!btn || !form || !view) return;
+            btn.addEventListener('click', function(){
+                const open = form.style.display === 'none';
+                form.style.display = open ? 'flex' : 'none';
+                view.style.display = open ? 'none' : 'block';
+                btn.textContent = open ? 'Cancel' : 'Edit';
+                if (open) {
+                    // Switch to status tab if not active
+                    document.querySelector('.tab[data-tab="status"]').click();
+                }
+            });
+          })();
         });
       </script>
             </div>
 
-  
+    <script>
+    document.getElementById('mobile-toggle')?.addEventListener('click', function() {
+      document.getElementById('mobile-menu').classList.toggle('active');
+      this.textContent = document.getElementById('mobile-menu').classList.contains('active') ? '✕' : '☰';
+    });
+  </script>
+
   <footer class="site-footer muted" style="text-align:center;margin:24px 0 8px 0;font-size:.9rem;">
-  Powered by Discogs API & Coffee Since 2025 | Lovingly Crafted in Boise, Idaho
+  Powered by Discogs API & Coffee Since 2026 | Lovingly Crafted in Boise, Idaho
 </footer>
 </body>
 </html>

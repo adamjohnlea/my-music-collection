@@ -4,18 +4,197 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Diana Krall, The Clayton-Hamilton Jazz Orchestra — Christmas Songs</title>
+  <style>
+    :root {
+      --bg: #0b0b0c;
+      --card: #16171a;
+      --text: #e7e7ea;
+      --muted: #a0a3aa;
+      --accent: #67e8f9;
+      --border: #2a2b2f;
+      --header-bg: rgba(11, 11, 12, 0.8);
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    .content-wrap {
+      margin-top: 24px;
+      margin-bottom: 24px;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .muted { color: var(--muted); }
+
+    /* Layout Helpers */
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .gap-4 { gap: 16px; }
+    .gap-2 { gap: 8px; }
+
+    /* Common Components */
+    .btn-small {
+      font-size: .8rem;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--card);
+      color: var(--text);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-small:hover { border-color: var(--accent); text-decoration: none; }
+
+    /* Common Header Components */
+    .main-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--header-bg);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-content {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    /* Desktop Nav */
+    .desktop-nav { display: flex; align-items: center; gap: 20px; }
+    @media (max-width: 768px) { .desktop-nav { display: none; } }
+
+    /* Account Dropdown */
+    .dropdown { position: relative; display: inline-block; }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background: var(--card);
+      min-width: 160px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      padding: 8px 0;
+      z-index: 101;
+    }
+    .dropdown:hover .dropdown-content { display: block; }
+    .dropdown-item {
+      display: block;
+      padding: 8px 16px;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .dropdown-item:hover { background: rgba(255,255,255,0.05); }
+
+    /* Mobile Nav / Hamburger */
+    .mobile-nav-toggle {
+      display: none;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 8px;
+    }
+    @media (max-width: 768px) { .mobile-nav-toggle { display: block; } }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 65px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg);
+      z-index: 99;
+      padding: 20px;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .mobile-menu.active { display: flex; }
+    .mobile-menu .nav-item {
+        display: block;
+        padding: 12px 16px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: var(--text);
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .mobile-menu .nav-item:hover { border-color: var(--accent); }
+
+    /* Breadcrumbs */
+    .breadcrumbs {
+      padding: 12px 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .breadcrumbs a { color: var(--muted); }
+    .breadcrumbs span { margin: 0 8px; opacity: 0.5; }
+
+    /* Utility Bar (Mobile Sticky Search/Sort) */
+    .utility-bar {
+        display: none;
+        position: sticky;
+        top: 65px;
+        z-index: 90;
+        background: var(--bg);
+        padding: 8px 20px;
+        border-bottom: 1px solid var(--border);
+    }
+    @media (max-width: 768px) {
+        .utility-bar.is-visible { display: block; }
+    }
+  </style>
     <style>
-    :root { --bg:#0b0b0c; --card:#16171a; --text:#e7e7ea; --muted:#a0a3aa; --accent:#67e8f9; --overlay: rgba(0,0,0,.9); }
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif}
-    .wrap{max-width:1000px;margin:40px auto;padding:0 20px}
-    a{color:var(--accent);text-decoration:none}
-    a:hover{text-decoration:underline}
-    .layout{display:grid;grid-template-columns:280px 1fr;gap:24px}
+    :root { --overlay: rgba(0,0,0,.9); }
+    .layout{display:grid;grid-template-columns:1fr 1fr;gap:40px}
     .card{background:var(--card);border-radius:12px;overflow:hidden}
     .cover{width:100%;aspect-ratio:1/1;object-fit:cover;background:#222;cursor:zoom-in}
     .meta{padding:16px}
-    .muted{color:var(--muted)}
-    h1{margin:0 0 8px 0;font-size:1.6rem}
+    h1{margin:0 0 8px 0;font-size:2rem}
+
+    /* Carousel */
+    .carousel-container { position: relative; width: 100%; overflow: hidden; border-radius: 12px; }
+    .carousel-track { display: flex; transition: transform 0.3s ease-out; }
+    .carousel-slide { min-width: 100%; aspect-ratio: 1/1; }
+    .carousel-slide img { width: 100%; height: 100%; object-fit: cover; }
+    .carousel-dots { display: none; justify-content: center; gap: 8px; margin-top: 12px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); cursor: pointer; opacity: 0.5; }
+    .dot.active { background: var(--accent); opacity: 1; }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 4px; border-bottom: 1px solid #2a2b2f; margin-top: 24px; overflow-x: auto; scrollbar-width: none; }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab { padding: 12px 20px; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; white-space: nowrap; }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-content { display: none; padding-top: 20px; }
+    .tab-content.active { display: block; }
 
     /* Lightbox */
     .lightbox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--overlay);z-index:1000}
@@ -30,322 +209,409 @@
     .lb-counter{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);color:#fff;background:rgba(0,0,0,.5);padding:4px 10px;border-radius:999px;font-size:.9rem}
 
     @media (max-width: 800px){
-      .layout{grid-template-columns:1fr}
+      .layout{grid-template-columns:1fr; gap: 24px;}
+      .carousel-dots { display: flex; }
       .lb-prev{left:10px}
       .lb-next{right:10px}
+      .wrap { margin-top: 12px; }
     }
   </style>
 </head>
 <body>
-  
+  <header class="main-header">
     <div class="wrap">
-    <p><a href="../index.html">← Back</a></p>
-          <div class="layout">
+      <div class="header-content">
+        <a href="/" class="logo">My Music</a>
+
+        <div class="desktop-nav">
+          <a href="/?view=collection" class="muted">Collection</a>
+          <a href="/?view=wantlist" class="muted">Wantlist</a>
+          <a href="/random" class="muted">Surprise Me</a>
+          <a href="/stats" class="muted">Stats</a>
+          <a href="/about" class="muted">About</a>
+        </div>
+
+        <button class="mobile-nav-toggle" id="mobile-toggle" aria-label="Toggle menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="/?view=collection" class="nav-item">Collection</a>
+    <a href="/?view=wantlist" class="nav-item">Wantlist</a>
+    <a href="/random" class="nav-item">Surprise Me</a>
+    <a href="/stats" class="nav-item">Stats</a>
+    <a href="/about" class="nav-item">About</a>
+  </div>
+
+  <div class="wrap">
+      <nav class="breadcrumbs">
+    <div>
+      <a href="/">Home</a>
+      <span>/</span>
+      <a href="/?view=collection">Collection</a>
+      <span>/</span>
+      Christmas Songs
+    </div>
+  </nav>
+  </div>
+
+  
+    <div class="wrap content-wrap">
+    <div style="margin-bottom:24px">
+      <p style="margin:0"><a href="../index.html" style="background:var(--card);border:1px solid #2a2b2f;padding:6px 12px;border-radius:8px;color:var(--text);font-size:.9rem;text-decoration:none">← Back</a></p>
+    </div>
+                <div class="layout">
         <div>
-          <div class="card">
-                          <img id="main-cover" class="cover" src="../images/9386597/6e15b8008c3eb93ee700da6142e92ac7092387d0.jpg" alt="Christmas Songs cover" data-idx="0" />
-                      </div>
-                      <div class="thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
-                              <button class="thumb" data-url="../images/9386597/6e15b8008c3eb93ee700da6142e92ac7092387d0.jpg" data-idx="0" title="Image 1" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/9386597/6e15b8008c3eb93ee700da6142e92ac7092387d0.jpg" alt="thumb 1" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:1" />
+          <div class="carousel-container" id="carousel">
+            <div class="carousel-track" id="carousel-track">
+                                                <div class="carousel-slide">
+                    <img class="cover" src="../images/9386597/6e15b8008c3eb93ee700da6142e92ac7092387d0.jpg" alt="Christmas Songs cover" data-idx="0" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/9386597/735d9bc37f6ac1893fe5b487d3557090da931ae8.jpg" alt="Christmas Songs cover" data-idx="1" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/9386597/149cda1d360c3dd32de0c4d26a06768d7fbd6119.jpg" alt="Christmas Songs cover" data-idx="2" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/9386597/6f6c611843ad825fc32db1876a5ea9dac3c5c973.jpg" alt="Christmas Songs cover" data-idx="3" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/9386597/ce98dda2ba7ccf0c53888b13ceecdf54d28b40d6.jpg" alt="Christmas Songs cover" data-idx="4" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/9386597/dfe567c1914649bc08b01f5a7da0474fb775ed32.jpg" alt="Christmas Songs cover" data-idx="5" />
+                  </div>
+                                          </div>
+          </div>
+                      <div class="carousel-dots" id="carousel-dots">
+                              <div class="dot active" data-idx="0"></div>
+                              <div class="dot " data-idx="1"></div>
+                              <div class="dot " data-idx="2"></div>
+                              <div class="dot " data-idx="3"></div>
+                              <div class="dot " data-idx="4"></div>
+                              <div class="dot " data-idx="5"></div>
+                          </div>
+            <div class="thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;">
+                              <button class="thumb" data-idx="0" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/9386597/6e15b8008c3eb93ee700da6142e92ac7092387d0.jpg" alt="thumb 1" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:1" />
                 </button>
-                              <button class="thumb" data-url="../images/9386597/735d9bc37f6ac1893fe5b487d3557090da931ae8.jpg" data-idx="1" title="Image 2" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/9386597/735d9bc37f6ac1893fe5b487d3557090da931ae8.jpg" alt="thumb 2" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="1" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/9386597/735d9bc37f6ac1893fe5b487d3557090da931ae8.jpg" alt="thumb 2" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/9386597/149cda1d360c3dd32de0c4d26a06768d7fbd6119.jpg" data-idx="2" title="Image 3" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/9386597/149cda1d360c3dd32de0c4d26a06768d7fbd6119.jpg" alt="thumb 3" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="2" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/9386597/149cda1d360c3dd32de0c4d26a06768d7fbd6119.jpg" alt="thumb 3" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/9386597/6f6c611843ad825fc32db1876a5ea9dac3c5c973.jpg" data-idx="3" title="Image 4" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/9386597/6f6c611843ad825fc32db1876a5ea9dac3c5c973.jpg" alt="thumb 4" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="3" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/9386597/6f6c611843ad825fc32db1876a5ea9dac3c5c973.jpg" alt="thumb 4" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/9386597/ce98dda2ba7ccf0c53888b13ceecdf54d28b40d6.jpg" data-idx="4" title="Image 5" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/9386597/ce98dda2ba7ccf0c53888b13ceecdf54d28b40d6.jpg" alt="thumb 5" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="4" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/9386597/ce98dda2ba7ccf0c53888b13ceecdf54d28b40d6.jpg" alt="thumb 5" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/9386597/dfe567c1914649bc08b01f5a7da0474fb775ed32.jpg" data-idx="5" title="Image 6" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/9386597/dfe567c1914649bc08b01f5a7da0474fb775ed32.jpg" alt="thumb 6" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="5" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/9386597/dfe567c1914649bc08b01f5a7da0474fb775ed32.jpg" alt="thumb 6" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                           </div>
                   </div>
         <div>
           <h1>Christmas Songs</h1>
-          <p class="muted">Diana Krall, The Clayton-Hamilton Jazz Orchestra • 2016</p>
+          <p class="muted" style="font-size:1.2rem">Diana Krall, The Clayton-Hamilton Jazz Orchestra • 2016</p>
           <p class="muted">US</p>
-                      <p style="margin:8px 0;">
-              <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Jazz</span>              <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Big Band</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Holiday</span>            </p>
-          
-                      <p class="muted">Formats:
-                              Vinyl (Translucent Green)                          </p>
-          
+          <div style="margin:16px 0; display:flex; gap:8px; flex-wrap:wrap">
+            <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Jazz</span>            <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Big Band</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Holiday</span>          </div>
+
                       <p class="muted">Labels:
               Verve Records (B0025418-01)            </p>
           
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Tracklist</strong>
-                <ol>
-                                      <li>A1 — Jingle Bells <span class="muted">(3:26)</span></li>
-                                      <li>A2 — Let It Snow <span class="muted">(4:02)</span></li>
-                                      <li>A3 — The Christmas Song <span class="muted">(4:24)</span></li>
-                                      <li>A4 — Winter Wonderland <span class="muted">(3:15)</span></li>
-                                      <li>A5 — I&#039;ll Be Home For Christmas <span class="muted">(3:08)</span></li>
-                                      <li>A6 — Christmas Time Is Here <span class="muted">(3:35)</span></li>
-                                      <li>B1 — Santa Claus Is Coming To Town <span class="muted">(2:54)</span></li>
-                                      <li>B2 — Have Yourself A Merry Little Christmas <span class="muted">(4:19)</span></li>
-                                      <li>B3 — White Christmas <span class="muted">(4:32)</span></li>
-                                      <li>B4 — What Are You Doing New Year&#039;s Eve <span class="muted">(4:10)</span></li>
-                                      <li>B5 — Sleigh Ride <span class="muted">(3:26)</span></li>
-                                      <li>B6 — Count Your Blessings Instead Of Sheep <span class="muted">(3:41)</span></li>
-                                  </ol>
-              </div>
-            </div>
-          
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Videos</strong>
-                <ul>
-                                      <li><a href="https://www.youtube.com/watch?v=UJR_sOdk2YQ" target="_blank" rel="noopener">Let It Snow</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=2Rcr4Mb6oAY" target="_blank" rel="noopener">Santa Claus Is Coming To Town</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=dXg963cszQU" target="_blank" rel="noopener">The Christmas Song</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=MeC4qaeUsqM" target="_blank" rel="noopener">Sleigh Ride</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=wmUkC2fRUII" target="_blank" rel="noopener">I&#039;ll Be Home For Christmas</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=neKB0c5p2TI" target="_blank" rel="noopener">Winter Wonderland</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=QcGW4aQNA9k" target="_blank" rel="noopener">Jingle Bells</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=ZJXV562rcAU" target="_blank" rel="noopener">Christmas Time Is Here</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=pLDAfhN-aIM" target="_blank" rel="noopener">Have Yourself A Merry Little Christmas</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=7AQieI6DNlM" target="_blank" rel="noopener">White Christmas</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=Ac-S0dJy_eA" target="_blank" rel="noopener">What Are You Doing New Year&#039;s Eve?</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=3aShVX2rFbc" target="_blank" rel="noopener">Count Your Blessings Instead Of Sheep</a></li>
-                                  </ul>
-              </div>
-            </div>
-          
-          
-          <div class="card" style="margin-top:16px;">
-            <div class="meta">
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-                <strong>My Notes</strong>
-                              </div>
-
-              
-              <div id="notesView" style="margin-top:8px">
-                                                  <div class="muted">(none)</div>
-                              </div>
-
-                          </div>
+          <div class="tabs" id="release-tabs">
+            <div class="tab active" data-tab="tracks">Tracks</div>
+            <div class="tab" data-tab="details">Details</div>
+            <div class="tab" data-tab="credits">Credits</div>
+            <div class="tab" data-tab="status">Status & Notes</div>
           </div>
 
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Credits</strong>
-                <ul>
-                                      <li>
-                      Evelyn Morgan
-                      <span class="muted">— A&amp;R [Administration]</span>                                          </li>
-                                      <li>
-                      Jeff Clayton
-                      <span class="muted">— Alto Saxophone [Lead], Flute [The Clayton / Hamilton Jazz Orchestra]</span>                                          </li>
-                                      <li>
-                      Keith Fiddmont
-                      <span class="muted">— Alto Saxophone, Clarinet [The Clayton / Hamilton Jazz Orchestra]</span>                                          </li>
-                                      <li>
-                      Hollis King
-                      <span class="muted">— Art Direction</span>                                          </li>
-                                      <li>
-                      Adam Schroeder
-                      <span class="muted">— Baritone Saxophone, Clarinet [Bass, The Clayton / Hamilton Jazz Orchestra]</span>                                          </li>
-                                      <li>
-                      Robert Hurst
-                      <span class="muted">— Bass [The Clayton / Hamilton Jazz Orchestra]</span>                                          </li>
-                                      <li>
-                      Johnny Mandel
-                      <span class="muted">— Co-producer</span>                      <span class="muted"> (tracks: A6, B2)</span>                    </li>
-                                      <li>
-                      Tommy LiPuma
-                      <span class="muted">— Co-producer</span>                      <span class="muted"> (tracks: A6, B2)</span>                    </li>
-                                      <li>
-                      Shari Sutcliffe
-                      <span class="muted">— Contractor, Coordinator [The Clayton / Hamilton Jazz Orchestra]</span>                                          </li>
-                                      <li>
-                      John Newcott
-                      <span class="muted">— Coordinator [Release Coordination]</span>                                          </li>
-                                      <li>
-                      Kelly Pratt
-                      <span class="muted">— Coordinator [Release Coordination]</span>                                          </li>
-                                      <li>
-                      Coco Shinomiya
-                      <span class="muted">— Design</span>                                          </li>
-                                      <li>
-                      Jeff Hamilton
-                      <span class="muted">— Drums [The Clayton / Hamilton Jazz Orchestra]</span>                                          </li>
-                                      <li>
-                      Bill Smith
-                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
-                                      <li>
-                      Brian Vibberts
-                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
-                                      <li>
-                      David Swope
-                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
-                                      <li>
-                      Koji Egawa
-                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
-                                      <li>
-                      Steve Genewick
-                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
-                                      <li>
-                      Brad Warnaar
-                      <span class="muted">— French Horn [The Clayton / Hamilton Jazz Orchestra]</span>                                          </li>
-                                      <li>
-                      David Duke
-                      <span class="muted">— French Horn [The Clayton / Hamilton Jazz Orchestra]</span>                                          </li>
-                                      <li>
-                      Joe Meyer
-                      <span class="muted">— French Horn [The Clayton / Hamilton Jazz Orchestra]</span>                                          </li>
-                                      <li>
-                      Richard Todd
-                      <span class="muted">— French Horn [The Clayton / Hamilton Jazz Orchestra]</span>                                          </li>
-                                      <li>
-                      Anthony Wilson
-                      <span class="muted">— Guitar [The Clayton / Hamilton Jazz Orchestra]</span>                                          </li>
-                                      <li>
-                      Nicola Clarke
-                      <span class="muted">— Hair</span>                                          </li>
-                                      <li>
-                      Heino Leja
-                      <span class="muted">— Lacquer Cut By</span>                                          </li>
-                                      <li>
-                      Charlie Pichon
-                      <span class="muted">— Make-Up</span>                                          </li>
-                                      <li>
-                      Doug Sax
-                      <span class="muted">— Mastered By</span>                                          </li>
-                                      <li>
-                      Noni Crème
-                      <span class="muted">— Other [Manicure]</span>                                          </li>
-                                      <li>
-                      Hannah Teare
-                      <span class="muted">— Other [Wardrobe Assistant]</span>                                          </li>
-                                      <li>
-                      Joe Porcaro
-                      <span class="muted">— Percussion [The Clayton / Hamilton Jazz Orchestra]</span>                                          </li>
-                                      <li>
-                      Sam Taylor-Wood
-                      <span class="muted">— Photography By</span>                                          </li>
-                                      <li>
-                      Diana Krall
-                      <span class="muted">— Producer</span>                                          </li>
-                                      <li>
-                      Tommy LiPuma
-                      <span class="muted">— Producer</span>                                          </li>
-                                      <li>
-                      Al Schmitt
-                      <span class="muted">— Recorded By, Mixed By</span>                                          </li>
-                                      <li>
-                      Steve Genewick
-                      <span class="muted">— Technician [Pro Tools By]</span>                                          </li>
-                                      <li>
-                      Charles Owens
-                      <span class="muted">— Tenor Saxophone, Clarinet [The Clayton / Hamilton Jazz Orchestra]</span>                                          </li>
-                                      <li>
-                      Rickey Woodard
-                      <span class="muted">— Tenor Saxophone, Clarinet [The Clayton / Hamilton Jazz Orchestra]</span>                                          </li>
-                                      <li>
-                      George Bohanon
-                      <span class="muted">— Trombone [The Clayton / Hamilton Jazz Orchestra]</span>                                          </li>
-                                      <li>
-                      Ira Nepus
-                      <span class="muted">— Trombone [The Clayton / Hamilton Jazz Orchestra]</span>                                          </li>
-                                      <li>
-                      Ryan Porter
-                      <span class="muted">— Trombone [The Clayton / Hamilton Jazz Orchestra]</span>                                          </li>
-                                      <li>
-                      Clay Jenkins
-                      <span class="muted">— Trumpet [The Clayton / Hamilton Jazz Orchestra]</span>                                          </li>
-                                      <li>
-                      Gilbert Castellanos
-                      <span class="muted">— Trumpet [The Clayton / Hamilton Jazz Orchestra]</span>                                          </li>
-                                      <li>
-                      Rick Baptist
-                      <span class="muted">— Trumpet [The Clayton / Hamilton Jazz Orchestra]</span>                                          </li>
-                                      <li>
-                      Sal Cracchiolo
-                      <span class="muted">— Trumpet [The Clayton / Hamilton Jazz Orchestra]</span>                                          </li>
-                                      <li>
-                      William Barnhart
-                      <span class="muted">— Trumpet [The Clayton / Hamilton Jazz Orchestra]</span>                                          </li>
-                                      <li>
-                      John Thomas Johnson
-                      <span class="muted">— Tuba [The Clayton / Hamilton Jazz Orchestra]</span>                                          </li>
-                                  </ul>
+          <div id="tab-tracks" class="tab-content active">
+                          <div class="card">
+                <div class="meta">
+                  <ol style="margin:0; padding-left:20px">
+                                          <li style="margin-bottom:8px">A1 — Jingle Bells <span class="muted">(3:26)</span></li>
+                                          <li style="margin-bottom:8px">A2 — Let It Snow <span class="muted">(4:02)</span></li>
+                                          <li style="margin-bottom:8px">A3 — The Christmas Song <span class="muted">(4:24)</span></li>
+                                          <li style="margin-bottom:8px">A4 — Winter Wonderland <span class="muted">(3:15)</span></li>
+                                          <li style="margin-bottom:8px">A5 — I&#039;ll Be Home For Christmas <span class="muted">(3:08)</span></li>
+                                          <li style="margin-bottom:8px">A6 — Christmas Time Is Here <span class="muted">(3:35)</span></li>
+                                          <li style="margin-bottom:8px">B1 — Santa Claus Is Coming To Town <span class="muted">(2:54)</span></li>
+                                          <li style="margin-bottom:8px">B2 — Have Yourself A Merry Little Christmas <span class="muted">(4:19)</span></li>
+                                          <li style="margin-bottom:8px">B3 — White Christmas <span class="muted">(4:32)</span></li>
+                                          <li style="margin-bottom:8px">B4 — What Are You Doing New Year&#039;s Eve <span class="muted">(4:10)</span></li>
+                                          <li style="margin-bottom:8px">B5 — Sleigh Ride <span class="muted">(3:26)</span></li>
+                                          <li style="margin-bottom:8px">B6 — Count Your Blessings Instead Of Sheep <span class="muted">(3:41)</span></li>
+                                      </ol>
+                </div>
               </div>
+                      </div>
+
+          <div id="tab-details" class="tab-content">
+            <div class="card">
+                <div class="meta">
+                                            <p class="muted"><strong>Formats:</strong>
+                                                    Vinyl (Translucent Green)                                                </p>
+                                        
+                    
+                                            <p><strong>Videos:</strong></p>
+                        <ul style="margin:0; padding-left:20px">
+                                                    <li><a href="https://www.youtube.com/watch?v=UJR_sOdk2YQ" target="_blank" rel="noopener">Let It Snow</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=2Rcr4Mb6oAY" target="_blank" rel="noopener">Santa Claus Is Coming To Town</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=dXg963cszQU" target="_blank" rel="noopener">The Christmas Song</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=MeC4qaeUsqM" target="_blank" rel="noopener">Sleigh Ride</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=wmUkC2fRUII" target="_blank" rel="noopener">I&#039;ll Be Home For Christmas</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=neKB0c5p2TI" target="_blank" rel="noopener">Winter Wonderland</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=QcGW4aQNA9k" target="_blank" rel="noopener">Jingle Bells</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=ZJXV562rcAU" target="_blank" rel="noopener">Christmas Time Is Here</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=pLDAfhN-aIM" target="_blank" rel="noopener">Have Yourself A Merry Little Christmas</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=7AQieI6DNlM" target="_blank" rel="noopener">White Christmas</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=Ac-S0dJy_eA" target="_blank" rel="noopener">What Are You Doing New Year&#039;s Eve?</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=3aShVX2rFbc" target="_blank" rel="noopener">Count Your Blessings Instead Of Sheep</a></li>
+                                                </ul>
+                    
+                                            <p><strong>Barcodes:</strong></p>
+                        <ul style="margin:0; padding-left:20px" class="muted">
+                                                    <li>6 02557 05714 0 (Printed)</li>
+                                                    <li>602557057140 (Scanned)</li>
+                                                </ul>
+                                    </div>
             </div>
-          
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Companies</strong>
-                <ul>
-                                      <li>
-                      Capitol Studios
-                      <span class="muted"> — Recorded At</span>                                          </li>
-                                      <li>
-                      Capitol Studios
-                      <span class="muted"> — Mixed At</span>                                          </li>
-                                      <li>
-                      The Verve Music Group
-                      <span class="muted"> — Phonographic Copyright (p)</span>                                          </li>
-                                      <li>
-                      The Verve Music Group
-                      <span class="muted"> — Copyright (c)</span>                                          </li>
-                                      <li>
-                      UMG Recordings, Inc.
-                      <span class="muted"> — Record Company</span>                                          </li>
-                                      <li>
-                      Universal Music Distribution
-                      <span class="muted"> — Distributed By</span>                                          </li>
-                                      <li>
-                      The Mastering Lab
-                      <span class="muted"> — Mastered At</span>                                          </li>
-                                      <li>
-                      Bill Schnee Studios
-                      <span class="muted"> — Recorded At</span>                                          </li>
-                                      <li>
-                      Ocean Way Recording
-                      <span class="muted"> — Recorded At</span>                                          </li>
-                                      <li>
-                      Sony Music Studios, New York City
-                      <span class="muted"> — Recorded At</span>                                          </li>
-                                      <li>
-                      Barnes &amp; Noble
-                      <span class="muted"> — Exclusive Retailer</span>                                          </li>
-                                      <li>
-                      Optimal Media GmbH
-                      <span class="muted"> — Lacquer Cut At</span>                                          </li>
-                                      <li>
-                      Rainbo Records
-                      <span class="muted"> — Pressed By</span>                                          </li>
-                                      <li>
-                      Rainbo Records
-                      <span class="muted"> — Pressed By</span>                                          </li>
-                                  </ul>
-              </div>
+          </div>
+
+          <div id="tab-credits" class="tab-content">
+                             <div class="card">
+                    <div class="meta">
+                                                    <p><strong>Credits:</strong></p>
+                            <ul style="margin:0; padding-left:20px" class="muted">
+                                                            <li style="margin-bottom:4px">
+                                Evelyn Morgan
+                                 — A&amp;R [Administration]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Jeff Clayton
+                                 — Alto Saxophone [Lead], Flute [The Clayton / Hamilton Jazz Orchestra]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Keith Fiddmont
+                                 — Alto Saxophone, Clarinet [The Clayton / Hamilton Jazz Orchestra]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Hollis King
+                                 — Art Direction                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Adam Schroeder
+                                 — Baritone Saxophone, Clarinet [Bass, The Clayton / Hamilton Jazz Orchestra]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Robert Hurst
+                                 — Bass [The Clayton / Hamilton Jazz Orchestra]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Johnny Mandel
+                                 — Co-producer                                 (tracks: A6, B2)                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Tommy LiPuma
+                                 — Co-producer                                 (tracks: A6, B2)                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Shari Sutcliffe
+                                 — Contractor, Coordinator [The Clayton / Hamilton Jazz Orchestra]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                John Newcott
+                                 — Coordinator [Release Coordination]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Kelly Pratt
+                                 — Coordinator [Release Coordination]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Coco Shinomiya
+                                 — Design                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Jeff Hamilton
+                                 — Drums [The Clayton / Hamilton Jazz Orchestra]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Bill Smith
+                                 — Engineer [Assistant]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Brian Vibberts
+                                 — Engineer [Assistant]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                David Swope
+                                 — Engineer [Assistant]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Koji Egawa
+                                 — Engineer [Assistant]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Steve Genewick
+                                 — Engineer [Assistant]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Brad Warnaar
+                                 — French Horn [The Clayton / Hamilton Jazz Orchestra]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                David Duke
+                                 — French Horn [The Clayton / Hamilton Jazz Orchestra]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Joe Meyer
+                                 — French Horn [The Clayton / Hamilton Jazz Orchestra]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Richard Todd
+                                 — French Horn [The Clayton / Hamilton Jazz Orchestra]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Anthony Wilson
+                                 — Guitar [The Clayton / Hamilton Jazz Orchestra]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Nicola Clarke
+                                 — Hair                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Heino Leja
+                                 — Lacquer Cut By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Charlie Pichon
+                                 — Make-Up                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Doug Sax
+                                 — Mastered By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Noni Crème
+                                 — Other [Manicure]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Hannah Teare
+                                 — Other [Wardrobe Assistant]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Joe Porcaro
+                                 — Percussion [The Clayton / Hamilton Jazz Orchestra]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Sam Taylor-Wood
+                                 — Photography By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Diana Krall
+                                 — Producer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Tommy LiPuma
+                                 — Producer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Al Schmitt
+                                 — Recorded By, Mixed By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Steve Genewick
+                                 — Technician [Pro Tools By]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Charles Owens
+                                 — Tenor Saxophone, Clarinet [The Clayton / Hamilton Jazz Orchestra]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Rickey Woodard
+                                 — Tenor Saxophone, Clarinet [The Clayton / Hamilton Jazz Orchestra]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                George Bohanon
+                                 — Trombone [The Clayton / Hamilton Jazz Orchestra]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Ira Nepus
+                                 — Trombone [The Clayton / Hamilton Jazz Orchestra]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Ryan Porter
+                                 — Trombone [The Clayton / Hamilton Jazz Orchestra]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Clay Jenkins
+                                 — Trumpet [The Clayton / Hamilton Jazz Orchestra]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Gilbert Castellanos
+                                 — Trumpet [The Clayton / Hamilton Jazz Orchestra]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Rick Baptist
+                                 — Trumpet [The Clayton / Hamilton Jazz Orchestra]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Sal Cracchiolo
+                                 — Trumpet [The Clayton / Hamilton Jazz Orchestra]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                William Barnhart
+                                 — Trumpet [The Clayton / Hamilton Jazz Orchestra]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                John Thomas Johnson
+                                 — Tuba [The Clayton / Hamilton Jazz Orchestra]                                                                </li>
+                                                        </ul>
+                        
+                                                    <p style="margin-top:16px"><strong>Companies:</strong></p>
+                            <ul style="margin:0; padding-left:20px" class="muted">
+                                                            <li style="margin-bottom:4px">
+                                Capitol Studios
+                                 — Recorded At                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Capitol Studios
+                                 — Mixed At                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                The Verve Music Group
+                                 — Phonographic Copyright (p)                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                The Verve Music Group
+                                 — Copyright (c)                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                UMG Recordings, Inc.
+                                 — Record Company                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Universal Music Distribution
+                                 — Distributed By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                The Mastering Lab
+                                 — Mastered At                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Bill Schnee Studios
+                                 — Recorded At                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Ocean Way Recording
+                                 — Recorded At                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Sony Music Studios, New York City
+                                 — Recorded At                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Barnes &amp; Noble
+                                 — Exclusive Retailer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Optimal Media GmbH
+                                 — Lacquer Cut At                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Rainbo Records
+                                 — Pressed By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Rainbo Records
+                                 — Pressed By                                                                </li>
+                                                        </ul>
+                                            </div>
+                </div>
+                       </div>
+
+          <div id="tab-status" class="tab-content">
+            <div class="card">
+                <div class="meta">
+                    <div style="margin-bottom:16px">
+                        <strong>Discogs Status</strong>
+                        <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+                                                        <form method="post" action="/release/save" style="margin:0">
+                                <input type="hidden" name="_token" value="" />
+                                <input type="hidden" name="release_id" value="9386597" />
+                                <input type="hidden" name="action" value="want_to_collection" />
+                                <input type="hidden" name="return" value="../index.html" />
+                                <button type="submit" style="background:var(--card);color:var(--accent);border:1px solid #2a2b2f;border-radius:8px;padding:6px 10px;cursor:pointer">Add to Collection</button>
+                            </form>
+                            
+                                                        <form method="post" action="/release/save" style="margin:0">
+                                <input type="hidden" name="_token" value="" />
+                                <input type="hidden" name="release_id" value="9386597" />
+                                <input type="hidden" name="action" value="add_want" />
+                                <input type="hidden" name="return" value="../index.html" />
+                                <button type="submit" class="muted" style="background:transparent;border:1px solid #2a2b2f;border-radius:8px;padding:6px 10px;cursor:pointer;color:inherit">Add to Wantlist</button>
+                            </form>
+                                                    </div>
+                    </div>
+
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                        <strong>My Notes</strong>
+                                            </div>
+
+                    <div id="notesView" style="margin-top:8px">
+                                                                                                                    </div>
+                                                         </div>
             </div>
-          
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Barcodes</strong>
-                <ul>
-                                      <li>6 02557 05714 0 <span class="muted">(Printed)</span></li>
-                                      <li>602557057140 <span class="muted">(Scanned)</span></li>
-                                  </ul>
-              </div>
-            </div>
-          
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Identifiers</strong>
-                <ul>
-                                      <li>Matrix / Runout: B0025418-01 A <span class="muted">(Side A label)</span></li>
-                                      <li>Matrix / Runout: B0025418-01 B <span class="muted">(Side B label)</span></li>
-                                      <li>Matrix / Runout: BD28074-01 A2 HL S-98351 <span class="muted">(Side A runout)</span></li>
-                                      <li>Matrix / Runout: BD28074-01 B1 HL S-98352 <span class="muted">(Side B runout)</span></li>
-                                  </ul>
-              </div>
-            </div>
-                  </div>
+          </div>
+        </div>
       </div>
 
             <!-- Lightbox overlay -->
@@ -363,7 +629,8 @@
         document.addEventListener('DOMContentLoaded', function(){
           const images = [
             '..\/images\/9386597\/6e15b8008c3eb93ee700da6142e92ac7092387d0.jpg', '..\/images\/9386597\/735d9bc37f6ac1893fe5b487d3557090da931ae8.jpg', '..\/images\/9386597\/149cda1d360c3dd32de0c4d26a06768d7fbd6119.jpg', '..\/images\/9386597\/6f6c611843ad825fc32db1876a5ea9dac3c5c973.jpg', '..\/images\/9386597\/ce98dda2ba7ccf0c53888b13ceecdf54d28b40d6.jpg', '..\/images\/9386597\/dfe567c1914649bc08b01f5a7da0474fb775ed32.jpg'          ];
-          const main = document.getElementById('main-cover');
+          const track = document.getElementById('carousel-track');
+          const dots = document.querySelectorAll('.dot');
           const thumbs = document.querySelectorAll('.thumb');
           const lb = document.getElementById('lightbox');
           const lbImg = lb ? lb.querySelector('.lb-img') : null;
@@ -371,16 +638,12 @@
           const lbPrev = lb ? lb.querySelector('.lb-prev') : null;
           const lbNext = lb ? lb.querySelector('.lb-next') : null;
           const lbCounter = lb ? lb.querySelector('.lb-counter') : null;
-          let idx = parseInt(main?.getAttribute('data-idx') || '0', 10) || 0;
+          let idx = 0;
 
-          function updateMain(to){
-            if (!main) return;
-            const i = Math.max(0, Math.min(images.length - 1, to));
-            if (images[i] && main.getAttribute('src') !== images[i]) {
-              main.setAttribute('src', images[i]);
-            }
-            main.setAttribute('data-idx', String(i));
-            idx = i;
+          function updateCarousel(to){
+            idx = Math.max(0, Math.min(images.length - 1, to));
+            if (track) track.style.transform = `translateX(-${idx * 100}%)`;
+            dots.forEach((d, i) => d.classList.toggle('active', i === idx));
           }
 
           function openLightbox(startIdx){
@@ -398,54 +661,92 @@
             lb.setAttribute('aria-hidden', 'true');
             document.body.style.overflow = '';
           }
-          function next(){ idx = (idx + 1) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
-          function prev(){ idx = (idx - 1 + images.length) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
+          function next(){ idx = (idx + 1) % images.length; if (lb.classList.contains('open')) { lbImg.src = images[idx]; lbCounter.textContent = (idx + 1) + ' / ' + images.length; } else { updateCarousel(idx); } }
+          function prev(){ idx = (idx - 1 + images.length) % images.length; if (lb.classList.contains('open')) { lbImg.src = images[idx]; lbCounter.textContent = (idx + 1) + ' / ' + images.length; } else { updateCarousel(idx); } }
 
-          // Thumbnail click: swap main and set index; Shift+Click opens lightbox
-          thumbs.forEach(function(btn){
-            btn.addEventListener('click', function(e){
-              const i = parseInt(this.getAttribute('data-idx') || '0', 10) || 0;
-              if (e.shiftKey) { openLightbox(i); return; }
-              updateMain(i);
-            });
+          // Carousel dot/thumb clicks
+          dots.forEach(d => d.addEventListener('click', () => updateCarousel(parseInt(d.dataset.idx))));
+          thumbs.forEach(t => t.addEventListener('click', () => updateCarousel(parseInt(t.dataset.idx))));
+
+          // Lightbox trigger on carousel image click
+          document.querySelectorAll('.carousel-slide img').forEach(img => {
+            img.addEventListener('click', () => openLightbox(parseInt(img.dataset.idx)));
           });
-
-          // Main cover click: open lightbox on current index
-          if (main) {
-            main.addEventListener('click', function(){
-              const i = parseInt(main.getAttribute('data-idx') || '0', 10) || 0;
-              openLightbox(i);
-            });
-          }
 
           // Lightbox interactions
           lbClose?.addEventListener('click', closeLightbox);
           lbPrev?.addEventListener('click', prev);
           lbNext?.addEventListener('click', next);
-          lbImg?.addEventListener('click', next); // click image to advance
+          lbImg?.addEventListener('click', next);
           lb?.addEventListener('click', function(e){ if (e.target === lb) closeLightbox(); });
 
-          // Keyboard support
+          // Keyboard
           document.addEventListener('keydown', function(e){
             if (!lb || !lb.classList.contains('open')) return;
-            if (e.key === 'Escape') { e.preventDefault(); closeLightbox(); }
-            else if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
-            else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+            if (e.key === 'Escape') closeLightbox();
+            else if (e.key === 'ArrowRight') next();
+            else if (e.key === 'ArrowLeft') prev();
           });
 
-          // Ensure initial main index reflects the list
-          if (images.length > 0 && main) {
-            let initial = images.indexOf(main.getAttribute('src'));
-            if (initial < 0) initial = 0;
-            main.setAttribute('data-idx', String(initial));
+          // Tabs
+          const tabs = document.querySelectorAll('.tab');
+          const contents = document.querySelectorAll('.tab-content');
+          tabs.forEach(t => {
+            t.addEventListener('click', () => {
+              const target = t.dataset.tab;
+              tabs.forEach(t2 => t2.classList.toggle('active', t2 === t));
+              contents.forEach(c => c.classList.toggle('active', c.id === `tab-${target}`));
+            });
+          });
+
+          // Handle tab parameter in URL
+          const urlParams = new URLSearchParams(window.location.search);
+          const activeTab = urlParams.get('tab');
+          if (activeTab) {
+            const tabEl = document.querySelector(`.tab[data-tab="${activeTab}"]`);
+            if (tabEl) tabEl.click();
           }
+
+          // Swipe support for carousel (basic)
+          let startX = 0;
+          track?.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+          track?.addEventListener('touchend', e => {
+            const diff = startX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) {
+              if (diff > 0) next(); else prev();
+            }
+          });
+
+          // Notes Toggle
+          (function(){
+            const btn = document.getElementById('editToggle');
+            const form = document.getElementById('notesForm');
+            const view = document.getElementById('notesView');
+            if (!btn || !form || !view) return;
+            btn.addEventListener('click', function(){
+                const open = form.style.display === 'none';
+                form.style.display = open ? 'flex' : 'none';
+                view.style.display = open ? 'none' : 'block';
+                btn.textContent = open ? 'Cancel' : 'Edit';
+                if (open) {
+                    // Switch to status tab if not active
+                    document.querySelector('.tab[data-tab="status"]').click();
+                }
+            });
+          })();
         });
       </script>
             </div>
 
-  
+    <script>
+    document.getElementById('mobile-toggle')?.addEventListener('click', function() {
+      document.getElementById('mobile-menu').classList.toggle('active');
+      this.textContent = document.getElementById('mobile-menu').classList.contains('active') ? '✕' : '☰';
+    });
+  </script>
+
   <footer class="site-footer muted" style="text-align:center;margin:24px 0 8px 0;font-size:.9rem;">
-  Powered by Discogs API & Coffee Since 2025 | Lovingly Crafted in Boise, Idaho
+  Powered by Discogs API & Coffee Since 2026 | Lovingly Crafted in Boise, Idaho
 </footer>
 </body>
 </html>

@@ -4,18 +4,197 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Duran Duran — Notorious</title>
+  <style>
+    :root {
+      --bg: #0b0b0c;
+      --card: #16171a;
+      --text: #e7e7ea;
+      --muted: #a0a3aa;
+      --accent: #67e8f9;
+      --border: #2a2b2f;
+      --header-bg: rgba(11, 11, 12, 0.8);
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    .content-wrap {
+      margin-top: 24px;
+      margin-bottom: 24px;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .muted { color: var(--muted); }
+
+    /* Layout Helpers */
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .gap-4 { gap: 16px; }
+    .gap-2 { gap: 8px; }
+
+    /* Common Components */
+    .btn-small {
+      font-size: .8rem;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--card);
+      color: var(--text);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-small:hover { border-color: var(--accent); text-decoration: none; }
+
+    /* Common Header Components */
+    .main-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--header-bg);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-content {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    /* Desktop Nav */
+    .desktop-nav { display: flex; align-items: center; gap: 20px; }
+    @media (max-width: 768px) { .desktop-nav { display: none; } }
+
+    /* Account Dropdown */
+    .dropdown { position: relative; display: inline-block; }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background: var(--card);
+      min-width: 160px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      padding: 8px 0;
+      z-index: 101;
+    }
+    .dropdown:hover .dropdown-content { display: block; }
+    .dropdown-item {
+      display: block;
+      padding: 8px 16px;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .dropdown-item:hover { background: rgba(255,255,255,0.05); }
+
+    /* Mobile Nav / Hamburger */
+    .mobile-nav-toggle {
+      display: none;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 8px;
+    }
+    @media (max-width: 768px) { .mobile-nav-toggle { display: block; } }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 65px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg);
+      z-index: 99;
+      padding: 20px;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .mobile-menu.active { display: flex; }
+    .mobile-menu .nav-item {
+        display: block;
+        padding: 12px 16px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: var(--text);
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .mobile-menu .nav-item:hover { border-color: var(--accent); }
+
+    /* Breadcrumbs */
+    .breadcrumbs {
+      padding: 12px 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .breadcrumbs a { color: var(--muted); }
+    .breadcrumbs span { margin: 0 8px; opacity: 0.5; }
+
+    /* Utility Bar (Mobile Sticky Search/Sort) */
+    .utility-bar {
+        display: none;
+        position: sticky;
+        top: 65px;
+        z-index: 90;
+        background: var(--bg);
+        padding: 8px 20px;
+        border-bottom: 1px solid var(--border);
+    }
+    @media (max-width: 768px) {
+        .utility-bar.is-visible { display: block; }
+    }
+  </style>
     <style>
-    :root { --bg:#0b0b0c; --card:#16171a; --text:#e7e7ea; --muted:#a0a3aa; --accent:#67e8f9; --overlay: rgba(0,0,0,.9); }
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif}
-    .wrap{max-width:1000px;margin:40px auto;padding:0 20px}
-    a{color:var(--accent);text-decoration:none}
-    a:hover{text-decoration:underline}
-    .layout{display:grid;grid-template-columns:280px 1fr;gap:24px}
+    :root { --overlay: rgba(0,0,0,.9); }
+    .layout{display:grid;grid-template-columns:1fr 1fr;gap:40px}
     .card{background:var(--card);border-radius:12px;overflow:hidden}
     .cover{width:100%;aspect-ratio:1/1;object-fit:cover;background:#222;cursor:zoom-in}
     .meta{padding:16px}
-    .muted{color:var(--muted)}
-    h1{margin:0 0 8px 0;font-size:1.6rem}
+    h1{margin:0 0 8px 0;font-size:2rem}
+
+    /* Carousel */
+    .carousel-container { position: relative; width: 100%; overflow: hidden; border-radius: 12px; }
+    .carousel-track { display: flex; transition: transform 0.3s ease-out; }
+    .carousel-slide { min-width: 100%; aspect-ratio: 1/1; }
+    .carousel-slide img { width: 100%; height: 100%; object-fit: cover; }
+    .carousel-dots { display: none; justify-content: center; gap: 8px; margin-top: 12px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); cursor: pointer; opacity: 0.5; }
+    .dot.active { background: var(--accent); opacity: 1; }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 4px; border-bottom: 1px solid #2a2b2f; margin-top: 24px; overflow-x: auto; scrollbar-width: none; }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab { padding: 12px 20px; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; white-space: nowrap; }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-content { display: none; padding-top: 20px; }
+    .tab-content.active { display: block; }
 
     /* Lightbox */
     .lightbox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--overlay);z-index:1000}
@@ -30,255 +209,361 @@
     .lb-counter{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);color:#fff;background:rgba(0,0,0,.5);padding:4px 10px;border-radius:999px;font-size:.9rem}
 
     @media (max-width: 800px){
-      .layout{grid-template-columns:1fr}
+      .layout{grid-template-columns:1fr; gap: 24px;}
+      .carousel-dots { display: flex; }
       .lb-prev{left:10px}
       .lb-next{right:10px}
+      .wrap { margin-top: 12px; }
     }
   </style>
 </head>
 <body>
-  
+  <header class="main-header">
     <div class="wrap">
-    <p><a href="../index.html">← Back</a></p>
-          <div class="layout">
+      <div class="header-content">
+        <a href="/" class="logo">My Music</a>
+
+        <div class="desktop-nav">
+          <a href="/?view=collection" class="muted">Collection</a>
+          <a href="/?view=wantlist" class="muted">Wantlist</a>
+          <a href="/random" class="muted">Surprise Me</a>
+          <a href="/stats" class="muted">Stats</a>
+          <a href="/about" class="muted">About</a>
+        </div>
+
+        <button class="mobile-nav-toggle" id="mobile-toggle" aria-label="Toggle menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="/?view=collection" class="nav-item">Collection</a>
+    <a href="/?view=wantlist" class="nav-item">Wantlist</a>
+    <a href="/random" class="nav-item">Surprise Me</a>
+    <a href="/stats" class="nav-item">Stats</a>
+    <a href="/about" class="nav-item">About</a>
+  </div>
+
+  <div class="wrap">
+      <nav class="breadcrumbs">
+    <div>
+      <a href="/">Home</a>
+      <span>/</span>
+      <a href="/?view=collection">Collection</a>
+      <span>/</span>
+      Notorious
+    </div>
+  </nav>
+  </div>
+
+  
+    <div class="wrap content-wrap">
+    <div style="margin-bottom:24px">
+      <p style="margin:0"><a href="../index.html" style="background:var(--card);border:1px solid #2a2b2f;padding:6px 12px;border-radius:8px;color:var(--text);font-size:.9rem;text-decoration:none">← Back</a></p>
+    </div>
+                <div class="layout">
         <div>
-          <div class="card">
-                          <img id="main-cover" class="cover" src="../images/1847915/b5a7677495e6717abd9000ea46b923e7c263bda4.jpg" alt="Notorious cover" data-idx="0" />
-                      </div>
-                      <div class="thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
-                              <button class="thumb" data-url="../images/1847915/b5a7677495e6717abd9000ea46b923e7c263bda4.jpg" data-idx="0" title="Image 1" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/1847915/b5a7677495e6717abd9000ea46b923e7c263bda4.jpg" alt="thumb 1" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:1" />
+          <div class="carousel-container" id="carousel">
+            <div class="carousel-track" id="carousel-track">
+                                                <div class="carousel-slide">
+                    <img class="cover" src="../images/1847915/b5a7677495e6717abd9000ea46b923e7c263bda4.jpg" alt="Notorious cover" data-idx="0" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/1847915/b4dba9798e2e1ea673b28dc6ed31560a9b3e7703.jpg" alt="Notorious cover" data-idx="1" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/1847915/2784c53a6099bc6361af7937a8322a7502571f5e.jpg" alt="Notorious cover" data-idx="2" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/1847915/cb9a11b4730dd3b9c3a012787575f97aa458afc2.jpg" alt="Notorious cover" data-idx="3" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/1847915/971963980c3f81ffee1a4ad5c5066e872901e8f5.jpg" alt="Notorious cover" data-idx="4" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/1847915/aaed514cf8a8a1cc64b05a6fb323db35f4f3ca55.jpg" alt="Notorious cover" data-idx="5" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/1847915/d752b2d017d084af1cb6f6a305a84cf39b7b2735.jpg" alt="Notorious cover" data-idx="6" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/1847915/2a562395097293ddf49ddb53e430806785764343.jpg" alt="Notorious cover" data-idx="7" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/1847915/c0e5da783ec7c24a8e4ddb39e219ad01134f03fc.jpg" alt="Notorious cover" data-idx="8" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/1847915/0004161fcb6a5418579170e7080a57e77c8aa8bf.jpg" alt="Notorious cover" data-idx="9" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/1847915/ccc27f44e86e91c7e7f55a676f2c7e5e26d622a3.jpg" alt="Notorious cover" data-idx="10" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/1847915/876b53792a9d796d0b180ab132491d625e32c325.jpg" alt="Notorious cover" data-idx="11" />
+                  </div>
+                                          </div>
+          </div>
+                      <div class="carousel-dots" id="carousel-dots">
+                              <div class="dot active" data-idx="0"></div>
+                              <div class="dot " data-idx="1"></div>
+                              <div class="dot " data-idx="2"></div>
+                              <div class="dot " data-idx="3"></div>
+                              <div class="dot " data-idx="4"></div>
+                              <div class="dot " data-idx="5"></div>
+                              <div class="dot " data-idx="6"></div>
+                              <div class="dot " data-idx="7"></div>
+                              <div class="dot " data-idx="8"></div>
+                              <div class="dot " data-idx="9"></div>
+                              <div class="dot " data-idx="10"></div>
+                              <div class="dot " data-idx="11"></div>
+                          </div>
+            <div class="thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;">
+                              <button class="thumb" data-idx="0" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/1847915/b5a7677495e6717abd9000ea46b923e7c263bda4.jpg" alt="thumb 1" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:1" />
                 </button>
-                              <button class="thumb" data-url="../images/1847915/b4dba9798e2e1ea673b28dc6ed31560a9b3e7703.jpg" data-idx="1" title="Image 2" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/1847915/b4dba9798e2e1ea673b28dc6ed31560a9b3e7703.jpg" alt="thumb 2" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="1" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/1847915/b4dba9798e2e1ea673b28dc6ed31560a9b3e7703.jpg" alt="thumb 2" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/1847915/2784c53a6099bc6361af7937a8322a7502571f5e.jpg" data-idx="2" title="Image 3" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/1847915/2784c53a6099bc6361af7937a8322a7502571f5e.jpg" alt="thumb 3" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="2" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/1847915/2784c53a6099bc6361af7937a8322a7502571f5e.jpg" alt="thumb 3" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/1847915/cb9a11b4730dd3b9c3a012787575f97aa458afc2.jpg" data-idx="3" title="Image 4" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/1847915/cb9a11b4730dd3b9c3a012787575f97aa458afc2.jpg" alt="thumb 4" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="3" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/1847915/cb9a11b4730dd3b9c3a012787575f97aa458afc2.jpg" alt="thumb 4" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/1847915/971963980c3f81ffee1a4ad5c5066e872901e8f5.jpg" data-idx="4" title="Image 5" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/1847915/971963980c3f81ffee1a4ad5c5066e872901e8f5.jpg" alt="thumb 5" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="4" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/1847915/971963980c3f81ffee1a4ad5c5066e872901e8f5.jpg" alt="thumb 5" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/1847915/aaed514cf8a8a1cc64b05a6fb323db35f4f3ca55.jpg" data-idx="5" title="Image 6" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/1847915/aaed514cf8a8a1cc64b05a6fb323db35f4f3ca55.jpg" alt="thumb 6" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="5" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/1847915/aaed514cf8a8a1cc64b05a6fb323db35f4f3ca55.jpg" alt="thumb 6" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/1847915/d752b2d017d084af1cb6f6a305a84cf39b7b2735.jpg" data-idx="6" title="Image 7" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/1847915/d752b2d017d084af1cb6f6a305a84cf39b7b2735.jpg" alt="thumb 7" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="6" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/1847915/d752b2d017d084af1cb6f6a305a84cf39b7b2735.jpg" alt="thumb 7" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/1847915/2a562395097293ddf49ddb53e430806785764343.jpg" data-idx="7" title="Image 8" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/1847915/2a562395097293ddf49ddb53e430806785764343.jpg" alt="thumb 8" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="7" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/1847915/2a562395097293ddf49ddb53e430806785764343.jpg" alt="thumb 8" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/1847915/c0e5da783ec7c24a8e4ddb39e219ad01134f03fc.jpg" data-idx="8" title="Image 9" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/1847915/c0e5da783ec7c24a8e4ddb39e219ad01134f03fc.jpg" alt="thumb 9" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="8" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/1847915/c0e5da783ec7c24a8e4ddb39e219ad01134f03fc.jpg" alt="thumb 9" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/1847915/0004161fcb6a5418579170e7080a57e77c8aa8bf.jpg" data-idx="9" title="Image 10" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/1847915/0004161fcb6a5418579170e7080a57e77c8aa8bf.jpg" alt="thumb 10" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="9" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/1847915/0004161fcb6a5418579170e7080a57e77c8aa8bf.jpg" alt="thumb 10" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/1847915/ccc27f44e86e91c7e7f55a676f2c7e5e26d622a3.jpg" data-idx="10" title="Image 11" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/1847915/ccc27f44e86e91c7e7f55a676f2c7e5e26d622a3.jpg" alt="thumb 11" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="10" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/1847915/ccc27f44e86e91c7e7f55a676f2c7e5e26d622a3.jpg" alt="thumb 11" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/1847915/876b53792a9d796d0b180ab132491d625e32c325.jpg" data-idx="11" title="Image 12" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/1847915/876b53792a9d796d0b180ab132491d625e32c325.jpg" alt="thumb 12" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="11" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/1847915/876b53792a9d796d0b180ab132491d625e32c325.jpg" alt="thumb 12" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                           </div>
                   </div>
         <div>
           <h1>Notorious</h1>
-          <p class="muted">Duran Duran • 1986</p>
+          <p class="muted" style="font-size:1.2rem">Duran Duran • 1986</p>
           <p class="muted">Japan</p>
-                      <p style="margin:8px 0;">
-              <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Electronic</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Pop</span>              <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Synth-pop</span>            </p>
-          
-                      <p class="muted">Formats:
-                              Vinyl                          </p>
-          
+          <div style="margin:16px 0; display:flex; gap:8px; flex-wrap:wrap">
+            <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Electronic</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Pop</span>            <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Synth-pop</span>          </div>
+
                       <p class="muted">Labels:
               EMI (EMS-91202)            </p>
           
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Tracklist</strong>
-                <ol>
-                                      <li>A1 — Notorious <span class="muted">(4:17)</span></li>
-                                      <li>A2 — American Science <span class="muted">(4:42)</span></li>
-                                      <li>A3 — Skin Trade <span class="muted">(5:56)</span></li>
-                                      <li>A4 — A Matter Of Feeling <span class="muted">(5:56)</span></li>
-                                      <li>A5 — Hold Me <span class="muted">(4:30)</span></li>
-                                      <li>B1 — Vertigo (Do The Demolition) <span class="muted">(4:43)</span></li>
-                                      <li>B2 — So Misled <span class="muted">(4:03)</span></li>
-                                      <li>B3 — &quot;Meet El Presidente&quot; <span class="muted">(4:17)</span></li>
-                                      <li>B4 — Winter Marches On <span class="muted">(3:24)</span></li>
-                                      <li>B5 — Proposition <span class="muted">(4:57)</span></li>
-                                  </ol>
-              </div>
-            </div>
-          
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Videos</strong>
-                <ul>
-                                      <li><a href="https://www.youtube.com/watch?v=Z9z0e1Wm64M" target="_blank" rel="noopener">Duran Duran - Notorious (Official Music Video)</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=M6CLWV0JBU4" target="_blank" rel="noopener">Duran Duran - Meet El Presidente (Official Music Video)</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=oNU61nS0TTY" target="_blank" rel="noopener">Duran Duran - Skin Trade (Official Music Video)</a></li>
-                                  </ul>
-              </div>
-            </div>
-          
-          
-          <div class="card" style="margin-top:16px;">
-            <div class="meta">
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-                <strong>My Notes</strong>
-                              </div>
-
-              
-              <div id="notesView" style="margin-top:8px">
-                                                  <div class="muted">(none)</div>
-                              </div>
-
-                          </div>
+          <div class="tabs" id="release-tabs">
+            <div class="tab active" data-tab="tracks">Tracks</div>
+            <div class="tab" data-tab="details">Details</div>
+            <div class="tab" data-tab="credits">Credits</div>
+            <div class="tab" data-tab="status">Status & Notes</div>
           </div>
 
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Credits</strong>
-                <ul>
-                                      <li>
-                      Christy Turlington
-                      <span class="muted">— Cover</span>                                          </li>
-                                      <li>
-                      Frank Olinsky
-                      <span class="muted">— Cover</span>                                          </li>
-                                      <li>
-                      John Swannell
-                      <span class="muted">— Cover</span>                                          </li>
-                                      <li>
-                      Daniel Abraham
-                      <span class="muted">— Engineer, Mixed By</span>                                          </li>
-                                      <li>
-                      Lenny Pickett
-                      <span class="muted">— Horns [The Borneo Horns]</span>                                          </li>
-                                      <li>
-                      Stan Harrison
-                      <span class="muted">— Horns [The Borneo Horns]</span>                                          </li>
-                                      <li>
-                      Steve Elson
-                      <span class="muted">— Horns [The Borneo Horns]</span>                                          </li>
-                                      <li>
-                      The Borneo Horns
-                      <span class="muted">— Horns, Performer [Musicians]</span>                                          </li>
-                                      <li>
-                      Michinari Yamada
-                      <span class="muted">— Liner Notes</span>                                          </li>
-                                      <li>
-                      Bob Ludwig
-                      <span class="muted">— Mastered By</span>                                          </li>
-                                      <li>
-                      Andy Taylor
-                      <span class="muted">— Performer</span>                                          </li>
-                                      <li>
-                      John Taylor
-                      <span class="muted">— Performer</span>                                          </li>
-                                      <li>
-                      Nick Rhodes
-                      <span class="muted">— Performer</span>                                          </li>
-                                      <li>
-                      Simon Le Bon
-                      <span class="muted">— Performer</span>                                          </li>
-                                      <li>
-                      Steve Ferrone
-                      <span class="muted">— Performer</span>                                          </li>
-                                      <li>
-                      Jimmy Maelen
-                      <span class="muted">— Performer [Musicians]</span>                                          </li>
-                                      <li>
-                      Mac Gollehon
-                      <span class="muted">— Performer [Musicians]</span>                                          </li>
-                                      <li>
-                      Warren Cuccurullo
-                      <span class="muted">— Performer [Musicians]</span>                                          </li>
-                                      <li>
-                      Nile Rodgers
-                      <span class="muted">— Performer, Producer</span>                                          </li>
-                                      <li>
-                      Duran Duran
-                      <span class="muted">— Producer</span>                                          </li>
-                                      <li>
-                      Brenda White King
-                      <span class="muted">— Voice [Additional]</span>                                          </li>
-                                      <li>
-                      Cindy Mizelle
-                      <span class="muted">— Voice [Additional]</span>                                          </li>
-                                      <li>
-                      Curtis King
-                      <span class="muted">— Voice [Additional]</span>                                          </li>
-                                      <li>
-                      Tessa Niles
-                      <span class="muted">— Voice [Additional]</span>                                          </li>
-                                      <li>
-                      John Taylor
-                      <span class="muted">— Written-By [All Songs]</span>                                          </li>
-                                      <li>
-                      Nick Rhodes
-                      <span class="muted">— Written-By [All Songs]</span>                                          </li>
-                                      <li>
-                      Simon Le Bon
-                      <span class="muted">— Written-By [All Songs]</span>                                          </li>
-                                  </ul>
+          <div id="tab-tracks" class="tab-content active">
+                          <div class="card">
+                <div class="meta">
+                  <ol style="margin:0; padding-left:20px">
+                                          <li style="margin-bottom:8px">A1 — Notorious <span class="muted">(4:17)</span></li>
+                                          <li style="margin-bottom:8px">A2 — American Science <span class="muted">(4:42)</span></li>
+                                          <li style="margin-bottom:8px">A3 — Skin Trade <span class="muted">(5:56)</span></li>
+                                          <li style="margin-bottom:8px">A4 — A Matter Of Feeling <span class="muted">(5:56)</span></li>
+                                          <li style="margin-bottom:8px">A5 — Hold Me <span class="muted">(4:30)</span></li>
+                                          <li style="margin-bottom:8px">B1 — Vertigo (Do The Demolition) <span class="muted">(4:43)</span></li>
+                                          <li style="margin-bottom:8px">B2 — So Misled <span class="muted">(4:03)</span></li>
+                                          <li style="margin-bottom:8px">B3 — &quot;Meet El Presidente&quot; <span class="muted">(4:17)</span></li>
+                                          <li style="margin-bottom:8px">B4 — Winter Marches On <span class="muted">(3:24)</span></li>
+                                          <li style="margin-bottom:8px">B5 — Proposition <span class="muted">(4:57)</span></li>
+                                      </ol>
+                </div>
               </div>
+                      </div>
+
+          <div id="tab-details" class="tab-content">
+            <div class="card">
+                <div class="meta">
+                                            <p class="muted"><strong>Formats:</strong>
+                                                    Vinyl                                                </p>
+                                        
+                    
+                                            <p><strong>Videos:</strong></p>
+                        <ul style="margin:0; padding-left:20px">
+                                                    <li><a href="https://www.youtube.com/watch?v=Z9z0e1Wm64M" target="_blank" rel="noopener">Duran Duran - Notorious (Official Music Video)</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=M6CLWV0JBU4" target="_blank" rel="noopener">Duran Duran - Meet El Presidente (Official Music Video)</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=oNU61nS0TTY" target="_blank" rel="noopener">Duran Duran - Skin Trade (Official Music Video)</a></li>
+                                                </ul>
+                    
+                                            <p><strong>Barcodes:</strong></p>
+                        <ul style="margin:0; padding-left:20px" class="muted">
+                                                    <li>T4988 006 60736 1</li>
+                                                </ul>
+                                    </div>
             </div>
-          
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Companies</strong>
-                <ul>
-                                      <li>
-                      Masterdisk
-                      <span class="muted"> — Mastered At</span>                                          </li>
-                                      <li>
-                      EMI Music Publishing Ltd.
-                      <span class="muted"> — Published By</span>                                          </li>
-                                      <li>
-                      Tritec Music Ltd.
-                      <span class="muted"> — Phonographic Copyright (p)</span>                                          </li>
-                                      <li>
-                      Tritec Music Ltd.
-                      <span class="muted"> — Made By</span>                                          </li>
-                                      <li>
-                      EMI Records Ltd.
-                      <span class="muted"> — Licensed To</span>                                          </li>
-                                      <li>
-                      DD Productions Ltd.
-                      <span class="muted"> — Copyright (c)</span>                                          </li>
-                                      <li>
-                      Toshiba EMI Ltd
-                      <span class="muted"> — Manufactured By</span>                                          </li>
-                                  </ul>
-              </div>
+          </div>
+
+          <div id="tab-credits" class="tab-content">
+                             <div class="card">
+                    <div class="meta">
+                                                    <p><strong>Credits:</strong></p>
+                            <ul style="margin:0; padding-left:20px" class="muted">
+                                                            <li style="margin-bottom:4px">
+                                Christy Turlington
+                                 — Cover                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Frank Olinsky
+                                 — Cover                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                John Swannell
+                                 — Cover                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Daniel Abraham
+                                 — Engineer, Mixed By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Lenny Pickett
+                                 — Horns [The Borneo Horns]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Stan Harrison
+                                 — Horns [The Borneo Horns]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Steve Elson
+                                 — Horns [The Borneo Horns]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                The Borneo Horns
+                                 — Horns, Performer [Musicians]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Michinari Yamada
+                                 — Liner Notes                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Bob Ludwig
+                                 — Mastered By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Andy Taylor
+                                 — Performer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                John Taylor
+                                 — Performer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Nick Rhodes
+                                 — Performer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Simon Le Bon
+                                 — Performer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Steve Ferrone
+                                 — Performer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Jimmy Maelen
+                                 — Performer [Musicians]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Mac Gollehon
+                                 — Performer [Musicians]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Warren Cuccurullo
+                                 — Performer [Musicians]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Nile Rodgers
+                                 — Performer, Producer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Duran Duran
+                                 — Producer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Brenda White King
+                                 — Voice [Additional]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Cindy Mizelle
+                                 — Voice [Additional]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Curtis King
+                                 — Voice [Additional]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Tessa Niles
+                                 — Voice [Additional]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                John Taylor
+                                 — Written-By [All Songs]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Nick Rhodes
+                                 — Written-By [All Songs]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Simon Le Bon
+                                 — Written-By [All Songs]                                                                </li>
+                                                        </ul>
+                        
+                                                    <p style="margin-top:16px"><strong>Companies:</strong></p>
+                            <ul style="margin:0; padding-left:20px" class="muted">
+                                                            <li style="margin-bottom:4px">
+                                Masterdisk
+                                 — Mastered At                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                EMI Music Publishing Ltd.
+                                 — Published By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Tritec Music Ltd.
+                                 — Phonographic Copyright (p)                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Tritec Music Ltd.
+                                 — Made By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                EMI Records Ltd.
+                                 — Licensed To                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                DD Productions Ltd.
+                                 — Copyright (c)                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Toshiba EMI Ltd
+                                 — Manufactured By                                                                </li>
+                                                        </ul>
+                                            </div>
+                </div>
+                       </div>
+
+          <div id="tab-status" class="tab-content">
+            <div class="card">
+                <div class="meta">
+                    <div style="margin-bottom:16px">
+                        <strong>Discogs Status</strong>
+                        <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+                                                        <form method="post" action="/release/save" style="margin:0">
+                                <input type="hidden" name="_token" value="" />
+                                <input type="hidden" name="release_id" value="1847915" />
+                                <input type="hidden" name="action" value="want_to_collection" />
+                                <input type="hidden" name="return" value="../index.html" />
+                                <button type="submit" style="background:var(--card);color:var(--accent);border:1px solid #2a2b2f;border-radius:8px;padding:6px 10px;cursor:pointer">Add to Collection</button>
+                            </form>
+                            
+                                                        <form method="post" action="/release/save" style="margin:0">
+                                <input type="hidden" name="_token" value="" />
+                                <input type="hidden" name="release_id" value="1847915" />
+                                <input type="hidden" name="action" value="add_want" />
+                                <input type="hidden" name="return" value="../index.html" />
+                                <button type="submit" class="muted" style="background:transparent;border:1px solid #2a2b2f;border-radius:8px;padding:6px 10px;cursor:pointer;color:inherit">Add to Wantlist</button>
+                            </form>
+                                                    </div>
+                    </div>
+
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                        <strong>My Notes</strong>
+                                            </div>
+
+                    <div id="notesView" style="margin-top:8px">
+                                                                                                                    </div>
+                                                         </div>
             </div>
-          
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Barcodes</strong>
-                <ul>
-                                      <li>T4988 006 60736 1</li>
-                                  </ul>
-              </div>
-            </div>
-          
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Identifiers</strong>
-                <ul>
-                                      <li>Matrix / Runout: DDN 331-A <span class="muted">(Side A label)</span></li>
-                                      <li>Matrix / Runout: DDN 331-B <span class="muted">(Side B label)</span></li>
-                                      <li>Matrix / Runout: DDN-331-A 1S 1 9 <span class="muted">(Side A runout, stamped, variant 1)</span></li>
-                                      <li>Matrix / Runout: DDN 331 B 2S 1 7 <span class="muted">(Side B runout, stamped, variant 1)</span></li>
-                                      <li>Matrix / Runout: DDN-331-A 1S 7 1 - 0 <span class="muted">(Side A runout, stamped, variant 2)</span></li>
-                                      <li>Matrix / Runout: DDN 331 B 2S 2 1 <span class="muted">(Side B runout, stamped, variant 2)</span></li>
-                                      <li>Rights Society: JASRAC</li>
-                                      <li>Other: ¥2,800 <span class="muted">(Price)</span></li>
-                                      <li>Other: H·12·6 <span class="muted">(Sleeve date)</span></li>
-                                  </ul>
-              </div>
-            </div>
-                  </div>
+          </div>
+        </div>
       </div>
 
             <!-- Lightbox overlay -->
@@ -296,7 +581,8 @@
         document.addEventListener('DOMContentLoaded', function(){
           const images = [
             '..\/images\/1847915\/b5a7677495e6717abd9000ea46b923e7c263bda4.jpg', '..\/images\/1847915\/b4dba9798e2e1ea673b28dc6ed31560a9b3e7703.jpg', '..\/images\/1847915\/2784c53a6099bc6361af7937a8322a7502571f5e.jpg', '..\/images\/1847915\/cb9a11b4730dd3b9c3a012787575f97aa458afc2.jpg', '..\/images\/1847915\/971963980c3f81ffee1a4ad5c5066e872901e8f5.jpg', '..\/images\/1847915\/aaed514cf8a8a1cc64b05a6fb323db35f4f3ca55.jpg', '..\/images\/1847915\/d752b2d017d084af1cb6f6a305a84cf39b7b2735.jpg', '..\/images\/1847915\/2a562395097293ddf49ddb53e430806785764343.jpg', '..\/images\/1847915\/c0e5da783ec7c24a8e4ddb39e219ad01134f03fc.jpg', '..\/images\/1847915\/0004161fcb6a5418579170e7080a57e77c8aa8bf.jpg', '..\/images\/1847915\/ccc27f44e86e91c7e7f55a676f2c7e5e26d622a3.jpg', '..\/images\/1847915\/876b53792a9d796d0b180ab132491d625e32c325.jpg'          ];
-          const main = document.getElementById('main-cover');
+          const track = document.getElementById('carousel-track');
+          const dots = document.querySelectorAll('.dot');
           const thumbs = document.querySelectorAll('.thumb');
           const lb = document.getElementById('lightbox');
           const lbImg = lb ? lb.querySelector('.lb-img') : null;
@@ -304,16 +590,12 @@
           const lbPrev = lb ? lb.querySelector('.lb-prev') : null;
           const lbNext = lb ? lb.querySelector('.lb-next') : null;
           const lbCounter = lb ? lb.querySelector('.lb-counter') : null;
-          let idx = parseInt(main?.getAttribute('data-idx') || '0', 10) || 0;
+          let idx = 0;
 
-          function updateMain(to){
-            if (!main) return;
-            const i = Math.max(0, Math.min(images.length - 1, to));
-            if (images[i] && main.getAttribute('src') !== images[i]) {
-              main.setAttribute('src', images[i]);
-            }
-            main.setAttribute('data-idx', String(i));
-            idx = i;
+          function updateCarousel(to){
+            idx = Math.max(0, Math.min(images.length - 1, to));
+            if (track) track.style.transform = `translateX(-${idx * 100}%)`;
+            dots.forEach((d, i) => d.classList.toggle('active', i === idx));
           }
 
           function openLightbox(startIdx){
@@ -331,54 +613,92 @@
             lb.setAttribute('aria-hidden', 'true');
             document.body.style.overflow = '';
           }
-          function next(){ idx = (idx + 1) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
-          function prev(){ idx = (idx - 1 + images.length) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
+          function next(){ idx = (idx + 1) % images.length; if (lb.classList.contains('open')) { lbImg.src = images[idx]; lbCounter.textContent = (idx + 1) + ' / ' + images.length; } else { updateCarousel(idx); } }
+          function prev(){ idx = (idx - 1 + images.length) % images.length; if (lb.classList.contains('open')) { lbImg.src = images[idx]; lbCounter.textContent = (idx + 1) + ' / ' + images.length; } else { updateCarousel(idx); } }
 
-          // Thumbnail click: swap main and set index; Shift+Click opens lightbox
-          thumbs.forEach(function(btn){
-            btn.addEventListener('click', function(e){
-              const i = parseInt(this.getAttribute('data-idx') || '0', 10) || 0;
-              if (e.shiftKey) { openLightbox(i); return; }
-              updateMain(i);
-            });
+          // Carousel dot/thumb clicks
+          dots.forEach(d => d.addEventListener('click', () => updateCarousel(parseInt(d.dataset.idx))));
+          thumbs.forEach(t => t.addEventListener('click', () => updateCarousel(parseInt(t.dataset.idx))));
+
+          // Lightbox trigger on carousel image click
+          document.querySelectorAll('.carousel-slide img').forEach(img => {
+            img.addEventListener('click', () => openLightbox(parseInt(img.dataset.idx)));
           });
-
-          // Main cover click: open lightbox on current index
-          if (main) {
-            main.addEventListener('click', function(){
-              const i = parseInt(main.getAttribute('data-idx') || '0', 10) || 0;
-              openLightbox(i);
-            });
-          }
 
           // Lightbox interactions
           lbClose?.addEventListener('click', closeLightbox);
           lbPrev?.addEventListener('click', prev);
           lbNext?.addEventListener('click', next);
-          lbImg?.addEventListener('click', next); // click image to advance
+          lbImg?.addEventListener('click', next);
           lb?.addEventListener('click', function(e){ if (e.target === lb) closeLightbox(); });
 
-          // Keyboard support
+          // Keyboard
           document.addEventListener('keydown', function(e){
             if (!lb || !lb.classList.contains('open')) return;
-            if (e.key === 'Escape') { e.preventDefault(); closeLightbox(); }
-            else if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
-            else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+            if (e.key === 'Escape') closeLightbox();
+            else if (e.key === 'ArrowRight') next();
+            else if (e.key === 'ArrowLeft') prev();
           });
 
-          // Ensure initial main index reflects the list
-          if (images.length > 0 && main) {
-            let initial = images.indexOf(main.getAttribute('src'));
-            if (initial < 0) initial = 0;
-            main.setAttribute('data-idx', String(initial));
+          // Tabs
+          const tabs = document.querySelectorAll('.tab');
+          const contents = document.querySelectorAll('.tab-content');
+          tabs.forEach(t => {
+            t.addEventListener('click', () => {
+              const target = t.dataset.tab;
+              tabs.forEach(t2 => t2.classList.toggle('active', t2 === t));
+              contents.forEach(c => c.classList.toggle('active', c.id === `tab-${target}`));
+            });
+          });
+
+          // Handle tab parameter in URL
+          const urlParams = new URLSearchParams(window.location.search);
+          const activeTab = urlParams.get('tab');
+          if (activeTab) {
+            const tabEl = document.querySelector(`.tab[data-tab="${activeTab}"]`);
+            if (tabEl) tabEl.click();
           }
+
+          // Swipe support for carousel (basic)
+          let startX = 0;
+          track?.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+          track?.addEventListener('touchend', e => {
+            const diff = startX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) {
+              if (diff > 0) next(); else prev();
+            }
+          });
+
+          // Notes Toggle
+          (function(){
+            const btn = document.getElementById('editToggle');
+            const form = document.getElementById('notesForm');
+            const view = document.getElementById('notesView');
+            if (!btn || !form || !view) return;
+            btn.addEventListener('click', function(){
+                const open = form.style.display === 'none';
+                form.style.display = open ? 'flex' : 'none';
+                view.style.display = open ? 'none' : 'block';
+                btn.textContent = open ? 'Cancel' : 'Edit';
+                if (open) {
+                    // Switch to status tab if not active
+                    document.querySelector('.tab[data-tab="status"]').click();
+                }
+            });
+          })();
         });
       </script>
             </div>
 
-  
+    <script>
+    document.getElementById('mobile-toggle')?.addEventListener('click', function() {
+      document.getElementById('mobile-menu').classList.toggle('active');
+      this.textContent = document.getElementById('mobile-menu').classList.contains('active') ? '✕' : '☰';
+    });
+  </script>
+
   <footer class="site-footer muted" style="text-align:center;margin:24px 0 8px 0;font-size:.9rem;">
-  Powered by Discogs API & Coffee Since 2025 | Lovingly Crafted in Boise, Idaho
+  Powered by Discogs API & Coffee Since 2026 | Lovingly Crafted in Boise, Idaho
 </footer>
 </body>
 </html>

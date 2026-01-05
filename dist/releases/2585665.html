@@ -4,18 +4,197 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Maria McKee — Maria McKee</title>
+  <style>
+    :root {
+      --bg: #0b0b0c;
+      --card: #16171a;
+      --text: #e7e7ea;
+      --muted: #a0a3aa;
+      --accent: #67e8f9;
+      --border: #2a2b2f;
+      --header-bg: rgba(11, 11, 12, 0.8);
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    .content-wrap {
+      margin-top: 24px;
+      margin-bottom: 24px;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .muted { color: var(--muted); }
+
+    /* Layout Helpers */
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .gap-4 { gap: 16px; }
+    .gap-2 { gap: 8px; }
+
+    /* Common Components */
+    .btn-small {
+      font-size: .8rem;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--card);
+      color: var(--text);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-small:hover { border-color: var(--accent); text-decoration: none; }
+
+    /* Common Header Components */
+    .main-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--header-bg);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-content {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    /* Desktop Nav */
+    .desktop-nav { display: flex; align-items: center; gap: 20px; }
+    @media (max-width: 768px) { .desktop-nav { display: none; } }
+
+    /* Account Dropdown */
+    .dropdown { position: relative; display: inline-block; }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background: var(--card);
+      min-width: 160px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      padding: 8px 0;
+      z-index: 101;
+    }
+    .dropdown:hover .dropdown-content { display: block; }
+    .dropdown-item {
+      display: block;
+      padding: 8px 16px;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .dropdown-item:hover { background: rgba(255,255,255,0.05); }
+
+    /* Mobile Nav / Hamburger */
+    .mobile-nav-toggle {
+      display: none;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 8px;
+    }
+    @media (max-width: 768px) { .mobile-nav-toggle { display: block; } }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 65px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg);
+      z-index: 99;
+      padding: 20px;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .mobile-menu.active { display: flex; }
+    .mobile-menu .nav-item {
+        display: block;
+        padding: 12px 16px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: var(--text);
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .mobile-menu .nav-item:hover { border-color: var(--accent); }
+
+    /* Breadcrumbs */
+    .breadcrumbs {
+      padding: 12px 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .breadcrumbs a { color: var(--muted); }
+    .breadcrumbs span { margin: 0 8px; opacity: 0.5; }
+
+    /* Utility Bar (Mobile Sticky Search/Sort) */
+    .utility-bar {
+        display: none;
+        position: sticky;
+        top: 65px;
+        z-index: 90;
+        background: var(--bg);
+        padding: 8px 20px;
+        border-bottom: 1px solid var(--border);
+    }
+    @media (max-width: 768px) {
+        .utility-bar.is-visible { display: block; }
+    }
+  </style>
     <style>
-    :root { --bg:#0b0b0c; --card:#16171a; --text:#e7e7ea; --muted:#a0a3aa; --accent:#67e8f9; --overlay: rgba(0,0,0,.9); }
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif}
-    .wrap{max-width:1000px;margin:40px auto;padding:0 20px}
-    a{color:var(--accent);text-decoration:none}
-    a:hover{text-decoration:underline}
-    .layout{display:grid;grid-template-columns:280px 1fr;gap:24px}
+    :root { --overlay: rgba(0,0,0,.9); }
+    .layout{display:grid;grid-template-columns:1fr 1fr;gap:40px}
     .card{background:var(--card);border-radius:12px;overflow:hidden}
     .cover{width:100%;aspect-ratio:1/1;object-fit:cover;background:#222;cursor:zoom-in}
     .meta{padding:16px}
-    .muted{color:var(--muted)}
-    h1{margin:0 0 8px 0;font-size:1.6rem}
+    h1{margin:0 0 8px 0;font-size:2rem}
+
+    /* Carousel */
+    .carousel-container { position: relative; width: 100%; overflow: hidden; border-radius: 12px; }
+    .carousel-track { display: flex; transition: transform 0.3s ease-out; }
+    .carousel-slide { min-width: 100%; aspect-ratio: 1/1; }
+    .carousel-slide img { width: 100%; height: 100%; object-fit: cover; }
+    .carousel-dots { display: none; justify-content: center; gap: 8px; margin-top: 12px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); cursor: pointer; opacity: 0.5; }
+    .dot.active { background: var(--accent); opacity: 1; }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 4px; border-bottom: 1px solid #2a2b2f; margin-top: 24px; overflow-x: auto; scrollbar-width: none; }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab { padding: 12px 20px; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; white-space: nowrap; }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-content { display: none; padding-top: 20px; }
+    .tab-content.active { display: block; }
 
     /* Lightbox */
     .lightbox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--overlay);z-index:1000}
@@ -30,310 +209,400 @@
     .lb-counter{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);color:#fff;background:rgba(0,0,0,.5);padding:4px 10px;border-radius:999px;font-size:.9rem}
 
     @media (max-width: 800px){
-      .layout{grid-template-columns:1fr}
+      .layout{grid-template-columns:1fr; gap: 24px;}
+      .carousel-dots { display: flex; }
       .lb-prev{left:10px}
       .lb-next{right:10px}
+      .wrap { margin-top: 12px; }
     }
   </style>
 </head>
 <body>
-  
+  <header class="main-header">
     <div class="wrap">
-    <p><a href="../index.html">← Back</a></p>
-          <div class="layout">
+      <div class="header-content">
+        <a href="/" class="logo">My Music</a>
+
+        <div class="desktop-nav">
+          <a href="/?view=collection" class="muted">Collection</a>
+          <a href="/?view=wantlist" class="muted">Wantlist</a>
+          <a href="/random" class="muted">Surprise Me</a>
+          <a href="/stats" class="muted">Stats</a>
+          <a href="/about" class="muted">About</a>
+        </div>
+
+        <button class="mobile-nav-toggle" id="mobile-toggle" aria-label="Toggle menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="/?view=collection" class="nav-item">Collection</a>
+    <a href="/?view=wantlist" class="nav-item">Wantlist</a>
+    <a href="/random" class="nav-item">Surprise Me</a>
+    <a href="/stats" class="nav-item">Stats</a>
+    <a href="/about" class="nav-item">About</a>
+  </div>
+
+  <div class="wrap">
+      <nav class="breadcrumbs">
+    <div>
+      <a href="/">Home</a>
+      <span>/</span>
+      <a href="/?view=collection">Collection</a>
+      <span>/</span>
+      Maria McKee
+    </div>
+  </nav>
+  </div>
+
+  
+    <div class="wrap content-wrap">
+    <div style="margin-bottom:24px">
+      <p style="margin:0"><a href="../index.html" style="background:var(--card);border:1px solid #2a2b2f;padding:6px 12px;border-radius:8px;color:var(--text);font-size:.9rem;text-decoration:none">← Back</a></p>
+    </div>
+                <div class="layout">
         <div>
-          <div class="card">
-                          <img id="main-cover" class="cover" src="../images/2585665/aca27e3a4826ddd5fc8d06db20c620306958aa07.jpg" alt="Maria McKee cover" data-idx="0" />
-                      </div>
-                      <div class="thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
-                              <button class="thumb" data-url="../images/2585665/aca27e3a4826ddd5fc8d06db20c620306958aa07.jpg" data-idx="0" title="Image 1" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/2585665/aca27e3a4826ddd5fc8d06db20c620306958aa07.jpg" alt="thumb 1" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:1" />
+          <div class="carousel-container" id="carousel">
+            <div class="carousel-track" id="carousel-track">
+                                                <div class="carousel-slide">
+                    <img class="cover" src="../images/2585665/aca27e3a4826ddd5fc8d06db20c620306958aa07.jpg" alt="Maria McKee cover" data-idx="0" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/2585665/8a67e78681681dd4e5ad52837cccc75dfd871b31.jpg" alt="Maria McKee cover" data-idx="1" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/2585665/85254db010cc0f7fad2963203a73953c5a88f539.jpg" alt="Maria McKee cover" data-idx="2" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/2585665/f46e5bde73da130e6113e37c594227d013de87ed.jpg" alt="Maria McKee cover" data-idx="3" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/2585665/07ac18645fa2b3b7ba62f91ba1b798c2101a6b5b.jpg" alt="Maria McKee cover" data-idx="4" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/2585665/835569ec2318f1c5b0878240b16228b97b1b4e3f.jpg" alt="Maria McKee cover" data-idx="5" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/2585665/b0a4053805356fc183ab4486c679475f3c5a0b69.jpg" alt="Maria McKee cover" data-idx="6" />
+                  </div>
+                                          </div>
+          </div>
+                      <div class="carousel-dots" id="carousel-dots">
+                              <div class="dot active" data-idx="0"></div>
+                              <div class="dot " data-idx="1"></div>
+                              <div class="dot " data-idx="2"></div>
+                              <div class="dot " data-idx="3"></div>
+                              <div class="dot " data-idx="4"></div>
+                              <div class="dot " data-idx="5"></div>
+                              <div class="dot " data-idx="6"></div>
+                          </div>
+            <div class="thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;">
+                              <button class="thumb" data-idx="0" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/2585665/aca27e3a4826ddd5fc8d06db20c620306958aa07.jpg" alt="thumb 1" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:1" />
                 </button>
-                              <button class="thumb" data-url="../images/2585665/8a67e78681681dd4e5ad52837cccc75dfd871b31.jpg" data-idx="1" title="Image 2" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/2585665/8a67e78681681dd4e5ad52837cccc75dfd871b31.jpg" alt="thumb 2" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="1" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/2585665/8a67e78681681dd4e5ad52837cccc75dfd871b31.jpg" alt="thumb 2" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/2585665/85254db010cc0f7fad2963203a73953c5a88f539.jpg" data-idx="2" title="Image 3" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/2585665/85254db010cc0f7fad2963203a73953c5a88f539.jpg" alt="thumb 3" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="2" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/2585665/85254db010cc0f7fad2963203a73953c5a88f539.jpg" alt="thumb 3" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/2585665/f46e5bde73da130e6113e37c594227d013de87ed.jpg" data-idx="3" title="Image 4" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/2585665/f46e5bde73da130e6113e37c594227d013de87ed.jpg" alt="thumb 4" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="3" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/2585665/f46e5bde73da130e6113e37c594227d013de87ed.jpg" alt="thumb 4" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/2585665/07ac18645fa2b3b7ba62f91ba1b798c2101a6b5b.jpg" data-idx="4" title="Image 5" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/2585665/07ac18645fa2b3b7ba62f91ba1b798c2101a6b5b.jpg" alt="thumb 5" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="4" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/2585665/07ac18645fa2b3b7ba62f91ba1b798c2101a6b5b.jpg" alt="thumb 5" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/2585665/835569ec2318f1c5b0878240b16228b97b1b4e3f.jpg" data-idx="5" title="Image 6" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/2585665/835569ec2318f1c5b0878240b16228b97b1b4e3f.jpg" alt="thumb 6" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="5" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/2585665/835569ec2318f1c5b0878240b16228b97b1b4e3f.jpg" alt="thumb 6" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/2585665/b0a4053805356fc183ab4486c679475f3c5a0b69.jpg" data-idx="6" title="Image 7" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/2585665/b0a4053805356fc183ab4486c679475f3c5a0b69.jpg" alt="thumb 7" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="6" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/2585665/b0a4053805356fc183ab4486c679475f3c5a0b69.jpg" alt="thumb 7" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                           </div>
                   </div>
         <div>
           <h1>Maria McKee</h1>
-          <p class="muted">Maria McKee • 1989</p>
+          <p class="muted" style="font-size:1.2rem">Maria McKee • 1989</p>
           <p class="muted">US</p>
-                      <p style="margin:8px 0;">
-              <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Rock</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Blues</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Folk, World, &amp; Country</span>                          </p>
-          
-                      <p class="muted">Formats:
-                              Vinyl                          </p>
-          
+          <div style="margin:16px 0; display:flex; gap:8px; flex-wrap:wrap">
+            <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Rock</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Blues</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Folk, World, &amp; Country</span>                      </div>
+
                       <p class="muted">Labels:
               Geffen Records (GHS 24229)            </p>
           
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Tracklist</strong>
-                <ol>
-                                      <li>A1 — I&#039;ve Forgotten What It Was In You (That Put The Need In Me) <span class="muted">(3:38)</span></li>
-                                      <li>A2 — To Miss Someone <span class="muted">(3:51)</span></li>
-                                      <li>A3 — Am I The Only One (Who&#039;s Ever Felt This Way?) <span class="muted">(2:54)</span></li>
-                                      <li>A4 — Nobody&#039;s Child <span class="muted">(3:58)</span></li>
-                                      <li>A5 — Panic Beach <span class="muted">(5:54)</span></li>
-                                      <li>B1 — Can&#039;t Pull The Wool Down (Over The Little Lamb&#039;s Eyes) <span class="muted">(3:44)</span></li>
-                                      <li>B2 — More Than A Heart Can Hold <span class="muted">(4:27)</span></li>
-                                      <li>B3 — This Property Is Condemned <span class="muted">(4:43)</span></li>
-                                      <li>B4 — Breathe <span class="muted">(4:33)</span></li>
-                                      <li>B5 — Has He Got A Friend For Me? <span class="muted">(3:32)</span></li>
-                                  </ol>
-              </div>
-            </div>
-          
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Videos</strong>
-                <ul>
-                                      <li><a href="https://www.youtube.com/watch?v=VHhpIwGSEYo" target="_blank" rel="noopener">Maria McKee - Nobody&#039;s Child (Vinyl, WAV, DR15)</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=QXQldH-TY_A" target="_blank" rel="noopener">Maria McKee - Breathe [1989]</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=uAdvozd2muw" target="_blank" rel="noopener">Maria McKee - I&#039;ve Forgotten What It Was In You (That Put The Need In Me)</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=b6EJyGT9kG8" target="_blank" rel="noopener">More Than A Heart Can Hold</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=0yL_hZFEhwA" target="_blank" rel="noopener">Can&#039;t Pull The Wool Down (Over The Little Lamb&#039;s Eyes)</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=7qGodpYv4dM" target="_blank" rel="noopener">Am I The Only One (Who&#039;s Ever Felt This Way?)</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=AM4DD28f9eo" target="_blank" rel="noopener">Maria McKee - I&#039;ve Forgotten what It Was in You (That Put the Need in Me)</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=I-z0fkcuKnA" target="_blank" rel="noopener">Maria McKee   Show Me Heaven Ultrasound 12 Inch Version</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=LdJOpb6dJlY" target="_blank" rel="noopener">Maria McKee - Breathe</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=i5Wwabj5bXg" target="_blank" rel="noopener">Maria McKee - To Miss Someone</a></li>
-                                  </ul>
-              </div>
-            </div>
-          
-          
-          <div class="card" style="margin-top:16px;">
-            <div class="meta">
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-                <strong>My Notes</strong>
-                              </div>
-
-              
-              <div id="notesView" style="margin-top:8px">
-                                                  <div class="muted">(none)</div>
-                              </div>
-
-                          </div>
+          <div class="tabs" id="release-tabs">
+            <div class="tab active" data-tab="tracks">Tracks</div>
+            <div class="tab" data-tab="details">Details</div>
+            <div class="tab" data-tab="credits">Credits</div>
+            <div class="tab" data-tab="status">Status & Notes</div>
           </div>
 
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Credits</strong>
-                <ul>
-                                      <li>
-                      Maria McKee
-                      <span class="muted">— Acoustic Guitar</span>                                          </li>
-                                      <li>
-                      Gabrielle Raumberger
-                      <span class="muted">— Art Direction</span>                                          </li>
-                                      <li>
-                      Jerry Scheff
-                      <span class="muted">— Bass</span>                                          </li>
-                                      <li>
-                      Tony Levin
-                      <span class="muted">— Bass</span>                                          </li>
-                                      <li>
-                      Philip Pickett
-                      <span class="muted">— Crumhorn [Crumbhorn]</span>                                          </li>
-                                      <li>
-                      Maria DeGrassi
-                      <span class="muted">— Design</span>                                          </li>
-                                      <li>
-                      Jerry Marotta
-                      <span class="muted">— Drums</span>                                          </li>
-                                      <li>
-                      Jim Keltner
-                      <span class="muted">— Drums</span>                                          </li>
-                                      <li>
-                      Tchad Blake
-                      <span class="muted">— Engineer</span>                                          </li>
-                                      <li>
-                      Ed Goodreau
-                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
-                                      <li>
-                      Mike Kloster
-                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
-                                      <li>
-                      Randy Staub
-                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
-                                      <li>
-                      Randy Wine
-                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
-                                      <li>
-                      Scott Woodman
-                      <span class="muted">— Engineer [Assistant]</span>                                          </li>
-                                      <li>
-                      Gary Gersh
-                      <span class="muted">— Executive-Producer</span>                                          </li>
-                                      <li>
-                      Steve Wickham
-                      <span class="muted">— Fiddle</span>                                          </li>
-                                      <li>
-                      James Ralston
-                      <span class="muted">— Guitar</span>                                          </li>
-                                      <li>
-                      Marc Ribot
-                      <span class="muted">— Guitar</span>                                          </li>
-                                      <li>
-                      Richard Thompson
-                      <span class="muted">— Guitar</span>                                          </li>
-                                      <li>
-                      Shane Fontayne
-                      <span class="muted">— Guitar</span>                                          </li>
-                                      <li>
-                      The Heart Attack Horns
-                      <span class="muted">— Horns</span>                                          </li>
-                                      <li>
-                      Bruce Brody
-                      <span class="muted">— Keyboards</span>                                          </li>
-                                      <li>
-                      Mitchell Froom
-                      <span class="muted">— Keyboards [Additional]</span>                                          </li>
-                                      <li>
-                      Canaan Management
-                      <span class="muted">— Management [Managed By]</span>                                          </li>
-                                      <li>
-                      Chuck Reed
-                      <span class="muted">— Management [Management Associate]</span>                                          </li>
-                                      <li>
-                      Tony Ferguson
-                      <span class="muted">— Management [Management Associate]</span>                                          </li>
-                                      <li>
-                      Richard Thompson
-                      <span class="muted">— Mandolin</span>                                          </li>
-                                      <li>
-                      Bob Ludwig
-                      <span class="muted">— Mastered By</span>                                          </li>
-                                      <li>
-                      Bruce Brody
-                      <span class="muted">— Organ [Hammond]</span>                                          </li>
-                                      <li>
-                      Alex Acuña
-                      <span class="muted">— Percussion</span>                                          </li>
-                                      <li>
-                      Deborah Frankel
-                      <span class="muted">— Photography By</span>                                          </li>
-                                      <li>
-                      Mitchell Froom
-                      <span class="muted">— Producer</span>                                          </li>
-                                      <li>
-                      Bruce Brody
-                      <span class="muted">— Producer [Associate]</span>                                          </li>
-                                      <li>
-                      Philip Pickett
-                      <span class="muted">— Recorder</span>                                          </li>
-                                      <li>
-                      Maria McKee
-                      <span class="muted">— Vocals</span>                                          </li>
-                                  </ul>
+          <div id="tab-tracks" class="tab-content active">
+                          <div class="card">
+                <div class="meta">
+                  <ol style="margin:0; padding-left:20px">
+                                          <li style="margin-bottom:8px">A1 — I&#039;ve Forgotten What It Was In You (That Put The Need In Me) <span class="muted">(3:38)</span></li>
+                                          <li style="margin-bottom:8px">A2 — To Miss Someone <span class="muted">(3:51)</span></li>
+                                          <li style="margin-bottom:8px">A3 — Am I The Only One (Who&#039;s Ever Felt This Way?) <span class="muted">(2:54)</span></li>
+                                          <li style="margin-bottom:8px">A4 — Nobody&#039;s Child <span class="muted">(3:58)</span></li>
+                                          <li style="margin-bottom:8px">A5 — Panic Beach <span class="muted">(5:54)</span></li>
+                                          <li style="margin-bottom:8px">B1 — Can&#039;t Pull The Wool Down (Over The Little Lamb&#039;s Eyes) <span class="muted">(3:44)</span></li>
+                                          <li style="margin-bottom:8px">B2 — More Than A Heart Can Hold <span class="muted">(4:27)</span></li>
+                                          <li style="margin-bottom:8px">B3 — This Property Is Condemned <span class="muted">(4:43)</span></li>
+                                          <li style="margin-bottom:8px">B4 — Breathe <span class="muted">(4:33)</span></li>
+                                          <li style="margin-bottom:8px">B5 — Has He Got A Friend For Me? <span class="muted">(3:32)</span></li>
+                                      </ol>
+                </div>
               </div>
+                      </div>
+
+          <div id="tab-details" class="tab-content">
+            <div class="card">
+                <div class="meta">
+                                            <p class="muted"><strong>Formats:</strong>
+                                                    Vinyl                                                </p>
+                                        
+                    
+                                            <p><strong>Videos:</strong></p>
+                        <ul style="margin:0; padding-left:20px">
+                                                    <li><a href="https://www.youtube.com/watch?v=VHhpIwGSEYo" target="_blank" rel="noopener">Maria McKee - Nobody&#039;s Child (Vinyl, WAV, DR15)</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=QXQldH-TY_A" target="_blank" rel="noopener">Maria McKee - Breathe [1989]</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=uAdvozd2muw" target="_blank" rel="noopener">Maria McKee - I&#039;ve Forgotten What It Was In You (That Put The Need In Me)</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=b6EJyGT9kG8" target="_blank" rel="noopener">More Than A Heart Can Hold</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=0yL_hZFEhwA" target="_blank" rel="noopener">Can&#039;t Pull The Wool Down (Over The Little Lamb&#039;s Eyes)</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=7qGodpYv4dM" target="_blank" rel="noopener">Am I The Only One (Who&#039;s Ever Felt This Way?)</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=AM4DD28f9eo" target="_blank" rel="noopener">Maria McKee - I&#039;ve Forgotten what It Was in You (That Put the Need in Me)</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=I-z0fkcuKnA" target="_blank" rel="noopener">Maria McKee   Show Me Heaven Ultrasound 12 Inch Version</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=LdJOpb6dJlY" target="_blank" rel="noopener">Maria McKee - Breathe</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=i5Wwabj5bXg" target="_blank" rel="noopener">Maria McKee - To Miss Someone</a></li>
+                                                </ul>
+                    
+                                            <p><strong>Barcodes:</strong></p>
+                        <ul style="margin:0; padding-left:20px" class="muted">
+                                                    <li>075992422918 (Compact text)</li>
+                                                    <li>0 7599-24229-1 8 (Printed text)</li>
+                                                </ul>
+                                    </div>
             </div>
-          
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Companies</strong>
-                <ul>
-                                      <li>
-                      The David Geffen Company
-                      <span class="muted"> — Copyright (c)</span>                                          </li>
-                                      <li>
-                      The David Geffen Company
-                      <span class="muted"> — Phonographic Copyright (p)</span>                                          </li>
-                                      <li>
-                      Geffen Again Music
-                      <span class="muted"> — Published By</span>                                          </li>
-                                      <li>
-                      Little Diva Music Company
-                      <span class="muted"> — Published By</span>                                          </li>
-                                      <li>
-                      Warner-Tamerlane Publishing Corp.
-                      <span class="muted"> — Published By</span>                                          </li>
-                                      <li>
-                      Medicine Hat Music
-                      <span class="muted"> — Published By</span>                                          </li>
-                                      <li>
-                      SBK April Music Inc.
-                      <span class="muted"> — Published By</span>                                          </li>
-                                      <li>
-                      Let&#039;s See Music
-                      <span class="muted"> — Published By</span>                                          </li>
-                                      <li>
-                      Planet Dallas Pub.
-                      <span class="muted"> — Published By</span>                                          </li>
-                                      <li>
-                      Doolittle Music
-                      <span class="muted"> — Published By</span>                                          </li>
-                                      <li>
-                      Beeswing Music
-                      <span class="muted"> — Published By</span>                                          </li>
-                                      <li>
-                      Warner Bros. Records Inc.
-                      <span class="muted"> — Manufactured By</span>                                          </li>
-                                      <li>
-                      Specialty Records Corporation
-                      <span class="muted"> — Pressed By</span>                                          </li>
-                                      <li>
-                      Masterdisk
-                      <span class="muted"> — Mastered At</span>                                          </li>
-                                      <li>
-                      A&amp;M Studios
-                      <span class="muted"> — Recorded At</span>                                          </li>
-                                      <li>
-                      The Sound Factory
-                      <span class="muted"> — Recorded At</span>                                          </li>
-                                      <li>
-                      Ocean Way Recording
-                      <span class="muted"> — Recorded At</span>                                          </li>
-                                      <li>
-                      Westside Studios
-                      <span class="muted"> — Recorded At</span>                                          </li>
-                                      <li>
-                      STS Dublin
-                      <span class="muted"> — Recorded At</span>                                          </li>
-                                      <li>
-                      A&amp;M Studios
-                      <span class="muted"> — Mixed At</span>                                          </li>
-                                      <li>
-                      The Grey Room
-                      <span class="muted"> — Mixed At</span>                                          </li>
-                                  </ul>
-              </div>
+          </div>
+
+          <div id="tab-credits" class="tab-content">
+                             <div class="card">
+                    <div class="meta">
+                                                    <p><strong>Credits:</strong></p>
+                            <ul style="margin:0; padding-left:20px" class="muted">
+                                                            <li style="margin-bottom:4px">
+                                Maria McKee
+                                 — Acoustic Guitar                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Gabrielle Raumberger
+                                 — Art Direction                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Jerry Scheff
+                                 — Bass                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Tony Levin
+                                 — Bass                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Philip Pickett
+                                 — Crumhorn [Crumbhorn]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Maria DeGrassi
+                                 — Design                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Jerry Marotta
+                                 — Drums                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Jim Keltner
+                                 — Drums                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Tchad Blake
+                                 — Engineer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Ed Goodreau
+                                 — Engineer [Assistant]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Mike Kloster
+                                 — Engineer [Assistant]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Randy Staub
+                                 — Engineer [Assistant]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Randy Wine
+                                 — Engineer [Assistant]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Scott Woodman
+                                 — Engineer [Assistant]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Gary Gersh
+                                 — Executive-Producer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Steve Wickham
+                                 — Fiddle                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                James Ralston
+                                 — Guitar                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Marc Ribot
+                                 — Guitar                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Richard Thompson
+                                 — Guitar                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Shane Fontayne
+                                 — Guitar                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                The Heart Attack Horns
+                                 — Horns                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Bruce Brody
+                                 — Keyboards                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Mitchell Froom
+                                 — Keyboards [Additional]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Canaan Management
+                                 — Management [Managed By]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Chuck Reed
+                                 — Management [Management Associate]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Tony Ferguson
+                                 — Management [Management Associate]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Richard Thompson
+                                 — Mandolin                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Bob Ludwig
+                                 — Mastered By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Bruce Brody
+                                 — Organ [Hammond]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Alex Acuña
+                                 — Percussion                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Deborah Frankel
+                                 — Photography By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Mitchell Froom
+                                 — Producer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Bruce Brody
+                                 — Producer [Associate]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Philip Pickett
+                                 — Recorder                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Maria McKee
+                                 — Vocals                                                                </li>
+                                                        </ul>
+                        
+                                                    <p style="margin-top:16px"><strong>Companies:</strong></p>
+                            <ul style="margin:0; padding-left:20px" class="muted">
+                                                            <li style="margin-bottom:4px">
+                                The David Geffen Company
+                                 — Copyright (c)                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                The David Geffen Company
+                                 — Phonographic Copyright (p)                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Geffen Again Music
+                                 — Published By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Little Diva Music Company
+                                 — Published By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Warner-Tamerlane Publishing Corp.
+                                 — Published By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Medicine Hat Music
+                                 — Published By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                SBK April Music Inc.
+                                 — Published By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Let&#039;s See Music
+                                 — Published By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Planet Dallas Pub.
+                                 — Published By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Doolittle Music
+                                 — Published By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Beeswing Music
+                                 — Published By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Warner Bros. Records Inc.
+                                 — Manufactured By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Specialty Records Corporation
+                                 — Pressed By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Masterdisk
+                                 — Mastered At                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                A&amp;M Studios
+                                 — Recorded At                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                The Sound Factory
+                                 — Recorded At                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Ocean Way Recording
+                                 — Recorded At                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Westside Studios
+                                 — Recorded At                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                STS Dublin
+                                 — Recorded At                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                A&amp;M Studios
+                                 — Mixed At                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                The Grey Room
+                                 — Mixed At                                                                </li>
+                                                        </ul>
+                                            </div>
+                </div>
+                       </div>
+
+          <div id="tab-status" class="tab-content">
+            <div class="card">
+                <div class="meta">
+                    <div style="margin-bottom:16px">
+                        <strong>Discogs Status</strong>
+                        <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+                                                        <form method="post" action="/release/save" style="margin:0">
+                                <input type="hidden" name="_token" value="" />
+                                <input type="hidden" name="release_id" value="2585665" />
+                                <input type="hidden" name="action" value="want_to_collection" />
+                                <input type="hidden" name="return" value="../index.html" />
+                                <button type="submit" style="background:var(--card);color:var(--accent);border:1px solid #2a2b2f;border-radius:8px;padding:6px 10px;cursor:pointer">Add to Collection</button>
+                            </form>
+                            
+                                                        <form method="post" action="/release/save" style="margin:0">
+                                <input type="hidden" name="_token" value="" />
+                                <input type="hidden" name="release_id" value="2585665" />
+                                <input type="hidden" name="action" value="add_want" />
+                                <input type="hidden" name="return" value="../index.html" />
+                                <button type="submit" class="muted" style="background:transparent;border:1px solid #2a2b2f;border-radius:8px;padding:6px 10px;cursor:pointer;color:inherit">Add to Wantlist</button>
+                            </form>
+                                                    </div>
+                    </div>
+
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                        <strong>My Notes</strong>
+                                            </div>
+
+                    <div id="notesView" style="margin-top:8px">
+                                                                                                                    </div>
+                                                         </div>
             </div>
-          
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Barcodes</strong>
-                <ul>
-                                      <li>075992422918 <span class="muted">(Compact text)</span></li>
-                                      <li>0 7599-24229-1 8 <span class="muted">(Printed text)</span></li>
-                                  </ul>
-              </div>
-            </div>
-          
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Identifiers</strong>
-                <ul>
-                                      <li>Matrix / Runout: GHS-2-4229-A-SR1-DMM  1-1  MASTERDISK <span class="muted">(Etched side A)</span></li>
-                                      <li>Matrix / Runout: GHS-2-4229-B-SR1-DMM  2̶  2̶   2-1 <span class="muted">(Etched side B)</span></li>
-                                      <li>Pressing Plant ID: E A S T <span class="muted">(Embossed on side B label)</span></li>
-                                      <li>Rights Society: BMI</li>
-                                      <li>Rights Society: ASCAP</li>
-                                  </ul>
-              </div>
-            </div>
-                  </div>
+          </div>
+        </div>
       </div>
 
             <!-- Lightbox overlay -->
@@ -351,7 +620,8 @@
         document.addEventListener('DOMContentLoaded', function(){
           const images = [
             '..\/images\/2585665\/aca27e3a4826ddd5fc8d06db20c620306958aa07.jpg', '..\/images\/2585665\/8a67e78681681dd4e5ad52837cccc75dfd871b31.jpg', '..\/images\/2585665\/85254db010cc0f7fad2963203a73953c5a88f539.jpg', '..\/images\/2585665\/f46e5bde73da130e6113e37c594227d013de87ed.jpg', '..\/images\/2585665\/07ac18645fa2b3b7ba62f91ba1b798c2101a6b5b.jpg', '..\/images\/2585665\/835569ec2318f1c5b0878240b16228b97b1b4e3f.jpg', '..\/images\/2585665\/b0a4053805356fc183ab4486c679475f3c5a0b69.jpg'          ];
-          const main = document.getElementById('main-cover');
+          const track = document.getElementById('carousel-track');
+          const dots = document.querySelectorAll('.dot');
           const thumbs = document.querySelectorAll('.thumb');
           const lb = document.getElementById('lightbox');
           const lbImg = lb ? lb.querySelector('.lb-img') : null;
@@ -359,16 +629,12 @@
           const lbPrev = lb ? lb.querySelector('.lb-prev') : null;
           const lbNext = lb ? lb.querySelector('.lb-next') : null;
           const lbCounter = lb ? lb.querySelector('.lb-counter') : null;
-          let idx = parseInt(main?.getAttribute('data-idx') || '0', 10) || 0;
+          let idx = 0;
 
-          function updateMain(to){
-            if (!main) return;
-            const i = Math.max(0, Math.min(images.length - 1, to));
-            if (images[i] && main.getAttribute('src') !== images[i]) {
-              main.setAttribute('src', images[i]);
-            }
-            main.setAttribute('data-idx', String(i));
-            idx = i;
+          function updateCarousel(to){
+            idx = Math.max(0, Math.min(images.length - 1, to));
+            if (track) track.style.transform = `translateX(-${idx * 100}%)`;
+            dots.forEach((d, i) => d.classList.toggle('active', i === idx));
           }
 
           function openLightbox(startIdx){
@@ -386,54 +652,92 @@
             lb.setAttribute('aria-hidden', 'true');
             document.body.style.overflow = '';
           }
-          function next(){ idx = (idx + 1) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
-          function prev(){ idx = (idx - 1 + images.length) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
+          function next(){ idx = (idx + 1) % images.length; if (lb.classList.contains('open')) { lbImg.src = images[idx]; lbCounter.textContent = (idx + 1) + ' / ' + images.length; } else { updateCarousel(idx); } }
+          function prev(){ idx = (idx - 1 + images.length) % images.length; if (lb.classList.contains('open')) { lbImg.src = images[idx]; lbCounter.textContent = (idx + 1) + ' / ' + images.length; } else { updateCarousel(idx); } }
 
-          // Thumbnail click: swap main and set index; Shift+Click opens lightbox
-          thumbs.forEach(function(btn){
-            btn.addEventListener('click', function(e){
-              const i = parseInt(this.getAttribute('data-idx') || '0', 10) || 0;
-              if (e.shiftKey) { openLightbox(i); return; }
-              updateMain(i);
-            });
+          // Carousel dot/thumb clicks
+          dots.forEach(d => d.addEventListener('click', () => updateCarousel(parseInt(d.dataset.idx))));
+          thumbs.forEach(t => t.addEventListener('click', () => updateCarousel(parseInt(t.dataset.idx))));
+
+          // Lightbox trigger on carousel image click
+          document.querySelectorAll('.carousel-slide img').forEach(img => {
+            img.addEventListener('click', () => openLightbox(parseInt(img.dataset.idx)));
           });
-
-          // Main cover click: open lightbox on current index
-          if (main) {
-            main.addEventListener('click', function(){
-              const i = parseInt(main.getAttribute('data-idx') || '0', 10) || 0;
-              openLightbox(i);
-            });
-          }
 
           // Lightbox interactions
           lbClose?.addEventListener('click', closeLightbox);
           lbPrev?.addEventListener('click', prev);
           lbNext?.addEventListener('click', next);
-          lbImg?.addEventListener('click', next); // click image to advance
+          lbImg?.addEventListener('click', next);
           lb?.addEventListener('click', function(e){ if (e.target === lb) closeLightbox(); });
 
-          // Keyboard support
+          // Keyboard
           document.addEventListener('keydown', function(e){
             if (!lb || !lb.classList.contains('open')) return;
-            if (e.key === 'Escape') { e.preventDefault(); closeLightbox(); }
-            else if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
-            else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+            if (e.key === 'Escape') closeLightbox();
+            else if (e.key === 'ArrowRight') next();
+            else if (e.key === 'ArrowLeft') prev();
           });
 
-          // Ensure initial main index reflects the list
-          if (images.length > 0 && main) {
-            let initial = images.indexOf(main.getAttribute('src'));
-            if (initial < 0) initial = 0;
-            main.setAttribute('data-idx', String(initial));
+          // Tabs
+          const tabs = document.querySelectorAll('.tab');
+          const contents = document.querySelectorAll('.tab-content');
+          tabs.forEach(t => {
+            t.addEventListener('click', () => {
+              const target = t.dataset.tab;
+              tabs.forEach(t2 => t2.classList.toggle('active', t2 === t));
+              contents.forEach(c => c.classList.toggle('active', c.id === `tab-${target}`));
+            });
+          });
+
+          // Handle tab parameter in URL
+          const urlParams = new URLSearchParams(window.location.search);
+          const activeTab = urlParams.get('tab');
+          if (activeTab) {
+            const tabEl = document.querySelector(`.tab[data-tab="${activeTab}"]`);
+            if (tabEl) tabEl.click();
           }
+
+          // Swipe support for carousel (basic)
+          let startX = 0;
+          track?.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+          track?.addEventListener('touchend', e => {
+            const diff = startX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) {
+              if (diff > 0) next(); else prev();
+            }
+          });
+
+          // Notes Toggle
+          (function(){
+            const btn = document.getElementById('editToggle');
+            const form = document.getElementById('notesForm');
+            const view = document.getElementById('notesView');
+            if (!btn || !form || !view) return;
+            btn.addEventListener('click', function(){
+                const open = form.style.display === 'none';
+                form.style.display = open ? 'flex' : 'none';
+                view.style.display = open ? 'none' : 'block';
+                btn.textContent = open ? 'Cancel' : 'Edit';
+                if (open) {
+                    // Switch to status tab if not active
+                    document.querySelector('.tab[data-tab="status"]').click();
+                }
+            });
+          })();
         });
       </script>
             </div>
 
-  
+    <script>
+    document.getElementById('mobile-toggle')?.addEventListener('click', function() {
+      document.getElementById('mobile-menu').classList.toggle('active');
+      this.textContent = document.getElementById('mobile-menu').classList.contains('active') ? '✕' : '☰';
+    });
+  </script>
+
   <footer class="site-footer muted" style="text-align:center;margin:24px 0 8px 0;font-size:.9rem;">
-  Powered by Discogs API & Coffee Since 2025 | Lovingly Crafted in Boise, Idaho
+  Powered by Discogs API & Coffee Since 2026 | Lovingly Crafted in Boise, Idaho
 </footer>
 </body>
 </html>

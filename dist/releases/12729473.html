@@ -4,18 +4,197 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Metallica — ...And Justice For All</title>
+  <style>
+    :root {
+      --bg: #0b0b0c;
+      --card: #16171a;
+      --text: #e7e7ea;
+      --muted: #a0a3aa;
+      --accent: #67e8f9;
+      --border: #2a2b2f;
+      --header-bg: rgba(11, 11, 12, 0.8);
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    .content-wrap {
+      margin-top: 24px;
+      margin-bottom: 24px;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .muted { color: var(--muted); }
+
+    /* Layout Helpers */
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .gap-4 { gap: 16px; }
+    .gap-2 { gap: 8px; }
+
+    /* Common Components */
+    .btn-small {
+      font-size: .8rem;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--card);
+      color: var(--text);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-small:hover { border-color: var(--accent); text-decoration: none; }
+
+    /* Common Header Components */
+    .main-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--header-bg);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-content {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    /* Desktop Nav */
+    .desktop-nav { display: flex; align-items: center; gap: 20px; }
+    @media (max-width: 768px) { .desktop-nav { display: none; } }
+
+    /* Account Dropdown */
+    .dropdown { position: relative; display: inline-block; }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background: var(--card);
+      min-width: 160px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      padding: 8px 0;
+      z-index: 101;
+    }
+    .dropdown:hover .dropdown-content { display: block; }
+    .dropdown-item {
+      display: block;
+      padding: 8px 16px;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .dropdown-item:hover { background: rgba(255,255,255,0.05); }
+
+    /* Mobile Nav / Hamburger */
+    .mobile-nav-toggle {
+      display: none;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 8px;
+    }
+    @media (max-width: 768px) { .mobile-nav-toggle { display: block; } }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 65px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg);
+      z-index: 99;
+      padding: 20px;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .mobile-menu.active { display: flex; }
+    .mobile-menu .nav-item {
+        display: block;
+        padding: 12px 16px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: var(--text);
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .mobile-menu .nav-item:hover { border-color: var(--accent); }
+
+    /* Breadcrumbs */
+    .breadcrumbs {
+      padding: 12px 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .breadcrumbs a { color: var(--muted); }
+    .breadcrumbs span { margin: 0 8px; opacity: 0.5; }
+
+    /* Utility Bar (Mobile Sticky Search/Sort) */
+    .utility-bar {
+        display: none;
+        position: sticky;
+        top: 65px;
+        z-index: 90;
+        background: var(--bg);
+        padding: 8px 20px;
+        border-bottom: 1px solid var(--border);
+    }
+    @media (max-width: 768px) {
+        .utility-bar.is-visible { display: block; }
+    }
+  </style>
     <style>
-    :root { --bg:#0b0b0c; --card:#16171a; --text:#e7e7ea; --muted:#a0a3aa; --accent:#67e8f9; --overlay: rgba(0,0,0,.9); }
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif}
-    .wrap{max-width:1000px;margin:40px auto;padding:0 20px}
-    a{color:var(--accent);text-decoration:none}
-    a:hover{text-decoration:underline}
-    .layout{display:grid;grid-template-columns:280px 1fr;gap:24px}
+    :root { --overlay: rgba(0,0,0,.9); }
+    .layout{display:grid;grid-template-columns:1fr 1fr;gap:40px}
     .card{background:var(--card);border-radius:12px;overflow:hidden}
     .cover{width:100%;aspect-ratio:1/1;object-fit:cover;background:#222;cursor:zoom-in}
     .meta{padding:16px}
-    .muted{color:var(--muted)}
-    h1{margin:0 0 8px 0;font-size:1.6rem}
+    h1{margin:0 0 8px 0;font-size:2rem}
+
+    /* Carousel */
+    .carousel-container { position: relative; width: 100%; overflow: hidden; border-radius: 12px; }
+    .carousel-track { display: flex; transition: transform 0.3s ease-out; }
+    .carousel-slide { min-width: 100%; aspect-ratio: 1/1; }
+    .carousel-slide img { width: 100%; height: 100%; object-fit: cover; }
+    .carousel-dots { display: none; justify-content: center; gap: 8px; margin-top: 12px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); cursor: pointer; opacity: 0.5; }
+    .dot.active { background: var(--accent); opacity: 1; }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 4px; border-bottom: 1px solid #2a2b2f; margin-top: 24px; overflow-x: auto; scrollbar-width: none; }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab { padding: 12px 20px; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; white-space: nowrap; }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-content { display: none; padding-top: 20px; }
+    .tab-content.active { display: block; }
 
     /* Lightbox */
     .lightbox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--overlay);z-index:1000}
@@ -30,369 +209,472 @@
     .lb-counter{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);color:#fff;background:rgba(0,0,0,.5);padding:4px 10px;border-radius:999px;font-size:.9rem}
 
     @media (max-width: 800px){
-      .layout{grid-template-columns:1fr}
+      .layout{grid-template-columns:1fr; gap: 24px;}
+      .carousel-dots { display: flex; }
       .lb-prev{left:10px}
       .lb-next{right:10px}
+      .wrap { margin-top: 12px; }
     }
   </style>
 </head>
 <body>
-  
+  <header class="main-header">
     <div class="wrap">
-    <p><a href="../index.html">← Back</a></p>
-          <div class="layout">
+      <div class="header-content">
+        <a href="/" class="logo">My Music</a>
+
+        <div class="desktop-nav">
+          <a href="/?view=collection" class="muted">Collection</a>
+          <a href="/?view=wantlist" class="muted">Wantlist</a>
+          <a href="/random" class="muted">Surprise Me</a>
+          <a href="/stats" class="muted">Stats</a>
+          <a href="/about" class="muted">About</a>
+        </div>
+
+        <button class="mobile-nav-toggle" id="mobile-toggle" aria-label="Toggle menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="/?view=collection" class="nav-item">Collection</a>
+    <a href="/?view=wantlist" class="nav-item">Wantlist</a>
+    <a href="/random" class="nav-item">Surprise Me</a>
+    <a href="/stats" class="nav-item">Stats</a>
+    <a href="/about" class="nav-item">About</a>
+  </div>
+
+  <div class="wrap">
+      <nav class="breadcrumbs">
+    <div>
+      <a href="/">Home</a>
+      <span>/</span>
+      <a href="/?view=collection">Collection</a>
+      <span>/</span>
+      ...And Justice For All
+    </div>
+  </nav>
+  </div>
+
+  
+    <div class="wrap content-wrap">
+    <div style="margin-bottom:24px">
+      <p style="margin:0"><a href="../index.html" style="background:var(--card);border:1px solid #2a2b2f;padding:6px 12px;border-radius:8px;color:var(--text);font-size:.9rem;text-decoration:none">← Back</a></p>
+    </div>
+                <div class="layout">
         <div>
-          <div class="card">
-                          <img id="main-cover" class="cover" src="../images/12729473/b3476d3c30e8bb98428c45faa74e46ee6c2b13fe.jpg" alt="...And Justice For All cover" data-idx="0" />
-                      </div>
-                      <div class="thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
-                              <button class="thumb" data-url="../images/12729473/b3476d3c30e8bb98428c45faa74e46ee6c2b13fe.jpg" data-idx="0" title="Image 1" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/12729473/b3476d3c30e8bb98428c45faa74e46ee6c2b13fe.jpg" alt="thumb 1" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:1" />
+          <div class="carousel-container" id="carousel">
+            <div class="carousel-track" id="carousel-track">
+                                                <div class="carousel-slide">
+                    <img class="cover" src="../images/12729473/b3476d3c30e8bb98428c45faa74e46ee6c2b13fe.jpg" alt="...And Justice For All cover" data-idx="0" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/12729473/6fd851cd00897f617f391ba4f535fffe61e61059.jpg" alt="...And Justice For All cover" data-idx="1" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/12729473/9fc6f7348704581e015f2e6fcd20c3c863e82b9b.jpg" alt="...And Justice For All cover" data-idx="2" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/12729473/283b189f9b65ee6fee411fd8a840e69bf0627229.jpg" alt="...And Justice For All cover" data-idx="3" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/12729473/9ed95f0311c21e888219101a10fdc451b88f58a5.jpg" alt="...And Justice For All cover" data-idx="4" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/12729473/0a0f6dbcfdd5bc9933ce8db7297cece4528d55d6.jpg" alt="...And Justice For All cover" data-idx="5" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/12729473/4e0cc1064c28bff8225a4f653d31723dedcf8aef.jpg" alt="...And Justice For All cover" data-idx="6" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/12729473/2754f9f5cb9283656de9b399b40d8f3991c9f431.jpg" alt="...And Justice For All cover" data-idx="7" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/12729473/f3ef27d8893dddb4132190e6b13dd6335bf1ba03.jpg" alt="...And Justice For All cover" data-idx="8" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/12729473/c1746e44317057fc37f1b7e47aebb00962839310.jpg" alt="...And Justice For All cover" data-idx="9" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/12729473/c4cfce82689142cc9c513a8996d489243a407514.jpg" alt="...And Justice For All cover" data-idx="10" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/12729473/fed09c7dc91bc04747d0c2d8ad5db3320f1a563c.jpg" alt="...And Justice For All cover" data-idx="11" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/12729473/7cce77ea75dd2ca7ee1da608d3d3439ab4d66052.jpg" alt="...And Justice For All cover" data-idx="12" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/12729473/8a2650cd67eba0fccdf899d536aaec75d1c7a2ee.jpg" alt="...And Justice For All cover" data-idx="13" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/12729473/68f25f7e6ab64df97fe77476c350b63980566d01.jpg" alt="...And Justice For All cover" data-idx="14" />
+                  </div>
+                                          </div>
+          </div>
+                      <div class="carousel-dots" id="carousel-dots">
+                              <div class="dot active" data-idx="0"></div>
+                              <div class="dot " data-idx="1"></div>
+                              <div class="dot " data-idx="2"></div>
+                              <div class="dot " data-idx="3"></div>
+                              <div class="dot " data-idx="4"></div>
+                              <div class="dot " data-idx="5"></div>
+                              <div class="dot " data-idx="6"></div>
+                              <div class="dot " data-idx="7"></div>
+                              <div class="dot " data-idx="8"></div>
+                              <div class="dot " data-idx="9"></div>
+                              <div class="dot " data-idx="10"></div>
+                              <div class="dot " data-idx="11"></div>
+                              <div class="dot " data-idx="12"></div>
+                              <div class="dot " data-idx="13"></div>
+                              <div class="dot " data-idx="14"></div>
+                          </div>
+            <div class="thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;">
+                              <button class="thumb" data-idx="0" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/12729473/b3476d3c30e8bb98428c45faa74e46ee6c2b13fe.jpg" alt="thumb 1" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:1" />
                 </button>
-                              <button class="thumb" data-url="../images/12729473/6fd851cd00897f617f391ba4f535fffe61e61059.jpg" data-idx="1" title="Image 2" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/12729473/6fd851cd00897f617f391ba4f535fffe61e61059.jpg" alt="thumb 2" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="1" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/12729473/6fd851cd00897f617f391ba4f535fffe61e61059.jpg" alt="thumb 2" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/12729473/9fc6f7348704581e015f2e6fcd20c3c863e82b9b.jpg" data-idx="2" title="Image 3" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/12729473/9fc6f7348704581e015f2e6fcd20c3c863e82b9b.jpg" alt="thumb 3" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="2" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/12729473/9fc6f7348704581e015f2e6fcd20c3c863e82b9b.jpg" alt="thumb 3" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/12729473/283b189f9b65ee6fee411fd8a840e69bf0627229.jpg" data-idx="3" title="Image 4" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/12729473/283b189f9b65ee6fee411fd8a840e69bf0627229.jpg" alt="thumb 4" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="3" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/12729473/283b189f9b65ee6fee411fd8a840e69bf0627229.jpg" alt="thumb 4" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/12729473/9ed95f0311c21e888219101a10fdc451b88f58a5.jpg" data-idx="4" title="Image 5" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/12729473/9ed95f0311c21e888219101a10fdc451b88f58a5.jpg" alt="thumb 5" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="4" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/12729473/9ed95f0311c21e888219101a10fdc451b88f58a5.jpg" alt="thumb 5" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/12729473/0a0f6dbcfdd5bc9933ce8db7297cece4528d55d6.jpg" data-idx="5" title="Image 6" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/12729473/0a0f6dbcfdd5bc9933ce8db7297cece4528d55d6.jpg" alt="thumb 6" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="5" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/12729473/0a0f6dbcfdd5bc9933ce8db7297cece4528d55d6.jpg" alt="thumb 6" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/12729473/4e0cc1064c28bff8225a4f653d31723dedcf8aef.jpg" data-idx="6" title="Image 7" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/12729473/4e0cc1064c28bff8225a4f653d31723dedcf8aef.jpg" alt="thumb 7" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="6" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/12729473/4e0cc1064c28bff8225a4f653d31723dedcf8aef.jpg" alt="thumb 7" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/12729473/2754f9f5cb9283656de9b399b40d8f3991c9f431.jpg" data-idx="7" title="Image 8" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/12729473/2754f9f5cb9283656de9b399b40d8f3991c9f431.jpg" alt="thumb 8" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="7" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/12729473/2754f9f5cb9283656de9b399b40d8f3991c9f431.jpg" alt="thumb 8" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/12729473/f3ef27d8893dddb4132190e6b13dd6335bf1ba03.jpg" data-idx="8" title="Image 9" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/12729473/f3ef27d8893dddb4132190e6b13dd6335bf1ba03.jpg" alt="thumb 9" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="8" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/12729473/f3ef27d8893dddb4132190e6b13dd6335bf1ba03.jpg" alt="thumb 9" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/12729473/c1746e44317057fc37f1b7e47aebb00962839310.jpg" data-idx="9" title="Image 10" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/12729473/c1746e44317057fc37f1b7e47aebb00962839310.jpg" alt="thumb 10" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="9" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/12729473/c1746e44317057fc37f1b7e47aebb00962839310.jpg" alt="thumb 10" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/12729473/c4cfce82689142cc9c513a8996d489243a407514.jpg" data-idx="10" title="Image 11" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/12729473/c4cfce82689142cc9c513a8996d489243a407514.jpg" alt="thumb 11" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="10" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/12729473/c4cfce82689142cc9c513a8996d489243a407514.jpg" alt="thumb 11" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/12729473/fed09c7dc91bc04747d0c2d8ad5db3320f1a563c.jpg" data-idx="11" title="Image 12" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/12729473/fed09c7dc91bc04747d0c2d8ad5db3320f1a563c.jpg" alt="thumb 12" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="11" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/12729473/fed09c7dc91bc04747d0c2d8ad5db3320f1a563c.jpg" alt="thumb 12" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/12729473/7cce77ea75dd2ca7ee1da608d3d3439ab4d66052.jpg" data-idx="12" title="Image 13" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/12729473/7cce77ea75dd2ca7ee1da608d3d3439ab4d66052.jpg" alt="thumb 13" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="12" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/12729473/7cce77ea75dd2ca7ee1da608d3d3439ab4d66052.jpg" alt="thumb 13" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/12729473/8a2650cd67eba0fccdf899d536aaec75d1c7a2ee.jpg" data-idx="13" title="Image 14" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/12729473/8a2650cd67eba0fccdf899d536aaec75d1c7a2ee.jpg" alt="thumb 14" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="13" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/12729473/8a2650cd67eba0fccdf899d536aaec75d1c7a2ee.jpg" alt="thumb 14" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/12729473/68f25f7e6ab64df97fe77476c350b63980566d01.jpg" data-idx="14" title="Image 15" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/12729473/68f25f7e6ab64df97fe77476c350b63980566d01.jpg" alt="thumb 15" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="14" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/12729473/68f25f7e6ab64df97fe77476c350b63980566d01.jpg" alt="thumb 15" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                           </div>
                   </div>
         <div>
           <h1>...And Justice For All</h1>
-          <p class="muted">Metallica • 2018</p>
+          <p class="muted" style="font-size:1.2rem">Metallica • 2018</p>
           <p class="muted">US</p>
-                      <p style="margin:8px 0;">
-              <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Rock</span>              <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Heavy Metal</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Thrash</span>            </p>
-          
-                      <p class="muted">Formats:
-                              Vinyl (180G)                          </p>
-          
+          <div style="margin:16px 0; display:flex; gap:8px; flex-wrap:wrap">
+            <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Rock</span>            <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Heavy Metal</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Thrash</span>          </div>
+
                       <p class="muted">Labels:
               Blackened (BLCKND007R-1)            </p>
           
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Tracklist</strong>
-                <ol>
-                                      <li>A1 — Blackened <span class="muted">(6:42)</span></li>
-                                      <li>A2 — ...And Justice For All <span class="muted">(9:45)</span></li>
-                                      <li>B1 — Eye Of The Beholder <span class="muted">(6:26)</span></li>
-                                      <li>B2 — One <span class="muted">(7:23)</span></li>
-                                      <li>C1 — The Shortest Straw <span class="muted">(6:35)</span></li>
-                                      <li>C2 — Harvester Of Sorrow <span class="muted">(5:45)</span></li>
-                                      <li>C3 — The Frayed Ends Of Sanity <span class="muted">(7:41)</span></li>
-                                      <li>D1 — To Live Is To Die <span class="muted">(9:48)</span></li>
-                                      <li>D2 — Dyers Eve <span class="muted">(5:13)</span></li>
-                                  </ol>
-              </div>
-            </div>
-          
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Videos</strong>
-                <ul>
-                                      <li><a href="https://www.youtube.com/watch?v=-BG1Ng2pU-8" target="_blank" rel="noopener">Metallica - ...And Justice For All [Full Album]</a></li>
-                                  </ul>
-              </div>
-            </div>
-          
-          
-          <div class="card" style="margin-top:16px;">
-            <div class="meta">
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-                <strong>My Notes</strong>
-                              </div>
-
-              
-              <div id="notesView" style="margin-top:8px">
-                                                  <div class="muted">(none)</div>
-                              </div>
-
-                          </div>
+          <div class="tabs" id="release-tabs">
+            <div class="tab active" data-tab="tracks">Tracks</div>
+            <div class="tab" data-tab="details">Details</div>
+            <div class="tab" data-tab="credits">Credits</div>
+            <div class="tab" data-tab="status">Status & Notes</div>
           </div>
 
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Credits</strong>
-                <ul>
-                                      <li>
-                      James Hetfield
-                      <span class="muted">— Arranged By</span>                                          </li>
-                                      <li>
-                      Lars Ulrich
-                      <span class="muted">— Arranged By</span>                                          </li>
-                                      <li>
-                      Jason Newsted
-                      <span class="muted">— Bass</span>                                          </li>
-                                      <li>
-                      Linden Travel
-                      <span class="muted">— Booking [Travel, New York]</span>                                          </li>
-                                      <li>
-                      Marla Wax-Ferguson
-                      <span class="muted">— Booking [Travel, New York]</span>                                          </li>
-                                      <li>
-                      James Hetfield
-                      <span class="muted">— Concept By [Cover]</span>                                          </li>
-                                      <li>
-                      Lars Ulrich
-                      <span class="muted">— Concept By [Cover]</span>                                          </li>
-                                      <li>
-                      &quot;Big&quot; Mick
-                      <span class="muted">— Crew [Crew Fuckers 88/89]</span>                                          </li>
-                                      <li>
-                      Andy Battye
-                      <span class="muted">— Crew [Crew Fuckers 88/89]</span>                                          </li>
-                                      <li>
-                      Bobby &#039;Slender&#039; Schneider
-                      <span class="muted">— Crew [Crew Fuckers 88/89]</span>                                          </li>
-                                      <li>
-                      Danny Murphy
-                      <span class="muted">— Crew [Crew Fuckers 88/89]</span>                                          </li>
-                                      <li>
-                      Flemming Larsen
-                      <span class="muted">— Crew [Crew Fuckers 88/89]</span>                                          </li>
-                                      <li>
-                      Steve &#039;Blood&#039; Fowler
-                      <span class="muted">— Crew [Crew Fuckers 88/89]</span>                                          </li>
-                                      <li>
-                      Tony &#039;Swift&#039; Smith
-                      <span class="muted">— Crew [Crew Fuckers 88/89]</span>                                          </li>
-                                      <li>
-                      Zach Harmon
-                      <span class="muted">— Crew [Crew Fuckers 88/89]</span>                                          </li>
-                                      <li>
-                      Pushead
-                      <span class="muted">— Design [T-Shirt &amp; Art Guy]</span>                                          </li>
-                                      <li>
-                      Reiner Design Consultants, Inc.
-                      <span class="muted">— Design, Layout</span>                                          </li>
-                                      <li>
-                      Lars Ulrich
-                      <span class="muted">— Drums</span>                                          </li>
-                                      <li>
-                      Flemming Rasmussen
-                      <span class="muted">— Engineer</span>                                          </li>
-                                      <li>
-                      Toby Wright
-                      <span class="muted">— Engineer [Assistant And Additional]</span>                                          </li>
-                                      <li>
-                      George Cowan
-                      <span class="muted">— Engineer [Assistant Mixing]</span>                                          </li>
-                                      <li>
-                      Mike Clink
-                      <span class="muted">— Engineer [Drum Trax]</span>                      <span class="muted"> (tracks: C1, C2)</span>                    </li>
-                                      <li>
-                      Greg Fidelman
-                      <span class="muted">— Executive-Producer [Reissues Executive Producer]</span>                                          </li>
-                                      <li>
-                      James Hetfield
-                      <span class="muted">— Guitar [Harmony &amp; Melody], Acoustic Guitar</span>                                          </li>
-                                      <li>
-                      Stephen Gorman
-                      <span class="muted">— Illustration [Cover]</span>                                          </li>
-                                      <li>
-                      Pushead
-                      <span class="muted">— Illustration [Hammer]</span>                                          </li>
-                                      <li>
-                      Chris Bellman
-                      <span class="muted">— Lacquer Cut By</span>                                          </li>
-                                      <li>
-                      Kirk Hammett
-                      <span class="muted">— Lead Guitar</span>                                          </li>
-                                      <li>
-                      Peter Paterno
-                      <span class="muted">— Legal [Representation, Los Angeles]</span>                                          </li>
-                                      <li>
-                      Cliff Burton
-                      <span class="muted">— Lyrics By</span>                      <span class="muted"> (tracks: D1)</span>                    </li>
-                                      <li>
-                      James Hetfield
-                      <span class="muted">— Lyrics By</span>                      <span class="muted"> (tracks: A1 to C3, D2)</span>                    </li>
-                                      <li>
-                      Cliff Burnstein
-                      <span class="muted">— Management</span>                                          </li>
-                                      <li>
-                      Peter Mensch
-                      <span class="muted">— Management</span>                                          </li>
-                                      <li>
-                      Q Prime Inc.
-                      <span class="muted">— Management</span>                                          </li>
-                                      <li>
-                      Fred Duffin
-                      <span class="muted">— Management [Accounting, San Francisco]</span>                                          </li>
-                                      <li>
-                      Joni Schneider
-                      <span class="muted">— Management [Accounting, San Francisco]</span>                                          </li>
-                                      <li>
-                      Siegel &amp; Feldstein
-                      <span class="muted">— Management [Accounting, San Francisco]</span>                                          </li>
-                                      <li>
-                      Fair Warning
-                      <span class="muted">— Management [Agency Representation, London]</span>                                          </li>
-                                      <li>
-                      John Jackson
-                      <span class="muted">— Management [Agency Representation, London]</span>                                          </li>
-                                      <li>
-                      ICM
-                      <span class="muted">— Management [Agency Representation, New York]</span>                                          </li>
-                                      <li>
-                      Marsha Vlasic
-                      <span class="muted">— Management [Agency Representation, New York]</span>                                          </li>
-                                      <li>
-                      Gail Leibowitz
-                      <span class="muted">— Management [Immigration, New York]</span>                                          </li>
-                                      <li>
-                      George Knemeyer
-                      <span class="muted">— Management [Management Staff]</span>                                          </li>
-                                      <li>
-                      Linda Walker
-                      <span class="muted">— Management [Management Staff]</span>                                          </li>
-                                      <li>
-                      Q Prime Inc.
-                      <span class="muted">— Management [Management Staff]</span>                                          </li>
-                                      <li>
-                      Bob Ludwig
-                      <span class="muted">— Mastered By</span>                                          </li>
-                                      <li>
-                      Steve Thompson &amp; Michael Barbiero
-                      <span class="muted">— Mixed By</span>                                          </li>
-                                      <li>
-                      Brockum
-                      <span class="muted">— Other [Merchandising, New York / Toronto / London]</span>                                          </li>
-                                      <li>
-                      Ross Halfin
-                      <span class="muted">— Photography By [All Photos]</span>                                          </li>
-                                      <li>
-                      Flemming Rasmussen
-                      <span class="muted">— Producer</span>                                          </li>
-                                      <li>
-                      Metallica
-                      <span class="muted">— Producer</span>                                          </li>
-                                      <li>
-                      Reuben Cohen
-                      <span class="muted">— Remastered By</span>                                          </li>
-                                      <li>
-                      James Hetfield
-                      <span class="muted">— Rhythm Guitar, Vocals</span>                                          </li>
-                                  </ul>
+          <div id="tab-tracks" class="tab-content active">
+                          <div class="card">
+                <div class="meta">
+                  <ol style="margin:0; padding-left:20px">
+                                          <li style="margin-bottom:8px">A1 — Blackened <span class="muted">(6:42)</span></li>
+                                          <li style="margin-bottom:8px">A2 — ...And Justice For All <span class="muted">(9:45)</span></li>
+                                          <li style="margin-bottom:8px">B1 — Eye Of The Beholder <span class="muted">(6:26)</span></li>
+                                          <li style="margin-bottom:8px">B2 — One <span class="muted">(7:23)</span></li>
+                                          <li style="margin-bottom:8px">C1 — The Shortest Straw <span class="muted">(6:35)</span></li>
+                                          <li style="margin-bottom:8px">C2 — Harvester Of Sorrow <span class="muted">(5:45)</span></li>
+                                          <li style="margin-bottom:8px">C3 — The Frayed Ends Of Sanity <span class="muted">(7:41)</span></li>
+                                          <li style="margin-bottom:8px">D1 — To Live Is To Die <span class="muted">(9:48)</span></li>
+                                          <li style="margin-bottom:8px">D2 — Dyers Eve <span class="muted">(5:13)</span></li>
+                                      </ol>
+                </div>
               </div>
+                      </div>
+
+          <div id="tab-details" class="tab-content">
+            <div class="card">
+                <div class="meta">
+                                            <p class="muted"><strong>Formats:</strong>
+                                                    Vinyl (180G)                                                </p>
+                                        
+                    
+                    
+                                            <p><strong>Barcodes:</strong></p>
+                        <ul style="margin:0; padding-left:20px" class="muted">
+                                                    <li>8 58978 00577 6 (Text)</li>
+                                                    <li>858978005776 (Scanned)</li>
+                                                </ul>
+                                    </div>
             </div>
-          
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Companies</strong>
-                <ul>
-                                      <li>
-                      Blackened Recordings
-                      <span class="muted"> — Phonographic Copyright (p)</span>                                          </li>
-                                      <li>
-                      Blackened Recordings
-                      <span class="muted"> — Copyright (c)</span>                                          </li>
-                                      <li>
-                      Creeping Death Music
-                      <span class="muted"> — Copyright (c)</span>                                          </li>
-                                      <li>
-                      Creeping Death Music
-                      <span class="muted"> — Published By</span>                                          </li>
-                                      <li>
-                      One On One Studios
-                      <span class="muted"> — Recorded At</span>                                          </li>
-                                      <li>
-                      Bearsville Studios
-                      <span class="muted"> — Mixed At</span>                                          </li>
-                                      <li>
-                      Masterdisk
-                      <span class="muted"> — Mastered At</span>                                          </li>
-                                      <li>
-                      Lurssen Mastering
-                      <span class="muted"> — Remastered At</span>                                          </li>
-                                      <li>
-                      Blackened Recordings
-                      <span class="muted"> — Manufactured By</span>                                          </li>
-                                      <li>
-                      Bernie Grundman Mastering
-                      <span class="muted"> — Lacquer Cut At</span>                                          </li>
-                                      <li>
-                      Pallas USA
-                      <span class="muted"> — Manufactured By</span>                                          </li>
-                                      <li>
-                      Schallplattenfabrik Pallas GmbH
-                      <span class="muted"> — Pressed By</span>                                          </li>
-                                      <li>
-                      Schallplattenfabrik Pallas GmbH
-                      <span class="muted"> — Pressed By</span>                                          </li>
-                                  </ul>
-              </div>
+          </div>
+
+          <div id="tab-credits" class="tab-content">
+                             <div class="card">
+                    <div class="meta">
+                                                    <p><strong>Credits:</strong></p>
+                            <ul style="margin:0; padding-left:20px" class="muted">
+                                                            <li style="margin-bottom:4px">
+                                James Hetfield
+                                 — Arranged By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Lars Ulrich
+                                 — Arranged By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Jason Newsted
+                                 — Bass                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Linden Travel
+                                 — Booking [Travel, New York]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Marla Wax-Ferguson
+                                 — Booking [Travel, New York]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                James Hetfield
+                                 — Concept By [Cover]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Lars Ulrich
+                                 — Concept By [Cover]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                &quot;Big&quot; Mick
+                                 — Crew [Crew Fuckers 88/89]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Andy Battye
+                                 — Crew [Crew Fuckers 88/89]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Bobby &#039;Slender&#039; Schneider
+                                 — Crew [Crew Fuckers 88/89]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Danny Murphy
+                                 — Crew [Crew Fuckers 88/89]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Flemming Larsen
+                                 — Crew [Crew Fuckers 88/89]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Steve &#039;Blood&#039; Fowler
+                                 — Crew [Crew Fuckers 88/89]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Tony &#039;Swift&#039; Smith
+                                 — Crew [Crew Fuckers 88/89]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Zach Harmon
+                                 — Crew [Crew Fuckers 88/89]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Pushead
+                                 — Design [T-Shirt &amp; Art Guy]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Reiner Design Consultants, Inc.
+                                 — Design, Layout                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Lars Ulrich
+                                 — Drums                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Flemming Rasmussen
+                                 — Engineer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Toby Wright
+                                 — Engineer [Assistant And Additional]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                George Cowan
+                                 — Engineer [Assistant Mixing]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Mike Clink
+                                 — Engineer [Drum Trax]                                 (tracks: C1, C2)                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Greg Fidelman
+                                 — Executive-Producer [Reissues Executive Producer]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                James Hetfield
+                                 — Guitar [Harmony &amp; Melody], Acoustic Guitar                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Stephen Gorman
+                                 — Illustration [Cover]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Pushead
+                                 — Illustration [Hammer]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Chris Bellman
+                                 — Lacquer Cut By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Kirk Hammett
+                                 — Lead Guitar                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Peter Paterno
+                                 — Legal [Representation, Los Angeles]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Cliff Burton
+                                 — Lyrics By                                 (tracks: D1)                                </li>
+                                                            <li style="margin-bottom:4px">
+                                James Hetfield
+                                 — Lyrics By                                 (tracks: A1 to C3, D2)                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Cliff Burnstein
+                                 — Management                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Peter Mensch
+                                 — Management                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Q Prime Inc.
+                                 — Management                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Fred Duffin
+                                 — Management [Accounting, San Francisco]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Joni Schneider
+                                 — Management [Accounting, San Francisco]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Siegel &amp; Feldstein
+                                 — Management [Accounting, San Francisco]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Fair Warning
+                                 — Management [Agency Representation, London]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                John Jackson
+                                 — Management [Agency Representation, London]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                ICM
+                                 — Management [Agency Representation, New York]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Marsha Vlasic
+                                 — Management [Agency Representation, New York]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Gail Leibowitz
+                                 — Management [Immigration, New York]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                George Knemeyer
+                                 — Management [Management Staff]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Linda Walker
+                                 — Management [Management Staff]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Q Prime Inc.
+                                 — Management [Management Staff]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Bob Ludwig
+                                 — Mastered By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Steve Thompson &amp; Michael Barbiero
+                                 — Mixed By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Brockum
+                                 — Other [Merchandising, New York / Toronto / London]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Ross Halfin
+                                 — Photography By [All Photos]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Flemming Rasmussen
+                                 — Producer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Metallica
+                                 — Producer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Reuben Cohen
+                                 — Remastered By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                James Hetfield
+                                 — Rhythm Guitar, Vocals                                                                </li>
+                                                        </ul>
+                        
+                                                    <p style="margin-top:16px"><strong>Companies:</strong></p>
+                            <ul style="margin:0; padding-left:20px" class="muted">
+                                                            <li style="margin-bottom:4px">
+                                Blackened Recordings
+                                 — Phonographic Copyright (p)                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Blackened Recordings
+                                 — Copyright (c)                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Creeping Death Music
+                                 — Copyright (c)                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Creeping Death Music
+                                 — Published By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                One On One Studios
+                                 — Recorded At                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Bearsville Studios
+                                 — Mixed At                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Masterdisk
+                                 — Mastered At                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Lurssen Mastering
+                                 — Remastered At                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Blackened Recordings
+                                 — Manufactured By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Bernie Grundman Mastering
+                                 — Lacquer Cut At                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Pallas USA
+                                 — Manufactured By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Schallplattenfabrik Pallas GmbH
+                                 — Pressed By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Schallplattenfabrik Pallas GmbH
+                                 — Pressed By                                                                </li>
+                                                        </ul>
+                                            </div>
+                </div>
+                       </div>
+
+          <div id="tab-status" class="tab-content">
+            <div class="card">
+                <div class="meta">
+                    <div style="margin-bottom:16px">
+                        <strong>Discogs Status</strong>
+                        <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+                                                        <form method="post" action="/release/save" style="margin:0">
+                                <input type="hidden" name="_token" value="" />
+                                <input type="hidden" name="release_id" value="12729473" />
+                                <input type="hidden" name="action" value="want_to_collection" />
+                                <input type="hidden" name="return" value="../index.html" />
+                                <button type="submit" style="background:var(--card);color:var(--accent);border:1px solid #2a2b2f;border-radius:8px;padding:6px 10px;cursor:pointer">Add to Collection</button>
+                            </form>
+                            
+                                                        <form method="post" action="/release/save" style="margin:0">
+                                <input type="hidden" name="_token" value="" />
+                                <input type="hidden" name="release_id" value="12729473" />
+                                <input type="hidden" name="action" value="add_want" />
+                                <input type="hidden" name="return" value="../index.html" />
+                                <button type="submit" class="muted" style="background:transparent;border:1px solid #2a2b2f;border-radius:8px;padding:6px 10px;cursor:pointer;color:inherit">Add to Wantlist</button>
+                            </form>
+                                                    </div>
+                    </div>
+
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                        <strong>My Notes</strong>
+                                            </div>
+
+                    <div id="notesView" style="margin-top:8px">
+                                                                                                                    </div>
+                                                         </div>
             </div>
-          
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Barcodes</strong>
-                <ul>
-                                      <li>8 58978 00577 6 <span class="muted">(Text)</span></li>
-                                      <li>858978005776 <span class="muted">(Scanned)</span></li>
-                                  </ul>
-              </div>
-            </div>
-          
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Identifiers</strong>
-                <ul>
-                                      <li>Matrix / Runout: BLCKND-007R-1A ...And Vinyl For All CB P. USA -47993- <span class="muted">(Side A runout, Variant 1)</span></li>
-                                      <li>Matrix / Runout: BLCKND-007R-1B Made on the MetalliPress CB P. USA -47993- <span class="muted">(Side B runout, Variant 1)</span></li>
-                                      <li>Matrix / Runout: BLCKND-007R-1C ...And Vinyl For All CB P. USA -47994- <span class="muted">(Side C runout, Variant 1)</span></li>
-                                      <li>Matrix / Runout: BLCKND-007R-1D Made on the MetalliPress CB P. USA -47994- <span class="muted">(Side D runout, Variant 1)</span></li>
-                                      <li>Matrix / Runout: BLCKND-007R-1A2 ...And Vinyl For All CB P. USA -47993- II <span class="muted">(Side A runout, Variant 2)</span></li>
-                                      <li>Matrix / Runout: BLCKND-007R-1B2 Made on the MetalliPress CB P. USA -47993- IV <span class="muted">(Side B runout, Variant 2)</span></li>
-                                      <li>Matrix / Runout: BLCKND-007R-1C2 ...And Vinyl For All CB P. USA -47994- II <span class="muted">(Side C runout, Variant 2)</span></li>
-                                      <li>Matrix / Runout: BLCKND-007R-1D2 Made on the MetalliPress CB P. USA -47994- IV <span class="muted">(Side D runout, Variant 2)</span></li>
-                                      <li>Matrix / Runout: BLCKND-007R-1A2 ...And Vinyl For All CB P. USA -47993- V <span class="muted">(Side A runout, Variant 3)</span></li>
-                                      <li>Matrix / Runout: BLCKND-007R-1B2 Made on the MetalliPress CB P. USA -47993- <span class="muted">(Side B runout, Variant 3)</span></li>
-                                      <li>Matrix / Runout: BLCKND-007R-1C2 ...And Vinyl For All CB P. USA -47994- V <span class="muted">(Side C runout, Variant 3)</span></li>
-                                      <li>Matrix / Runout: BLCKND-007R-1D2 Made on the MetalliPress CB P. USA -47994- VI <span class="muted">(Side D runout, Variant 3)</span></li>
-                                      <li>Matrix / Runout: BLCKND-007R-1A2 ...And Vinyl For All CB P. USA -47993- II <span class="muted">(Side A runout, Variant 4)</span></li>
-                                      <li>Matrix / Runout: BLCKND-007R-1B2 Made on the MetalliPress CB P. USA -47993- <span class="muted">(Side B runout, Variant 4)</span></li>
-                                      <li>Matrix / Runout: BLCKND-007R-1C2 Made on the MetalliPress CB P. USA -47994- IV <span class="muted">(Side C runout, Variant 4)</span></li>
-                                      <li>Matrix / Runout: BLCKND-007R-1D2 Made on the MetalliPress CB P. USA -47994- IV <span class="muted">(Side D runout, Variant 4)</span></li>
-                                      <li>Matrix / Runout: BLCKND-007R-1A2 ...And Vinyl For All CB P. USA -47993- <span class="muted">(Side A runout, Variant 5)</span></li>
-                                      <li>Matrix / Runout: BLCKND-007R-1B2 Made on the MetalliPress CB P. USA -47993- <span class="muted">(Side B runout, Variant 5)</span></li>
-                                      <li>Matrix / Runout: BLCKND-007R-1C2 ...And Vinyl For All CB P. USA -47994- <span class="muted">(Side C runout, Variant 5)</span></li>
-                                      <li>Matrix / Runout: BLCKND-007R-1D2 Made on the MetalliPress CB P. USA -47994- VI <span class="muted">(Side D runout, Variant 5)</span></li>
-                                  </ul>
-              </div>
-            </div>
-                  </div>
+          </div>
+        </div>
       </div>
 
             <!-- Lightbox overlay -->
@@ -410,7 +692,8 @@
         document.addEventListener('DOMContentLoaded', function(){
           const images = [
             '..\/images\/12729473\/b3476d3c30e8bb98428c45faa74e46ee6c2b13fe.jpg', '..\/images\/12729473\/6fd851cd00897f617f391ba4f535fffe61e61059.jpg', '..\/images\/12729473\/9fc6f7348704581e015f2e6fcd20c3c863e82b9b.jpg', '..\/images\/12729473\/283b189f9b65ee6fee411fd8a840e69bf0627229.jpg', '..\/images\/12729473\/9ed95f0311c21e888219101a10fdc451b88f58a5.jpg', '..\/images\/12729473\/0a0f6dbcfdd5bc9933ce8db7297cece4528d55d6.jpg', '..\/images\/12729473\/4e0cc1064c28bff8225a4f653d31723dedcf8aef.jpg', '..\/images\/12729473\/2754f9f5cb9283656de9b399b40d8f3991c9f431.jpg', '..\/images\/12729473\/f3ef27d8893dddb4132190e6b13dd6335bf1ba03.jpg', '..\/images\/12729473\/c1746e44317057fc37f1b7e47aebb00962839310.jpg', '..\/images\/12729473\/c4cfce82689142cc9c513a8996d489243a407514.jpg', '..\/images\/12729473\/fed09c7dc91bc04747d0c2d8ad5db3320f1a563c.jpg', '..\/images\/12729473\/7cce77ea75dd2ca7ee1da608d3d3439ab4d66052.jpg', '..\/images\/12729473\/8a2650cd67eba0fccdf899d536aaec75d1c7a2ee.jpg', '..\/images\/12729473\/68f25f7e6ab64df97fe77476c350b63980566d01.jpg'          ];
-          const main = document.getElementById('main-cover');
+          const track = document.getElementById('carousel-track');
+          const dots = document.querySelectorAll('.dot');
           const thumbs = document.querySelectorAll('.thumb');
           const lb = document.getElementById('lightbox');
           const lbImg = lb ? lb.querySelector('.lb-img') : null;
@@ -418,16 +701,12 @@
           const lbPrev = lb ? lb.querySelector('.lb-prev') : null;
           const lbNext = lb ? lb.querySelector('.lb-next') : null;
           const lbCounter = lb ? lb.querySelector('.lb-counter') : null;
-          let idx = parseInt(main?.getAttribute('data-idx') || '0', 10) || 0;
+          let idx = 0;
 
-          function updateMain(to){
-            if (!main) return;
-            const i = Math.max(0, Math.min(images.length - 1, to));
-            if (images[i] && main.getAttribute('src') !== images[i]) {
-              main.setAttribute('src', images[i]);
-            }
-            main.setAttribute('data-idx', String(i));
-            idx = i;
+          function updateCarousel(to){
+            idx = Math.max(0, Math.min(images.length - 1, to));
+            if (track) track.style.transform = `translateX(-${idx * 100}%)`;
+            dots.forEach((d, i) => d.classList.toggle('active', i === idx));
           }
 
           function openLightbox(startIdx){
@@ -445,54 +724,92 @@
             lb.setAttribute('aria-hidden', 'true');
             document.body.style.overflow = '';
           }
-          function next(){ idx = (idx + 1) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
-          function prev(){ idx = (idx - 1 + images.length) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
+          function next(){ idx = (idx + 1) % images.length; if (lb.classList.contains('open')) { lbImg.src = images[idx]; lbCounter.textContent = (idx + 1) + ' / ' + images.length; } else { updateCarousel(idx); } }
+          function prev(){ idx = (idx - 1 + images.length) % images.length; if (lb.classList.contains('open')) { lbImg.src = images[idx]; lbCounter.textContent = (idx + 1) + ' / ' + images.length; } else { updateCarousel(idx); } }
 
-          // Thumbnail click: swap main and set index; Shift+Click opens lightbox
-          thumbs.forEach(function(btn){
-            btn.addEventListener('click', function(e){
-              const i = parseInt(this.getAttribute('data-idx') || '0', 10) || 0;
-              if (e.shiftKey) { openLightbox(i); return; }
-              updateMain(i);
-            });
+          // Carousel dot/thumb clicks
+          dots.forEach(d => d.addEventListener('click', () => updateCarousel(parseInt(d.dataset.idx))));
+          thumbs.forEach(t => t.addEventListener('click', () => updateCarousel(parseInt(t.dataset.idx))));
+
+          // Lightbox trigger on carousel image click
+          document.querySelectorAll('.carousel-slide img').forEach(img => {
+            img.addEventListener('click', () => openLightbox(parseInt(img.dataset.idx)));
           });
-
-          // Main cover click: open lightbox on current index
-          if (main) {
-            main.addEventListener('click', function(){
-              const i = parseInt(main.getAttribute('data-idx') || '0', 10) || 0;
-              openLightbox(i);
-            });
-          }
 
           // Lightbox interactions
           lbClose?.addEventListener('click', closeLightbox);
           lbPrev?.addEventListener('click', prev);
           lbNext?.addEventListener('click', next);
-          lbImg?.addEventListener('click', next); // click image to advance
+          lbImg?.addEventListener('click', next);
           lb?.addEventListener('click', function(e){ if (e.target === lb) closeLightbox(); });
 
-          // Keyboard support
+          // Keyboard
           document.addEventListener('keydown', function(e){
             if (!lb || !lb.classList.contains('open')) return;
-            if (e.key === 'Escape') { e.preventDefault(); closeLightbox(); }
-            else if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
-            else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+            if (e.key === 'Escape') closeLightbox();
+            else if (e.key === 'ArrowRight') next();
+            else if (e.key === 'ArrowLeft') prev();
           });
 
-          // Ensure initial main index reflects the list
-          if (images.length > 0 && main) {
-            let initial = images.indexOf(main.getAttribute('src'));
-            if (initial < 0) initial = 0;
-            main.setAttribute('data-idx', String(initial));
+          // Tabs
+          const tabs = document.querySelectorAll('.tab');
+          const contents = document.querySelectorAll('.tab-content');
+          tabs.forEach(t => {
+            t.addEventListener('click', () => {
+              const target = t.dataset.tab;
+              tabs.forEach(t2 => t2.classList.toggle('active', t2 === t));
+              contents.forEach(c => c.classList.toggle('active', c.id === `tab-${target}`));
+            });
+          });
+
+          // Handle tab parameter in URL
+          const urlParams = new URLSearchParams(window.location.search);
+          const activeTab = urlParams.get('tab');
+          if (activeTab) {
+            const tabEl = document.querySelector(`.tab[data-tab="${activeTab}"]`);
+            if (tabEl) tabEl.click();
           }
+
+          // Swipe support for carousel (basic)
+          let startX = 0;
+          track?.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+          track?.addEventListener('touchend', e => {
+            const diff = startX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) {
+              if (diff > 0) next(); else prev();
+            }
+          });
+
+          // Notes Toggle
+          (function(){
+            const btn = document.getElementById('editToggle');
+            const form = document.getElementById('notesForm');
+            const view = document.getElementById('notesView');
+            if (!btn || !form || !view) return;
+            btn.addEventListener('click', function(){
+                const open = form.style.display === 'none';
+                form.style.display = open ? 'flex' : 'none';
+                view.style.display = open ? 'none' : 'block';
+                btn.textContent = open ? 'Cancel' : 'Edit';
+                if (open) {
+                    // Switch to status tab if not active
+                    document.querySelector('.tab[data-tab="status"]').click();
+                }
+            });
+          })();
         });
       </script>
             </div>
 
-  
+    <script>
+    document.getElementById('mobile-toggle')?.addEventListener('click', function() {
+      document.getElementById('mobile-menu').classList.toggle('active');
+      this.textContent = document.getElementById('mobile-menu').classList.contains('active') ? '✕' : '☰';
+    });
+  </script>
+
   <footer class="site-footer muted" style="text-align:center;margin:24px 0 8px 0;font-size:.9rem;">
-  Powered by Discogs API & Coffee Since 2025 | Lovingly Crafted in Boise, Idaho
+  Powered by Discogs API & Coffee Since 2026 | Lovingly Crafted in Boise, Idaho
 </footer>
 </body>
 </html>

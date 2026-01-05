@@ -4,18 +4,197 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Lords Of Acid — Voodoo-U</title>
+  <style>
+    :root {
+      --bg: #0b0b0c;
+      --card: #16171a;
+      --text: #e7e7ea;
+      --muted: #a0a3aa;
+      --accent: #67e8f9;
+      --border: #2a2b2f;
+      --header-bg: rgba(11, 11, 12, 0.8);
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    .content-wrap {
+      margin-top: 24px;
+      margin-bottom: 24px;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .muted { color: var(--muted); }
+
+    /* Layout Helpers */
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .gap-4 { gap: 16px; }
+    .gap-2 { gap: 8px; }
+
+    /* Common Components */
+    .btn-small {
+      font-size: .8rem;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--card);
+      color: var(--text);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-small:hover { border-color: var(--accent); text-decoration: none; }
+
+    /* Common Header Components */
+    .main-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--header-bg);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-content {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    /* Desktop Nav */
+    .desktop-nav { display: flex; align-items: center; gap: 20px; }
+    @media (max-width: 768px) { .desktop-nav { display: none; } }
+
+    /* Account Dropdown */
+    .dropdown { position: relative; display: inline-block; }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background: var(--card);
+      min-width: 160px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      padding: 8px 0;
+      z-index: 101;
+    }
+    .dropdown:hover .dropdown-content { display: block; }
+    .dropdown-item {
+      display: block;
+      padding: 8px 16px;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .dropdown-item:hover { background: rgba(255,255,255,0.05); }
+
+    /* Mobile Nav / Hamburger */
+    .mobile-nav-toggle {
+      display: none;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 8px;
+    }
+    @media (max-width: 768px) { .mobile-nav-toggle { display: block; } }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 65px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg);
+      z-index: 99;
+      padding: 20px;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .mobile-menu.active { display: flex; }
+    .mobile-menu .nav-item {
+        display: block;
+        padding: 12px 16px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: var(--text);
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .mobile-menu .nav-item:hover { border-color: var(--accent); }
+
+    /* Breadcrumbs */
+    .breadcrumbs {
+      padding: 12px 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .breadcrumbs a { color: var(--muted); }
+    .breadcrumbs span { margin: 0 8px; opacity: 0.5; }
+
+    /* Utility Bar (Mobile Sticky Search/Sort) */
+    .utility-bar {
+        display: none;
+        position: sticky;
+        top: 65px;
+        z-index: 90;
+        background: var(--bg);
+        padding: 8px 20px;
+        border-bottom: 1px solid var(--border);
+    }
+    @media (max-width: 768px) {
+        .utility-bar.is-visible { display: block; }
+    }
+  </style>
     <style>
-    :root { --bg:#0b0b0c; --card:#16171a; --text:#e7e7ea; --muted:#a0a3aa; --accent:#67e8f9; --overlay: rgba(0,0,0,.9); }
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif}
-    .wrap{max-width:1000px;margin:40px auto;padding:0 20px}
-    a{color:var(--accent);text-decoration:none}
-    a:hover{text-decoration:underline}
-    .layout{display:grid;grid-template-columns:280px 1fr;gap:24px}
+    :root { --overlay: rgba(0,0,0,.9); }
+    .layout{display:grid;grid-template-columns:1fr 1fr;gap:40px}
     .card{background:var(--card);border-radius:12px;overflow:hidden}
     .cover{width:100%;aspect-ratio:1/1;object-fit:cover;background:#222;cursor:zoom-in}
     .meta{padding:16px}
-    .muted{color:var(--muted)}
-    h1{margin:0 0 8px 0;font-size:1.6rem}
+    h1{margin:0 0 8px 0;font-size:2rem}
+
+    /* Carousel */
+    .carousel-container { position: relative; width: 100%; overflow: hidden; border-radius: 12px; }
+    .carousel-track { display: flex; transition: transform 0.3s ease-out; }
+    .carousel-slide { min-width: 100%; aspect-ratio: 1/1; }
+    .carousel-slide img { width: 100%; height: 100%; object-fit: cover; }
+    .carousel-dots { display: none; justify-content: center; gap: 8px; margin-top: 12px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); cursor: pointer; opacity: 0.5; }
+    .dot.active { background: var(--accent); opacity: 1; }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 4px; border-bottom: 1px solid #2a2b2f; margin-top: 24px; overflow-x: auto; scrollbar-width: none; }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab { padding: 12px 20px; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; white-space: nowrap; }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-content { display: none; padding-top: 20px; }
+    .tab-content.active { display: block; }
 
     /* Lightbox */
     .lightbox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--overlay);z-index:1000}
@@ -30,212 +209,317 @@
     .lb-counter{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);color:#fff;background:rgba(0,0,0,.5);padding:4px 10px;border-radius:999px;font-size:.9rem}
 
     @media (max-width: 800px){
-      .layout{grid-template-columns:1fr}
+      .layout{grid-template-columns:1fr; gap: 24px;}
+      .carousel-dots { display: flex; }
       .lb-prev{left:10px}
       .lb-next{right:10px}
+      .wrap { margin-top: 12px; }
     }
   </style>
 </head>
 <body>
-  
+  <header class="main-header">
     <div class="wrap">
-    <p><a href="../index.html">← Back</a></p>
-          <div class="layout">
+      <div class="header-content">
+        <a href="/" class="logo">My Music</a>
+
+        <div class="desktop-nav">
+          <a href="/?view=collection" class="muted">Collection</a>
+          <a href="/?view=wantlist" class="muted">Wantlist</a>
+          <a href="/random" class="muted">Surprise Me</a>
+          <a href="/stats" class="muted">Stats</a>
+          <a href="/about" class="muted">About</a>
+        </div>
+
+        <button class="mobile-nav-toggle" id="mobile-toggle" aria-label="Toggle menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="/?view=collection" class="nav-item">Collection</a>
+    <a href="/?view=wantlist" class="nav-item">Wantlist</a>
+    <a href="/random" class="nav-item">Surprise Me</a>
+    <a href="/stats" class="nav-item">Stats</a>
+    <a href="/about" class="nav-item">About</a>
+  </div>
+
+  <div class="wrap">
+      <nav class="breadcrumbs">
+    <div>
+      <a href="/">Home</a>
+      <span>/</span>
+      <a href="/?view=collection">Collection</a>
+      <span>/</span>
+      Voodoo-U
+    </div>
+  </nav>
+  </div>
+
+  
+    <div class="wrap content-wrap">
+    <div style="margin-bottom:24px">
+      <p style="margin:0"><a href="../index.html" style="background:var(--card);border:1px solid #2a2b2f;padding:6px 12px;border-radius:8px;color:var(--text);font-size:.9rem;text-decoration:none">← Back</a></p>
+    </div>
+                <div class="layout">
         <div>
-          <div class="card">
-                          <img id="main-cover" class="cover" src="../images/34271164/c2a85ce54f98448aa7cc0969db4fbf1bf8bffdaa.jpg" alt="Voodoo-U cover" data-idx="0" />
-                      </div>
-                      <div class="thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
-                              <button class="thumb" data-url="../images/34271164/c2a85ce54f98448aa7cc0969db4fbf1bf8bffdaa.jpg" data-idx="0" title="Image 1" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/34271164/c2a85ce54f98448aa7cc0969db4fbf1bf8bffdaa.jpg" alt="thumb 1" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:1" />
+          <div class="carousel-container" id="carousel">
+            <div class="carousel-track" id="carousel-track">
+                                                <div class="carousel-slide">
+                    <img class="cover" src="../images/34271164/c2a85ce54f98448aa7cc0969db4fbf1bf8bffdaa.jpg" alt="Voodoo-U cover" data-idx="0" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/34271164/684735d4786c040b1dfe7bcd8aa323a6b5b67f8f.jpg" alt="Voodoo-U cover" data-idx="1" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/34271164/b8184920508f2849c7d36cdb1281ba244adf83d3.jpg" alt="Voodoo-U cover" data-idx="2" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/34271164/541f534cee1148dff7f261740a61d0d83a5dde70.jpg" alt="Voodoo-U cover" data-idx="3" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/34271164/a92993aa1b0b7f3aaf56b4065eccb9dca8d8a244.jpg" alt="Voodoo-U cover" data-idx="4" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/34271164/0753dd228feea1329dad1982f5b2f51f434dd5c6.jpg" alt="Voodoo-U cover" data-idx="5" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/34271164/e62b8f8addb8faa6860a38723d44b8859f0fe50b.jpg" alt="Voodoo-U cover" data-idx="6" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/34271164/51a70856c5ea7830fb8d85e99dd33283195f5d53.jpg" alt="Voodoo-U cover" data-idx="7" />
+                  </div>
+                                          </div>
+          </div>
+                      <div class="carousel-dots" id="carousel-dots">
+                              <div class="dot active" data-idx="0"></div>
+                              <div class="dot " data-idx="1"></div>
+                              <div class="dot " data-idx="2"></div>
+                              <div class="dot " data-idx="3"></div>
+                              <div class="dot " data-idx="4"></div>
+                              <div class="dot " data-idx="5"></div>
+                              <div class="dot " data-idx="6"></div>
+                              <div class="dot " data-idx="7"></div>
+                          </div>
+            <div class="thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;">
+                              <button class="thumb" data-idx="0" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/34271164/c2a85ce54f98448aa7cc0969db4fbf1bf8bffdaa.jpg" alt="thumb 1" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:1" />
                 </button>
-                              <button class="thumb" data-url="https://i.discogs.com/cU8hj_yMftjNwcfCqNJe9MyqKx7ZuBJ0sFCGxNrxWiQ/rs:fit/g:sm/q:90/h:600/w:596/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTM0Mjcx/MTY0LTE3NDk5OTE3/OTEtMjc5My5qcGVn.jpeg" data-idx="1" title="Image 2" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="https://i.discogs.com/cU8hj_yMftjNwcfCqNJe9MyqKx7ZuBJ0sFCGxNrxWiQ/rs:fit/g:sm/q:90/h:600/w:596/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTM0Mjcx/MTY0LTE3NDk5OTE3/OTEtMjc5My5qcGVn.jpeg" alt="thumb 2" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="1" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/34271164/684735d4786c040b1dfe7bcd8aa323a6b5b67f8f.jpg" alt="thumb 2" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="https://i.discogs.com/EhGNUwvr-x5Ar89VmuxdYpn3yoiOhlUYna3rD2dZBgs/rs:fit/g:sm/q:90/h:592/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTM0Mjcx/MTY0LTE3NDk5OTE4/NTQtMjAxOC5qcGVn.jpeg" data-idx="2" title="Image 3" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="https://i.discogs.com/EhGNUwvr-x5Ar89VmuxdYpn3yoiOhlUYna3rD2dZBgs/rs:fit/g:sm/q:90/h:592/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTM0Mjcx/MTY0LTE3NDk5OTE4/NTQtMjAxOC5qcGVn.jpeg" alt="thumb 3" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="2" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/34271164/b8184920508f2849c7d36cdb1281ba244adf83d3.jpg" alt="thumb 3" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="https://i.discogs.com/IOwPZcPvx7FLkuSr2oZJW0Mkf9ZCBFqB6Hewj0L0vaA/rs:fit/g:sm/q:90/h:597/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTM0Mjcx/MTY0LTE3NDk5OTE5/NjMtNjY3OC5qcGVn.jpeg" data-idx="3" title="Image 4" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="https://i.discogs.com/IOwPZcPvx7FLkuSr2oZJW0Mkf9ZCBFqB6Hewj0L0vaA/rs:fit/g:sm/q:90/h:597/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTM0Mjcx/MTY0LTE3NDk5OTE5/NjMtNjY3OC5qcGVn.jpeg" alt="thumb 4" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="3" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/34271164/541f534cee1148dff7f261740a61d0d83a5dde70.jpg" alt="thumb 4" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="https://i.discogs.com/iy39hOj0LnyZ11JbZGQtDYXQtIwMN6_AYZAYFmexwRA/rs:fit/g:sm/q:90/h:582/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTM0Mjcx/MTY0LTE3NDk5OTIw/NjYtNTUyNC5qcGVn.jpeg" data-idx="4" title="Image 5" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="https://i.discogs.com/iy39hOj0LnyZ11JbZGQtDYXQtIwMN6_AYZAYFmexwRA/rs:fit/g:sm/q:90/h:582/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTM0Mjcx/MTY0LTE3NDk5OTIw/NjYtNTUyNC5qcGVn.jpeg" alt="thumb 5" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="4" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/34271164/a92993aa1b0b7f3aaf56b4065eccb9dca8d8a244.jpg" alt="thumb 5" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="https://i.discogs.com/mlblWxCy8uIWEIaQxvR4485jOgWtzF6kbFymzt86QBo/rs:fit/g:sm/q:90/h:594/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTM0Mjcx/MTY0LTE3NDk5OTIx/MjktOTAwOC5qcGVn.jpeg" data-idx="5" title="Image 6" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="https://i.discogs.com/mlblWxCy8uIWEIaQxvR4485jOgWtzF6kbFymzt86QBo/rs:fit/g:sm/q:90/h:594/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTM0Mjcx/MTY0LTE3NDk5OTIx/MjktOTAwOC5qcGVn.jpeg" alt="thumb 6" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="5" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/34271164/0753dd228feea1329dad1982f5b2f51f434dd5c6.jpg" alt="thumb 6" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="https://i.discogs.com/-dZuNUQbodkNYnA80VIb21dPvyBcbvq9RTGumxBOPgw/rs:fit/g:sm/q:90/h:384/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTM0Mjcx/MTY0LTE3NDk5OTIy/NjQtNjM0Mi5qcGVn.jpeg" data-idx="6" title="Image 7" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="https://i.discogs.com/-dZuNUQbodkNYnA80VIb21dPvyBcbvq9RTGumxBOPgw/rs:fit/g:sm/q:90/h:384/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTM0Mjcx/MTY0LTE3NDk5OTIy/NjQtNjM0Mi5qcGVn.jpeg" alt="thumb 7" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="6" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/34271164/e62b8f8addb8faa6860a38723d44b8859f0fe50b.jpg" alt="thumb 7" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="https://i.discogs.com/HeDxB9Cwj3yiZAUv0gAf3JvETppEJapb94e2aqzQMOs/rs:fit/g:sm/q:90/h:403/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTM0Mjcx/MTY0LTE3NDk5OTI2/MzgtMjc3Ni5qcGVn.jpeg" data-idx="7" title="Image 8" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="https://i.discogs.com/HeDxB9Cwj3yiZAUv0gAf3JvETppEJapb94e2aqzQMOs/rs:fit/g:sm/q:90/h:403/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTM0Mjcx/MTY0LTE3NDk5OTI2/MzgtMjc3Ni5qcGVn.jpeg" alt="thumb 8" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="7" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/34271164/51a70856c5ea7830fb8d85e99dd33283195f5d53.jpg" alt="thumb 8" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                           </div>
                   </div>
         <div>
           <h1>Voodoo-U</h1>
-          <p class="muted">Lords Of Acid • 2025</p>
+          <p class="muted" style="font-size:1.2rem">Lords Of Acid • 2025</p>
           <p class="muted">US</p>
-                      <p style="margin:8px 0;">
-              <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Electronic</span>              <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Breakbeat</span>            </p>
-          
-                      <p class="muted">Formats:
-                              Vinyl (Special Remastered Band Edition, Red Translucent)                          </p>
-          
+          <div style="margin:16px 0; display:flex; gap:8px; flex-wrap:wrap">
+            <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Electronic</span>            <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Breakbeat</span>          </div>
+
                       <p class="muted">Labels:
               Metropolis (MET 1413), ArtFabric (MET 1413)            </p>
           
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Tracklist</strong>
-                <ol>
-                                      <li>A1 — Voodoo-U</li>
-                                      <li>A2 — The Crablouse</li>
-                                      <li>A3 — She And Mr. Jones</li>
-                                      <li>A4 — Do What You Wanna Do</li>
-                                      <li>B1 — Young Boys</li>
-                                      <li>B2 — Out Comes The Evil</li>
-                                      <li>B3 — Mister Machoman</li>
-                                      <li>B4 — Marijuana In Your Brain</li>
-                                      <li>C1 — Special Moments</li>
-                                      <li>C2 — Dirty Willy</li>
-                                      <li>C3 — Drink My Honey</li>
-                                      <li>C4 — Blowing Up Your Mind</li>
-                                      <li>D1 — The Wet Dream</li>
-                                      <li>D2 — Paris France</li>
-                                      <li>D3 — The Real Thing</li>
-                                      <li>D4 — Dont Kill For Love</li>
-                                  </ol>
-              </div>
-            </div>
-          
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Videos</strong>
-                <ul>
-                                      <li><a href="https://www.youtube.com/watch?v=64Se_tG-jJ4" target="_blank" rel="noopener">Lords of Acid - Voodoo U (Voodoo-U album)</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=O5e4aY-_72g" target="_blank" rel="noopener">Lords of Acid - Out Comes the Evil (Voodoo-U album)</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=6j0KhGdBIGo" target="_blank" rel="noopener">Lords of Acid - Young Boys (Voodoo-U album)</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=fj2jsRzIpnY" target="_blank" rel="noopener">Lords of Acid - She and Mr. Jones (Voodoo-U album)</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=iKCnobYPmTM" target="_blank" rel="noopener">Lords of Acid - Mister Machoman (Voodoo-U album)</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=2bCuY9JFE4Y" target="_blank" rel="noopener">Lords of Acid - The Crablouse (Voodoo-U album)</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=o5zZthqTr-4" target="_blank" rel="noopener">Lords of Acid - Marijuana in Your Brain (Voodoo-U album)</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=BRr_yuKhPlY" target="_blank" rel="noopener">Lords of Acid - Drink My Honey (Voodoo-U album)</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=US-guD7nIA8" target="_blank" rel="noopener">Lords of Acid - Do What You Wanna Do (Voodoo-U album)</a></li>
-                                      <li><a href="https://www.youtube.com/watch?v=eRIidgS7nRw" target="_blank" rel="noopener">Lords of Acid - Blowing Up Your Mind (Voodoo-U album)</a></li>
-                                  </ul>
-              </div>
-            </div>
-          
-          
-          <div class="card" style="margin-top:16px;">
-            <div class="meta">
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-                <strong>My Notes</strong>
-                              </div>
-
-              
-              <div id="notesView" style="margin-top:8px">
-                                                  <div class="muted">(none)</div>
-                              </div>
-
-                          </div>
+          <div class="tabs" id="release-tabs">
+            <div class="tab active" data-tab="tracks">Tracks</div>
+            <div class="tab" data-tab="details">Details</div>
+            <div class="tab" data-tab="credits">Credits</div>
+            <div class="tab" data-tab="status">Status & Notes</div>
           </div>
 
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Credits</strong>
-                <ul>
-                                      <li>
-                      Dirk Walter
-                      <span class="muted">— Design [Original Voodoo-U Design]</span>                                          </li>
-                                      <li>
-                      Katherine Delaney
-                      <span class="muted">— Design [Original Voodoo-U Design]</span>                                          </li>
-                                      <li>
-                      Jose Morelos
-                      <span class="muted">— Design [Voodoo-U Reissue Re-design And Tweaks]</span>                                          </li>
-                                      <li>
-                      Chris Kniker
-                      <span class="muted">— Executive-Producer</span>                                          </li>
-                                      <li>
-                      Chris Cooper
-                      <span class="muted">— Illustration [Original Illustrations]</span>                                          </li>
-                                      <li>
-                      Joe Schulthise
-                      <span class="muted">— Layout, Typography</span>                                          </li>
-                                      <li>
-                      Lords Of Acid
-                      <span class="muted">— Performer [All Tracks Performed By]</span>                                          </li>
-                                      <li>
-                      Jade 4U
-                      <span class="muted">— Producer</span>                                          </li>
-                                      <li>
-                      Oliver Adams
-                      <span class="muted">— Producer</span>                                          </li>
-                                      <li>
-                      Praga Khan
-                      <span class="muted">— Producer</span>                                          </li>
-                                      <li>
-                      Erie Loch
-                      <span class="muted">— Remastered By</span>                                          </li>
-                                      <li>
-                      Carl S. Johansen
-                      <span class="muted">— Written-By</span>                      <span class="muted"> (tracks: A1, A4, C1, C3 to D1)</span>                    </li>
-                                      <li>
-                      JK Magick
-                      <span class="muted">— Written-By</span>                      <span class="muted"> (tracks: A2, B1 to B3, D1, D2, D4)</span>                    </li>
-                                      <li>
-                      Jade 4U
-                      <span class="muted">— Written-By</span>                      <span class="muted"> (tracks: A2, B1 to B3, D1 to D4)</span>                    </li>
-                                      <li>
-                      Oliver Adams
-                      <span class="muted">— Written-By</span>                      <span class="muted"> (tracks: D3)</span>                    </li>
-                                      <li>
-                      Praga Khan
-                      <span class="muted">— Written-By</span>                                          </li>
-                                  </ul>
+          <div id="tab-tracks" class="tab-content active">
+                          <div class="card">
+                <div class="meta">
+                  <ol style="margin:0; padding-left:20px">
+                                          <li style="margin-bottom:8px">A1 — Voodoo-U</li>
+                                          <li style="margin-bottom:8px">A2 — The Crablouse</li>
+                                          <li style="margin-bottom:8px">A3 — She And Mr. Jones</li>
+                                          <li style="margin-bottom:8px">A4 — Do What You Wanna Do</li>
+                                          <li style="margin-bottom:8px">B1 — Young Boys</li>
+                                          <li style="margin-bottom:8px">B2 — Out Comes The Evil</li>
+                                          <li style="margin-bottom:8px">B3 — Mister Machoman</li>
+                                          <li style="margin-bottom:8px">B4 — Marijuana In Your Brain</li>
+                                          <li style="margin-bottom:8px">C1 — Special Moments</li>
+                                          <li style="margin-bottom:8px">C2 — Dirty Willy</li>
+                                          <li style="margin-bottom:8px">C3 — Drink My Honey</li>
+                                          <li style="margin-bottom:8px">C4 — Blowing Up Your Mind</li>
+                                          <li style="margin-bottom:8px">D1 — The Wet Dream</li>
+                                          <li style="margin-bottom:8px">D2 — Paris France</li>
+                                          <li style="margin-bottom:8px">D3 — The Real Thing</li>
+                                          <li style="margin-bottom:8px">D4 — Dont Kill For Love</li>
+                                      </ol>
+                </div>
               </div>
+                      </div>
+
+          <div id="tab-details" class="tab-content">
+            <div class="card">
+                <div class="meta">
+                                            <p class="muted"><strong>Formats:</strong>
+                                                    Vinyl (Special Remastered Band Edition, Red Translucent)                                                </p>
+                                        
+                    
+                                            <p><strong>Videos:</strong></p>
+                        <ul style="margin:0; padding-left:20px">
+                                                    <li><a href="https://www.youtube.com/watch?v=64Se_tG-jJ4" target="_blank" rel="noopener">Lords of Acid - Voodoo U (Voodoo-U album)</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=O5e4aY-_72g" target="_blank" rel="noopener">Lords of Acid - Out Comes the Evil (Voodoo-U album)</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=6j0KhGdBIGo" target="_blank" rel="noopener">Lords of Acid - Young Boys (Voodoo-U album)</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=fj2jsRzIpnY" target="_blank" rel="noopener">Lords of Acid - She and Mr. Jones (Voodoo-U album)</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=iKCnobYPmTM" target="_blank" rel="noopener">Lords of Acid - Mister Machoman (Voodoo-U album)</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=2bCuY9JFE4Y" target="_blank" rel="noopener">Lords of Acid - The Crablouse (Voodoo-U album)</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=o5zZthqTr-4" target="_blank" rel="noopener">Lords of Acid - Marijuana in Your Brain (Voodoo-U album)</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=BRr_yuKhPlY" target="_blank" rel="noopener">Lords of Acid - Drink My Honey (Voodoo-U album)</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=US-guD7nIA8" target="_blank" rel="noopener">Lords of Acid - Do What You Wanna Do (Voodoo-U album)</a></li>
+                                                    <li><a href="https://www.youtube.com/watch?v=eRIidgS7nRw" target="_blank" rel="noopener">Lords of Acid - Blowing Up Your Mind (Voodoo-U album)</a></li>
+                                                </ul>
+                    
+                                            <p><strong>Barcodes:</strong></p>
+                        <ul style="margin:0; padding-left:20px" class="muted">
+                                                    <li>782388141314 (Scanned)</li>
+                                                    <li>7 82388 14131 4 (Text)</li>
+                                                </ul>
+                                    </div>
             </div>
-          
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Companies</strong>
-                <ul>
-                                      <li>
-                      Metropolis Records
-                      <span class="muted"> — Phonographic Copyright (p)</span>                                          </li>
-                                      <li>
-                      Metropolis Records
-                      <span class="muted"> — Copyright (c)</span>                                          </li>
-                                      <li>
-                      ArtFabric bvba
-                      <span class="muted"> — Licensed From</span>                                          </li>
-                                      <li>
-                      Metropolis Records
-                      <span class="muted"> — Licensed To</span>                                          </li>
-                                      <li>
-                      BE&#039;S Songs
-                      <span class="muted"> — Published By</span>                                          </li>
-                                      <li>
-                      Sony ATV
-                      <span class="muted"> — Published By</span>                                          </li>
-                                      <li>
-                      GZ Media
-                      <span class="muted"> — Mastered At</span>                                          </li>
-                                      <li>
-                      Precision Record Pressing
-                      <span class="muted"> — Pressed By</span>                                          </li>
-                                  </ul>
-              </div>
+          </div>
+
+          <div id="tab-credits" class="tab-content">
+                             <div class="card">
+                    <div class="meta">
+                                                    <p><strong>Credits:</strong></p>
+                            <ul style="margin:0; padding-left:20px" class="muted">
+                                                            <li style="margin-bottom:4px">
+                                Dirk Walter
+                                 — Design [Original Voodoo-U Design]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Katherine Delaney
+                                 — Design [Original Voodoo-U Design]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Jose Morelos
+                                 — Design [Voodoo-U Reissue Re-design And Tweaks]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Chris Kniker
+                                 — Executive-Producer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Chris Cooper
+                                 — Illustration [Original Illustrations]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Joe Schulthise
+                                 — Layout, Typography                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Lords Of Acid
+                                 — Performer [All Tracks Performed By]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Jade 4U
+                                 — Producer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Oliver Adams
+                                 — Producer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Praga Khan
+                                 — Producer                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Erie Loch
+                                 — Remastered By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Carl S. Johansen
+                                 — Written-By                                 (tracks: A1, A4, C1, C3 to D1)                                </li>
+                                                            <li style="margin-bottom:4px">
+                                JK Magick
+                                 — Written-By                                 (tracks: A2, B1 to B3, D1, D2, D4)                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Jade 4U
+                                 — Written-By                                 (tracks: A2, B1 to B3, D1 to D4)                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Oliver Adams
+                                 — Written-By                                 (tracks: D3)                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Praga Khan
+                                 — Written-By                                                                </li>
+                                                        </ul>
+                        
+                                                    <p style="margin-top:16px"><strong>Companies:</strong></p>
+                            <ul style="margin:0; padding-left:20px" class="muted">
+                                                            <li style="margin-bottom:4px">
+                                Metropolis Records
+                                 — Phonographic Copyright (p)                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Metropolis Records
+                                 — Copyright (c)                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                ArtFabric bvba
+                                 — Licensed From                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Metropolis Records
+                                 — Licensed To                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                BE&#039;S Songs
+                                 — Published By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Sony ATV
+                                 — Published By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                GZ Media
+                                 — Mastered At                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Precision Record Pressing
+                                 — Pressed By                                                                </li>
+                                                        </ul>
+                                            </div>
+                </div>
+                       </div>
+
+          <div id="tab-status" class="tab-content">
+            <div class="card">
+                <div class="meta">
+                    <div style="margin-bottom:16px">
+                        <strong>Discogs Status</strong>
+                        <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+                                                        <form method="post" action="/release/save" style="margin:0">
+                                <input type="hidden" name="_token" value="" />
+                                <input type="hidden" name="release_id" value="34271164" />
+                                <input type="hidden" name="action" value="want_to_collection" />
+                                <input type="hidden" name="return" value="../index.html" />
+                                <button type="submit" style="background:var(--card);color:var(--accent);border:1px solid #2a2b2f;border-radius:8px;padding:6px 10px;cursor:pointer">Add to Collection</button>
+                            </form>
+                            
+                                                        <form method="post" action="/release/save" style="margin:0">
+                                <input type="hidden" name="_token" value="" />
+                                <input type="hidden" name="release_id" value="34271164" />
+                                <input type="hidden" name="action" value="add_want" />
+                                <input type="hidden" name="return" value="../index.html" />
+                                <button type="submit" class="muted" style="background:transparent;border:1px solid #2a2b2f;border-radius:8px;padding:6px 10px;cursor:pointer;color:inherit">Add to Wantlist</button>
+                            </form>
+                                                    </div>
+                    </div>
+
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                        <strong>My Notes</strong>
+                                            </div>
+
+                    <div id="notesView" style="margin-top:8px">
+                                                                                                                    </div>
+                                                         </div>
             </div>
-          
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Barcodes</strong>
-                <ul>
-                                      <li>782388141314 <span class="muted">(Scanned)</span></li>
-                                      <li>7 82388 14131 4 <span class="muted">(Text)</span></li>
-                                  </ul>
-              </div>
-            </div>
-          
-                  </div>
+          </div>
+        </div>
       </div>
 
             <!-- Lightbox overlay -->
@@ -252,8 +536,9 @@
       <script>
         document.addEventListener('DOMContentLoaded', function(){
           const images = [
-            '..\/images\/34271164\/c2a85ce54f98448aa7cc0969db4fbf1bf8bffdaa.jpg', 'https\u003A\/\/i.discogs.com\/cU8hj_yMftjNwcfCqNJe9MyqKx7ZuBJ0sFCGxNrxWiQ\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A596\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTM0Mjcx\/MTY0LTE3NDk5OTE3\/OTEtMjc5My5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/EhGNUwvr\u002Dx5Ar89VmuxdYpn3yoiOhlUYna3rD2dZBgs\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A592\/w\u003A600\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTM0Mjcx\/MTY0LTE3NDk5OTE4\/NTQtMjAxOC5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/IOwPZcPvx7FLkuSr2oZJW0Mkf9ZCBFqB6Hewj0L0vaA\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A597\/w\u003A600\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTM0Mjcx\/MTY0LTE3NDk5OTE5\/NjMtNjY3OC5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/iy39hOj0LnyZ11JbZGQtDYXQtIwMN6_AYZAYFmexwRA\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A582\/w\u003A600\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTM0Mjcx\/MTY0LTE3NDk5OTIw\/NjYtNTUyNC5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/mlblWxCy8uIWEIaQxvR4485jOgWtzF6kbFymzt86QBo\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A594\/w\u003A600\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTM0Mjcx\/MTY0LTE3NDk5OTIx\/MjktOTAwOC5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/\u002DdZuNUQbodkNYnA80VIb21dPvyBcbvq9RTGumxBOPgw\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A384\/w\u003A600\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTM0Mjcx\/MTY0LTE3NDk5OTIy\/NjQtNjM0Mi5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/HeDxB9Cwj3yiZAUv0gAf3JvETppEJapb94e2aqzQMOs\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A403\/w\u003A600\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTM0Mjcx\/MTY0LTE3NDk5OTI2\/MzgtMjc3Ni5qcGVn.jpeg'          ];
-          const main = document.getElementById('main-cover');
+            '..\/images\/34271164\/c2a85ce54f98448aa7cc0969db4fbf1bf8bffdaa.jpg', '..\/images\/34271164\/684735d4786c040b1dfe7bcd8aa323a6b5b67f8f.jpg', '..\/images\/34271164\/b8184920508f2849c7d36cdb1281ba244adf83d3.jpg', '..\/images\/34271164\/541f534cee1148dff7f261740a61d0d83a5dde70.jpg', '..\/images\/34271164\/a92993aa1b0b7f3aaf56b4065eccb9dca8d8a244.jpg', '..\/images\/34271164\/0753dd228feea1329dad1982f5b2f51f434dd5c6.jpg', '..\/images\/34271164\/e62b8f8addb8faa6860a38723d44b8859f0fe50b.jpg', '..\/images\/34271164\/51a70856c5ea7830fb8d85e99dd33283195f5d53.jpg'          ];
+          const track = document.getElementById('carousel-track');
+          const dots = document.querySelectorAll('.dot');
           const thumbs = document.querySelectorAll('.thumb');
           const lb = document.getElementById('lightbox');
           const lbImg = lb ? lb.querySelector('.lb-img') : null;
@@ -261,16 +546,12 @@
           const lbPrev = lb ? lb.querySelector('.lb-prev') : null;
           const lbNext = lb ? lb.querySelector('.lb-next') : null;
           const lbCounter = lb ? lb.querySelector('.lb-counter') : null;
-          let idx = parseInt(main?.getAttribute('data-idx') || '0', 10) || 0;
+          let idx = 0;
 
-          function updateMain(to){
-            if (!main) return;
-            const i = Math.max(0, Math.min(images.length - 1, to));
-            if (images[i] && main.getAttribute('src') !== images[i]) {
-              main.setAttribute('src', images[i]);
-            }
-            main.setAttribute('data-idx', String(i));
-            idx = i;
+          function updateCarousel(to){
+            idx = Math.max(0, Math.min(images.length - 1, to));
+            if (track) track.style.transform = `translateX(-${idx * 100}%)`;
+            dots.forEach((d, i) => d.classList.toggle('active', i === idx));
           }
 
           function openLightbox(startIdx){
@@ -288,54 +569,92 @@
             lb.setAttribute('aria-hidden', 'true');
             document.body.style.overflow = '';
           }
-          function next(){ idx = (idx + 1) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
-          function prev(){ idx = (idx - 1 + images.length) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
+          function next(){ idx = (idx + 1) % images.length; if (lb.classList.contains('open')) { lbImg.src = images[idx]; lbCounter.textContent = (idx + 1) + ' / ' + images.length; } else { updateCarousel(idx); } }
+          function prev(){ idx = (idx - 1 + images.length) % images.length; if (lb.classList.contains('open')) { lbImg.src = images[idx]; lbCounter.textContent = (idx + 1) + ' / ' + images.length; } else { updateCarousel(idx); } }
 
-          // Thumbnail click: swap main and set index; Shift+Click opens lightbox
-          thumbs.forEach(function(btn){
-            btn.addEventListener('click', function(e){
-              const i = parseInt(this.getAttribute('data-idx') || '0', 10) || 0;
-              if (e.shiftKey) { openLightbox(i); return; }
-              updateMain(i);
-            });
+          // Carousel dot/thumb clicks
+          dots.forEach(d => d.addEventListener('click', () => updateCarousel(parseInt(d.dataset.idx))));
+          thumbs.forEach(t => t.addEventListener('click', () => updateCarousel(parseInt(t.dataset.idx))));
+
+          // Lightbox trigger on carousel image click
+          document.querySelectorAll('.carousel-slide img').forEach(img => {
+            img.addEventListener('click', () => openLightbox(parseInt(img.dataset.idx)));
           });
-
-          // Main cover click: open lightbox on current index
-          if (main) {
-            main.addEventListener('click', function(){
-              const i = parseInt(main.getAttribute('data-idx') || '0', 10) || 0;
-              openLightbox(i);
-            });
-          }
 
           // Lightbox interactions
           lbClose?.addEventListener('click', closeLightbox);
           lbPrev?.addEventListener('click', prev);
           lbNext?.addEventListener('click', next);
-          lbImg?.addEventListener('click', next); // click image to advance
+          lbImg?.addEventListener('click', next);
           lb?.addEventListener('click', function(e){ if (e.target === lb) closeLightbox(); });
 
-          // Keyboard support
+          // Keyboard
           document.addEventListener('keydown', function(e){
             if (!lb || !lb.classList.contains('open')) return;
-            if (e.key === 'Escape') { e.preventDefault(); closeLightbox(); }
-            else if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
-            else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+            if (e.key === 'Escape') closeLightbox();
+            else if (e.key === 'ArrowRight') next();
+            else if (e.key === 'ArrowLeft') prev();
           });
 
-          // Ensure initial main index reflects the list
-          if (images.length > 0 && main) {
-            let initial = images.indexOf(main.getAttribute('src'));
-            if (initial < 0) initial = 0;
-            main.setAttribute('data-idx', String(initial));
+          // Tabs
+          const tabs = document.querySelectorAll('.tab');
+          const contents = document.querySelectorAll('.tab-content');
+          tabs.forEach(t => {
+            t.addEventListener('click', () => {
+              const target = t.dataset.tab;
+              tabs.forEach(t2 => t2.classList.toggle('active', t2 === t));
+              contents.forEach(c => c.classList.toggle('active', c.id === `tab-${target}`));
+            });
+          });
+
+          // Handle tab parameter in URL
+          const urlParams = new URLSearchParams(window.location.search);
+          const activeTab = urlParams.get('tab');
+          if (activeTab) {
+            const tabEl = document.querySelector(`.tab[data-tab="${activeTab}"]`);
+            if (tabEl) tabEl.click();
           }
+
+          // Swipe support for carousel (basic)
+          let startX = 0;
+          track?.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+          track?.addEventListener('touchend', e => {
+            const diff = startX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) {
+              if (diff > 0) next(); else prev();
+            }
+          });
+
+          // Notes Toggle
+          (function(){
+            const btn = document.getElementById('editToggle');
+            const form = document.getElementById('notesForm');
+            const view = document.getElementById('notesView');
+            if (!btn || !form || !view) return;
+            btn.addEventListener('click', function(){
+                const open = form.style.display === 'none';
+                form.style.display = open ? 'flex' : 'none';
+                view.style.display = open ? 'none' : 'block';
+                btn.textContent = open ? 'Cancel' : 'Edit';
+                if (open) {
+                    // Switch to status tab if not active
+                    document.querySelector('.tab[data-tab="status"]').click();
+                }
+            });
+          })();
         });
       </script>
             </div>
 
-  
+    <script>
+    document.getElementById('mobile-toggle')?.addEventListener('click', function() {
+      document.getElementById('mobile-menu').classList.toggle('active');
+      this.textContent = document.getElementById('mobile-menu').classList.contains('active') ? '✕' : '☰';
+    });
+  </script>
+
   <footer class="site-footer muted" style="text-align:center;margin:24px 0 8px 0;font-size:.9rem;">
-  Powered by Discogs API & Coffee Since 2025 | Lovingly Crafted in Boise, Idaho
+  Powered by Discogs API & Coffee Since 2026 | Lovingly Crafted in Boise, Idaho
 </footer>
 </body>
 </html>

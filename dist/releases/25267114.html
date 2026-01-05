@@ -4,18 +4,197 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Duran Duran — Hammersmith &#039;82!</title>
+  <style>
+    :root {
+      --bg: #0b0b0c;
+      --card: #16171a;
+      --text: #e7e7ea;
+      --muted: #a0a3aa;
+      --accent: #67e8f9;
+      --border: #2a2b2f;
+      --header-bg: rgba(11, 11, 12, 0.8);
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    .content-wrap {
+      margin-top: 24px;
+      margin-bottom: 24px;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .muted { color: var(--muted); }
+
+    /* Layout Helpers */
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .gap-4 { gap: 16px; }
+    .gap-2 { gap: 8px; }
+
+    /* Common Components */
+    .btn-small {
+      font-size: .8rem;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--card);
+      color: var(--text);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-small:hover { border-color: var(--accent); text-decoration: none; }
+
+    /* Common Header Components */
+    .main-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--header-bg);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-content {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    /* Desktop Nav */
+    .desktop-nav { display: flex; align-items: center; gap: 20px; }
+    @media (max-width: 768px) { .desktop-nav { display: none; } }
+
+    /* Account Dropdown */
+    .dropdown { position: relative; display: inline-block; }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background: var(--card);
+      min-width: 160px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      padding: 8px 0;
+      z-index: 101;
+    }
+    .dropdown:hover .dropdown-content { display: block; }
+    .dropdown-item {
+      display: block;
+      padding: 8px 16px;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .dropdown-item:hover { background: rgba(255,255,255,0.05); }
+
+    /* Mobile Nav / Hamburger */
+    .mobile-nav-toggle {
+      display: none;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 8px;
+    }
+    @media (max-width: 768px) { .mobile-nav-toggle { display: block; } }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 65px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg);
+      z-index: 99;
+      padding: 20px;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .mobile-menu.active { display: flex; }
+    .mobile-menu .nav-item {
+        display: block;
+        padding: 12px 16px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: var(--text);
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .mobile-menu .nav-item:hover { border-color: var(--accent); }
+
+    /* Breadcrumbs */
+    .breadcrumbs {
+      padding: 12px 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .breadcrumbs a { color: var(--muted); }
+    .breadcrumbs span { margin: 0 8px; opacity: 0.5; }
+
+    /* Utility Bar (Mobile Sticky Search/Sort) */
+    .utility-bar {
+        display: none;
+        position: sticky;
+        top: 65px;
+        z-index: 90;
+        background: var(--bg);
+        padding: 8px 20px;
+        border-bottom: 1px solid var(--border);
+    }
+    @media (max-width: 768px) {
+        .utility-bar.is-visible { display: block; }
+    }
+  </style>
     <style>
-    :root { --bg:#0b0b0c; --card:#16171a; --text:#e7e7ea; --muted:#a0a3aa; --accent:#67e8f9; --overlay: rgba(0,0,0,.9); }
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif}
-    .wrap{max-width:1000px;margin:40px auto;padding:0 20px}
-    a{color:var(--accent);text-decoration:none}
-    a:hover{text-decoration:underline}
-    .layout{display:grid;grid-template-columns:280px 1fr;gap:24px}
+    :root { --overlay: rgba(0,0,0,.9); }
+    .layout{display:grid;grid-template-columns:1fr 1fr;gap:40px}
     .card{background:var(--card);border-radius:12px;overflow:hidden}
     .cover{width:100%;aspect-ratio:1/1;object-fit:cover;background:#222;cursor:zoom-in}
     .meta{padding:16px}
-    .muted{color:var(--muted)}
-    h1{margin:0 0 8px 0;font-size:1.6rem}
+    h1{margin:0 0 8px 0;font-size:2rem}
+
+    /* Carousel */
+    .carousel-container { position: relative; width: 100%; overflow: hidden; border-radius: 12px; }
+    .carousel-track { display: flex; transition: transform 0.3s ease-out; }
+    .carousel-slide { min-width: 100%; aspect-ratio: 1/1; }
+    .carousel-slide img { width: 100%; height: 100%; object-fit: cover; }
+    .carousel-dots { display: none; justify-content: center; gap: 8px; margin-top: 12px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); cursor: pointer; opacity: 0.5; }
+    .dot.active { background: var(--accent); opacity: 1; }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 4px; border-bottom: 1px solid #2a2b2f; margin-top: 24px; overflow-x: auto; scrollbar-width: none; }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab { padding: 12px 20px; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; white-space: nowrap; }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-content { display: none; padding-top: 20px; }
+    .tab-content.active { display: block; }
 
     /* Lightbox */
     .lightbox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--overlay);z-index:1000}
@@ -30,235 +209,368 @@
     .lb-counter{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);color:#fff;background:rgba(0,0,0,.5);padding:4px 10px;border-radius:999px;font-size:.9rem}
 
     @media (max-width: 800px){
-      .layout{grid-template-columns:1fr}
+      .layout{grid-template-columns:1fr; gap: 24px;}
+      .carousel-dots { display: flex; }
       .lb-prev{left:10px}
       .lb-next{right:10px}
+      .wrap { margin-top: 12px; }
     }
   </style>
 </head>
 <body>
-  
+  <header class="main-header">
     <div class="wrap">
-    <p><a href="../index.html">← Back</a></p>
-          <div class="layout">
+      <div class="header-content">
+        <a href="/" class="logo">My Music</a>
+
+        <div class="desktop-nav">
+          <a href="/?view=collection" class="muted">Collection</a>
+          <a href="/?view=wantlist" class="muted">Wantlist</a>
+          <a href="/random" class="muted">Surprise Me</a>
+          <a href="/stats" class="muted">Stats</a>
+          <a href="/about" class="muted">About</a>
+        </div>
+
+        <button class="mobile-nav-toggle" id="mobile-toggle" aria-label="Toggle menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="/?view=collection" class="nav-item">Collection</a>
+    <a href="/?view=wantlist" class="nav-item">Wantlist</a>
+    <a href="/random" class="nav-item">Surprise Me</a>
+    <a href="/stats" class="nav-item">Stats</a>
+    <a href="/about" class="nav-item">About</a>
+  </div>
+
+  <div class="wrap">
+      <nav class="breadcrumbs">
+    <div>
+      <a href="/">Home</a>
+      <span>/</span>
+      <a href="/?view=collection">Collection</a>
+      <span>/</span>
+      Hammersmith &#039;82!
+    </div>
+  </nav>
+  </div>
+
+  
+    <div class="wrap content-wrap">
+    <div style="margin-bottom:24px">
+      <p style="margin:0"><a href="../index.html" style="background:var(--card);border:1px solid #2a2b2f;padding:6px 12px;border-radius:8px;color:var(--text);font-size:.9rem;text-decoration:none">← Back</a></p>
+    </div>
+                <div class="layout">
         <div>
-          <div class="card">
-                          <img id="main-cover" class="cover" src="../images/25267114/6dd26cf897c1af75e6f9f10f0fdddb3c660b8843.jpg" alt="Hammersmith &#039;82! cover" data-idx="0" />
-                      </div>
-                      <div class="thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
-                              <button class="thumb" data-url="../images/25267114/6dd26cf897c1af75e6f9f10f0fdddb3c660b8843.jpg" data-idx="0" title="Image 1" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/25267114/6dd26cf897c1af75e6f9f10f0fdddb3c660b8843.jpg" alt="thumb 1" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:1" />
+          <div class="carousel-container" id="carousel">
+            <div class="carousel-track" id="carousel-track">
+                                                <div class="carousel-slide">
+                    <img class="cover" src="../images/25267114/6dd26cf897c1af75e6f9f10f0fdddb3c660b8843.jpg" alt="Hammersmith &#039;82! cover" data-idx="0" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/25267114/03a52926d7f6a9e022a16205d96457fa739446ce.jpg" alt="Hammersmith &#039;82! cover" data-idx="1" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/25267114/ed48afcb3a2bb285060458c8fc3b1983d7a66508.jpg" alt="Hammersmith &#039;82! cover" data-idx="2" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/25267114/1224d71c3ace3649c40e5dd55b822bcc1fb1df3d.jpg" alt="Hammersmith &#039;82! cover" data-idx="3" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/25267114/a69f98f16163b986bdfe02ffe4a55143d17ecd34.jpg" alt="Hammersmith &#039;82! cover" data-idx="4" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/25267114/cac555e771620d23444d078af748c1492a58e663.jpg" alt="Hammersmith &#039;82! cover" data-idx="5" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/25267114/85a7e4c82e1f49c9a58e961b7590d2323afdf2e9.jpg" alt="Hammersmith &#039;82! cover" data-idx="6" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/25267114/92e8a279e22d4edf6262b415173c146122d145e8.jpg" alt="Hammersmith &#039;82! cover" data-idx="7" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/25267114/684c94f097678f3cfa66d8e34bc7b527fc74913b.jpg" alt="Hammersmith &#039;82! cover" data-idx="8" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/25267114/5714f27748b7734eb434182ef5d882dccd70e202.jpg" alt="Hammersmith &#039;82! cover" data-idx="9" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/25267114/ff84361d3b2670a39a9e2ba59e46ab7d4b54032b.jpg" alt="Hammersmith &#039;82! cover" data-idx="10" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/25267114/b4f6a88b171321db837b898e1747a34a29622af1.jpg" alt="Hammersmith &#039;82! cover" data-idx="11" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/25267114/8d842faca706d4db58d6d6a10a1a1077afe0b11f.jpg" alt="Hammersmith &#039;82! cover" data-idx="12" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/25267114/0657e22545d99b6c4addb770ceaceb08b1289790.jpg" alt="Hammersmith &#039;82! cover" data-idx="13" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/25267114/59e54c20bf9d97f687dee1f7fbe3b33d53016d40.jpg" alt="Hammersmith &#039;82! cover" data-idx="14" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/25267114/4d1b1cc60ead81ada94c7c11202a2970d152a787.jpg" alt="Hammersmith &#039;82! cover" data-idx="15" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/25267114/04818913506511ff2575dd1310ab509b0da95535.jpg" alt="Hammersmith &#039;82! cover" data-idx="16" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/25267114/c33cf5596735cf9a615704fb7db202c51e4f555c.jpg" alt="Hammersmith &#039;82! cover" data-idx="17" />
+                  </div>
+                                          </div>
+          </div>
+                      <div class="carousel-dots" id="carousel-dots">
+                              <div class="dot active" data-idx="0"></div>
+                              <div class="dot " data-idx="1"></div>
+                              <div class="dot " data-idx="2"></div>
+                              <div class="dot " data-idx="3"></div>
+                              <div class="dot " data-idx="4"></div>
+                              <div class="dot " data-idx="5"></div>
+                              <div class="dot " data-idx="6"></div>
+                              <div class="dot " data-idx="7"></div>
+                              <div class="dot " data-idx="8"></div>
+                              <div class="dot " data-idx="9"></div>
+                              <div class="dot " data-idx="10"></div>
+                              <div class="dot " data-idx="11"></div>
+                              <div class="dot " data-idx="12"></div>
+                              <div class="dot " data-idx="13"></div>
+                              <div class="dot " data-idx="14"></div>
+                              <div class="dot " data-idx="15"></div>
+                              <div class="dot " data-idx="16"></div>
+                              <div class="dot " data-idx="17"></div>
+                          </div>
+            <div class="thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;">
+                              <button class="thumb" data-idx="0" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/25267114/6dd26cf897c1af75e6f9f10f0fdddb3c660b8843.jpg" alt="thumb 1" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:1" />
                 </button>
-                              <button class="thumb" data-url="../images/25267114/03a52926d7f6a9e022a16205d96457fa739446ce.jpg" data-idx="1" title="Image 2" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/25267114/03a52926d7f6a9e022a16205d96457fa739446ce.jpg" alt="thumb 2" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="1" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/25267114/03a52926d7f6a9e022a16205d96457fa739446ce.jpg" alt="thumb 2" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/25267114/ed48afcb3a2bb285060458c8fc3b1983d7a66508.jpg" data-idx="2" title="Image 3" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/25267114/ed48afcb3a2bb285060458c8fc3b1983d7a66508.jpg" alt="thumb 3" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="2" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/25267114/ed48afcb3a2bb285060458c8fc3b1983d7a66508.jpg" alt="thumb 3" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/25267114/1224d71c3ace3649c40e5dd55b822bcc1fb1df3d.jpg" data-idx="3" title="Image 4" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/25267114/1224d71c3ace3649c40e5dd55b822bcc1fb1df3d.jpg" alt="thumb 4" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="3" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/25267114/1224d71c3ace3649c40e5dd55b822bcc1fb1df3d.jpg" alt="thumb 4" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/25267114/a69f98f16163b986bdfe02ffe4a55143d17ecd34.jpg" data-idx="4" title="Image 5" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/25267114/a69f98f16163b986bdfe02ffe4a55143d17ecd34.jpg" alt="thumb 5" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="4" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/25267114/a69f98f16163b986bdfe02ffe4a55143d17ecd34.jpg" alt="thumb 5" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/25267114/cac555e771620d23444d078af748c1492a58e663.jpg" data-idx="5" title="Image 6" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/25267114/cac555e771620d23444d078af748c1492a58e663.jpg" alt="thumb 6" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="5" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/25267114/cac555e771620d23444d078af748c1492a58e663.jpg" alt="thumb 6" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/25267114/85a7e4c82e1f49c9a58e961b7590d2323afdf2e9.jpg" data-idx="6" title="Image 7" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/25267114/85a7e4c82e1f49c9a58e961b7590d2323afdf2e9.jpg" alt="thumb 7" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="6" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/25267114/85a7e4c82e1f49c9a58e961b7590d2323afdf2e9.jpg" alt="thumb 7" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/25267114/92e8a279e22d4edf6262b415173c146122d145e8.jpg" data-idx="7" title="Image 8" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/25267114/92e8a279e22d4edf6262b415173c146122d145e8.jpg" alt="thumb 8" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="7" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/25267114/92e8a279e22d4edf6262b415173c146122d145e8.jpg" alt="thumb 8" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/25267114/684c94f097678f3cfa66d8e34bc7b527fc74913b.jpg" data-idx="8" title="Image 9" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/25267114/684c94f097678f3cfa66d8e34bc7b527fc74913b.jpg" alt="thumb 9" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="8" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/25267114/684c94f097678f3cfa66d8e34bc7b527fc74913b.jpg" alt="thumb 9" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/25267114/5714f27748b7734eb434182ef5d882dccd70e202.jpg" data-idx="9" title="Image 10" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/25267114/5714f27748b7734eb434182ef5d882dccd70e202.jpg" alt="thumb 10" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="9" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/25267114/5714f27748b7734eb434182ef5d882dccd70e202.jpg" alt="thumb 10" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/25267114/ff84361d3b2670a39a9e2ba59e46ab7d4b54032b.jpg" data-idx="10" title="Image 11" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/25267114/ff84361d3b2670a39a9e2ba59e46ab7d4b54032b.jpg" alt="thumb 11" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="10" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/25267114/ff84361d3b2670a39a9e2ba59e46ab7d4b54032b.jpg" alt="thumb 11" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/25267114/b4f6a88b171321db837b898e1747a34a29622af1.jpg" data-idx="11" title="Image 12" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/25267114/b4f6a88b171321db837b898e1747a34a29622af1.jpg" alt="thumb 12" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="11" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/25267114/b4f6a88b171321db837b898e1747a34a29622af1.jpg" alt="thumb 12" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/25267114/8d842faca706d4db58d6d6a10a1a1077afe0b11f.jpg" data-idx="12" title="Image 13" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/25267114/8d842faca706d4db58d6d6a10a1a1077afe0b11f.jpg" alt="thumb 13" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="12" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/25267114/8d842faca706d4db58d6d6a10a1a1077afe0b11f.jpg" alt="thumb 13" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/25267114/0657e22545d99b6c4addb770ceaceb08b1289790.jpg" data-idx="13" title="Image 14" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/25267114/0657e22545d99b6c4addb770ceaceb08b1289790.jpg" alt="thumb 14" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="13" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/25267114/0657e22545d99b6c4addb770ceaceb08b1289790.jpg" alt="thumb 14" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/25267114/59e54c20bf9d97f687dee1f7fbe3b33d53016d40.jpg" data-idx="14" title="Image 15" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/25267114/59e54c20bf9d97f687dee1f7fbe3b33d53016d40.jpg" alt="thumb 15" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="14" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/25267114/59e54c20bf9d97f687dee1f7fbe3b33d53016d40.jpg" alt="thumb 15" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/25267114/4d1b1cc60ead81ada94c7c11202a2970d152a787.jpg" data-idx="15" title="Image 16" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/25267114/4d1b1cc60ead81ada94c7c11202a2970d152a787.jpg" alt="thumb 16" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="15" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/25267114/4d1b1cc60ead81ada94c7c11202a2970d152a787.jpg" alt="thumb 16" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/25267114/04818913506511ff2575dd1310ab509b0da95535.jpg" data-idx="16" title="Image 17" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/25267114/04818913506511ff2575dd1310ab509b0da95535.jpg" alt="thumb 17" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="16" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/25267114/04818913506511ff2575dd1310ab509b0da95535.jpg" alt="thumb 17" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
-                              <button class="thumb" data-url="../images/25267114/c33cf5596735cf9a615704fb7db202c51e4f555c.jpg" data-idx="17" title="Image 18" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/25267114/c33cf5596735cf9a615704fb7db202c51e4f555c.jpg" alt="thumb 18" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.85" />
+                              <button class="thumb" data-idx="17" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/25267114/c33cf5596735cf9a615704fb7db202c51e4f555c.jpg" alt="thumb 18" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                           </div>
                   </div>
         <div>
           <h1>Hammersmith &#039;82!</h1>
-          <p class="muted">Duran Duran • 2022</p>
+          <p class="muted" style="font-size:1.2rem">Duran Duran • 2022</p>
           <p class="muted">Worldwide</p>
-                      <p style="margin:8px 0;">
-              <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Electronic</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Rock</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Pop</span>              <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">New Wave</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Synth-pop</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:2px 8px;margin-right:6px;display:inline-block">Pop Rock</span>            </p>
-          
-                      <p class="muted">Formats:
-                              Vinyl (Gold, 40th Anniversary Edition)                          </p>
-          
+          <div style="margin:16px 0; display:flex; gap:8px; flex-wrap:wrap">
+            <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Electronic</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Rock</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Pop</span>            <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">New Wave</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Synth-pop</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Pop Rock</span>          </div>
+
                       <p class="muted">Labels:
               Parlophone (5054197132827)            </p>
           
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Tracklist</strong>
-                <ol>
-                                      <li>A1 — Rio <span class="muted">(5:50)</span></li>
-                                      <li>A2 — Hungry Like The Wolf <span class="muted">(4:13)</span></li>
-                                      <li>A3 — Night Boat <span class="muted">(5:10)</span></li>
-                                      <li>B1 — New Religion  <span class="muted">(5:51)</span></li>
-                                      <li>B2 — Save A Prayer <span class="muted">(6:24)</span></li>
-                                      <li>B3 — Planet Earth <span class="muted">(4:43)</span></li>
-                                      <li>C1 — Friends Of Mine <span class="muted">(5:22)</span></li>
-                                      <li>C2 — Careless Memories <span class="muted">(4:45)</span></li>
-                                      <li>D1 — Make Me Smile (Come Up And See Me) <span class="muted">(5:33)</span></li>
-                                      <li>D2 — Girls On Film <span class="muted">(7:09)</span></li>
-                                  </ol>
-              </div>
-            </div>
-          
-          
-          
-          <div class="card" style="margin-top:16px;">
-            <div class="meta">
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-                <strong>My Notes</strong>
-                              </div>
-
-              
-              <div id="notesView" style="margin-top:8px">
-                                                  <div class="muted">(none)</div>
-                              </div>
-
-                          </div>
+          <div class="tabs" id="release-tabs">
+            <div class="tab active" data-tab="tracks">Tracks</div>
+            <div class="tab" data-tab="details">Details</div>
+            <div class="tab" data-tab="credits">Credits</div>
+            <div class="tab" data-tab="status">Status & Notes</div>
           </div>
 
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Credits</strong>
-                <ul>
-                                      <li>
-                      Darren Evans
-                      <span class="muted">— Artwork</span>                                          </li>
-                                      <li>
-                      John Taylor
-                      <span class="muted">— Bass Guitar</span>                                          </li>
-                                      <li>
-                      Roger Taylor
-                      <span class="muted">— Drums</span>                                          </li>
-                                      <li>
-                      Andy Taylor
-                      <span class="muted">— Guitar</span>                                          </li>
-                                      <li>
-                      Geoff Pesche
-                      <span class="muted">— Lacquer Cut By [2022 Vinyl Edition Audio Prepared And Lacquer Cut By]</span>                                          </li>
-                                      <li>
-                      Simon Le Bon
-                      <span class="muted">— Lead Vocals</span>                                          </li>
-                                      <li>
-                      John Jackson
-                      <span class="muted">— Producer [2022 Vinyl Edition]</span>                                          </li>
-                                      <li>
-                      Ian Little
-                      <span class="muted">— Producer [Produced By]</span>                                          </li>
-                                      <li>
-                      Andy Hamilton
-                      <span class="muted">— Saxophone, Percussion, Piano</span>                                          </li>
-                                      <li>
-                      Andy Taylor
-                      <span class="muted">— Songwriter</span>                      <span class="muted"> (tracks: A1 to C2, D2)</span>                    </li>
-                                      <li>
-                      John Taylor
-                      <span class="muted">— Songwriter</span>                      <span class="muted"> (tracks: A1 to C2, D2)</span>                    </li>
-                                      <li>
-                      Nick Rhodes
-                      <span class="muted">— Songwriter</span>                      <span class="muted"> (tracks: A1 to C2, D2)</span>                    </li>
-                                      <li>
-                      Roger Taylor
-                      <span class="muted">— Songwriter</span>                      <span class="muted"> (tracks: A1 to C2, D2)</span>                    </li>
-                                      <li>
-                      Simon Le Bon
-                      <span class="muted">— Songwriter</span>                      <span class="muted"> (tracks: A1 to C2, D2)</span>                    </li>
-                                      <li>
-                      Nick Rhodes
-                      <span class="muted">— Synth</span>                                          </li>
-                                  </ul>
+          <div id="tab-tracks" class="tab-content active">
+                          <div class="card">
+                <div class="meta">
+                  <ol style="margin:0; padding-left:20px">
+                                          <li style="margin-bottom:8px">A1 — Rio <span class="muted">(5:50)</span></li>
+                                          <li style="margin-bottom:8px">A2 — Hungry Like The Wolf <span class="muted">(4:13)</span></li>
+                                          <li style="margin-bottom:8px">A3 — Night Boat <span class="muted">(5:10)</span></li>
+                                          <li style="margin-bottom:8px">B1 — New Religion  <span class="muted">(5:51)</span></li>
+                                          <li style="margin-bottom:8px">B2 — Save A Prayer <span class="muted">(6:24)</span></li>
+                                          <li style="margin-bottom:8px">B3 — Planet Earth <span class="muted">(4:43)</span></li>
+                                          <li style="margin-bottom:8px">C1 — Friends Of Mine <span class="muted">(5:22)</span></li>
+                                          <li style="margin-bottom:8px">C2 — Careless Memories <span class="muted">(4:45)</span></li>
+                                          <li style="margin-bottom:8px">D1 — Make Me Smile (Come Up And See Me) <span class="muted">(5:33)</span></li>
+                                          <li style="margin-bottom:8px">D2 — Girls On Film <span class="muted">(7:09)</span></li>
+                                      </ol>
+                </div>
               </div>
+                      </div>
+
+          <div id="tab-details" class="tab-content">
+            <div class="card">
+                <div class="meta">
+                                            <p class="muted"><strong>Formats:</strong>
+                                                    Vinyl (Gold, 40th Anniversary Edition)                                                </p>
+                                        
+                    
+                    
+                                            <p><strong>Barcodes:</strong></p>
+                        <ul style="margin:0; padding-left:20px" class="muted">
+                                                    <li>5 051497 132827 (Text)</li>
+                                                    <li>5054197132827 (Scanned, EAN-13)</li>
+                                                </ul>
+                                    </div>
             </div>
-          
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Companies</strong>
-                <ul>
-                                      <li>
-                      Parlophone Records Ltd.
-                      <span class="muted"> — Phonographic Copyright (p)</span>                                          </li>
-                                      <li>
-                      Parlophone Records Ltd.
-                      <span class="muted"> — Copyright (c)</span>                                          </li>
-                                      <li>
-                      Warner Music Group
-                      <span class="muted"> — Record Company</span>                                          </li>
-                                      <li>
-                      Warner Music UK Ltd.
-                      <span class="muted"> — Licensed To</span>                                          </li>
-                                      <li>
-                      Gloucester Place Music Ltd.
-                      <span class="muted"> — Published By</span>                                          </li>
-                                      <li>
-                      EMI Music Publishing Ltd.
-                      <span class="muted"> — Published By</span>                                          </li>
-                                      <li>
-                      Trigram RAK Publishing Ltd.
-                      <span class="muted"> — Published By</span>                                          </li>
-                                      <li>
-                      Hammersmith Odeon
-                      <span class="muted"> — Recorded At</span>                                          </li>
-                                      <li>
-                      Optimal Media GmbH
-                      <span class="muted"> — Pressed By</span>                                          </li>
-                                  </ul>
-              </div>
+          </div>
+
+          <div id="tab-credits" class="tab-content">
+                             <div class="card">
+                    <div class="meta">
+                                                    <p><strong>Credits:</strong></p>
+                            <ul style="margin:0; padding-left:20px" class="muted">
+                                                            <li style="margin-bottom:4px">
+                                Darren Evans
+                                 — Artwork                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                John Taylor
+                                 — Bass Guitar                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Roger Taylor
+                                 — Drums                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Andy Taylor
+                                 — Guitar                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Geoff Pesche
+                                 — Lacquer Cut By [2022 Vinyl Edition Audio Prepared And Lacquer Cut By]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Simon Le Bon
+                                 — Lead Vocals                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                John Jackson
+                                 — Producer [2022 Vinyl Edition]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Ian Little
+                                 — Producer [Produced By]                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Andy Hamilton
+                                 — Saxophone, Percussion, Piano                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Andy Taylor
+                                 — Songwriter                                 (tracks: A1 to C2, D2)                                </li>
+                                                            <li style="margin-bottom:4px">
+                                John Taylor
+                                 — Songwriter                                 (tracks: A1 to C2, D2)                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Nick Rhodes
+                                 — Songwriter                                 (tracks: A1 to C2, D2)                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Roger Taylor
+                                 — Songwriter                                 (tracks: A1 to C2, D2)                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Simon Le Bon
+                                 — Songwriter                                 (tracks: A1 to C2, D2)                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Nick Rhodes
+                                 — Synth                                                                </li>
+                                                        </ul>
+                        
+                                                    <p style="margin-top:16px"><strong>Companies:</strong></p>
+                            <ul style="margin:0; padding-left:20px" class="muted">
+                                                            <li style="margin-bottom:4px">
+                                Parlophone Records Ltd.
+                                 — Phonographic Copyright (p)                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Parlophone Records Ltd.
+                                 — Copyright (c)                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Warner Music Group
+                                 — Record Company                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Warner Music UK Ltd.
+                                 — Licensed To                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Gloucester Place Music Ltd.
+                                 — Published By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                EMI Music Publishing Ltd.
+                                 — Published By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Trigram RAK Publishing Ltd.
+                                 — Published By                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Hammersmith Odeon
+                                 — Recorded At                                                                </li>
+                                                            <li style="margin-bottom:4px">
+                                Optimal Media GmbH
+                                 — Pressed By                                                                </li>
+                                                        </ul>
+                                            </div>
+                </div>
+                       </div>
+
+          <div id="tab-status" class="tab-content">
+            <div class="card">
+                <div class="meta">
+                    <div style="margin-bottom:16px">
+                        <strong>Discogs Status</strong>
+                        <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+                                                        <form method="post" action="/release/save" style="margin:0">
+                                <input type="hidden" name="_token" value="" />
+                                <input type="hidden" name="release_id" value="25267114" />
+                                <input type="hidden" name="action" value="want_to_collection" />
+                                <input type="hidden" name="return" value="../index.html" />
+                                <button type="submit" style="background:var(--card);color:var(--accent);border:1px solid #2a2b2f;border-radius:8px;padding:6px 10px;cursor:pointer">Add to Collection</button>
+                            </form>
+                            
+                                                        <form method="post" action="/release/save" style="margin:0">
+                                <input type="hidden" name="_token" value="" />
+                                <input type="hidden" name="release_id" value="25267114" />
+                                <input type="hidden" name="action" value="add_want" />
+                                <input type="hidden" name="return" value="../index.html" />
+                                <button type="submit" class="muted" style="background:transparent;border:1px solid #2a2b2f;border-radius:8px;padding:6px 10px;cursor:pointer;color:inherit">Add to Wantlist</button>
+                            </form>
+                                                    </div>
+                    </div>
+
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                        <strong>My Notes</strong>
+                                            </div>
+
+                    <div id="notesView" style="margin-top:8px">
+                                                                                                                    </div>
+                                                         </div>
             </div>
-          
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Barcodes</strong>
-                <ul>
-                                      <li>5 051497 132827 <span class="muted">(Text)</span></li>
-                                      <li>5054197132827 <span class="muted">(Scanned, EAN-13)</span></li>
-                                  </ul>
-              </div>
-            </div>
-          
-                      <div class="card" style="margin-top:16px;">
-              <div class="meta"><strong>Identifiers</strong>
-                <ul>
-                                      <li>Rights Society: GEMA/MCPS</li>
-                                      <li>Matrix / Runout: BM74602-01 A1 5054197132827-01 =1 <span class="muted">(Side A runout, variant 1)</span></li>
-                                      <li>Matrix / Runout: BM74602-01 B1 5054197132827-01 =1 <span class="muted">(Side B runout, variant 1)</span></li>
-                                      <li>Matrix / Runout: BM74602-02 C1 5054197132827-02 1I <span class="muted">(Side C runout, variant 1)</span></li>
-                                      <li>Matrix / Runout: BM74602-02 D1 5054197132827-02 1I <span class="muted">(Side D runout, variant 1)</span></li>
-                                      <li>Matrix / Runout: BM74602-01 A1 5054197132827-01 1= <span class="muted">(Side A runout, variant 2)</span></li>
-                                      <li>Matrix / Runout: BM74602-01 B1 5054197132827-01 1+ <span class="muted">(Side B runout, variant 2)</span></li>
-                                      <li>Matrix / Runout: BM74602-02 C1 5054197132827-02 1I <span class="muted">(Side C runout, variant 2)</span></li>
-                                      <li>Matrix / Runout: BM74602-02 D1 5054197132827-02 <span class="muted">(Side D runout, variant 2)</span></li>
-                                  </ul>
-              </div>
-            </div>
-                  </div>
+          </div>
+        </div>
       </div>
 
             <!-- Lightbox overlay -->
@@ -276,7 +588,8 @@
         document.addEventListener('DOMContentLoaded', function(){
           const images = [
             '..\/images\/25267114\/6dd26cf897c1af75e6f9f10f0fdddb3c660b8843.jpg', '..\/images\/25267114\/03a52926d7f6a9e022a16205d96457fa739446ce.jpg', '..\/images\/25267114\/ed48afcb3a2bb285060458c8fc3b1983d7a66508.jpg', '..\/images\/25267114\/1224d71c3ace3649c40e5dd55b822bcc1fb1df3d.jpg', '..\/images\/25267114\/a69f98f16163b986bdfe02ffe4a55143d17ecd34.jpg', '..\/images\/25267114\/cac555e771620d23444d078af748c1492a58e663.jpg', '..\/images\/25267114\/85a7e4c82e1f49c9a58e961b7590d2323afdf2e9.jpg', '..\/images\/25267114\/92e8a279e22d4edf6262b415173c146122d145e8.jpg', '..\/images\/25267114\/684c94f097678f3cfa66d8e34bc7b527fc74913b.jpg', '..\/images\/25267114\/5714f27748b7734eb434182ef5d882dccd70e202.jpg', '..\/images\/25267114\/ff84361d3b2670a39a9e2ba59e46ab7d4b54032b.jpg', '..\/images\/25267114\/b4f6a88b171321db837b898e1747a34a29622af1.jpg', '..\/images\/25267114\/8d842faca706d4db58d6d6a10a1a1077afe0b11f.jpg', '..\/images\/25267114\/0657e22545d99b6c4addb770ceaceb08b1289790.jpg', '..\/images\/25267114\/59e54c20bf9d97f687dee1f7fbe3b33d53016d40.jpg', '..\/images\/25267114\/4d1b1cc60ead81ada94c7c11202a2970d152a787.jpg', '..\/images\/25267114\/04818913506511ff2575dd1310ab509b0da95535.jpg', '..\/images\/25267114\/c33cf5596735cf9a615704fb7db202c51e4f555c.jpg'          ];
-          const main = document.getElementById('main-cover');
+          const track = document.getElementById('carousel-track');
+          const dots = document.querySelectorAll('.dot');
           const thumbs = document.querySelectorAll('.thumb');
           const lb = document.getElementById('lightbox');
           const lbImg = lb ? lb.querySelector('.lb-img') : null;
@@ -284,16 +597,12 @@
           const lbPrev = lb ? lb.querySelector('.lb-prev') : null;
           const lbNext = lb ? lb.querySelector('.lb-next') : null;
           const lbCounter = lb ? lb.querySelector('.lb-counter') : null;
-          let idx = parseInt(main?.getAttribute('data-idx') || '0', 10) || 0;
+          let idx = 0;
 
-          function updateMain(to){
-            if (!main) return;
-            const i = Math.max(0, Math.min(images.length - 1, to));
-            if (images[i] && main.getAttribute('src') !== images[i]) {
-              main.setAttribute('src', images[i]);
-            }
-            main.setAttribute('data-idx', String(i));
-            idx = i;
+          function updateCarousel(to){
+            idx = Math.max(0, Math.min(images.length - 1, to));
+            if (track) track.style.transform = `translateX(-${idx * 100}%)`;
+            dots.forEach((d, i) => d.classList.toggle('active', i === idx));
           }
 
           function openLightbox(startIdx){
@@ -311,54 +620,92 @@
             lb.setAttribute('aria-hidden', 'true');
             document.body.style.overflow = '';
           }
-          function next(){ idx = (idx + 1) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
-          function prev(){ idx = (idx - 1 + images.length) % images.length; if (lbImg){ lbImg.src = images[idx]; } if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length; }
+          function next(){ idx = (idx + 1) % images.length; if (lb.classList.contains('open')) { lbImg.src = images[idx]; lbCounter.textContent = (idx + 1) + ' / ' + images.length; } else { updateCarousel(idx); } }
+          function prev(){ idx = (idx - 1 + images.length) % images.length; if (lb.classList.contains('open')) { lbImg.src = images[idx]; lbCounter.textContent = (idx + 1) + ' / ' + images.length; } else { updateCarousel(idx); } }
 
-          // Thumbnail click: swap main and set index; Shift+Click opens lightbox
-          thumbs.forEach(function(btn){
-            btn.addEventListener('click', function(e){
-              const i = parseInt(this.getAttribute('data-idx') || '0', 10) || 0;
-              if (e.shiftKey) { openLightbox(i); return; }
-              updateMain(i);
-            });
+          // Carousel dot/thumb clicks
+          dots.forEach(d => d.addEventListener('click', () => updateCarousel(parseInt(d.dataset.idx))));
+          thumbs.forEach(t => t.addEventListener('click', () => updateCarousel(parseInt(t.dataset.idx))));
+
+          // Lightbox trigger on carousel image click
+          document.querySelectorAll('.carousel-slide img').forEach(img => {
+            img.addEventListener('click', () => openLightbox(parseInt(img.dataset.idx)));
           });
-
-          // Main cover click: open lightbox on current index
-          if (main) {
-            main.addEventListener('click', function(){
-              const i = parseInt(main.getAttribute('data-idx') || '0', 10) || 0;
-              openLightbox(i);
-            });
-          }
 
           // Lightbox interactions
           lbClose?.addEventListener('click', closeLightbox);
           lbPrev?.addEventListener('click', prev);
           lbNext?.addEventListener('click', next);
-          lbImg?.addEventListener('click', next); // click image to advance
+          lbImg?.addEventListener('click', next);
           lb?.addEventListener('click', function(e){ if (e.target === lb) closeLightbox(); });
 
-          // Keyboard support
+          // Keyboard
           document.addEventListener('keydown', function(e){
             if (!lb || !lb.classList.contains('open')) return;
-            if (e.key === 'Escape') { e.preventDefault(); closeLightbox(); }
-            else if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
-            else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+            if (e.key === 'Escape') closeLightbox();
+            else if (e.key === 'ArrowRight') next();
+            else if (e.key === 'ArrowLeft') prev();
           });
 
-          // Ensure initial main index reflects the list
-          if (images.length > 0 && main) {
-            let initial = images.indexOf(main.getAttribute('src'));
-            if (initial < 0) initial = 0;
-            main.setAttribute('data-idx', String(initial));
+          // Tabs
+          const tabs = document.querySelectorAll('.tab');
+          const contents = document.querySelectorAll('.tab-content');
+          tabs.forEach(t => {
+            t.addEventListener('click', () => {
+              const target = t.dataset.tab;
+              tabs.forEach(t2 => t2.classList.toggle('active', t2 === t));
+              contents.forEach(c => c.classList.toggle('active', c.id === `tab-${target}`));
+            });
+          });
+
+          // Handle tab parameter in URL
+          const urlParams = new URLSearchParams(window.location.search);
+          const activeTab = urlParams.get('tab');
+          if (activeTab) {
+            const tabEl = document.querySelector(`.tab[data-tab="${activeTab}"]`);
+            if (tabEl) tabEl.click();
           }
+
+          // Swipe support for carousel (basic)
+          let startX = 0;
+          track?.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+          track?.addEventListener('touchend', e => {
+            const diff = startX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) {
+              if (diff > 0) next(); else prev();
+            }
+          });
+
+          // Notes Toggle
+          (function(){
+            const btn = document.getElementById('editToggle');
+            const form = document.getElementById('notesForm');
+            const view = document.getElementById('notesView');
+            if (!btn || !form || !view) return;
+            btn.addEventListener('click', function(){
+                const open = form.style.display === 'none';
+                form.style.display = open ? 'flex' : 'none';
+                view.style.display = open ? 'none' : 'block';
+                btn.textContent = open ? 'Cancel' : 'Edit';
+                if (open) {
+                    // Switch to status tab if not active
+                    document.querySelector('.tab[data-tab="status"]').click();
+                }
+            });
+          })();
         });
       </script>
             </div>
 
-  
+    <script>
+    document.getElementById('mobile-toggle')?.addEventListener('click', function() {
+      document.getElementById('mobile-menu').classList.toggle('active');
+      this.textContent = document.getElementById('mobile-menu').classList.contains('active') ? '✕' : '☰';
+    });
+  </script>
+
   <footer class="site-footer muted" style="text-align:center;margin:24px 0 8px 0;font-size:.9rem;">
-  Powered by Discogs API & Coffee Since 2025 | Lovingly Crafted in Boise, Idaho
+  Powered by Discogs API & Coffee Since 2026 | Lovingly Crafted in Boise, Idaho
 </footer>
 </body>
 </html>
