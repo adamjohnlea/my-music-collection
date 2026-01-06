@@ -22,6 +22,7 @@ class SyncEnrichCommand extends Command
     {
         $this->addOption('limit', null, InputOption::VALUE_REQUIRED, 'Max releases to enrich in this run', '100');
         $this->addOption('id', null, InputOption::VALUE_REQUIRED, 'Enrich a specific release id');
+        $this->addOption('force', 'f', InputOption::VALUE_NONE, 'Enrich releases even if they were already enriched');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -66,8 +67,9 @@ class SyncEnrichCommand extends Command
 
         $limit = (int)$input->getOption('limit');
         if ($limit <= 0) $limit = 100;
-        $output->writeln("<info>Enriching up to $limit releases missing details…</info>");
-        $n = $enricher->enrichMissing($limit);
+        $force = (bool)$input->getOption('force');
+        $output->writeln("<info>Enriching up to $limit releases" . ($force ? " (forced)" : " missing details") . "…</info>");
+        $n = $enricher->enrichMissing($limit, $force);
         $errors = $enricher->getErrors();
         $output->writeln("<info>Enrichment complete. Updated $n releases.</info>");
         if (!empty($errors)) {

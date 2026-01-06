@@ -138,4 +138,10 @@ class SqliteReleaseRepository implements ReleaseRepositoryInterface
             ':json' => json_encode($recommendations)
         ]);
     }
+
+    public function updateAppleMusicId(int $releaseId, string $appleMusicId): void
+    {
+        $st = $this->pdo->prepare('UPDATE releases SET apple_music_id = :amid WHERE id = :rid');
+        $st->execute([':amid' => $appleMusicId, ':rid' => $releaseId]);
+    }
 }

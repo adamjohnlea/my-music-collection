@@ -70,6 +70,16 @@ final class Config
         return $this->env('ANTHROPIC_API_KEY');
     }
 
+    public function getAppleMusicDeveloperToken(): ?string
+    {
+        return $this->env('APPLE_MUSIC_DEVELOPER_TOKEN');
+    }
+
+    public function getAppleMusicStorefront(): string
+    {
+        return $this->env('APPLE_MUSIC_STOREFRONT', 'us') ?? 'us';
+    }
+
     public function hasValidCredentials(): bool
     {
         $username = $this->getDiscogsUsername();

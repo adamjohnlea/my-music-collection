@@ -179,6 +179,10 @@
             {% else %}
                <p class="muted">No tracklist available.</p>
             {% endif %}
+
+            <div id="apple-music-player-container" style="margin-top:24px; display:none;">
+              <div id="apple-music-player"></div>
+            </div>
           </div>
 
           <div id="tab-details" class="tab-content">
@@ -539,6 +543,25 @@
                     document.querySelector('.tab[data-tab="status"]').click();
                 }
             });
+          })();
+
+          // Apple Music Player
+          (async function loadAppleMusicPlayer() {
+              const container = document.getElementById('apple-music-player-container');
+              const player = document.getElementById('apple-music-player');
+              if (!container || !player) return;
+
+              try {
+                  const res = await fetch(`/release/{{ release.id }}/apple-music-id`);
+                  const data = await res.json();
+
+                  if (data.apple_music_id) {
+                      container.style.display = 'block';
+                      player.innerHTML = `<iframe allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" frameborder="0" height="450" style="width:100%;max-width:660px;overflow:hidden;border-radius:10px;" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="https://embed.music.apple.com/us/album/${data.apple_music_id}"></iframe>`;
+                  }
+              } catch (e) {
+                  console.error('Failed to load Apple Music player:', e);
+              }
           })();
         });
       </script>

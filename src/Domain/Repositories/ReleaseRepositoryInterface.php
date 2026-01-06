@@ -16,4 +16,5 @@ interface ReleaseRepositoryInterface
     public function getImages(int $releaseId): array;
     public function getCachedRecommendations(int $releaseId): ?array;
     public function saveRecommendations(int $releaseId, array $recommendations): void;
+    public function updateAppleMusicId(int $releaseId, string $appleMusicId): void;
 }

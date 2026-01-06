@@ -6,6 +6,7 @@ use App\Infrastructure\MigrationRunner;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\ReleaseController;
 use App\Http\Controllers\RecommendationController;
+use App\Http\Controllers\AppleMusicController;
 use App\Http\Controllers\SearchController;
 use Dotenv\Dotenv;
 use Twig\Environment;
@@ -73,6 +74,7 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     $r->addRoute('POST', '/release/add', [ReleaseController::class, 'add']);
     $r->addRoute('GET', '/release/{id:\d+}', [ReleaseController::class, 'show']);
     $r->addRoute('GET', '/release/{id:\d+}/recommendations', [RecommendationController::class, 'getRecommendations']);
+    $r->addRoute('GET', '/release/{id:\d+}/apple-music-id', [AppleMusicController::class, 'getAppleMusicId']);
     $r->addRoute('POST', '/saved-searches', [SearchController::class, 'save']);
     $r->addRoute('POST', '/saved-searches/delete', [SearchController::class, 'delete']);
     $r->addRoute('GET', '/', [CollectionController::class, 'index']);
@@ -108,6 +110,8 @@ switch ($routeInfo[0]) {
             $controller->show((int)$vars['id'], $currentUser);
         } elseif ($handler[0] === RecommendationController::class && $method === 'getRecommendations') {
             $controller->getRecommendations((int)$vars['id'], $currentUser);
+        } elseif ($handler[0] === AppleMusicController::class && $method === 'getAppleMusicId') {
+            $controller->getAppleMusicId((int)$vars['id']);
         } elseif (in_array($handler[0], [CollectionController::class, SearchController::class, ReleaseController::class])) {
             $controller->$method($currentUser);
         } else {

@@ -64,7 +64,7 @@ class ReleaseEnricher
             if ($names) $artistSummary = implode(', ', $names);
         }
 
-        $stmt = $this->pdo->prepare('UPDATE releases SET title = COALESCE(:title, title), artist = COALESCE(:artist, artist), year = COALESCE(:year, year), formats = COALESCE(:formats, formats), labels = COALESCE(:labels, labels), country = COALESCE(:country, country), genres = :genres, styles = :styles, tracklist = :tracklist, master_id = :master_id, data_quality = :data_quality, videos = :videos, extraartists = :extraartists, companies = :companies, identifiers = :identifiers, notes = :notes, updated_at = :updated_at, enriched_at = :updated_at, raw_json = :raw_json WHERE id = :id');
+        $stmt = $this->pdo->prepare('UPDATE releases SET title = COALESCE(:title, title), artist = COALESCE(:artist, artist), year = COALESCE(:year, year), formats = COALESCE(:formats, formats), labels = COALESCE(:labels, labels), country = COALESCE(:country, country), genres = :genres, styles = :styles, tracklist = :tracklist, master_id = :master_id, data_quality = :data_quality, videos = :videos, extraartists = :extraartists, companies = :companies, identifiers = :identifiers, notes = :notes, updated_at = :updated_at, enriched_at = :updated_at, raw_json = :raw_json, apple_music_id = NULL WHERE id = :id');
         $stmt->execute([
             ':id' => $releaseId,
             ':title' => $title,
@@ -103,12 +103,16 @@ class ReleaseEnricher
         }
     }
 
-    public function enrichMissing(int $limit = 100): int
+    public function enrichMissing(int $limit = 100, bool $force = false): int
     {
         // reset previous errors
         $this->errors = [];
         // Select releases that have not yet been enriched in this database (explicit marker)
-        $stmt = $this->pdo->query('SELECT id FROM releases WHERE enriched_at IS NULL ORDER BY imported_at ASC LIMIT ' . (int)$limit);
+        $sql = 'SELECT id FROM releases WHERE enriched_at IS NULL ORDER BY imported_at ASC LIMIT ' . (int)$limit;
+        if ($force) {
+            $sql = 'SELECT id FROM releases ORDER BY enriched_at ASC, imported_at ASC LIMIT ' . (int)$limit;
+        }
+        $stmt = $this->pdo->query($sql);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $n = 0;
         foreach ($rows as $r) {

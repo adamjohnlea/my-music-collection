@@ -94,6 +94,11 @@ class MigrationRunner
                 $this->setVersion('14');
                 $version = '14';
             }
+            if ($version === '14') {
+                $this->migrateToV15();
+                $this->setVersion('15');
+                $version = '15';
+            }
 
             $this->pdo->commit();
 
@@ -408,6 +413,12 @@ class MigrationRunner
             recommendation_json TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )');
+    }
+
+    private function migrateToV15(): void
+    {
+        // Add apple_music_id to releases
+        $this->pdo->exec("ALTER TABLE releases ADD COLUMN apple_music_id TEXT");
     }
 
     public function rebuildSearch(): void

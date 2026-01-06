@@ -20,6 +20,7 @@ Local‑first Discogs collection viewer written in PHP 8.4. Imports your collect
 - Live Discogs Search: find and add releases directly to your collection or wantlist from the web UI
 - AI-Powered Recommendations: get personalized recommendations for artists and releases based on what's in your collection (powered by Anthropic Claude)
 - Static Site Generator: export your collection as a standalone, portable web app
+- Apple Music Integration: listen to releases directly in the app (requires barcodes and an Apple Music Developer Token)
 
 ## Prerequisites
 - PHP 8.4 (Herd recommended)
@@ -146,6 +147,16 @@ The application uses Anthropic's Claude AI to provide personalized recommendatio
 3. **Discovery**: On any release page, click the **"Recommendations"** tab.
 4. **Results**: The AI suggests 5 similar artists or releases. Each recommendation includes a **"Live Search"** link to help you find it on Discogs immediately.
 5. **Caching**: Recommendations are cached locally for 30 days to save on API usage.
+
+## Apple Music Integration
+The application can embed an Apple Music player on release pages by matching the release's barcode (UPC).
+
+1. **Setup**: Add your `APPLE_MUSIC_DEVELOPER_TOKEN` to the `.env` file.
+   - This must be a valid JSON Web Token (JWT) signed with your Apple Music private key.
+2. **Enrichment**: Ensure your releases are enriched. The integration relies on barcodes, which are fetched during the enrichment process.
+   - Run `php bin/console sync:enrich --limit=100` to fetch details for your releases.
+3. **Usage**: Open any release page and click the **"Tracks"** tab. If a matching album is found on Apple Music, the player will appear automatically below the tracklist.
+4. **Caching**: Matches are stored in your local database to ensure the player loads instantly on subsequent visits.
 
 ## Sorting
 - Default: Added (newest first)

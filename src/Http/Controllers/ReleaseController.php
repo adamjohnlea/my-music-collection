@@ -130,7 +130,14 @@ class ReleaseController extends BaseController
             if (!empty($details['identifiers'])) {
                 foreach ($details['identifiers'] as $idf) {
                     $type = isset($idf['type']) ? (string)$idf['type'] : '';
-                    if (strcasecmp($type, 'Barcode') === 0) $details['barcodes'][] = $idf; else $details['other_identifiers'][] = $idf;
+                    if (strcasecmp($type, 'Barcode') === 0) {
+                        $idf['value'] = preg_replace('/[^0-9]/', '', (string)($idf['value'] ?? ''));
+                        if (!empty($idf['value'])) {
+                            $details['barcodes'][] = $idf;
+                        }
+                    } else {
+                        $details['other_identifiers'][] = $idf;
+                    }
                 }
             }
 

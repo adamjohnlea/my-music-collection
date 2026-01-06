@@ -61,6 +61,9 @@ class ContainerFactory
             Config::class => function() {
                 return new Config();
             },
+            AppleMusicClient::class => function(ContainerInterface $c) {
+                return new AppleMusicClient($c->get(Config::class)->getUserAgent());
+            },
         ]);
 
         return $builder->build();
