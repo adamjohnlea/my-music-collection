@@ -28,6 +28,16 @@
     .tab-content { display: none; padding-top: 20px; }
     .tab-content.active { display: block; }
 
+    /* Skeleton Loader */
+    @keyframes skeleton-loading {
+      0% { opacity: 1; }
+      50% { opacity: 0.4; }
+      100% { opacity: 1; }
+    }
+    .skeleton-loader div {
+      animation: skeleton-loading 1.5s infinite ease-in-out;
+    }
+
     /* Lightbox */
     .lightbox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--overlay);z-index:1000}
     .lightbox.open{display:flex}
@@ -150,6 +160,9 @@
             <div class="tab" data-tab="details">Details</div>
             <div class="tab" data-tab="credits">Credits</div>
             <div class="tab" data-tab="status">Status & Notes</div>
+            {% if auth_user.anthropic_api_key %}
+              <div class="tab" data-tab="recommendations">Recommendations</div>
+            {% endif %}
           </div>
 
           <div id="tab-tracks" class="tab-content active">
@@ -345,6 +358,22 @@
                 </div>
             </div>
           </div>
+
+          {% if auth_user.anthropic_api_key %}
+            <div id="tab-recommendations" class="tab-content">
+                <div class="card">
+                    <div class="meta" id="recommendations-container">
+                        <div class="skeleton-loader">
+                            <div style="height:20px; background:rgba(255,255,255,0.05); margin-bottom:12px; border-radius:4px; width:70%"></div>
+                            <div style="height:20px; background:rgba(255,255,255,0.05); margin-bottom:12px; border-radius:4px; width:90%"></div>
+                            <div style="height:20px; background:rgba(255,255,255,0.05); margin-bottom:12px; border-radius:4px; width:60%"></div>
+                            <div style="height:20px; background:rgba(255,255,255,0.05); margin-bottom:12px; border-radius:4px; width:80%"></div>
+                            <div style="height:20px; background:rgba(255,255,255,0.05); margin-bottom:12px; border-radius:4px; width:75%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          {% endif %}
         </div>
       </div>
 
@@ -432,8 +461,49 @@
               const target = t.dataset.tab;
               tabs.forEach(t2 => t2.classList.toggle('active', t2 === t));
               contents.forEach(c => c.classList.toggle('active', c.id === `tab-${target}`));
+
+              if (target === 'recommendations' && !t.dataset.loaded) {
+                fetchRecommendations();
+                t.dataset.loaded = 'true';
+              }
             });
           });
+
+          async function fetchRecommendations() {
+            const container = document.getElementById('recommendations-container');
+            try {
+              const res = await fetch(`/release/{{ release.id }}/recommendations`);
+              const data = await res.json();
+              
+              if (data.error) {
+                container.innerHTML = `<p class="muted">${data.error}</p>`;
+                return;
+              }
+
+              if (data.recommendations && data.recommendations.length > 0) {
+                let html = '<ul style="margin:0; padding-left:20px">';
+                data.recommendations.forEach(item => {
+                  const label = item.type === 'release' ? `${item.artist} — ${item.title}` : item.artist;
+                  const searchUrl = `/?q=${encodeURIComponent('discogs: ' + (item.type === 'artist' ? 'artist:' : '') + item.artist + (item.type === 'release' ? ' title:"' + item.title + '"' : ''))}`;
+                  
+                  html += `<li style="margin-bottom:12px">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px">
+                      <span><strong>${label}</strong> <span class="muted">(${item.type})</span></span>
+                      <div style="display:flex; gap:8px">
+                        <a href="${searchUrl}" class="muted" style="font-size:0.8rem; border:1px solid #2a2b2f; padding:2px 8px; border-radius:4px; text-decoration:none; color:var(--accent)">Live Search</a>
+                      </div>
+                    </div>
+                  </li>`;
+                });
+                html += '</ul>';
+                container.innerHTML = html;
+              } else {
+                container.innerHTML = '<p class="muted">No recommendations found.</p>';
+              }
+            } catch (e) {
+              container.innerHTML = '<p class="muted">Error loading recommendations.</p>';
+            }
+          }
 
           // Handle tab parameter in URL
           const urlParams = new URLSearchParams(window.location.search);

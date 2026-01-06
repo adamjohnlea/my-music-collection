@@ -18,6 +18,7 @@ Local‑first Discogs collection viewer written in PHP 8.4. Imports your collect
 - Statistics: visualization of your collection by artist, genre, decade, and format
 - Randomizer: "Surprise Me" button to pick a random release from your collection
 - Live Discogs Search: find and add releases directly to your collection or wantlist from the web UI
+- AI-Powered Recommendations: get personalized recommendations for artists and releases based on what's in your collection (powered by Anthropic Claude)
 - Static Site Generator: export your collection as a standalone, portable web app
 
 ## Prerequisites
@@ -39,6 +40,9 @@ APP_DEBUG=1
 # Discogs Credentials
 DISCOGS_USERNAME=your_username
 DISCOGS_TOKEN=your_personal_access_token
+
+# AI Recommendations (Optional)
+ANTHROPIC_API_KEY=your_anthropic_api_key
 ```
 
 2) Install dependencies
@@ -133,6 +137,15 @@ Any search query can be saved as a **Smart Collection**.
 1. Perform your search (e.g., `genre:jazz year:1950..1960 format:vinyl`).
 2. Click the **"Save Search"** button in the sidebar.
 3. Your search will now appear as a permanent shortcut in the sidebar, updating automatically as you add new releases to your collection.
+
+## AI Recommendations
+The application uses Anthropic's Claude AI to provide personalized recommendations.
+
+1. **Setup**: Add your `ANTHROPIC_API_KEY` to the `.env` file.
+2. **Personalized Context**: Claude looks at your top 5 artists and top 5 genres to understand your taste.
+3. **Discovery**: On any release page, click the **"Recommendations"** tab.
+4. **Results**: The AI suggests 5 similar artists or releases. Each recommendation includes a **"Live Search"** link to help you find it on Discogs immediately.
+5. **Caching**: Recommendations are cached locally for 30 days to save on API usage.
 
 ## Sorting
 - Default: Added (newest first)

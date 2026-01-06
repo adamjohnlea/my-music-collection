@@ -65,6 +65,11 @@ final class Config
         return $this->env('DISCOGS_TOKEN');
     }
 
+    public function getAnthropicKey(): ?string
+    {
+        return $this->env('ANTHROPIC_API_KEY');
+    }
+
     public function hasValidCredentials(): bool
     {
         $username = $this->getDiscogsUsername();

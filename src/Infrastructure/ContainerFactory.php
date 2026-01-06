@@ -58,6 +58,9 @@ class ContainerFactory
             Validator::class => function() {
                 return new Validator();
             },
+            Config::class => function() {
+                return new Config();
+            },
         ]);
 
         return $builder->build();

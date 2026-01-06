@@ -14,4 +14,6 @@ interface ReleaseRepositoryInterface
     public function getAll(string $username, string $itemsTable, string $orderBy, int $limit, int $offset): array;
     public function countAll(string $username, string $itemsTable): int;
     public function getImages(int $releaseId): array;
+    public function getCachedRecommendations(int $releaseId): ?array;
+    public function saveRecommendations(int $releaseId, array $recommendations): void;
 }

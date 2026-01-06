@@ -120,4 +120,22 @@ class SqliteReleaseRepository implements ReleaseRepositoryInterface
         $st->execute([':rid' => $releaseId]);
         return $st->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getCachedRecommendations(int $releaseId): ?array
+    {
+        $st = $this->pdo->prepare('SELECT recommendation_json FROM ai_recommendations WHERE release_id = :rid AND created_at > datetime("now", "-30 days")');
+        $st->execute([':rid' => $releaseId]);
+        $row = $st->fetch(PDO::FETCH_ASSOC);
+        if (!$row) return null;
+        return json_decode($row['recommendation_json'], true);
+    }
+
+    public function saveRecommendations(int $releaseId, array $recommendations): void
+    {
+        $st = $this->pdo->prepare('INSERT INTO ai_recommendations (release_id, recommendation_json, created_at) VALUES (:rid, :json, datetime("now")) ON CONFLICT(release_id) DO UPDATE SET recommendation_json = excluded.recommendation_json, created_at = excluded.created_at');
+        $st->execute([
+            ':rid' => $releaseId,
+            ':json' => json_encode($recommendations)
+        ]);
+    }
 }

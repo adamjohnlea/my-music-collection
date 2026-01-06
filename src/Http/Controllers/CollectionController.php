@@ -46,8 +46,8 @@ class CollectionController extends BaseController
 
         $page = max(1, (int)($_GET['page'] ?? 1));
         $perPage = max(1, min(60, (int)($_GET['per_page'] ?? 24)));
-        $sort = (string)($_GET['sort'] ?? 'added_desc');
         $q = trim((string)($_GET['q'] ?? ''));
+        $sort = (string)($_GET['sort'] ?? ($q !== '' ? 'relevance' : 'added_desc'));
         $view = (string)($_GET['view'] ?? 'collection'); // 'collection' or 'wantlist'
 
         $parsed = $this->queryParser->parse($q);
@@ -58,11 +58,9 @@ class CollectionController extends BaseController
         $chips = $parsed['chips'] ?? [];
         $filters = $parsed['filters'] ?? [];
         $isDiscogs = $parsed['is_discogs'] ?? false;
-        
-        file_put_contents('debug.log', "q: $q, isDiscogs: " . ($isDiscogs ? 'true' : 'false') . ", username: " . ($currentUser['discogs_username'] ?? 'NULL') . "\n", FILE_APPEND);
 
         if ($isDiscogs && !empty($currentUser['discogs_username'])) {
-            $this->handleDiscogsSearch($currentUser, $usernameFilter, $q, $filters, $page, $perPage, $sort, $chips, $savedSearches);
+            $this->handleDiscogsSearch($currentUser, $usernameFilter, $q, $filters, $page, $perPage, $sort, $chips, $savedSearches, $match);
             return;
         }
 
@@ -82,6 +80,15 @@ class CollectionController extends BaseController
             'label_asc'    => "json_extract(r.labels, '$[0].name') COLLATE NOCASE ASC, r.artist COLLATE NOCASE ASC, r.title COLLATE NOCASE ASC",
             'format_asc'   => "json_extract(r.formats, '$[0].name') COLLATE NOCASE ASC, r.artist COLLATE NOCASE ASC, r.title COLLATE NOCASE ASC",
         ];
+
+        if ($match !== '') {
+            $sorts = array_merge(['relevance' => 'rank'], $sorts);
+        }
+
+        if ($sort === 'relevance' && !isset($sorts['relevance'])) {
+            $sort = 'added_desc';
+        }
+
         $orderBy = $sorts[$sort] ?? $sorts['added_desc'];
         $offset = ($page - 1) * $perPage;
 
@@ -138,6 +145,7 @@ class CollectionController extends BaseController
             'total' => $total,
             'sort' => $sort,
             'q' => $q,
+            'match' => $match,
             'view' => $view,
             'chips' => $chips,
             'saved_searches' => $savedSearches,
@@ -173,7 +181,7 @@ class CollectionController extends BaseController
         $this->render('about.html.twig', ['title' => 'About this app']);
     }
 
-    private function handleDiscogsSearch(array $currentUser, string $usernameFilter, string $q, array $filters, int $page, int $perPage, string $sort, array $chips, array $savedSearches): void
+    private function handleDiscogsSearch(array $currentUser, string $usernameFilter, string $q, array $filters, int $page, int $perPage, string $sort, array $chips, array $savedSearches, string $match): void
     {
         $discogsClient = new DiscogsHttpClient('MyMusicCollection/1.0', $currentUser['discogs_token'], new KvStore($this->pdo));
         $http = $discogsClient->client();
@@ -182,6 +190,7 @@ class CollectionController extends BaseController
         $params = [
             'per_page' => $perPage,
             'page' => $page,
+            'sort' => 'relevance',
         ];
 
         if (isset($filters['type'])) {
@@ -244,6 +253,7 @@ class CollectionController extends BaseController
                     'artist' => '',
                     'year' => isset($res['year']) ? (int)$res['year'] : null,
                     'image' => $res['thumb'] ?? $res['cover_image'] ?? null,
+                    'uri' => $res['uri'] ?? null,
                     'in_collection' => $inCollection,
                     'in_wantlist' => $inWantlist,
                     'is_discogs_result' => true,
@@ -258,6 +268,7 @@ class CollectionController extends BaseController
                 'total' => $total,
                 'sort' => $sort,
                 'q' => $q,
+                'match' => $match,
                 'view' => 'discogs',
                 'chips' => $chips,
                 'saved_searches' => $savedSearches,

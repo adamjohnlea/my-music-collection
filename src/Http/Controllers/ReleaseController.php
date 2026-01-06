@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 use App\Domain\Repositories\CollectionRepositoryInterface;
 use App\Domain\Repositories\ReleaseRepositoryInterface;
 use App\Http\DiscogsHttpClient;
+use App\Infrastructure\Config;
 use App\Infrastructure\KvStore;
 use App\Http\Validation\Validator;
 use PDO;
@@ -16,6 +17,7 @@ class ReleaseController extends BaseController
     public function __construct(
         Environment $twig,
         private PDO $pdo,
+        private Config $config,
         private ReleaseRepositoryInterface $releaseRepository,
         private CollectionRepositoryInterface $collectionRepository,
         Validator $validator
@@ -26,6 +28,48 @@ class ReleaseController extends BaseController
     public function show(int $rid, ?array $currentUser): void
     {
         $release = $this->releaseRepository->findById($rid);
+
+        // If not found locally, try to fetch from Discogs
+        if (!$release && $currentUser && !empty($currentUser['discogs_token'])) {
+            $discogsClient = new DiscogsHttpClient(
+                $this->config->getUserAgent(),
+                $currentUser['discogs_token'],
+                new KvStore($this->pdo)
+            );
+            $http = $discogsClient->client();
+            try {
+                $resp = $http->request('GET', sprintf('releases/%d', $rid));
+                if ($resp->getStatusCode() === 200) {
+                    $data = json_decode((string)$resp->getBody(), true);
+                    $now = gmdate('c');
+                    $title = $data['title'] ?? null;
+                    $artists = $data['artists'] ?? [];
+                    $names = [];
+                    foreach ($artists as $a) { $n = $a['name'] ?? null; if ($n) $names[] = $n; }
+                    $artistSummary = $names ? implode(', ', $names) : null;
+                    $year = isset($data['year']) ? (int)$data['year'] : null;
+                    $thumb = $data['thumb'] ?? null;
+                    $cover = $data['images'][0]['uri'] ?? $data['cover_image'] ?? null;
+
+                    $this->releaseRepository->save([
+                        ':id' => $rid,
+                        ':title' => $title,
+                        ':artist' => $artistSummary,
+                        ':year' => $year,
+                        ':thumb_url' => $thumb,
+                        ':cover_url' => $cover,
+                        ':imported_at' => $now,
+                        ':updated_at' => $now,
+                        ':raw_json' => json_encode($data, JSON_UNESCAPED_SLASHES)
+                    ]);
+                    
+                    // Re-fetch from DB to get the standard array format
+                    $release = $this->releaseRepository->findById($rid);
+                }
+            } catch (\Throwable $e) {
+                error_log("Failed to fetch release $rid from Discogs: " . $e->getMessage());
+            }
+        }
 
         $imageUrl = null;
         $images = [];

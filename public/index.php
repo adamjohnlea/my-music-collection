@@ -5,8 +5,8 @@ use App\Infrastructure\ContainerFactory;
 use App\Infrastructure\MigrationRunner;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\ReleaseController;
+use App\Http\Controllers\RecommendationController;
 use App\Http\Controllers\SearchController;
-use App\Http\Controllers\SetupController;
 use Dotenv\Dotenv;
 use Twig\Environment;
 
@@ -35,14 +35,6 @@ if (file_exists($envPath.'/.env')) {
     Dotenv::createImmutable($envPath, '.env.example')->load();
 }
 
-// Check if setup is needed
-$config = new \App\Infrastructure\Config();
-$uri = $_SERVER['REQUEST_URI'] ?? '/';
-if (!$config->hasValidCredentials() && !str_starts_with($uri, '/setup')) {
-    header('Location: /setup');
-    exit;
-}
-
 // Bootstrap Container
 $container = ContainerFactory::create();
 
@@ -62,6 +54,7 @@ if ($discogsUsername && $discogsToken) {
         'email' => 'admin@example.com',
         'discogs_username' => $discogsUsername,
         'discogs_token' => $discogsToken,
+        'anthropic_api_key' => $config->getAnthropicKey(),
         'discogs_search_exclude_title' => (bool)$config->env('DISCOGS_SEARCH_EXCLUDE_TITLE', '0'),
     ];
 }
@@ -73,14 +66,13 @@ $twig->addGlobal('csrf_token', $_SESSION['csrf'] ?? '');
 
 // Router
 $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
-    $r->addRoute('GET', '/setup', [SetupController::class, 'index']);
-    $r->addRoute('POST', '/setup/save', [SetupController::class, 'save']);
     $r->addRoute('GET', '/about', [CollectionController::class, 'about']);
     $r->addRoute('GET', '/stats', [CollectionController::class, 'stats']);
     $r->addRoute('GET', '/random', [CollectionController::class, 'random']);
     $r->addRoute('POST', '/release/save', [ReleaseController::class, 'save']);
     $r->addRoute('POST', '/release/add', [ReleaseController::class, 'add']);
     $r->addRoute('GET', '/release/{id:\d+}', [ReleaseController::class, 'show']);
+    $r->addRoute('GET', '/release/{id:\d+}/recommendations', [RecommendationController::class, 'getRecommendations']);
     $r->addRoute('POST', '/saved-searches', [SearchController::class, 'save']);
     $r->addRoute('POST', '/saved-searches/delete', [SearchController::class, 'delete']);
     $r->addRoute('GET', '/', [CollectionController::class, 'index']);
@@ -114,10 +106,10 @@ switch ($routeInfo[0]) {
         // Match existing signatures
         if ($handler[0] === ReleaseController::class && $method === 'show') {
             $controller->show((int)$vars['id'], $currentUser);
+        } elseif ($handler[0] === RecommendationController::class && $method === 'getRecommendations') {
+            $controller->getRecommendations((int)$vars['id'], $currentUser);
         } elseif (in_array($handler[0], [CollectionController::class, SearchController::class, ReleaseController::class])) {
             $controller->$method($currentUser);
-        } elseif ($handler[0] === SetupController::class) {
-            $controller->$method();
         } else {
             $controller->$method();
         }

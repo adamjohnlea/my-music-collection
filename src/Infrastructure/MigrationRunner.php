@@ -89,6 +89,11 @@ class MigrationRunner
                 $this->setVersion('13');
                 $version = '13';
             }
+            if ($version === '13') {
+                $this->migrateToV14();
+                $this->setVersion('14');
+                $version = '14';
+            }
 
             $this->pdo->commit();
 
@@ -393,6 +398,16 @@ class MigrationRunner
         // Add media_condition and sleeve_condition to push_queue
         $this->pdo->exec("ALTER TABLE push_queue ADD COLUMN media_condition TEXT");
         $this->pdo->exec("ALTER TABLE push_queue ADD COLUMN sleeve_condition TEXT");
+    }
+
+    private function migrateToV14(): void
+    {
+        // AI recommendations table
+        $this->pdo->exec('CREATE TABLE IF NOT EXISTS ai_recommendations (
+            release_id INTEGER PRIMARY KEY,
+            recommendation_json TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )');
     }
 
     public function rebuildSearch(): void

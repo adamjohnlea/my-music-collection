@@ -107,6 +107,9 @@
             <div class="sort-wrap">
               <select id="sort" class="sort-select" name="sort" onchange="this.form.submit()">
                 <optgroup label="Sort by">
+                  {% if match is defined and match %}
+                    <option value="relevance" {{ sort=='relevance'?'selected':'' }}>Relevance</option>
+                  {% endif %}
                   <option value="added_desc" {{ sort=='added_desc'?'selected':'' }}>Added (newest)</option>
                   <option value="added_asc" {{ sort=='added_asc'?'selected':'' }}>Added (oldest)</option>
                   {% if view != 'wantlist' %}
@@ -249,14 +252,15 @@
           {% set return_to = '/?view=' ~ (view|default('collection')) ~ '&per_page=' ~ per_page ~ '&sort=' ~ sort ~ '&page=' ~ page ~ (q is defined and q ? '&q=' ~ (q|url_encode) : '') %}
           <div class="grid">
             {% for it in items %}
+              {% set item_url = it.is_discogs_result and it.uri ? 'https://www.discogs.com' ~ it.uri : '/release/' ~ it.id ~ '?return=' ~ (return_to|url_encode) %}
               <div class="card" title="{{ it.title }} — {{ it.artist|strip_discogs_suffix }}">
                 <div class="cover-wrap">
                   {% if it.image %}
-                    <a href="/release/{{ it.id }}?return={{ return_to|url_encode }}">
+                    <a href="{{ item_url }}" {{ it.is_discogs_result ? 'target="_blank" rel="noopener"' : '' }}>
                       <img class="cover" src="{{ it.image }}" alt="{{ it.title }} cover" loading="lazy" />
                     </a>
                   {% else %}
-                    <a href="/release/{{ it.id }}?return={{ return_to|url_encode }}">
+                    <a href="{{ item_url }}" {{ it.is_discogs_result ? 'target="_blank" rel="noopener"' : '' }}>
                       <div class="cover"></div>
                     </a>
                   {% endif %}
@@ -266,7 +270,7 @@
                     {% if it.is_discogs_result %}
                       <span title="Discogs Result" style="cursor:help">🌐</span>
                     {% endif %}
-                    <a href="/release/{{ it.id }}?return={{ return_to|url_encode }}">{{ it.title }}</a>
+                    <a href="{{ item_url }}" {{ it.is_discogs_result ? 'target="_blank" rel="noopener"' : '' }}>{{ it.title }}</a>
                   </div>
                   <div class="artist">
                     {% if it.is_discogs_result %}
