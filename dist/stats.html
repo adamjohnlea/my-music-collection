@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Collection Statistics</title>
+  <style>
+    :root {
+      --bg: #0b0b0c;
+      --card: #16171a;
+      --text: #e7e7ea;
+      --muted: #a0a3aa;
+      --accent: #67e8f9;
+      --border: #2a2b2f;
+      --header-bg: rgba(11, 11, 12, 0.8);
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    .content-wrap {
+      margin-top: 24px;
+      margin-bottom: 24px;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .muted { color: var(--muted); }
+
+    /* Layout Helpers */
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .gap-4 { gap: 16px; }
+    .gap-2 { gap: 8px; }
+
+    /* Common Components */
+    .btn-small {
+      font-size: .8rem;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--card);
+      color: var(--text);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-small:hover { border-color: var(--accent); text-decoration: none; }
+
+    /* Common Header Components */
+    .main-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--header-bg);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-content {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    /* Desktop Nav */
+    .desktop-nav { display: flex; align-items: center; gap: 20px; }
+    @media (max-width: 768px) { .desktop-nav { display: none; } }
+
+    /* Account Dropdown */
+    .dropdown { position: relative; display: inline-block; }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background: var(--card);
+      min-width: 160px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      padding: 8px 0;
+      z-index: 101;
+    }
+    .dropdown:hover .dropdown-content { display: block; }
+    .dropdown-item {
+      display: block;
+      padding: 8px 16px;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .dropdown-item:hover { background: rgba(255,255,255,0.05); }
+
+    /* Mobile Nav / Hamburger */
+    .mobile-nav-toggle {
+      display: none;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 8px;
+    }
+    @media (max-width: 768px) { .mobile-nav-toggle { display: block; } }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 65px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg);
+      z-index: 99;
+      padding: 20px;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .mobile-menu.active { display: flex; }
+    .mobile-menu .nav-item {
+        display: block;
+        padding: 12px 16px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: var(--text);
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .mobile-menu .nav-item:hover { border-color: var(--accent); }
+
+    /* Breadcrumbs */
+    .breadcrumbs {
+      padding: 12px 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .breadcrumbs a { color: var(--muted); }
+    .breadcrumbs span { margin: 0 8px; opacity: 0.5; }
+
+    /* Utility Bar (Mobile Sticky Search/Sort) */
+    .utility-bar {
+        display: none;
+        position: sticky;
+        top: 65px;
+        z-index: 90;
+        background: var(--bg);
+        padding: 8px 20px;
+        border-bottom: 1px solid var(--border);
+    }
+    @media (max-width: 768px) {
+        .utility-bar.is-visible { display: block; }
+    }
+  </style>
+    <style>
+    h1{font-size:1.8rem;margin:0 0 24px 0}
+    h2{font-size:1.2rem;margin:0 0 16px 0;color:var(--accent)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:24px}
+    .card{background:var(--card);border-radius:12px;padding:20px;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+    .stat-row{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+    .stat-label{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .stat-bar-wrap{flex:2;background:#2a2b2f;height:8px;border-radius:4px;overflow:hidden}
+    .stat-bar{background:var(--accent);height:100%;border-radius:4px}
+    .stat-count{flex:0 0 40px;text-align:right;font-size:.9rem;color:var(--muted)}
+    .big-num{font-size:3rem;font-weight:700;color:var(--accent);margin-bottom:4px}
+  </style>
+</head>
+<body>
+  <header class="main-header">
+    <div class="wrap">
+      <div class="header-content">
+        <a href="./index.html" class="logo">My Music</a>
+
+        <div class="desktop-nav">
+          <a href="./index.html" class="muted">Collection</a>
+          <a href="./wantlist.html" class="muted">Wantlist</a>
+          <a href="javascript:void(0)" class="muted" onclick="if(window.surpriseMe)window.surpriseMe();">Surprise Me</a>
+          <a href="./stats.html" class="muted">Stats</a>
+          <a href="./about.html" class="muted">About</a>
+        </div>
+
+        <button class="mobile-nav-toggle" id="mobile-toggle" aria-label="Toggle menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="./index.html" class="nav-item">Collection</a>
+    <a href="./wantlist.html" class="nav-item">Wantlist</a>
+    <a href="javascript:void(0)" class="nav-item" onclick="if(window.surpriseMe)window.surpriseMe();">Surprise Me</a>
+    <a href="./stats.html" class="nav-item">Stats</a>
+    <a href="./about.html" class="nav-item">About</a>
+  </div>
+
+  <div class="wrap">
+      <nav class="breadcrumbs">
+    <div>
+      <a href="./index.html">Home</a>
+      <span>/</span>
+      Stats
+    </div>
+  </nav>
+  </div>
+
+  
+    <div class="wrap content-wrap">
+    <h1>Collection Statistics</h1>
+
+    <div class="grid">
+      <div class="card" style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center">
+        <div class="big-num">154</div>
+        <div class="muted">Total Releases</div>
+      </div>
+
+      <div class="card">
+        <h2>Top Artists</h2>
+                  <div class="stat-row">
+            <div class="stat-label" title="Various">Various</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 100%"></div>
+            </div>
+            <div class="stat-count">13</div>
+          </div>
+                  <div class="stat-row">
+            <div class="stat-label" title="Devo">Devo</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 69%"></div>
+            </div>
+            <div class="stat-count">9</div>
+          </div>
+                  <div class="stat-row">
+            <div class="stat-label" title="Jack White (2)">Jack White</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 38%"></div>
+            </div>
+            <div class="stat-count">5</div>
+          </div>
+                  <div class="stat-row">
+            <div class="stat-label" title="The White Stripes">The White Stripes</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 31%"></div>
+            </div>
+            <div class="stat-count">4</div>
+          </div>
+                  <div class="stat-row">
+            <div class="stat-label" title="Slothrust">Slothrust</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 31%"></div>
+            </div>
+            <div class="stat-count">4</div>
+          </div>
+                  <div class="stat-row">
+            <div class="stat-label" title="R.E.M.">R.E.M.</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 31%"></div>
+            </div>
+            <div class="stat-count">4</div>
+          </div>
+                  <div class="stat-row">
+            <div class="stat-label" title="Metallica">Metallica</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 31%"></div>
+            </div>
+            <div class="stat-count">4</div>
+          </div>
+                  <div class="stat-row">
+            <div class="stat-label" title="The Beatles">The Beatles</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 23%"></div>
+            </div>
+            <div class="stat-count">3</div>
+          </div>
+                  <div class="stat-row">
+            <div class="stat-label" title="Tom Tom Club">Tom Tom Club</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 15%"></div>
+            </div>
+            <div class="stat-count">2</div>
+          </div>
+                  <div class="stat-row">
+            <div class="stat-label" title="The Heligoats">The Heligoats</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 15%"></div>
+            </div>
+            <div class="stat-count">2</div>
+          </div>
+              </div>
+
+      <div class="card">
+        <h2>Top Genres</h2>
+                  <div class="stat-row">
+            <div class="stat-label">Rock</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 100%"></div>
+            </div>
+            <div class="stat-count">104</div>
+          </div>
+                  <div class="stat-row">
+            <div class="stat-label">Electronic</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 31%"></div>
+            </div>
+            <div class="stat-count">32</div>
+          </div>
+                  <div class="stat-row">
+            <div class="stat-label">Jazz</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 25%"></div>
+            </div>
+            <div class="stat-count">26</div>
+          </div>
+                  <div class="stat-row">
+            <div class="stat-label">Pop</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 20%"></div>
+            </div>
+            <div class="stat-count">21</div>
+          </div>
+                  <div class="stat-row">
+            <div class="stat-label">Funk / Soul</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 13%"></div>
+            </div>
+            <div class="stat-count">14</div>
+          </div>
+                  <div class="stat-row">
+            <div class="stat-label">Folk, World, &amp; Country</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 8%"></div>
+            </div>
+            <div class="stat-count">8</div>
+          </div>
+                  <div class="stat-row">
+            <div class="stat-label">Blues</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 7%"></div>
+            </div>
+            <div class="stat-count">7</div>
+          </div>
+                  <div class="stat-row">
+            <div class="stat-label">Stage &amp; Screen</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 3%"></div>
+            </div>
+            <div class="stat-count">3</div>
+          </div>
+                  <div class="stat-row">
+            <div class="stat-label">Latin</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 2%"></div>
+            </div>
+            <div class="stat-count">2</div>
+          </div>
+                  <div class="stat-row">
+            <div class="stat-label">Hip Hop</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 2%"></div>
+            </div>
+            <div class="stat-count">2</div>
+          </div>
+              </div>
+
+      <div class="card">
+        <h2>Decades</h2>
+                                  <div class="stat-row">
+            <div class="stat-label">1950s</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 23%"></div>
+            </div>
+            <div class="stat-count">12</div>
+          </div>
+                  <div class="stat-row">
+            <div class="stat-label">1960s</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 6%"></div>
+            </div>
+            <div class="stat-count">3</div>
+          </div>
+                  <div class="stat-row">
+            <div class="stat-label">1970s</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 15%"></div>
+            </div>
+            <div class="stat-count">8</div>
+          </div>
+                  <div class="stat-row">
+            <div class="stat-label">1980s</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 49%"></div>
+            </div>
+            <div class="stat-count">26</div>
+          </div>
+                  <div class="stat-row">
+            <div class="stat-label">1990s</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 2%"></div>
+            </div>
+            <div class="stat-count">1</div>
+          </div>
+                  <div class="stat-row">
+            <div class="stat-label">2000s</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 6%"></div>
+            </div>
+            <div class="stat-count">3</div>
+          </div>
+                  <div class="stat-row">
+            <div class="stat-label">2010s</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 89%"></div>
+            </div>
+            <div class="stat-count">47</div>
+          </div>
+                  <div class="stat-row">
+            <div class="stat-label">2020s</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 100%"></div>
+            </div>
+            <div class="stat-count">53</div>
+          </div>
+              </div>
+
+      <div class="card">
+        <h2>Formats</h2>
+                                  <div class="stat-row">
+            <div class="stat-label">Vinyl</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 100%"></div>
+            </div>
+            <div class="stat-count">160</div>
+          </div>
+                  <div class="stat-row">
+            <div class="stat-label">All Media</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 4%"></div>
+            </div>
+            <div class="stat-count">7</div>
+          </div>
+                  <div class="stat-row">
+            <div class="stat-label">CD</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 2%"></div>
+            </div>
+            <div class="stat-count">3</div>
+          </div>
+                  <div class="stat-row">
+            <div class="stat-label">Box Set</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 1%"></div>
+            </div>
+            <div class="stat-count">2</div>
+          </div>
+                  <div class="stat-row">
+            <div class="stat-label">DVD</div>
+            <div class="stat-bar-wrap">
+              <div class="stat-bar" style="width: 1%"></div>
+            </div>
+            <div class="stat-count">1</div>
+          </div>
+              </div>
+    </div>
+  </div>
+
+    <script>
+    document.getElementById('mobile-toggle')?.addEventListener('click', function() {
+      document.getElementById('mobile-menu').classList.toggle('active');
+      this.textContent = document.getElementById('mobile-menu').classList.contains('active') ? '✕' : '☰';
+    });
+  </script>
+
+  <footer class="site-footer muted" style="text-align:center;margin:24px 0 8px 0;font-size:.9rem;">
+  Powered by Discogs API & Coffee Since 2026 | Lovingly Crafted in Boise, Idaho
+</footer>
+</body>
+</html>

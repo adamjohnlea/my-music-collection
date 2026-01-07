@@ -196,6 +196,16 @@
     .tab-content { display: none; padding-top: 20px; }
     .tab-content.active { display: block; }
 
+    /* Skeleton Loader */
+    @keyframes skeleton-loading {
+      0% { opacity: 1; }
+      50% { opacity: 0.4; }
+      100% { opacity: 1; }
+    }
+    .skeleton-loader div {
+      animation: skeleton-loading 1.5s infinite ease-in-out;
+    }
+
     /* Lightbox */
     .lightbox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--overlay);z-index:1000}
     .lightbox.open{display:flex}
@@ -221,14 +231,14 @@
   <header class="main-header">
     <div class="wrap">
       <div class="header-content">
-        <a href="/" class="logo">My Music</a>
+        <a href="./index.html" class="logo">My Music</a>
 
         <div class="desktop-nav">
-          <a href="/?view=collection" class="muted">Collection</a>
-          <a href="/?view=wantlist" class="muted">Wantlist</a>
-          <a href="/random" class="muted">Surprise Me</a>
-          <a href="/stats" class="muted">Stats</a>
-          <a href="/about" class="muted">About</a>
+          <a href="./index.html" class="muted">Collection</a>
+          <a href="./wantlist.html" class="muted">Wantlist</a>
+          <a href="javascript:void(0)" class="muted" onclick="if(window.surpriseMe)window.surpriseMe();">Surprise Me</a>
+          <a href="./stats.html" class="muted">Stats</a>
+          <a href="./about.html" class="muted">About</a>
         </div>
 
         <button class="mobile-nav-toggle" id="mobile-toggle" aria-label="Toggle menu">☰</button>
@@ -237,19 +247,19 @@
   </header>
 
   <div class="mobile-menu" id="mobile-menu">
-    <a href="/?view=collection" class="nav-item">Collection</a>
-    <a href="/?view=wantlist" class="nav-item">Wantlist</a>
-    <a href="/random" class="nav-item">Surprise Me</a>
-    <a href="/stats" class="nav-item">Stats</a>
-    <a href="/about" class="nav-item">About</a>
+    <a href="./index.html" class="nav-item">Collection</a>
+    <a href="./wantlist.html" class="nav-item">Wantlist</a>
+    <a href="javascript:void(0)" class="nav-item" onclick="if(window.surpriseMe)window.surpriseMe();">Surprise Me</a>
+    <a href="./stats.html" class="nav-item">Stats</a>
+    <a href="./about.html" class="nav-item">About</a>
   </div>
 
   <div class="wrap">
       <nav class="breadcrumbs">
     <div>
-      <a href="/">Home</a>
+      <a href="../index.html">Home</a>
       <span>/</span>
-      <a href="/?view=collection">Collection</a>
+      <a href="../index.html">Collection</a>
       <span>/</span>
       Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads)
     </div>
@@ -269,112 +279,112 @@
                     <img class="cover" src="../images/28021260/c8bb0d2532635255436d35c5608f7e9831e6cf64.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="0" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/d06303e178681606ed2c7f62ec16923cf19a57ae.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="1" />
+                    <img class="cover" src="https://i.discogs.com/I4I-xGJLaYEze6MDjkXTwtRZ0GsGaorwvT-KTu9Ga8I/rs:fit/g:sm/q:90/h:599/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY1/ODItNzUwNS5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="1" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/a8516f65e53a8f201cb9485d9dfe28385cb9c693.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="2" />
+                    <img class="cover" src="https://i.discogs.com/AorOPYc0ZdFZCqDfEbluBYroJ-mra4NmEChs_iXjubM/rs:fit/g:sm/q:90/h:600/w:599/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY1/ODktNjcyOC5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="2" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/1d3c5798570182fa383e66a30eba12fcc5479207.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="3" />
+                    <img class="cover" src="https://i.discogs.com/aet6m1fhrSCpOobxZ6gn2fLrnJ9tBiorBRuuC6uEM5I/rs:fit/g:sm/q:90/h:597/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NDctNzMzNi5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="3" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/2d4e75af6825bea6ca68479d2fe7b9fcbe3d7e43.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="4" />
+                    <img class="cover" src="https://i.discogs.com/NF7LKhNtfZAWLRtu6CFbuydyGk7Eu-z96b73DR2s0PI/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NDktMzM5OS5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="4" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/62e799279514126da509a9879be0479066d1ba74.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="5" />
+                    <img class="cover" src="https://i.discogs.com/kZx9K9mg2LRu669UezrtBJiptrIJJon0M_RZKRwm6XY/rs:fit/g:sm/q:90/h:600/w:598/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/MzgtNTU5OC5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="5" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/5ab7692d9d766b7d42cbec9b44594bbf13ea2093.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="6" />
+                    <img class="cover" src="https://i.discogs.com/NsD4SzH1oZUJXl6bl5Heg6U9s3RuZwjOKUspXnHwCG8/rs:fit/g:sm/q:90/h:600/w:597/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NDEtOTk3MC5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="6" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/a2253b5fdf4c8decf3e0c3da2fa885a868d5ff7c.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="7" />
+                    <img class="cover" src="https://i.discogs.com/CAfH37iQ7FcmqoproihUghKmBvJB88mksZqtXfWrUEU/rs:fit/g:sm/q:90/h:600/w:454/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NTgtMTYwOC5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="7" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/10eb537ce4529160a8f454195093ce06a452e038.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="8" />
+                    <img class="cover" src="https://i.discogs.com/bbzVer_cZEq6eT1KT-Q2gfPoBomcBBqqlqOzOKr9HLw/rs:fit/g:sm/q:90/h:600/w:453/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/MzUtODU5OC5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="8" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/104e36b69ac301e3571289f3971878e09525f52b.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="9" />
+                    <img class="cover" src="https://i.discogs.com/kUuzJr2fNhsUCbTzEOSf-G-Ax9s8H49-IxUPrAR3YEc/rs:fit/g:sm/q:90/h:600/w:453/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NDgtMjc2Ni5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="9" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/3c853cf5f413e498339ed2abf75f48a2bbfc5242.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="10" />
+                    <img class="cover" src="https://i.discogs.com/85j0tLP_76NLlvCyBE4PkcGq8affCfff3yCUmKZVL18/rs:fit/g:sm/q:90/h:600/w:452/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NDctNTc0Ny5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="10" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/9166c4e3ed3231f9ca17f158275c655945b9eafe.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="11" />
+                    <img class="cover" src="https://i.discogs.com/Om51an7Su6kP01etc_49JJ_fAEj8w67q7OdkLRMFCII/rs:fit/g:sm/q:90/h:600/w:452/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NTItNTc4MS5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="11" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/0a2d1dcd1f8732ff9080e7b4d8d96bc9dbdc07bc.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="12" />
+                    <img class="cover" src="https://i.discogs.com/C4qGUcA3HUg0LQZNvRk_gEnJnljf5CWBRn1NZzaXk0I/rs:fit/g:sm/q:90/h:600/w:450/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/MzMtNTE1OS5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="12" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/7f41a1b2f3f43dd5222e763cc458385827d264fe.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="13" />
+                    <img class="cover" src="https://i.discogs.com/Z3x5hBjIUQ4QMI9-oZABdHlFp6gzyaP-YuA-j-W9DWY/rs:fit/g:sm/q:90/h:600/w:450/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NDAtNjk5My5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="13" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/c04a49a963a052b3d59718690e97da5857db03c8.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="14" />
+                    <img class="cover" src="https://i.discogs.com/KMqsjebSeAnD2F8uibXMIaGzKf9H871pCmN_WFyJe1E/rs:fit/g:sm/q:90/h:600/w:448/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/MjgtNjg1MS5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="14" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/b5e9623b88bb77bdf2eebd2ab319753475e520bf.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="15" />
+                    <img class="cover" src="https://i.discogs.com/CkzS17YAj6odZh1CPhHzZB8HL7sX9debNkc-GOCuzD4/rs:fit/g:sm/q:90/h:600/w:449/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NTYtMjc3NC5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="15" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/a2ea1a9ba97623041e74d2060d121a1cbaa21545.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="16" />
+                    <img class="cover" src="https://i.discogs.com/D8bAaw0AW8mAuaxOr-3SAuQbD0iDEe8C4AuWEKl_FcQ/rs:fit/g:sm/q:90/h:600/w:450/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NTctOTE5Ni5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="16" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/ff34c7caeba6ff7f2add5c7b338dc76e40324661.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="17" />
+                    <img class="cover" src="https://i.discogs.com/xWq5hE4mzDZWQ9_sUCm1omw7bSTrEIvFgc8T1GSVUEc/rs:fit/g:sm/q:90/h:600/w:448/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NTctNjU2Ny5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="17" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/004e0488d3922befe0b1fe4a9f5544b402650b26.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="18" />
+                    <img class="cover" src="https://i.discogs.com/oP4aAHAUdaRXOV4RUunXBxD1T3xFZMCfmJeDnWhvLe0/rs:fit/g:sm/q:90/h:600/w:446/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NTktNTE2NC5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="18" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/4737b6ae2fff0acc629e1845a3f9def675cc6877.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="19" />
+                    <img class="cover" src="https://i.discogs.com/Fo7Hez2yI4O5zl0b0MwWyMGONOhOnjpR0OcyiCAUoJs/rs:fit/g:sm/q:90/h:600/w:448/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/MzEtNzM3Mi5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="19" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/6d5268dd62f30fa3919c0a2fa679b91084d0a1de.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="20" />
+                    <img class="cover" src="https://i.discogs.com/8mHCKJxPcqLt3b_Abv6s41Zx2usAEJbRzOycr4iCZwA/rs:fit/g:sm/q:90/h:600/w:450/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/MzQtNjk3OC5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="20" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/76c13dc124c37e0a3a1b58423db97c2a6e70e599.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="21" />
+                    <img class="cover" src="https://i.discogs.com/5FYxgRrsxIezFLvnv4hSyQu87dDNE6Xnpm3GO1Yj6BQ/rs:fit/g:sm/q:90/h:600/w:450/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/MjMtNzY3Mi5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="21" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/43e5428794fd6e7e0d6535f54eb7e1e7d7123ca3.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="22" />
+                    <img class="cover" src="https://i.discogs.com/RKT8XsR62gKR7eI9iqDAMUHoWKf-Qtc1K90naZuSa7E/rs:fit/g:sm/q:90/h:600/w:449/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NTEtNDAxMy5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="22" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/3762466b434a0f0db1957c0e4f73c268f0892d0f.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="23" />
+                    <img class="cover" src="https://i.discogs.com/QcXG4BEsxuh6qX_2wdHxHv9ybPKrLr0_A3ZmJLfYPMw/rs:fit/g:sm/q:90/h:600/w:449/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/MTQtODgyMS5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="23" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/3dbd35d1e32bd8324d08552c38f85b98b202f36f.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="24" />
+                    <img class="cover" src="https://i.discogs.com/M0UJhsM4vZ3Lc0OZeAae_nLHyrUHSQmmoFgVtuFYM00/rs:fit/g:sm/q:90/h:600/w:452/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NTEtMzg5My5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="24" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/2eb744bf21552e0dd0ff2b31a4b7f0bc0484240d.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="25" />
+                    <img class="cover" src="https://i.discogs.com/cmuHj2dfP20x4VPCEMCHs5lPCBeFjEngk5wMng4APaU/rs:fit/g:sm/q:90/h:600/w:452/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NDQtNDA3Ny5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="25" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/4556f8a151c52fae62faa1fbd97a9335b5f6ce54.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="26" />
+                    <img class="cover" src="https://i.discogs.com/PPwsj0kyoeRLuGGvx8Xi_vSJXJ5Acc5MGwQpOzTkhZk/rs:fit/g:sm/q:90/h:600/w:451/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NTEtMjE1My5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="26" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/1277c8a9576a16670ff78ba86b605bf498c103fc.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="27" />
+                    <img class="cover" src="https://i.discogs.com/qay-hmevCzGstdI96UhHHEnYjnNIgOqQoG562PkaFwg/rs:fit/g:sm/q:90/h:600/w:451/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NDgtMTA4My5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="27" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/f37d5301aa7912c8e6e50f6c467b8127d4320049.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="28" />
+                    <img class="cover" src="https://i.discogs.com/6ZccqLT8z_KhmoQoSuipBn7BEubR2ON871I_FVK84WI/rs:fit/g:sm/q:90/h:600/w:453/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NDYtNzM0Ni5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="28" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/6e3525b96b9f039c21d4c0d68bb5423d33b84db8.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="29" />
+                    <img class="cover" src="https://i.discogs.com/b9un9O0xS7gs_Biio-seyJRiePbtsoTWrYCcOTAsvm4/rs:fit/g:sm/q:90/h:600/w:453/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NDQtNzczNi5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="29" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/c71bf96d3e23eb01f0eb8facc39bee585da2e483.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="30" />
+                    <img class="cover" src="https://i.discogs.com/bc022R_hyvFCdw0GsYXZZKjVNjYVcVfnldZ_0vrD8_w/rs:fit/g:sm/q:90/h:600/w:451/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NDAtMTIyMC5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="30" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/ffa15fc7dbc7fa2e71f702e3e159734205d499f5.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="31" />
+                    <img class="cover" src="https://i.discogs.com/K9w9yWcSC3G5WE5aPMy52Yvb0uJjKcXfELuB9V1RMW0/rs:fit/g:sm/q:90/h:600/w:451/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/MzYtNDc3MS5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="31" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/10856bbbf7dd0b291ceb09bf57a6efbfdadd356d.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="32" />
+                    <img class="cover" src="https://i.discogs.com/Yj3U_S2u7mYcfE0UKNBWmEDsTDpPRQGeWu5c5cKSeOk/rs:fit/g:sm/q:90/h:600/w:454/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NDYtNTU2OC5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="32" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/58800f8c7e6b245a9f2691825a6151296e5c5ded.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="33" />
+                    <img class="cover" src="https://i.discogs.com/D1mivIqTW2mwFUTgaUnBn1D-nV3DbEC0_BW_0nve03s/rs:fit/g:sm/q:90/h:600/w:454/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NDctNjExNi5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="33" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/117b172942172b51d6c5e82afd349d7f197a3cdb.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="34" />
+                    <img class="cover" src="https://i.discogs.com/76ozC4GPoOVMJLqHxmbLQ4oqlTz6aG1Q2McXQkRzpzs/rs:fit/g:sm/q:90/h:600/w:454/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/MzItOTEyNi5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="34" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/ac624848b0b201f01da63b041496eeff075bb404.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="35" />
+                    <img class="cover" src="https://i.discogs.com/m0sP2SwE11ioEzafzGvhOuCnJRzBjBLJvEyeg7aEsio/rs:fit/g:sm/q:90/h:9/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY1/NTQtOTk2OC5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="35" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/28021260/50f0a88a6f04669994ab029762a7f65037475faa.jpg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="36" />
+                    <img class="cover" src="https://i.discogs.com/XS_7Nf94Y6nsU9OCziSmYwSZQxH1jQ0hKktBrVX6utE/rs:fit/g:sm/q:90/h:257/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/MjUtNDY0Mi5qcGVn.jpeg" alt="Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads) cover" data-idx="36" />
                   </div>
                                           </div>
           </div>
@@ -422,112 +432,112 @@
                   <img src="../images/28021260/c8bb0d2532635255436d35c5608f7e9831e6cf64.jpg" alt="thumb 1" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:1" />
                 </button>
                               <button class="thumb" data-idx="1" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/d06303e178681606ed2c7f62ec16923cf19a57ae.jpg" alt="thumb 2" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/I4I-xGJLaYEze6MDjkXTwtRZ0GsGaorwvT-KTu9Ga8I/rs:fit/g:sm/q:90/h:599/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY1/ODItNzUwNS5qcGVn.jpeg" alt="thumb 2" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="2" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/a8516f65e53a8f201cb9485d9dfe28385cb9c693.jpg" alt="thumb 3" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/AorOPYc0ZdFZCqDfEbluBYroJ-mra4NmEChs_iXjubM/rs:fit/g:sm/q:90/h:600/w:599/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY1/ODktNjcyOC5qcGVn.jpeg" alt="thumb 3" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="3" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/1d3c5798570182fa383e66a30eba12fcc5479207.jpg" alt="thumb 4" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/aet6m1fhrSCpOobxZ6gn2fLrnJ9tBiorBRuuC6uEM5I/rs:fit/g:sm/q:90/h:597/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NDctNzMzNi5qcGVn.jpeg" alt="thumb 4" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="4" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/2d4e75af6825bea6ca68479d2fe7b9fcbe3d7e43.jpg" alt="thumb 5" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/NF7LKhNtfZAWLRtu6CFbuydyGk7Eu-z96b73DR2s0PI/rs:fit/g:sm/q:90/h:600/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NDktMzM5OS5qcGVn.jpeg" alt="thumb 5" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="5" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/62e799279514126da509a9879be0479066d1ba74.jpg" alt="thumb 6" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/kZx9K9mg2LRu669UezrtBJiptrIJJon0M_RZKRwm6XY/rs:fit/g:sm/q:90/h:600/w:598/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/MzgtNTU5OC5qcGVn.jpeg" alt="thumb 6" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="6" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/5ab7692d9d766b7d42cbec9b44594bbf13ea2093.jpg" alt="thumb 7" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/NsD4SzH1oZUJXl6bl5Heg6U9s3RuZwjOKUspXnHwCG8/rs:fit/g:sm/q:90/h:600/w:597/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NDEtOTk3MC5qcGVn.jpeg" alt="thumb 7" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="7" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/a2253b5fdf4c8decf3e0c3da2fa885a868d5ff7c.jpg" alt="thumb 8" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/CAfH37iQ7FcmqoproihUghKmBvJB88mksZqtXfWrUEU/rs:fit/g:sm/q:90/h:600/w:454/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NTgtMTYwOC5qcGVn.jpeg" alt="thumb 8" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="8" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/10eb537ce4529160a8f454195093ce06a452e038.jpg" alt="thumb 9" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/bbzVer_cZEq6eT1KT-Q2gfPoBomcBBqqlqOzOKr9HLw/rs:fit/g:sm/q:90/h:600/w:453/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/MzUtODU5OC5qcGVn.jpeg" alt="thumb 9" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="9" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/104e36b69ac301e3571289f3971878e09525f52b.jpg" alt="thumb 10" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/kUuzJr2fNhsUCbTzEOSf-G-Ax9s8H49-IxUPrAR3YEc/rs:fit/g:sm/q:90/h:600/w:453/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NDgtMjc2Ni5qcGVn.jpeg" alt="thumb 10" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="10" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/3c853cf5f413e498339ed2abf75f48a2bbfc5242.jpg" alt="thumb 11" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/85j0tLP_76NLlvCyBE4PkcGq8affCfff3yCUmKZVL18/rs:fit/g:sm/q:90/h:600/w:452/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NDctNTc0Ny5qcGVn.jpeg" alt="thumb 11" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="11" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/9166c4e3ed3231f9ca17f158275c655945b9eafe.jpg" alt="thumb 12" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/Om51an7Su6kP01etc_49JJ_fAEj8w67q7OdkLRMFCII/rs:fit/g:sm/q:90/h:600/w:452/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NTItNTc4MS5qcGVn.jpeg" alt="thumb 12" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="12" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/0a2d1dcd1f8732ff9080e7b4d8d96bc9dbdc07bc.jpg" alt="thumb 13" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/C4qGUcA3HUg0LQZNvRk_gEnJnljf5CWBRn1NZzaXk0I/rs:fit/g:sm/q:90/h:600/w:450/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/MzMtNTE1OS5qcGVn.jpeg" alt="thumb 13" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="13" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/7f41a1b2f3f43dd5222e763cc458385827d264fe.jpg" alt="thumb 14" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/Z3x5hBjIUQ4QMI9-oZABdHlFp6gzyaP-YuA-j-W9DWY/rs:fit/g:sm/q:90/h:600/w:450/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NDAtNjk5My5qcGVn.jpeg" alt="thumb 14" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="14" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/c04a49a963a052b3d59718690e97da5857db03c8.jpg" alt="thumb 15" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/KMqsjebSeAnD2F8uibXMIaGzKf9H871pCmN_WFyJe1E/rs:fit/g:sm/q:90/h:600/w:448/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/MjgtNjg1MS5qcGVn.jpeg" alt="thumb 15" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="15" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/b5e9623b88bb77bdf2eebd2ab319753475e520bf.jpg" alt="thumb 16" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/CkzS17YAj6odZh1CPhHzZB8HL7sX9debNkc-GOCuzD4/rs:fit/g:sm/q:90/h:600/w:449/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NTYtMjc3NC5qcGVn.jpeg" alt="thumb 16" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="16" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/a2ea1a9ba97623041e74d2060d121a1cbaa21545.jpg" alt="thumb 17" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/D8bAaw0AW8mAuaxOr-3SAuQbD0iDEe8C4AuWEKl_FcQ/rs:fit/g:sm/q:90/h:600/w:450/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NTctOTE5Ni5qcGVn.jpeg" alt="thumb 17" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="17" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/ff34c7caeba6ff7f2add5c7b338dc76e40324661.jpg" alt="thumb 18" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/xWq5hE4mzDZWQ9_sUCm1omw7bSTrEIvFgc8T1GSVUEc/rs:fit/g:sm/q:90/h:600/w:448/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NTctNjU2Ny5qcGVn.jpeg" alt="thumb 18" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="18" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/004e0488d3922befe0b1fe4a9f5544b402650b26.jpg" alt="thumb 19" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/oP4aAHAUdaRXOV4RUunXBxD1T3xFZMCfmJeDnWhvLe0/rs:fit/g:sm/q:90/h:600/w:446/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NTktNTE2NC5qcGVn.jpeg" alt="thumb 19" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="19" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/4737b6ae2fff0acc629e1845a3f9def675cc6877.jpg" alt="thumb 20" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/Fo7Hez2yI4O5zl0b0MwWyMGONOhOnjpR0OcyiCAUoJs/rs:fit/g:sm/q:90/h:600/w:448/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/MzEtNzM3Mi5qcGVn.jpeg" alt="thumb 20" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="20" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/6d5268dd62f30fa3919c0a2fa679b91084d0a1de.jpg" alt="thumb 21" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/8mHCKJxPcqLt3b_Abv6s41Zx2usAEJbRzOycr4iCZwA/rs:fit/g:sm/q:90/h:600/w:450/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/MzQtNjk3OC5qcGVn.jpeg" alt="thumb 21" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="21" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/76c13dc124c37e0a3a1b58423db97c2a6e70e599.jpg" alt="thumb 22" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/5FYxgRrsxIezFLvnv4hSyQu87dDNE6Xnpm3GO1Yj6BQ/rs:fit/g:sm/q:90/h:600/w:450/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/MjMtNzY3Mi5qcGVn.jpeg" alt="thumb 22" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="22" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/43e5428794fd6e7e0d6535f54eb7e1e7d7123ca3.jpg" alt="thumb 23" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/RKT8XsR62gKR7eI9iqDAMUHoWKf-Qtc1K90naZuSa7E/rs:fit/g:sm/q:90/h:600/w:449/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NTEtNDAxMy5qcGVn.jpeg" alt="thumb 23" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="23" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/3762466b434a0f0db1957c0e4f73c268f0892d0f.jpg" alt="thumb 24" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/QcXG4BEsxuh6qX_2wdHxHv9ybPKrLr0_A3ZmJLfYPMw/rs:fit/g:sm/q:90/h:600/w:449/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/MTQtODgyMS5qcGVn.jpeg" alt="thumb 24" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="24" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/3dbd35d1e32bd8324d08552c38f85b98b202f36f.jpg" alt="thumb 25" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/M0UJhsM4vZ3Lc0OZeAae_nLHyrUHSQmmoFgVtuFYM00/rs:fit/g:sm/q:90/h:600/w:452/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NTEtMzg5My5qcGVn.jpeg" alt="thumb 25" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="25" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/2eb744bf21552e0dd0ff2b31a4b7f0bc0484240d.jpg" alt="thumb 26" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/cmuHj2dfP20x4VPCEMCHs5lPCBeFjEngk5wMng4APaU/rs:fit/g:sm/q:90/h:600/w:452/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NDQtNDA3Ny5qcGVn.jpeg" alt="thumb 26" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="26" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/4556f8a151c52fae62faa1fbd97a9335b5f6ce54.jpg" alt="thumb 27" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/PPwsj0kyoeRLuGGvx8Xi_vSJXJ5Acc5MGwQpOzTkhZk/rs:fit/g:sm/q:90/h:600/w:451/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NTEtMjE1My5qcGVn.jpeg" alt="thumb 27" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="27" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/1277c8a9576a16670ff78ba86b605bf498c103fc.jpg" alt="thumb 28" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/qay-hmevCzGstdI96UhHHEnYjnNIgOqQoG562PkaFwg/rs:fit/g:sm/q:90/h:600/w:451/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NDgtMTA4My5qcGVn.jpeg" alt="thumb 28" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="28" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/f37d5301aa7912c8e6e50f6c467b8127d4320049.jpg" alt="thumb 29" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/6ZccqLT8z_KhmoQoSuipBn7BEubR2ON871I_FVK84WI/rs:fit/g:sm/q:90/h:600/w:453/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NDYtNzM0Ni5qcGVn.jpeg" alt="thumb 29" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="29" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/6e3525b96b9f039c21d4c0d68bb5423d33b84db8.jpg" alt="thumb 30" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/b9un9O0xS7gs_Biio-seyJRiePbtsoTWrYCcOTAsvm4/rs:fit/g:sm/q:90/h:600/w:453/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NDQtNzczNi5qcGVn.jpeg" alt="thumb 30" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="30" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/c71bf96d3e23eb01f0eb8facc39bee585da2e483.jpg" alt="thumb 31" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/bc022R_hyvFCdw0GsYXZZKjVNjYVcVfnldZ_0vrD8_w/rs:fit/g:sm/q:90/h:600/w:451/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NDAtMTIyMC5qcGVn.jpeg" alt="thumb 31" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="31" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/ffa15fc7dbc7fa2e71f702e3e159734205d499f5.jpg" alt="thumb 32" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/K9w9yWcSC3G5WE5aPMy52Yvb0uJjKcXfELuB9V1RMW0/rs:fit/g:sm/q:90/h:600/w:451/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/MzYtNDc3MS5qcGVn.jpeg" alt="thumb 32" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="32" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/10856bbbf7dd0b291ceb09bf57a6efbfdadd356d.jpg" alt="thumb 33" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/Yj3U_S2u7mYcfE0UKNBWmEDsTDpPRQGeWu5c5cKSeOk/rs:fit/g:sm/q:90/h:600/w:454/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NDYtNTU2OC5qcGVn.jpeg" alt="thumb 33" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="33" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/58800f8c7e6b245a9f2691825a6151296e5c5ded.jpg" alt="thumb 34" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/D1mivIqTW2mwFUTgaUnBn1D-nV3DbEC0_BW_0nve03s/rs:fit/g:sm/q:90/h:600/w:454/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/NDctNjExNi5qcGVn.jpeg" alt="thumb 34" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="34" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/117b172942172b51d6c5e82afd349d7f197a3cdb.jpg" alt="thumb 35" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/76ozC4GPoOVMJLqHxmbLQ4oqlTz6aG1Q2McXQkRzpzs/rs:fit/g:sm/q:90/h:600/w:454/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/MzItOTEyNi5qcGVn.jpeg" alt="thumb 35" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="35" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/ac624848b0b201f01da63b041496eeff075bb404.jpg" alt="thumb 36" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/m0sP2SwE11ioEzafzGvhOuCnJRzBjBLJvEyeg7aEsio/rs:fit/g:sm/q:90/h:9/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY1/NTQtOTk2OC5qcGVn.jpeg" alt="thumb 36" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="36" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/50f0a88a6f04669994ab029762a7f65037475faa.jpg" alt="thumb 37" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/XS_7Nf94Y6nsU9OCziSmYwSZQxH1jQ0hKktBrVX6utE/rs:fit/g:sm/q:90/h:257/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI4MDIx/MjYwLTE2OTU2OTY2/MjUtNDY0Mi5qcGVn.jpeg" alt="thumb 37" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                           </div>
                   </div>
@@ -546,7 +556,7 @@
             <div class="tab" data-tab="details">Details</div>
             <div class="tab" data-tab="credits">Credits</div>
             <div class="tab" data-tab="status">Status & Notes</div>
-          </div>
+                      </div>
 
           <div id="tab-tracks" class="tab-content active">
                           <div class="card">
@@ -573,7 +583,11 @@
                                       </ol>
                 </div>
               </div>
-                      </div>
+            
+            <div id="apple-music-player-container" style="margin-top:24px; display:none;">
+              <div id="apple-music-player"></div>
+            </div>
+          </div>
 
           <div id="tab-details" class="tab-content">
             <div class="card">
@@ -864,7 +878,8 @@
                                                          </div>
             </div>
           </div>
-        </div>
+
+                  </div>
       </div>
 
             <!-- Lightbox overlay -->
@@ -881,7 +896,7 @@
       <script>
         document.addEventListener('DOMContentLoaded', function(){
           const images = [
-            '..\/images\/28021260\/c8bb0d2532635255436d35c5608f7e9831e6cf64.jpg', '..\/images\/28021260\/d06303e178681606ed2c7f62ec16923cf19a57ae.jpg', '..\/images\/28021260\/a8516f65e53a8f201cb9485d9dfe28385cb9c693.jpg', '..\/images\/28021260\/1d3c5798570182fa383e66a30eba12fcc5479207.jpg', '..\/images\/28021260\/2d4e75af6825bea6ca68479d2fe7b9fcbe3d7e43.jpg', '..\/images\/28021260\/62e799279514126da509a9879be0479066d1ba74.jpg', '..\/images\/28021260\/5ab7692d9d766b7d42cbec9b44594bbf13ea2093.jpg', '..\/images\/28021260\/a2253b5fdf4c8decf3e0c3da2fa885a868d5ff7c.jpg', '..\/images\/28021260\/10eb537ce4529160a8f454195093ce06a452e038.jpg', '..\/images\/28021260\/104e36b69ac301e3571289f3971878e09525f52b.jpg', '..\/images\/28021260\/3c853cf5f413e498339ed2abf75f48a2bbfc5242.jpg', '..\/images\/28021260\/9166c4e3ed3231f9ca17f158275c655945b9eafe.jpg', '..\/images\/28021260\/0a2d1dcd1f8732ff9080e7b4d8d96bc9dbdc07bc.jpg', '..\/images\/28021260\/7f41a1b2f3f43dd5222e763cc458385827d264fe.jpg', '..\/images\/28021260\/c04a49a963a052b3d59718690e97da5857db03c8.jpg', '..\/images\/28021260\/b5e9623b88bb77bdf2eebd2ab319753475e520bf.jpg', '..\/images\/28021260\/a2ea1a9ba97623041e74d2060d121a1cbaa21545.jpg', '..\/images\/28021260\/ff34c7caeba6ff7f2add5c7b338dc76e40324661.jpg', '..\/images\/28021260\/004e0488d3922befe0b1fe4a9f5544b402650b26.jpg', '..\/images\/28021260\/4737b6ae2fff0acc629e1845a3f9def675cc6877.jpg', '..\/images\/28021260\/6d5268dd62f30fa3919c0a2fa679b91084d0a1de.jpg', '..\/images\/28021260\/76c13dc124c37e0a3a1b58423db97c2a6e70e599.jpg', '..\/images\/28021260\/43e5428794fd6e7e0d6535f54eb7e1e7d7123ca3.jpg', '..\/images\/28021260\/3762466b434a0f0db1957c0e4f73c268f0892d0f.jpg', '..\/images\/28021260\/3dbd35d1e32bd8324d08552c38f85b98b202f36f.jpg', '..\/images\/28021260\/2eb744bf21552e0dd0ff2b31a4b7f0bc0484240d.jpg', '..\/images\/28021260\/4556f8a151c52fae62faa1fbd97a9335b5f6ce54.jpg', '..\/images\/28021260\/1277c8a9576a16670ff78ba86b605bf498c103fc.jpg', '..\/images\/28021260\/f37d5301aa7912c8e6e50f6c467b8127d4320049.jpg', '..\/images\/28021260\/6e3525b96b9f039c21d4c0d68bb5423d33b84db8.jpg', '..\/images\/28021260\/c71bf96d3e23eb01f0eb8facc39bee585da2e483.jpg', '..\/images\/28021260\/ffa15fc7dbc7fa2e71f702e3e159734205d499f5.jpg', '..\/images\/28021260\/10856bbbf7dd0b291ceb09bf57a6efbfdadd356d.jpg', '..\/images\/28021260\/58800f8c7e6b245a9f2691825a6151296e5c5ded.jpg', '..\/images\/28021260\/117b172942172b51d6c5e82afd349d7f197a3cdb.jpg', '..\/images\/28021260\/ac624848b0b201f01da63b041496eeff075bb404.jpg', '..\/images\/28021260\/50f0a88a6f04669994ab029762a7f65037475faa.jpg'          ];
+            '..\/images\/28021260\/c8bb0d2532635255436d35c5608f7e9831e6cf64.jpg', 'https\u003A\/\/i.discogs.com\/I4I\u002DxGJLaYEze6MDjkXTwtRZ0GsGaorwvT\u002DKTu9Ga8I\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A599\/w\u003A600\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY1\/ODItNzUwNS5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/AorOPYc0ZdFZCqDfEbluBYroJ\u002Dmra4NmEChs_iXjubM\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A599\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY1\/ODktNjcyOC5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/aet6m1fhrSCpOobxZ6gn2fLrnJ9tBiorBRuuC6uEM5I\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A597\/w\u003A600\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/NDctNzMzNi5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/NF7LKhNtfZAWLRtu6CFbuydyGk7Eu\u002Dz96b73DR2s0PI\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A600\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/NDktMzM5OS5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/kZx9K9mg2LRu669UezrtBJiptrIJJon0M_RZKRwm6XY\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A598\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/MzgtNTU5OC5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/NsD4SzH1oZUJXl6bl5Heg6U9s3RuZwjOKUspXnHwCG8\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A597\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/NDEtOTk3MC5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/CAfH37iQ7FcmqoproihUghKmBvJB88mksZqtXfWrUEU\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A454\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/NTgtMTYwOC5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/bbzVer_cZEq6eT1KT\u002DQ2gfPoBomcBBqqlqOzOKr9HLw\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A453\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/MzUtODU5OC5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/kUuzJr2fNhsUCbTzEOSf\u002DG\u002DAx9s8H49\u002DIxUPrAR3YEc\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A453\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/NDgtMjc2Ni5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/85j0tLP_76NLlvCyBE4PkcGq8affCfff3yCUmKZVL18\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A452\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/NDctNTc0Ny5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/Om51an7Su6kP01etc_49JJ_fAEj8w67q7OdkLRMFCII\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A452\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/NTItNTc4MS5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/C4qGUcA3HUg0LQZNvRk_gEnJnljf5CWBRn1NZzaXk0I\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A450\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/MzMtNTE1OS5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/Z3x5hBjIUQ4QMI9\u002DoZABdHlFp6gzyaP\u002DYuA\u002Dj\u002DW9DWY\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A450\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/NDAtNjk5My5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/KMqsjebSeAnD2F8uibXMIaGzKf9H871pCmN_WFyJe1E\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A448\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/MjgtNjg1MS5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/CkzS17YAj6odZh1CPhHzZB8HL7sX9debNkc\u002DGOCuzD4\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A449\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/NTYtMjc3NC5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/D8bAaw0AW8mAuaxOr\u002D3SAuQbD0iDEe8C4AuWEKl_FcQ\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A450\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/NTctOTE5Ni5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/xWq5hE4mzDZWQ9_sUCm1omw7bSTrEIvFgc8T1GSVUEc\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A448\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/NTctNjU2Ny5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/oP4aAHAUdaRXOV4RUunXBxD1T3xFZMCfmJeDnWhvLe0\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A446\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/NTktNTE2NC5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/Fo7Hez2yI4O5zl0b0MwWyMGONOhOnjpR0OcyiCAUoJs\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A448\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/MzEtNzM3Mi5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/8mHCKJxPcqLt3b_Abv6s41Zx2usAEJbRzOycr4iCZwA\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A450\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/MzQtNjk3OC5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/5FYxgRrsxIezFLvnv4hSyQu87dDNE6Xnpm3GO1Yj6BQ\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A450\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/MjMtNzY3Mi5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/RKT8XsR62gKR7eI9iqDAMUHoWKf\u002DQtc1K90naZuSa7E\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A449\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/NTEtNDAxMy5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/QcXG4BEsxuh6qX_2wdHxHv9ybPKrLr0_A3ZmJLfYPMw\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A449\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/MTQtODgyMS5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/M0UJhsM4vZ3Lc0OZeAae_nLHyrUHSQmmoFgVtuFYM00\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A452\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/NTEtMzg5My5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/cmuHj2dfP20x4VPCEMCHs5lPCBeFjEngk5wMng4APaU\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A452\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/NDQtNDA3Ny5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/PPwsj0kyoeRLuGGvx8Xi_vSJXJ5Acc5MGwQpOzTkhZk\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A451\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/NTEtMjE1My5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/qay\u002DhmevCzGstdI96UhHHEnYjnNIgOqQoG562PkaFwg\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A451\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/NDgtMTA4My5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/6ZccqLT8z_KhmoQoSuipBn7BEubR2ON871I_FVK84WI\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A453\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/NDYtNzM0Ni5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/b9un9O0xS7gs_Biio\u002DseyJRiePbtsoTWrYCcOTAsvm4\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A453\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/NDQtNzczNi5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/bc022R_hyvFCdw0GsYXZZKjVNjYVcVfnldZ_0vrD8_w\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A451\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/NDAtMTIyMC5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/K9w9yWcSC3G5WE5aPMy52Yvb0uJjKcXfELuB9V1RMW0\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A451\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/MzYtNDc3MS5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/Yj3U_S2u7mYcfE0UKNBWmEDsTDpPRQGeWu5c5cKSeOk\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A454\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/NDYtNTU2OC5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/D1mivIqTW2mwFUTgaUnBn1D\u002DnV3DbEC0_BW_0nve03s\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A454\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/NDctNjExNi5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/76ozC4GPoOVMJLqHxmbLQ4oqlTz6aG1Q2McXQkRzpzs\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A454\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/MzItOTEyNi5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/m0sP2SwE11ioEzafzGvhOuCnJRzBjBLJvEyeg7aEsio\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A9\/w\u003A600\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY1\/NTQtOTk2OC5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/XS_7Nf94Y6nsU9OCziSmYwSZQxH1jQ0hKktBrVX6utE\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A257\/w\u003A600\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI4MDIx\/MjYwLTE2OTU2OTY2\/MjUtNDY0Mi5qcGVn.jpeg'          ];
           const track = document.getElementById('carousel-track');
           const dots = document.querySelectorAll('.dot');
           const thumbs = document.querySelectorAll('.thumb');
@@ -949,8 +964,49 @@
               const target = t.dataset.tab;
               tabs.forEach(t2 => t2.classList.toggle('active', t2 === t));
               contents.forEach(c => c.classList.toggle('active', c.id === `tab-${target}`));
+
+              if (target === 'recommendations' && !t.dataset.loaded) {
+                fetchRecommendations();
+                t.dataset.loaded = 'true';
+              }
             });
           });
+
+          async function fetchRecommendations() {
+            const container = document.getElementById('recommendations-container');
+            try {
+              const res = await fetch(`/release/28021260/recommendations`);
+              const data = await res.json();
+              
+              if (data.error) {
+                container.innerHTML = `<p class="muted">${data.error}</p>`;
+                return;
+              }
+
+              if (data.recommendations && data.recommendations.length > 0) {
+                let html = '<ul style="margin:0; padding-left:20px">';
+                data.recommendations.forEach(item => {
+                  const label = item.type === 'release' ? `${item.artist} — ${item.title}` : item.artist;
+                  const searchUrl = `/?q=${encodeURIComponent('discogs: ' + (item.type === 'artist' ? 'artist:' : '') + item.artist + (item.type === 'release' ? ' title:"' + item.title + '"' : ''))}`;
+                  
+                  html += `<li style="margin-bottom:12px">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px">
+                      <span><strong>${label}</strong> <span class="muted">(${item.type})</span></span>
+                      <div style="display:flex; gap:8px">
+                        <a href="${searchUrl}" class="muted" style="font-size:0.8rem; border:1px solid #2a2b2f; padding:2px 8px; border-radius:4px; text-decoration:none; color:var(--accent)">Live Search</a>
+                      </div>
+                    </div>
+                  </li>`;
+                });
+                html += '</ul>';
+                container.innerHTML = html;
+              } else {
+                container.innerHTML = '<p class="muted">No recommendations found.</p>';
+              }
+            } catch (e) {
+              container.innerHTML = '<p class="muted">Error loading recommendations.</p>';
+            }
+          }
 
           // Handle tab parameter in URL
           const urlParams = new URLSearchParams(window.location.search);
@@ -986,6 +1042,25 @@
                     document.querySelector('.tab[data-tab="status"]').click();
                 }
             });
+          })();
+
+          // Apple Music Player
+          (async function loadAppleMusicPlayer() {
+              const container = document.getElementById('apple-music-player-container');
+              const player = document.getElementById('apple-music-player');
+              if (!container || !player) return;
+
+              try {
+                  const res = await fetch(`/release/28021260/apple-music-id`);
+                  const data = await res.json();
+
+                  if (data.apple_music_id) {
+                      container.style.display = 'block';
+                      player.innerHTML = `<iframe allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" frameborder="0" height="450" style="width:100%;max-width:660px;overflow:hidden;border-radius:10px;" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="https://embed.music.apple.com/us/album/${data.apple_music_id}"></iframe>`;
+                  }
+              } catch (e) {
+                  console.error('Failed to load Apple Music player:', e);
+              }
           })();
         });
       </script>

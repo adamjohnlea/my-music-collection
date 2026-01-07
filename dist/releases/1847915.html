@@ -196,6 +196,16 @@
     .tab-content { display: none; padding-top: 20px; }
     .tab-content.active { display: block; }
 
+    /* Skeleton Loader */
+    @keyframes skeleton-loading {
+      0% { opacity: 1; }
+      50% { opacity: 0.4; }
+      100% { opacity: 1; }
+    }
+    .skeleton-loader div {
+      animation: skeleton-loading 1.5s infinite ease-in-out;
+    }
+
     /* Lightbox */
     .lightbox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--overlay);z-index:1000}
     .lightbox.open{display:flex}
@@ -221,14 +231,14 @@
   <header class="main-header">
     <div class="wrap">
       <div class="header-content">
-        <a href="/" class="logo">My Music</a>
+        <a href="./index.html" class="logo">My Music</a>
 
         <div class="desktop-nav">
-          <a href="/?view=collection" class="muted">Collection</a>
-          <a href="/?view=wantlist" class="muted">Wantlist</a>
-          <a href="/random" class="muted">Surprise Me</a>
-          <a href="/stats" class="muted">Stats</a>
-          <a href="/about" class="muted">About</a>
+          <a href="./index.html" class="muted">Collection</a>
+          <a href="./wantlist.html" class="muted">Wantlist</a>
+          <a href="javascript:void(0)" class="muted" onclick="if(window.surpriseMe)window.surpriseMe();">Surprise Me</a>
+          <a href="./stats.html" class="muted">Stats</a>
+          <a href="./about.html" class="muted">About</a>
         </div>
 
         <button class="mobile-nav-toggle" id="mobile-toggle" aria-label="Toggle menu">☰</button>
@@ -237,19 +247,19 @@
   </header>
 
   <div class="mobile-menu" id="mobile-menu">
-    <a href="/?view=collection" class="nav-item">Collection</a>
-    <a href="/?view=wantlist" class="nav-item">Wantlist</a>
-    <a href="/random" class="nav-item">Surprise Me</a>
-    <a href="/stats" class="nav-item">Stats</a>
-    <a href="/about" class="nav-item">About</a>
+    <a href="./index.html" class="nav-item">Collection</a>
+    <a href="./wantlist.html" class="nav-item">Wantlist</a>
+    <a href="javascript:void(0)" class="nav-item" onclick="if(window.surpriseMe)window.surpriseMe();">Surprise Me</a>
+    <a href="./stats.html" class="nav-item">Stats</a>
+    <a href="./about.html" class="nav-item">About</a>
   </div>
 
   <div class="wrap">
       <nav class="breadcrumbs">
     <div>
-      <a href="/">Home</a>
+      <a href="../index.html">Home</a>
       <span>/</span>
-      <a href="/?view=collection">Collection</a>
+      <a href="../index.html">Collection</a>
       <span>/</span>
       Notorious
     </div>
@@ -371,7 +381,7 @@
             <div class="tab" data-tab="details">Details</div>
             <div class="tab" data-tab="credits">Credits</div>
             <div class="tab" data-tab="status">Status & Notes</div>
-          </div>
+                      </div>
 
           <div id="tab-tracks" class="tab-content active">
                           <div class="card">
@@ -390,7 +400,11 @@
                                       </ol>
                 </div>
               </div>
-                      </div>
+            
+            <div id="apple-music-player-container" style="margin-top:24px; display:none;">
+              <div id="apple-music-player"></div>
+            </div>
+          </div>
 
           <div id="tab-details" class="tab-content">
             <div class="card">
@@ -563,7 +577,8 @@
                                                          </div>
             </div>
           </div>
-        </div>
+
+                  </div>
       </div>
 
             <!-- Lightbox overlay -->
@@ -648,8 +663,49 @@
               const target = t.dataset.tab;
               tabs.forEach(t2 => t2.classList.toggle('active', t2 === t));
               contents.forEach(c => c.classList.toggle('active', c.id === `tab-${target}`));
+
+              if (target === 'recommendations' && !t.dataset.loaded) {
+                fetchRecommendations();
+                t.dataset.loaded = 'true';
+              }
             });
           });
+
+          async function fetchRecommendations() {
+            const container = document.getElementById('recommendations-container');
+            try {
+              const res = await fetch(`/release/1847915/recommendations`);
+              const data = await res.json();
+              
+              if (data.error) {
+                container.innerHTML = `<p class="muted">${data.error}</p>`;
+                return;
+              }
+
+              if (data.recommendations && data.recommendations.length > 0) {
+                let html = '<ul style="margin:0; padding-left:20px">';
+                data.recommendations.forEach(item => {
+                  const label = item.type === 'release' ? `${item.artist} — ${item.title}` : item.artist;
+                  const searchUrl = `/?q=${encodeURIComponent('discogs: ' + (item.type === 'artist' ? 'artist:' : '') + item.artist + (item.type === 'release' ? ' title:"' + item.title + '"' : ''))}`;
+                  
+                  html += `<li style="margin-bottom:12px">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px">
+                      <span><strong>${label}</strong> <span class="muted">(${item.type})</span></span>
+                      <div style="display:flex; gap:8px">
+                        <a href="${searchUrl}" class="muted" style="font-size:0.8rem; border:1px solid #2a2b2f; padding:2px 8px; border-radius:4px; text-decoration:none; color:var(--accent)">Live Search</a>
+                      </div>
+                    </div>
+                  </li>`;
+                });
+                html += '</ul>';
+                container.innerHTML = html;
+              } else {
+                container.innerHTML = '<p class="muted">No recommendations found.</p>';
+              }
+            } catch (e) {
+              container.innerHTML = '<p class="muted">Error loading recommendations.</p>';
+            }
+          }
 
           // Handle tab parameter in URL
           const urlParams = new URLSearchParams(window.location.search);
@@ -685,6 +741,25 @@
                     document.querySelector('.tab[data-tab="status"]').click();
                 }
             });
+          })();
+
+          // Apple Music Player
+          (async function loadAppleMusicPlayer() {
+              const container = document.getElementById('apple-music-player-container');
+              const player = document.getElementById('apple-music-player');
+              if (!container || !player) return;
+
+              try {
+                  const res = await fetch(`/release/1847915/apple-music-id`);
+                  const data = await res.json();
+
+                  if (data.apple_music_id) {
+                      container.style.display = 'block';
+                      player.innerHTML = `<iframe allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" frameborder="0" height="450" style="width:100%;max-width:660px;overflow:hidden;border-radius:10px;" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="https://embed.music.apple.com/us/album/${data.apple_music_id}"></iframe>`;
+                  }
+              } catch (e) {
+                  console.error('Failed to load Apple Music player:', e);
+              }
           })();
         });
       </script>

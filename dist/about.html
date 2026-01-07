@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>About this app</title>
+  <style>
+    :root {
+      --bg: #0b0b0c;
+      --card: #16171a;
+      --text: #e7e7ea;
+      --muted: #a0a3aa;
+      --accent: #67e8f9;
+      --border: #2a2b2f;
+      --header-bg: rgba(11, 11, 12, 0.8);
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    .content-wrap {
+      margin-top: 24px;
+      margin-bottom: 24px;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .muted { color: var(--muted); }
+
+    /* Layout Helpers */
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .gap-4 { gap: 16px; }
+    .gap-2 { gap: 8px; }
+
+    /* Common Components */
+    .btn-small {
+      font-size: .8rem;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--card);
+      color: var(--text);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-small:hover { border-color: var(--accent); text-decoration: none; }
+
+    /* Common Header Components */
+    .main-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--header-bg);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-content {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    /* Desktop Nav */
+    .desktop-nav { display: flex; align-items: center; gap: 20px; }
+    @media (max-width: 768px) { .desktop-nav { display: none; } }
+
+    /* Account Dropdown */
+    .dropdown { position: relative; display: inline-block; }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background: var(--card);
+      min-width: 160px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      padding: 8px 0;
+      z-index: 101;
+    }
+    .dropdown:hover .dropdown-content { display: block; }
+    .dropdown-item {
+      display: block;
+      padding: 8px 16px;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .dropdown-item:hover { background: rgba(255,255,255,0.05); }
+
+    /* Mobile Nav / Hamburger */
+    .mobile-nav-toggle {
+      display: none;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 8px;
+    }
+    @media (max-width: 768px) { .mobile-nav-toggle { display: block; } }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 65px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg);
+      z-index: 99;
+      padding: 20px;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .mobile-menu.active { display: flex; }
+    .mobile-menu .nav-item {
+        display: block;
+        padding: 12px 16px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: var(--text);
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .mobile-menu .nav-item:hover { border-color: var(--accent); }
+
+    /* Breadcrumbs */
+    .breadcrumbs {
+      padding: 12px 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .breadcrumbs a { color: var(--muted); }
+    .breadcrumbs span { margin: 0 8px; opacity: 0.5; }
+
+    /* Utility Bar (Mobile Sticky Search/Sort) */
+    .utility-bar {
+        display: none;
+        position: sticky;
+        top: 65px;
+        z-index: 90;
+        background: var(--bg);
+        padding: 8px 20px;
+        border-bottom: 1px solid var(--border);
+    }
+    @media (max-width: 768px) {
+        .utility-bar.is-visible { display: block; }
+    }
+  </style>
+    <style>
+    .card{background:var(--card);border-radius:12px;overflow:hidden}
+    .meta{padding:24px}
+    .muted{color:var(--muted)}
+    h1{margin-top:0}
+    h2{margin:0 0 12px 0; font-size:1.4rem; color:var(--accent)}
+    p{margin:0 0 16px 0}
+    li{margin-bottom:8px}
+  </style>
+</head>
+<body>
+  <header class="main-header">
+    <div class="wrap">
+      <div class="header-content">
+        <a href="./index.html" class="logo">My Music</a>
+
+        <div class="desktop-nav">
+          <a href="./index.html" class="muted">Collection</a>
+          <a href="./wantlist.html" class="muted">Wantlist</a>
+          <a href="javascript:void(0)" class="muted" onclick="if(window.surpriseMe)window.surpriseMe();">Surprise Me</a>
+          <a href="./stats.html" class="muted">Stats</a>
+          <a href="./about.html" class="muted">About</a>
+        </div>
+
+        <button class="mobile-nav-toggle" id="mobile-toggle" aria-label="Toggle menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="./index.html" class="nav-item">Collection</a>
+    <a href="./wantlist.html" class="nav-item">Wantlist</a>
+    <a href="javascript:void(0)" class="nav-item" onclick="if(window.surpriseMe)window.surpriseMe();">Surprise Me</a>
+    <a href="./stats.html" class="nav-item">Stats</a>
+    <a href="./about.html" class="nav-item">About</a>
+  </div>
+
+  <div class="wrap">
+      <nav class="breadcrumbs">
+    <div>
+      <a href="./index.html">Home</a>
+      <span>/</span>
+      About
+    </div>
+  </nav>
+  </div>
+
+  
+    <div class="wrap content-wrap">
+    <div class="card">
+      <div class="meta">
+        <h1>About</h1>
+        <p>This app lets you browse your Discogs collection locally, fast — powered by a small SQLite database and cached images. It honors Discogs API rate limits and avoids live calls during normal browsing.</p>
+        <p class="muted">Data provided by Discogs. Discogs® is a trademark of Zink Media, LLC. This project is for personal use. If you run it publicly, ensure your data is refreshed at least every 6 hours and include proper attribution.</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="meta">
+        <h2 style="margin:0 0 8px 0; font-size:1.2rem;">How it works</h2>
+        <ol style="margin:0 0 0 20px; padding:0;">
+          <li>Initial sync: we call the Discogs API to import your collection and wantlist into a local SQLite database.</li>
+          <li>Local-first UI: the web app reads only from your database and local images for fast, offline‑friendly browsing.</li>
+          <li>Optional enrichment: when you choose, we fetch full release details from the Discogs API (tracklist, genres/styles, credits, companies, identifiers, notes, videos) and store them locally.</li>
+          <li>Image cache: cover and gallery images are downloaded to <code>public/images/</code> with a conservative throttle (≈1 req/sec, ≤1000/day).</li>
+          <li>Incremental refresh: an optional job updates only items added/changed since your last run (both collection and wantlist).</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="meta">
+        <h2 style="margin:0 0 8px 0; font-size:1.2rem;">Key features</h2>
+        <ul style="margin:0 0 0 20px; padding:0;">
+          <li>Fast, local browsing from SQLite + cached images (no live API calls during normal use).</li>
+          <li>Smart rate limiting and retries that respect Discogs headers and Retry‑After.</li>
+          <li>Full release details (optional) including tracklist, credits, companies, identifiers, videos, and notes.</li>
+          <li>Wantlist support: view and manage your Discogs wantlist locally.</li>
+          <li>Smart Collections: save any search as a shortcut in your sidebar for quick access.</li>
+          <li>Collection Statistics: view insights on your collection by artist, genre, decade, and format.</li>
+          <li>Randomizer: use the "Surprise Me" button to pick a random release from your collection.</li>
+          <li>Live Search: find releases on Discogs and add them to your collection or wantlist directly.</li>
+          <li>Image gallery with a lightbox viewer; collection grid prefers the original cover image.</li>
+          <li>Powerful search (SQLite FTS5): search by artist, title, label, format, genre/style, country, year, identifiers (barcode/catno/matrix), credits/companies, and notes.</li>
+          <li>Useful sorts: Added date, Year, Artist, Title, Rating (with stable tie‑breakers).</li>
+          <li>Incremental refresh with a stored cursor so you can safely run it anytime.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="meta">
+        <h2 style="margin:0 0 8px 0; font-size:1.2rem;">Search tips</h2>
+        <p class="muted" style="margin-top:0">Use the header search box on the collection page. Examples:</p>
+        <ul style="margin:0 0 0 20px; padding:0;">
+          <li><code>miles davis kind of blue</code> — free text across artist/title/tracklist/etc.</li>
+          <li><code>artist:"duran duran"</code> — quoted phrase matches.</li>
+          <li><code>year:1980</code> or <code>year:1980..1989</code> — single year or range.</li>
+          <li><code>label:"blue note" catno:BST-84003</code> — label + catalog number.</li>
+          <li><code>barcode:0602527</code> — identifier search (also matrix/runout, ASIN, etc.).</li>
+          <li><code>notes:"first press"</code> — matches release notes and your personal notes.</li>
+        </ul>
+        <p class="muted" style="margin-top:8px">Tip: field prefixes accept a space after the colon (e.g., <code>year: 1980</code>).</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="meta">
+        <h2 style="margin:0 0 8px 0; font-size:1.2rem;">Sorting</h2>
+        <ul style="margin:0 0 0 20px; padding:0;">
+          <li>Default: Added (newest first).</li>
+          <li>Other options: Year, Artist, Title, Rating. Advanced sorts (Label/Format) are wired server‑side and may appear later.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="meta">
+        <h2 style="margin:0 0 8px 0; font-size:1.2rem;">Rate limits & quotas</h2>
+        <ul style="margin:0 0 0 20px; padding:0;">
+          <li>Core API: header‑aware limiter based on <code>X-Discogs-Ratelimit*</code>; automatic backoff on 429/5xx with <code>Retry-After</code>.</li>
+          <li>Images: separate throttle ~1 request/sec and a persisted daily cap of 1000/day (UTC reset).</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="meta">
+        <h2 style="margin:0 0 8px 0; font-size:1.2rem;">Data storage</h2>
+        <ul style="margin:0 0 0 20px; padding:0;">
+          <li>SQLite DB: <code>var/app.db</code> at the project root (never under <code>public/</code>).</li>
+          <li>Images: <code>public/images/&lt;release_id&gt;/&lt;sha1&gt;.jpg</code>; the UI prefers local files and falls back to Discogs URLs.</li>
+          <li>State: lightweight <code>kv_store</code> table keeps limiter counters, cursors, and schema version.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="meta">
+        <h2 style="margin:0 0 8px 0; font-size:1.2rem;">Privacy & usage</h2>
+        <ul style="margin:0 0 0 20px; padding:0;">
+          <li>Personal/local by default: browsing does not hit the Discogs API.</li>
+          <li>If you self‑host publicly: add a scheduled refresh (≤6h) and an attribution banner. Respect Discogs ToU.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="meta">
+        <h2 style="margin:0 0 8px 0; font-size:1.2rem;">Commands</h2>
+        <ul style="margin:0 0 0 20px; padding:0;">
+          <li><code>php bin/console sync:initial</code> — initial import (collection and wantlist)</li>
+          <li><code>php bin/console sync:refresh</code> — incremental refresh (new/changed items)</li>
+          <li><code>php bin/console sync:enrich --limit=100</code> — fetch full release details</li>
+          <li><code>php bin/console images:backfill --limit=200</code> — download covers to local cache</li>
+          <li><code>php bin/console search:rebuild</code> — rebuild search index</li>
+          <li><code>php bin/console sync:push</code> — push queued rating/note/collection changes to Discogs</li>
+          <li><code>php bin/console export:static</code> — generate a portable static site</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="meta">
+        <h2 style="margin:0 0 8px 0; font-size:1.2rem;">What’s new</h2>
+        <p class="muted" style="margin-top:0">Last updated: 2025-12-24 01:30</p>
+        <ul style="margin:0 0 0 20px; padding:0;">
+          <li>Wantlist support: Initial sync and refresh now include your Discogs wantlist. Toggle between Collection and Wantlist in the header.</li>
+          <li>Live Discogs Search: Search the Discogs database directly (use <code>discogs:</code> prefix or the button) and add releases to your local DB.</li>
+          <li>Smart Collections: Save your frequent searches as shortcuts in the sidebar.</li>
+          <li>Statistics page: Visualize your collection's composition by artist, genre, decade, and format.</li>
+          <li>Randomizer: "Surprise Me" button to help you pick what to listen to.</li>
+          <li>Static Site Generator: Export your collection as a portable static site using <code>php bin/console export:static</code>.</li>
+          <li>Ratings and notes push: Edit ratings and notes locally and push them to Discogs via <code>php bin/console sync:push</code>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="meta">
+        <h2 style="margin:0 0 8px 0; font-size:1.2rem;">Notes and ratings</h2>
+        <ul style="margin:0 0 0 20px; padding:0;">
+          <li>Ratings: editable here and synced to Discogs via <code>sync:push</code>. Use <code>sync:refresh</code> to pull updates.</li>
+          <li>Personal notes: stored locally and searchable here; they do not sync to Discogs.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <div class="meta">
+        <h2 style="margin:0 0 8px 0; font-size:1.2rem;">Troubleshooting</h2>
+        <ul style="margin:0 0 0 20px; padding:0;">
+          <li>No items on home page? Ensure both CLI and web use the same DB path (<code>var/app.db</code>) and run <code>sync:initial</code>.</li>
+          <li>Images not local? Run <code>images:backfill</code>; the UI will switch to local files automatically.</li>
+          <li>Missing notes/credits? Run <code>sync:enrich</code> again; it now targets releases missing notes as well.</li>
+          <li>Search feels off? Try <code>search:rebuild</code> to repopulate the FTS index.</li>
+        </ul>
+        <p class="muted" style="margin-top:8px">We’ll keep this page updated as features evolve.</p>
+      </div>
+    </div>
+  </div>
+
+    <script>
+    document.getElementById('mobile-toggle')?.addEventListener('click', function() {
+      document.getElementById('mobile-menu').classList.toggle('active');
+      this.textContent = document.getElementById('mobile-menu').classList.contains('active') ? '✕' : '☰';
+    });
+  </script>
+
+  <footer class="site-footer muted" style="text-align:center;margin:24px 0 8px 0;font-size:.9rem;">
+  Powered by Discogs API & Coffee Since 2026 | Lovingly Crafted in Boise, Idaho
+</footer>
+</body>
+</html>

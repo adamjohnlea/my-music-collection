@@ -78,7 +78,7 @@ class ExportStaticCommand extends Command
         $twig->addGlobal('base_url', $baseUrl);
 
         // 1) Export lightweight releases list JSON for catalog
-        $output->writeln('<info>Exporting releases list…</info>');
+        $output->writeln('<info>Exporting collection list…</info>');
         $all = $this->fetchAllReleases($pdo, $username, $baseDir, $baseUrl);
         $count = count($all);
         $output->writeln(sprintf('  - %d releases', $count));
@@ -96,10 +96,29 @@ class ExportStaticCommand extends Command
             file_put_contents($dataDir . '/releases.json', json_encode($all, JSON_UNESCAPED_SLASHES));
         }
 
+        // 1b) Export wantlist
+        $output->writeln('<info>Exporting wantlist…</info>');
+        $wants = $this->fetchAllReleases($pdo, $username, $baseDir, $baseUrl, 'wantlist_items');
+        $wantsCount = count($wants);
+        $output->writeln(sprintf('  - %d wantlist items', $wantsCount));
+        file_put_contents($dataDir . '/wantlist.json', json_encode($wants, JSON_UNESCAPED_SLASHES));
+
         // 2) Export per-release JSON and HTML pages
         $output->writeln('<info>Exporting release detail pages…</info>');
         $n = 0;
-        foreach ($all as $row) {
+        $allForDetails = array_merge($all, $wants);
+        // unique releases only
+        $seen = [];
+        $uniqueReleases = [];
+        foreach ($allForDetails as $r) {
+            if (!isset($seen[$r['id']])) {
+                $seen[$r['id']] = true;
+                $uniqueReleases[] = $r;
+            }
+        }
+        $totalToExport = count($uniqueReleases);
+
+        foreach ($uniqueReleases as $row) {
             $rid = (int)$row['id'];
             [$release, $details, $images, $imageUrl] = $this->loadReleaseDetail($pdo, $rid, $baseDir, $baseUrl);
             // JSON
@@ -122,7 +141,7 @@ class ExportStaticCommand extends Command
             ]);
             file_put_contents($pagesDir . '/' . $rid . '.html', $html);
             $n++;
-            if (($n % 100) === 0) $output->writeln("  - $n / $count");
+            if (($n % 100) === 0) $output->writeln("  - $n / $totalToExport");
         }
 
         // 3) Copy images (optional)
@@ -138,7 +157,7 @@ class ExportStaticCommand extends Command
         }
 
         // 4) Write static assets (CSS/JS) and index.html
-        $output->writeln('<info>Writing static assets and index.html…</info>');
+        $output->writeln('<info>Writing static assets, index.html, about, stats, and wantlist…</info>');
         $this->writeClientBundle($assetsDir);
 
         $indexHtml = $twig->render('static/index.html.twig', [
@@ -146,10 +165,35 @@ class ExportStaticCommand extends Command
             'total' => $count,
             'base_url' => $baseUrl,
             'data_is_chunked' => $chunkSize > 0 && $count > $chunkSize,
+            'view' => 'collection',
             // Provide inline JSON as a fallback when opening via file:// where fetch() may be blocked
             'releases_json' => ($chunkSize > 0 && $count > $chunkSize) ? null : json_encode($all, JSON_UNESCAPED_SLASHES),
         ]);
         file_put_contents($outDir . '/index.html', $indexHtml);
+
+        $wantlistHtml = $twig->render('static/index.html.twig', [
+            'title' => 'My Wantlist',
+            'total' => $wantsCount,
+            'base_url' => $baseUrl,
+            'view' => 'wantlist',
+            'releases_json' => json_encode($wants, JSON_UNESCAPED_SLASHES),
+        ]);
+        file_put_contents($outDir . '/wantlist.html', $wantlistHtml);
+
+        $aboutHtml = $twig->render('about.html.twig', [
+            'title' => 'About this app',
+            'base_url' => $baseUrl,
+            'static_export' => true,
+        ]);
+        file_put_contents($outDir . '/about.html', $aboutHtml);
+
+        $statsData = $this->fetchStats($pdo, $username);
+        $statsHtml = $twig->render('stats.html.twig', array_merge([
+            'title' => 'Collection Statistics',
+            'base_url' => $baseUrl,
+            'static_export' => true,
+        ], $statsData));
+        file_put_contents($outDir . '/stats.html', $statsHtml);
 
         $output->writeln('<info>Static export complete.</info>');
         $output->writeln('Open the dist/index.html in a browser, or upload the dist/ folder to any static host.');
@@ -186,15 +230,15 @@ class ExportStaticCommand extends Command
         return null;
     }
 
-    private function fetchAllReleases(\PDO $pdo, string $username, string $baseDir, string $baseUrl): array
+    private function fetchAllReleases(\PDO $pdo, string $username, string $baseDir, string $baseUrl, string $itemsTable = 'collection_items'): array
     {
         $sql = "SELECT r.id, r.title, r.artist, r.year, r.thumb_url, r.cover_url,
             (SELECT local_path FROM images i WHERE i.release_id = r.id AND i.source_url = r.cover_url ORDER BY id ASC LIMIT 1) AS primary_local_path,
             (SELECT local_path FROM images i WHERE i.release_id = r.id ORDER BY id ASC LIMIT 1) AS any_local_path,
-            (SELECT MAX(ci2.added) FROM collection_items ci2 WHERE ci2.release_id = r.id AND ci2.username = :u) AS added_at,
-            (SELECT MAX(ci3.rating) FROM collection_items ci3 WHERE ci3.release_id = r.id AND ci3.username = :u) AS rating
+            (SELECT MAX(ci2.added) FROM $itemsTable ci2 WHERE ci2.release_id = r.id AND ci2.username = :u) AS added_at,
+            (SELECT MAX(ci3.rating) FROM $itemsTable ci3 WHERE ci3.release_id = r.id AND ci3.username = :u) AS rating
         FROM releases r
-        WHERE EXISTS (SELECT 1 FROM collection_items ci WHERE ci.release_id = r.id AND ci.username = :u)
+        WHERE EXISTS (SELECT 1 FROM $itemsTable ci WHERE ci.release_id = r.id AND ci.username = :u)
         GROUP BY r.id
         ORDER BY r.id DESC";
         $st = $pdo->prepare($sql);
@@ -207,6 +251,12 @@ class ExportStaticCommand extends Command
             unset($row['primary_local_path'], $row['any_local_path']);
         }
         return $rows;
+    }
+
+    private function fetchStats(\PDO $pdo, string $username): array
+    {
+        $repo = new \App\Infrastructure\Persistence\SqliteCollectionRepository($pdo);
+        return $repo->getCollectionStats($username);
     }
 
     private function loadReleaseDetail(\PDO $pdo, int $rid, string $baseDir, string $baseUrl): array
@@ -416,21 +466,28 @@ class ExportStaticCommand extends Command
   }
 
   async function load(){
-    // Try chunked manifest else single file; if both fail (e.g., file://), fall back to inline JSON
+    const isWantlist = location.pathname.endsWith('wantlist.html');
+    const dataFile = isWantlist ? 'data/wantlist.json' : 'data/releases.json';
+    const manifestFile = isWantlist ? null : 'data/releases.manifest.json';
+
+    if (manifestFile) {
+      try {
+        const manRes = await fetch(manifestFile);
+        if (manRes.ok){
+          const manifest = await manRes.json();
+          const files = manifest.map(m=> 'data/'+m.file);
+          const arrays = await Promise.all(files.map(f=> fetch(f).then(r=>r.json())));
+          state.data = arrays.flat();
+          return;
+        }
+      } catch(e) {}
+    }
+
     try {
-      const manRes = await fetch('data/releases.manifest.json');
-      if (manRes.ok){
-        const manifest = await manRes.json();
-        const files = manifest.map(m=> 'data/'+m.file);
-        const arrays = await Promise.all(files.map(f=> fetch(f).then(r=>r.json())));
-        state.data = arrays.flat();
-        return;
-      }
-    } catch(e) {}
-    try {
-      const res = await fetch('data/releases.json');
+      const res = await fetch(dataFile);
       if (res.ok){ state.data = await res.json(); return; }
     } catch(e) {}
+
     // Inline fallback
     const el = document.getElementById('releases-data');
     if (el) {
@@ -439,6 +496,17 @@ class ExportStaticCommand extends Command
       state.data = [];
     }
   }
+
+  function surprise() {
+    if (!state.data.length) return;
+    const items = applyFilters(state.data);
+    if (!items.length) return;
+    const r = items[Math.floor(Math.random() * items.length)];
+    const isDetail = location.pathname.includes('/releases/');
+    location.href = (isDetail ? '' : 'releases/') + r.id + '.html';
+  }
+
+  window.surpriseMe = surprise;
 
   wire();
   load().then(()=> render(state.data.slice()));

@@ -218,14 +218,14 @@
   <header class="main-header">
     <div class="wrap">
       <div class="header-content">
-        <a href="/" class="logo">My Music</a>
+        <a href="./index.html" class="logo">My Music</a>
 
         <div class="desktop-nav">
-          <a href="/?view=collection" class="muted">Collection</a>
-          <a href="/?view=wantlist" class="muted">Wantlist</a>
-          <a href="/random" class="muted">Surprise Me</a>
-          <a href="/stats" class="muted">Stats</a>
-          <a href="/about" class="muted">About</a>
+          <a href="./index.html" class="muted">Collection</a>
+          <a href="./wantlist.html" class="muted">Wantlist</a>
+          <a href="javascript:void(0)" class="muted" onclick="if(window.surpriseMe)window.surpriseMe();">Surprise Me</a>
+          <a href="./stats.html" class="muted">Stats</a>
+          <a href="./about.html" class="muted">About</a>
         </div>
 
         <button class="mobile-nav-toggle" id="mobile-toggle" aria-label="Toggle menu">☰</button>
@@ -234,11 +234,11 @@
   </header>
 
   <div class="mobile-menu" id="mobile-menu">
-    <a href="/?view=collection" class="nav-item">Collection</a>
-    <a href="/?view=wantlist" class="nav-item">Wantlist</a>
-    <a href="/random" class="nav-item">Surprise Me</a>
-    <a href="/stats" class="nav-item">Stats</a>
-    <a href="/about" class="nav-item">About</a>
+    <a href="./index.html" class="nav-item">Collection</a>
+    <a href="./wantlist.html" class="nav-item">Wantlist</a>
+    <a href="javascript:void(0)" class="nav-item" onclick="if(window.surpriseMe)window.surpriseMe();">Surprise Me</a>
+    <a href="./stats.html" class="nav-item">Stats</a>
+    <a href="./about.html" class="nav-item">About</a>
   </div>
 
   <div class="wrap">
@@ -246,11 +246,9 @@
 
   
     <div class="wrap">
-    <header>
-      <h1><a href="./" style="color:inherit;text-decoration:none">My Music Collection</a></h1>
-      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;width:100%">
-        <div id="stats" class="muted stats" style="padding-top:20px">154 items</div>
-        <form id="search-form" class="toolbar" method="get" action="./" style="flex:1 1 auto">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;width:100%">
+      <div id="stats" class="muted stats" style="padding-top:20px">154 items</div>
+      <form id="search-form" class="toolbar" method="get" action="./" style="flex:1 1 auto">
           <div style="position:relative">
             <input id="search-input" class="search-input" type="text" name="q" value="" placeholder="Search artist:miles year:1980..1989 barcode:…" style="padding-right:40px" />
             <button type="submit" class="search-submit" title="Search">
@@ -278,11 +276,10 @@
               </optgroup>
             </select>
           </span>
-          <a href="/about.html" class="muted about-link" style="margin-left:8px;display:none">About</a>
+          <a href="about.html" class="muted about-link" style="margin-left:8px">About</a>
         </form>
       </div>
-    </header>
-
+    </div>
     <div id="grid" class="grid" aria-live="polite"></div>
 
     <nav id="pager" class="pagination" aria-label="Pagination"></nav>

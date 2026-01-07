@@ -196,6 +196,16 @@
     .tab-content { display: none; padding-top: 20px; }
     .tab-content.active { display: block; }
 
+    /* Skeleton Loader */
+    @keyframes skeleton-loading {
+      0% { opacity: 1; }
+      50% { opacity: 0.4; }
+      100% { opacity: 1; }
+    }
+    .skeleton-loader div {
+      animation: skeleton-loading 1.5s infinite ease-in-out;
+    }
+
     /* Lightbox */
     .lightbox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--overlay);z-index:1000}
     .lightbox.open{display:flex}
@@ -221,14 +231,14 @@
   <header class="main-header">
     <div class="wrap">
       <div class="header-content">
-        <a href="/" class="logo">My Music</a>
+        <a href="./index.html" class="logo">My Music</a>
 
         <div class="desktop-nav">
-          <a href="/?view=collection" class="muted">Collection</a>
-          <a href="/?view=wantlist" class="muted">Wantlist</a>
-          <a href="/random" class="muted">Surprise Me</a>
-          <a href="/stats" class="muted">Stats</a>
-          <a href="/about" class="muted">About</a>
+          <a href="./index.html" class="muted">Collection</a>
+          <a href="./wantlist.html" class="muted">Wantlist</a>
+          <a href="javascript:void(0)" class="muted" onclick="if(window.surpriseMe)window.surpriseMe();">Surprise Me</a>
+          <a href="./stats.html" class="muted">Stats</a>
+          <a href="./about.html" class="muted">About</a>
         </div>
 
         <button class="mobile-nav-toggle" id="mobile-toggle" aria-label="Toggle menu">☰</button>
@@ -237,19 +247,19 @@
   </header>
 
   <div class="mobile-menu" id="mobile-menu">
-    <a href="/?view=collection" class="nav-item">Collection</a>
-    <a href="/?view=wantlist" class="nav-item">Wantlist</a>
-    <a href="/random" class="nav-item">Surprise Me</a>
-    <a href="/stats" class="nav-item">Stats</a>
-    <a href="/about" class="nav-item">About</a>
+    <a href="./index.html" class="nav-item">Collection</a>
+    <a href="./wantlist.html" class="nav-item">Wantlist</a>
+    <a href="javascript:void(0)" class="nav-item" onclick="if(window.surpriseMe)window.surpriseMe();">Surprise Me</a>
+    <a href="./stats.html" class="nav-item">Stats</a>
+    <a href="./about.html" class="nav-item">About</a>
   </div>
 
   <div class="wrap">
       <nav class="breadcrumbs">
     <div>
-      <a href="/">Home</a>
+      <a href="../index.html">Home</a>
       <span>/</span>
-      <a href="/?view=collection">Collection</a>
+      <a href="../index.html">Collection</a>
       <span>/</span>
       Tom Tom Club
     </div>
@@ -269,49 +279,49 @@
                     <img class="cover" src="../images/26838653/4450b66854da1fe45177de52df7d3a4659709877.jpg" alt="Tom Tom Club cover" data-idx="0" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/26838653/31dc7b13b9d1d9dfd6c93ba638448fff08e5caac.jpg" alt="Tom Tom Club cover" data-idx="1" />
+                    <img class="cover" src="https://i.discogs.com/xJVfFOGFY2RmMbmbfnt29hcODs0cWj9jzVpdP-G-JqU/rs:fit/g:sm/q:90/h:573/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI2ODM4/NjUzLTE2ODc1MzY4/NzktNDQzMy5qcGVn.jpeg" alt="Tom Tom Club cover" data-idx="1" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/26838653/294b4d605b095076080eadd50683909030006b55.jpg" alt="Tom Tom Club cover" data-idx="2" />
+                    <img class="cover" src="https://i.discogs.com/gnR741sR9BdNtHb7mKSY4nhG8hH99PGTKcc_Jw-CIb0/rs:fit/g:sm/q:90/h:573/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI2ODM4/NjUzLTE2ODc1MzY4/NzktNTU4NC5qcGVn.jpeg" alt="Tom Tom Club cover" data-idx="2" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/26838653/017e9102652909fb4c27d4a6cf21878b5de744ab.jpg" alt="Tom Tom Club cover" data-idx="3" />
+                    <img class="cover" src="https://i.discogs.com/-WilJ3Ki58DFQwY5RPEVub3q7XNu0uyrCbawwtbEpCw/rs:fit/g:sm/q:90/h:600/w:597/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI2ODM4/NjUzLTE2ODIxMjg0/NDEtMzE3NC5qcGVn.jpeg" alt="Tom Tom Club cover" data-idx="3" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/26838653/cd3bc1c3d5b22ca25f5ce4052271c76c27c903af.jpg" alt="Tom Tom Club cover" data-idx="4" />
+                    <img class="cover" src="https://i.discogs.com/BPiKcCVbn5C8fXYVJeO6mKpQLYFDZsQ5WxRyqDqeoY4/rs:fit/g:sm/q:90/h:600/w:575/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI2ODM4/NjUzLTE2ODI2MzM4/NjktMTUyOS5qcGVn.jpeg" alt="Tom Tom Club cover" data-idx="4" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/26838653/7de1a7464b1f5d3c2f18bca9ad0ec5edb383f95d.jpg" alt="Tom Tom Club cover" data-idx="5" />
+                    <img class="cover" src="https://i.discogs.com/been3IbSH5SDZYSLFt-oa3ArZhIXlbDbMYrrIW5iAkU/rs:fit/g:sm/q:90/h:600/w:519/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI2ODM4/NjUzLTE2ODI2MzM4/NjgtNTA5Mi5qcGVn.jpeg" alt="Tom Tom Club cover" data-idx="5" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/26838653/439711e5691f79733d32ffaf50e905858f0ec31b.jpg" alt="Tom Tom Club cover" data-idx="6" />
+                    <img class="cover" src="https://i.discogs.com/U8s_bqa6QL5mY81Q81DiZ8xOXkQmH297gcowI9dRtTU/rs:fit/g:sm/q:90/h:600/w:593/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI2ODM4/NjUzLTE2ODc1MzY4/ODItMTQ1OS5qcGVn.jpeg" alt="Tom Tom Club cover" data-idx="6" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/26838653/e2367da54f1e6b0792924cf2c29ea63663ffbd38.jpg" alt="Tom Tom Club cover" data-idx="7" />
+                    <img class="cover" src="https://i.discogs.com/WGztmeWTxehtxGSOqT0zyKVpohdVfokeWlbxGMxk45Y/rs:fit/g:sm/q:90/h:600/w:590/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI2ODM4/NjUzLTE2ODc1MzY4/ODMtMTkxMy5qcGVn.jpeg" alt="Tom Tom Club cover" data-idx="7" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/26838653/209d12b3145f7631bd539160b83def378cdfba05.jpg" alt="Tom Tom Club cover" data-idx="8" />
+                    <img class="cover" src="https://i.discogs.com/IZ9A4T7IEU7ug0hzNMHdtdDUB_fTPBMr5uKzbuqRkow/rs:fit/g:sm/q:90/h:600/w:594/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI2ODM4/NjUzLTE2ODc1MzY4/ODAtOTM0OS5qcGVn.jpeg" alt="Tom Tom Club cover" data-idx="8" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/26838653/c349d3c64897570d1a6262d58e9a774ef9f60ae5.jpg" alt="Tom Tom Club cover" data-idx="9" />
+                    <img class="cover" src="https://i.discogs.com/7yjH_akrzlZLzb0rZcjX946z_3o9Fzs5ub8hBBQpXTw/rs:fit/g:sm/q:90/h:600/w:595/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI2ODM4/NjUzLTE2ODc1MzY4/NzYtNTEzMC5qcGVn.jpeg" alt="Tom Tom Club cover" data-idx="9" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/26838653/1b3d707cffbaaf851f14d2944c35ece5e6251109.jpg" alt="Tom Tom Club cover" data-idx="10" />
+                    <img class="cover" src="https://i.discogs.com/MFE_c1fyI5Ngudh6NsO8xFlnYT64XN8fSIiEcBnsfwQ/rs:fit/g:sm/q:90/h:600/w:599/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI2ODM4/NjUzLTE2ODIxMjg0/NDItNDcwOC5qcGVn.jpeg" alt="Tom Tom Club cover" data-idx="10" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/26838653/7e2013a2488c66c04e2ce3737b0053ec2166a432.jpg" alt="Tom Tom Club cover" data-idx="11" />
+                    <img class="cover" src="https://i.discogs.com/T9T-FqLyEfw1WMQapYYDHXessqnoLlSCy8bu6YlzmF8/rs:fit/g:sm/q:90/h:600/w:366/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI2ODM4/NjUzLTE2ODIxMjg0/MzktOTQ5NC5qcGVn.jpeg" alt="Tom Tom Club cover" data-idx="11" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/26838653/86e4bab31f8da881467c2a2ac28658303e215dad.jpg" alt="Tom Tom Club cover" data-idx="12" />
+                    <img class="cover" src="https://i.discogs.com/-MGBIKo5O740Qb5yiqoU6ZYAgilMUUm2MsK2twDS8fA/rs:fit/g:sm/q:90/h:110/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI2ODM4/NjUzLTE2ODIxMjg0/MzktODg5Mi5qcGVn.jpeg" alt="Tom Tom Club cover" data-idx="12" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/26838653/4d0f25f77b2bf6901105845ff15c5d5ca4080161.jpg" alt="Tom Tom Club cover" data-idx="13" />
+                    <img class="cover" src="https://i.discogs.com/gKE-y3yY3o6AvDxuAKUYjzR1GPy3JaZaS6ZPnU4Grrk/rs:fit/g:sm/q:90/h:134/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI2ODM4/NjUzLTE2ODIxMjg0/MzYtMTAxNi5qcGVn.jpeg" alt="Tom Tom Club cover" data-idx="13" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/26838653/8f6ad984a9bfd6b79bc5b050345e8402e572ffe7.jpg" alt="Tom Tom Club cover" data-idx="14" />
+                    <img class="cover" src="https://i.discogs.com/bZPgLlFF8iQSvR9Yic_tFxZp-JF_i1vGwCN9QMF5UIM/rs:fit/g:sm/q:90/h:128/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI2ODM4/NjUzLTE2ODc1NTY4/MTctMzIzMi5qcGVn.jpeg" alt="Tom Tom Club cover" data-idx="14" />
                   </div>
                                   <div class="carousel-slide">
-                    <img class="cover" src="../images/26838653/a0e1853737029a25e276c94c60091f38e61ffbcb.jpg" alt="Tom Tom Club cover" data-idx="15" />
+                    <img class="cover" src="https://i.discogs.com/SYIs9kCiVWGlr-m8DG3wQIBGwO_sTy2b8fussw7oyy4/rs:fit/g:sm/q:90/h:158/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI2ODM4/NjUzLTE2ODc1NTY5/MTItMTg1NS5qcGVn.jpeg" alt="Tom Tom Club cover" data-idx="15" />
                   </div>
                                           </div>
           </div>
@@ -338,49 +348,49 @@
                   <img src="../images/26838653/4450b66854da1fe45177de52df7d3a4659709877.jpg" alt="thumb 1" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:1" />
                 </button>
                               <button class="thumb" data-idx="1" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/26838653/31dc7b13b9d1d9dfd6c93ba638448fff08e5caac.jpg" alt="thumb 2" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/xJVfFOGFY2RmMbmbfnt29hcODs0cWj9jzVpdP-G-JqU/rs:fit/g:sm/q:90/h:573/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI2ODM4/NjUzLTE2ODc1MzY4/NzktNDQzMy5qcGVn.jpeg" alt="thumb 2" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="2" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/26838653/294b4d605b095076080eadd50683909030006b55.jpg" alt="thumb 3" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/gnR741sR9BdNtHb7mKSY4nhG8hH99PGTKcc_Jw-CIb0/rs:fit/g:sm/q:90/h:573/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI2ODM4/NjUzLTE2ODc1MzY4/NzktNTU4NC5qcGVn.jpeg" alt="thumb 3" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="3" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/26838653/017e9102652909fb4c27d4a6cf21878b5de744ab.jpg" alt="thumb 4" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/-WilJ3Ki58DFQwY5RPEVub3q7XNu0uyrCbawwtbEpCw/rs:fit/g:sm/q:90/h:600/w:597/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI2ODM4/NjUzLTE2ODIxMjg0/NDEtMzE3NC5qcGVn.jpeg" alt="thumb 4" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="4" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/26838653/cd3bc1c3d5b22ca25f5ce4052271c76c27c903af.jpg" alt="thumb 5" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/BPiKcCVbn5C8fXYVJeO6mKpQLYFDZsQ5WxRyqDqeoY4/rs:fit/g:sm/q:90/h:600/w:575/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI2ODM4/NjUzLTE2ODI2MzM4/NjktMTUyOS5qcGVn.jpeg" alt="thumb 5" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="5" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/26838653/7de1a7464b1f5d3c2f18bca9ad0ec5edb383f95d.jpg" alt="thumb 6" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/been3IbSH5SDZYSLFt-oa3ArZhIXlbDbMYrrIW5iAkU/rs:fit/g:sm/q:90/h:600/w:519/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI2ODM4/NjUzLTE2ODI2MzM4/NjgtNTA5Mi5qcGVn.jpeg" alt="thumb 6" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="6" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/26838653/439711e5691f79733d32ffaf50e905858f0ec31b.jpg" alt="thumb 7" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/U8s_bqa6QL5mY81Q81DiZ8xOXkQmH297gcowI9dRtTU/rs:fit/g:sm/q:90/h:600/w:593/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI2ODM4/NjUzLTE2ODc1MzY4/ODItMTQ1OS5qcGVn.jpeg" alt="thumb 7" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="7" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/26838653/e2367da54f1e6b0792924cf2c29ea63663ffbd38.jpg" alt="thumb 8" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/WGztmeWTxehtxGSOqT0zyKVpohdVfokeWlbxGMxk45Y/rs:fit/g:sm/q:90/h:600/w:590/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI2ODM4/NjUzLTE2ODc1MzY4/ODMtMTkxMy5qcGVn.jpeg" alt="thumb 8" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="8" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/26838653/209d12b3145f7631bd539160b83def378cdfba05.jpg" alt="thumb 9" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/IZ9A4T7IEU7ug0hzNMHdtdDUB_fTPBMr5uKzbuqRkow/rs:fit/g:sm/q:90/h:600/w:594/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI2ODM4/NjUzLTE2ODc1MzY4/ODAtOTM0OS5qcGVn.jpeg" alt="thumb 9" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="9" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/26838653/c349d3c64897570d1a6262d58e9a774ef9f60ae5.jpg" alt="thumb 10" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/7yjH_akrzlZLzb0rZcjX946z_3o9Fzs5ub8hBBQpXTw/rs:fit/g:sm/q:90/h:600/w:595/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI2ODM4/NjUzLTE2ODc1MzY4/NzYtNTEzMC5qcGVn.jpeg" alt="thumb 10" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="10" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/26838653/1b3d707cffbaaf851f14d2944c35ece5e6251109.jpg" alt="thumb 11" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/MFE_c1fyI5Ngudh6NsO8xFlnYT64XN8fSIiEcBnsfwQ/rs:fit/g:sm/q:90/h:600/w:599/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI2ODM4/NjUzLTE2ODIxMjg0/NDItNDcwOC5qcGVn.jpeg" alt="thumb 11" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="11" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/26838653/7e2013a2488c66c04e2ce3737b0053ec2166a432.jpg" alt="thumb 12" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/T9T-FqLyEfw1WMQapYYDHXessqnoLlSCy8bu6YlzmF8/rs:fit/g:sm/q:90/h:600/w:366/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI2ODM4/NjUzLTE2ODIxMjg0/MzktOTQ5NC5qcGVn.jpeg" alt="thumb 12" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="12" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/26838653/86e4bab31f8da881467c2a2ac28658303e215dad.jpg" alt="thumb 13" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/-MGBIKo5O740Qb5yiqoU6ZYAgilMUUm2MsK2twDS8fA/rs:fit/g:sm/q:90/h:110/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI2ODM4/NjUzLTE2ODIxMjg0/MzktODg5Mi5qcGVn.jpeg" alt="thumb 13" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="13" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/26838653/4d0f25f77b2bf6901105845ff15c5d5ca4080161.jpg" alt="thumb 14" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/gKE-y3yY3o6AvDxuAKUYjzR1GPy3JaZaS6ZPnU4Grrk/rs:fit/g:sm/q:90/h:134/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI2ODM4/NjUzLTE2ODIxMjg0/MzYtMTAxNi5qcGVn.jpeg" alt="thumb 14" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="14" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/26838653/8f6ad984a9bfd6b79bc5b050345e8402e572ffe7.jpg" alt="thumb 15" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/bZPgLlFF8iQSvR9Yic_tFxZp-JF_i1vGwCN9QMF5UIM/rs:fit/g:sm/q:90/h:128/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI2ODM4/NjUzLTE2ODc1NTY4/MTctMzIzMi5qcGVn.jpeg" alt="thumb 15" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="15" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/26838653/a0e1853737029a25e276c94c60091f38e61ffbcb.jpg" alt="thumb 16" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="https://i.discogs.com/SYIs9kCiVWGlr-m8DG3wQIBGwO_sTy2b8fussw7oyy4/rs:fit/g:sm/q:90/h:158/w:600/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI2ODM4/NjUzLTE2ODc1NTY5/MTItMTg1NS5qcGVn.jpeg" alt="thumb 16" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
                 </button>
                           </div>
                   </div>
@@ -399,7 +409,7 @@
             <div class="tab" data-tab="details">Details</div>
             <div class="tab" data-tab="credits">Credits</div>
             <div class="tab" data-tab="status">Status & Notes</div>
-          </div>
+                      </div>
 
           <div id="tab-tracks" class="tab-content active">
                           <div class="card">
@@ -422,7 +432,11 @@
                                       </ol>
                 </div>
               </div>
-                      </div>
+            
+            <div id="apple-music-player-container" style="margin-top:24px; display:none;">
+              <div id="apple-music-player"></div>
+            </div>
+          </div>
 
           <div id="tab-details" class="tab-content">
             <div class="card">
@@ -630,7 +644,8 @@
                                                          </div>
             </div>
           </div>
-        </div>
+
+                  </div>
       </div>
 
             <!-- Lightbox overlay -->
@@ -647,7 +662,7 @@
       <script>
         document.addEventListener('DOMContentLoaded', function(){
           const images = [
-            '..\/images\/26838653\/4450b66854da1fe45177de52df7d3a4659709877.jpg', '..\/images\/26838653\/31dc7b13b9d1d9dfd6c93ba638448fff08e5caac.jpg', '..\/images\/26838653\/294b4d605b095076080eadd50683909030006b55.jpg', '..\/images\/26838653\/017e9102652909fb4c27d4a6cf21878b5de744ab.jpg', '..\/images\/26838653\/cd3bc1c3d5b22ca25f5ce4052271c76c27c903af.jpg', '..\/images\/26838653\/7de1a7464b1f5d3c2f18bca9ad0ec5edb383f95d.jpg', '..\/images\/26838653\/439711e5691f79733d32ffaf50e905858f0ec31b.jpg', '..\/images\/26838653\/e2367da54f1e6b0792924cf2c29ea63663ffbd38.jpg', '..\/images\/26838653\/209d12b3145f7631bd539160b83def378cdfba05.jpg', '..\/images\/26838653\/c349d3c64897570d1a6262d58e9a774ef9f60ae5.jpg', '..\/images\/26838653\/1b3d707cffbaaf851f14d2944c35ece5e6251109.jpg', '..\/images\/26838653\/7e2013a2488c66c04e2ce3737b0053ec2166a432.jpg', '..\/images\/26838653\/86e4bab31f8da881467c2a2ac28658303e215dad.jpg', '..\/images\/26838653\/4d0f25f77b2bf6901105845ff15c5d5ca4080161.jpg', '..\/images\/26838653\/8f6ad984a9bfd6b79bc5b050345e8402e572ffe7.jpg', '..\/images\/26838653\/a0e1853737029a25e276c94c60091f38e61ffbcb.jpg'          ];
+            '..\/images\/26838653\/4450b66854da1fe45177de52df7d3a4659709877.jpg', 'https\u003A\/\/i.discogs.com\/xJVfFOGFY2RmMbmbfnt29hcODs0cWj9jzVpdP\u002DG\u002DJqU\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A573\/w\u003A600\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI2ODM4\/NjUzLTE2ODc1MzY4\/NzktNDQzMy5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/gnR741sR9BdNtHb7mKSY4nhG8hH99PGTKcc_Jw\u002DCIb0\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A573\/w\u003A600\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI2ODM4\/NjUzLTE2ODc1MzY4\/NzktNTU4NC5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/\u002DWilJ3Ki58DFQwY5RPEVub3q7XNu0uyrCbawwtbEpCw\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A597\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI2ODM4\/NjUzLTE2ODIxMjg0\/NDEtMzE3NC5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/BPiKcCVbn5C8fXYVJeO6mKpQLYFDZsQ5WxRyqDqeoY4\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A575\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI2ODM4\/NjUzLTE2ODI2MzM4\/NjktMTUyOS5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/been3IbSH5SDZYSLFt\u002Doa3ArZhIXlbDbMYrrIW5iAkU\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A519\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI2ODM4\/NjUzLTE2ODI2MzM4\/NjgtNTA5Mi5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/U8s_bqa6QL5mY81Q81DiZ8xOXkQmH297gcowI9dRtTU\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A593\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI2ODM4\/NjUzLTE2ODc1MzY4\/ODItMTQ1OS5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/WGztmeWTxehtxGSOqT0zyKVpohdVfokeWlbxGMxk45Y\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A590\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI2ODM4\/NjUzLTE2ODc1MzY4\/ODMtMTkxMy5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/IZ9A4T7IEU7ug0hzNMHdtdDUB_fTPBMr5uKzbuqRkow\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A594\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI2ODM4\/NjUzLTE2ODc1MzY4\/ODAtOTM0OS5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/7yjH_akrzlZLzb0rZcjX946z_3o9Fzs5ub8hBBQpXTw\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A595\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI2ODM4\/NjUzLTE2ODc1MzY4\/NzYtNTEzMC5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/MFE_c1fyI5Ngudh6NsO8xFlnYT64XN8fSIiEcBnsfwQ\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A599\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI2ODM4\/NjUzLTE2ODIxMjg0\/NDItNDcwOC5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/T9T\u002DFqLyEfw1WMQapYYDHXessqnoLlSCy8bu6YlzmF8\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A600\/w\u003A366\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI2ODM4\/NjUzLTE2ODIxMjg0\/MzktOTQ5NC5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/\u002DMGBIKo5O740Qb5yiqoU6ZYAgilMUUm2MsK2twDS8fA\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A110\/w\u003A600\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI2ODM4\/NjUzLTE2ODIxMjg0\/MzktODg5Mi5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/gKE\u002Dy3yY3o6AvDxuAKUYjzR1GPy3JaZaS6ZPnU4Grrk\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A134\/w\u003A600\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI2ODM4\/NjUzLTE2ODIxMjg0\/MzYtMTAxNi5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/bZPgLlFF8iQSvR9Yic_tFxZp\u002DJF_i1vGwCN9QMF5UIM\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A128\/w\u003A600\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI2ODM4\/NjUzLTE2ODc1NTY4\/MTctMzIzMi5qcGVn.jpeg', 'https\u003A\/\/i.discogs.com\/SYIs9kCiVWGlr\u002Dm8DG3wQIBGwO_sTy2b8fussw7oyy4\/rs\u003Afit\/g\u003Asm\/q\u003A90\/h\u003A158\/w\u003A600\/czM6Ly9kaXNjb2dz\/LWRhdGFiYXNlLWlt\/YWdlcy9SLTI2ODM4\/NjUzLTE2ODc1NTY5\/MTItMTg1NS5qcGVn.jpeg'          ];
           const track = document.getElementById('carousel-track');
           const dots = document.querySelectorAll('.dot');
           const thumbs = document.querySelectorAll('.thumb');
@@ -715,8 +730,49 @@
               const target = t.dataset.tab;
               tabs.forEach(t2 => t2.classList.toggle('active', t2 === t));
               contents.forEach(c => c.classList.toggle('active', c.id === `tab-${target}`));
+
+              if (target === 'recommendations' && !t.dataset.loaded) {
+                fetchRecommendations();
+                t.dataset.loaded = 'true';
+              }
             });
           });
+
+          async function fetchRecommendations() {
+            const container = document.getElementById('recommendations-container');
+            try {
+              const res = await fetch(`/release/26838653/recommendations`);
+              const data = await res.json();
+              
+              if (data.error) {
+                container.innerHTML = `<p class="muted">${data.error}</p>`;
+                return;
+              }
+
+              if (data.recommendations && data.recommendations.length > 0) {
+                let html = '<ul style="margin:0; padding-left:20px">';
+                data.recommendations.forEach(item => {
+                  const label = item.type === 'release' ? `${item.artist} — ${item.title}` : item.artist;
+                  const searchUrl = `/?q=${encodeURIComponent('discogs: ' + (item.type === 'artist' ? 'artist:' : '') + item.artist + (item.type === 'release' ? ' title:"' + item.title + '"' : ''))}`;
+                  
+                  html += `<li style="margin-bottom:12px">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px">
+                      <span><strong>${label}</strong> <span class="muted">(${item.type})</span></span>
+                      <div style="display:flex; gap:8px">
+                        <a href="${searchUrl}" class="muted" style="font-size:0.8rem; border:1px solid #2a2b2f; padding:2px 8px; border-radius:4px; text-decoration:none; color:var(--accent)">Live Search</a>
+                      </div>
+                    </div>
+                  </li>`;
+                });
+                html += '</ul>';
+                container.innerHTML = html;
+              } else {
+                container.innerHTML = '<p class="muted">No recommendations found.</p>';
+              }
+            } catch (e) {
+              container.innerHTML = '<p class="muted">Error loading recommendations.</p>';
+            }
+          }
 
           // Handle tab parameter in URL
           const urlParams = new URLSearchParams(window.location.search);
@@ -752,6 +808,25 @@
                     document.querySelector('.tab[data-tab="status"]').click();
                 }
             });
+          })();
+
+          // Apple Music Player
+          (async function loadAppleMusicPlayer() {
+              const container = document.getElementById('apple-music-player-container');
+              const player = document.getElementById('apple-music-player');
+              if (!container || !player) return;
+
+              try {
+                  const res = await fetch(`/release/26838653/apple-music-id`);
+                  const data = await res.json();
+
+                  if (data.apple_music_id) {
+                      container.style.display = 'block';
+                      player.innerHTML = `<iframe allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" frameborder="0" height="450" style="width:100%;max-width:660px;overflow:hidden;border-radius:10px;" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="https://embed.music.apple.com/us/album/${data.apple_music_id}"></iframe>`;
+                  }
+              } catch (e) {
+                  console.error('Failed to load Apple Music player:', e);
+              }
           })();
         });
       </script>

@@ -49,11 +49,9 @@
 
 {% block content %}
   <div class="wrap">
-    <header>
-      <h1><a href="./" style="color:inherit;text-decoration:none">{{ title }}</a></h1>
-      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;width:100%">
-        <div id="stats" class="muted stats" style="padding-top:20px">{{ total|default(0) }} items</div>
-        <form id="search-form" class="toolbar" method="get" action="./" style="flex:1 1 auto">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;width:100%">
+      <div id="stats" class="muted stats" style="padding-top:20px">{{ total|default(0) }} items</div>
+      <form id="search-form" class="toolbar" method="get" action="./" style="flex:1 1 auto">
           <div style="position:relative">
             <input id="search-input" class="search-input" type="text" name="q" value="{{ q|default('')|e }}" placeholder="Search artist:miles year:1980..1989 barcode:…" style="padding-right:40px" />
             <button type="submit" class="search-submit" title="Search">
@@ -81,11 +79,10 @@
               </optgroup>
             </select>
           </span>
-          <a href="{{ base_url }}/about.html" class="muted about-link" style="margin-left:8px;display:none">About</a>
+          <a href="{{ base_url is same as('') ? '' : base_url ~ '/' }}about.html" class="muted about-link" style="margin-left:8px">About</a>
         </form>
       </div>
-    </header>
-
+    </div>
     <div id="grid" class="grid" aria-live="polite"></div>
 
     <nav id="pager" class="pagination" aria-label="Pagination"></nav>

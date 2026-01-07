@@ -177,14 +177,14 @@
   <header class="main-header">
     <div class="wrap">
       <div class="header-content">
-        <a href="/" class="logo">My Music</a>
+        <a href="{{ static_export ? (base_url is same as('') ? './index.html' : base_url) : '/' }}" class="logo">My Music</a>
 
         <div class="desktop-nav">
-          <a href="/?view=collection" class="muted">Collection</a>
-          <a href="/?view=wantlist" class="muted">Wantlist</a>
-          <a href="/random" class="muted">Surprise Me</a>
-          <a href="/stats" class="muted">Stats</a>
-          <a href="/about" class="muted">About</a>
+          <a href="{{ static_export ? (base_url is same as('') ? './index.html' : base_url) : '/?view=collection' }}" class="muted">Collection</a>
+          <a href="{{ static_export ? (base_url is same as('') ? './wantlist.html' : base_url ~ '/wantlist.html') : '/?view=wantlist' }}" class="muted">Wantlist</a>
+          <a href="{{ static_export ? 'javascript:void(0)' : '/random' }}" class="muted" {% if static_export %}onclick="if(window.surpriseMe)window.surpriseMe();"{% endif %}>Surprise Me</a>
+          <a href="{{ static_export ? (base_url is same as('') ? './stats.html' : base_url ~ '/stats.html') : '/stats' }}" class="muted">Stats</a>
+          <a href="{{ static_export ? (base_url is same as('') ? './about.html' : base_url ~ '/about.html') : '/about' }}" class="muted">About</a>
         </div>
 
         <button class="mobile-nav-toggle" id="mobile-toggle" aria-label="Toggle menu">☰</button>
@@ -193,11 +193,11 @@
   </header>
 
   <div class="mobile-menu" id="mobile-menu">
-    <a href="/?view=collection" class="nav-item">Collection</a>
-    <a href="/?view=wantlist" class="nav-item">Wantlist</a>
-    <a href="/random" class="nav-item">Surprise Me</a>
-    <a href="/stats" class="nav-item">Stats</a>
-    <a href="/about" class="nav-item">About</a>
+    <a href="{{ static_export ? (base_url is same as('') ? './index.html' : base_url) : '/?view=collection' }}" class="nav-item">Collection</a>
+    <a href="{{ static_export ? (base_url is same as('') ? './wantlist.html' : base_url ~ '/wantlist.html') : '/?view=wantlist' }}" class="nav-item">Wantlist</a>
+    <a href="{{ static_export ? 'javascript:void(0)' : '/random' }}" class="nav-item" {% if static_export %}onclick="if(window.surpriseMe)window.surpriseMe();"{% endif %}>Surprise Me</a>
+    <a href="{{ static_export ? (base_url is same as('') ? './stats.html' : base_url ~ '/stats.html') : '/stats' }}" class="nav-item">Stats</a>
+    <a href="{{ static_export ? (base_url is same as('') ? './about.html' : base_url ~ '/about.html') : '/about' }}" class="nav-item">About</a>
   </div>
 
   <div class="wrap">

@@ -111,21 +111,28 @@
   }
 
   async function load(){
-    // Try chunked manifest else single file; if both fail (e.g., file://), fall back to inline JSON
+    const isWantlist = location.pathname.endsWith('wantlist.html');
+    const dataFile = isWantlist ? 'data/wantlist.json' : 'data/releases.json';
+    const manifestFile = isWantlist ? null : 'data/releases.manifest.json';
+
+    if (manifestFile) {
+      try {
+        const manRes = await fetch(manifestFile);
+        if (manRes.ok){
+          const manifest = await manRes.json();
+          const files = manifest.map(m=> 'data/'+m.file);
+          const arrays = await Promise.all(files.map(f=> fetch(f).then(r=>r.json())));
+          state.data = arrays.flat();
+          return;
+        }
+      } catch(e) {}
+    }
+
     try {
-      const manRes = await fetch('data/releases.manifest.json');
-      if (manRes.ok){
-        const manifest = await manRes.json();
-        const files = manifest.map(m=> 'data/'+m.file);
-        const arrays = await Promise.all(files.map(f=> fetch(f).then(r=>r.json())));
-        state.data = arrays.flat();
-        return;
-      }
-    } catch(e) {}
-    try {
-      const res = await fetch('data/releases.json');
+      const res = await fetch(dataFile);
       if (res.ok){ state.data = await res.json(); return; }
     } catch(e) {}
+
     // Inline fallback
     const el = document.getElementById('releases-data');
     if (el) {
@@ -134,6 +141,17 @@
       state.data = [];
     }
   }
+
+  function surprise() {
+    if (!state.data.length) return;
+    const items = applyFilters(state.data);
+    if (!items.length) return;
+    const r = items[Math.floor(Math.random() * items.length)];
+    const isDetail = location.pathname.includes('/releases/');
+    location.href = (isDetail ? '' : 'releases/') + r.id + '.html';
+  }
+
+  window.surpriseMe = surprise;
 
   wire();
   load().then(()=> render(state.data.slice()));
