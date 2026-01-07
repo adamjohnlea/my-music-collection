@@ -434,11 +434,15 @@ class ExportStaticCommand extends Command
     items.sort(cmp);
     const filtered = applyFilters(items);
     const {total, pages, page, slice} = paginate(filtered);
-    $('#stats').textContent = `${total} items` + (state.q? ` • Search: “${state.q}”`:'' );
+    const $stats = $('#stats');
+    if ($stats) {
+      const qText = state.q ? ` • Search: “${state.q}”` : '';
+      $stats.innerHTML = `<div>${total} items${qText}</div>`;
+    }
     const grid = $('#grid'); grid.innerHTML='';
     slice.forEach(r=>{
       const a = document.createElement('a'); a.className='card'; a.href = `releases/${r.id}.html`;
-      a.innerHTML = `<img class="cover ready" src="${r.image||''}" alt="${(r.title||'').replaceAll('"','&quot;')}"/>\n<div class="meta"><div class="title">${r.title||''}</div><div class="artist">${r.artist||''}${r.year? ' • '+r.year:''}</div></div>`;
+      a.innerHTML = `<div class="cover-wrap"><img class="cover ready" src="${r.image||''}" alt="${(r.title||'').replaceAll('"','&quot;')}"/></div>\n<div class="meta"><div class="title">${r.title||''}</div><div class="artist">${r.artist||''}${r.year? ' • '+r.year:''}</div></div>`;
       grid.appendChild(a);
     });
     renderPager(pages, page);
