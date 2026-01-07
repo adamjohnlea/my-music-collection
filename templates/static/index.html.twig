@@ -79,7 +79,7 @@
               </optgroup>
             </select>
           </span>
-          <a href="{{ base_url is same as('') ? '' : base_url ~ '/' }}about.html" class="muted about-link" style="margin-left:8px">About</a>
+          <a href="{{ static_export ? (base_url is same as('') ? (depth > 0 ? '../' : './') ~ 'about.html' : base_url ~ '/about.html') : '/about' }}" class="muted about-link" style="margin-left:8px">About</a>
         </form>
       </div>
     </div>

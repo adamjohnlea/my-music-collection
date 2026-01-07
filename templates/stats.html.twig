@@ -20,7 +20,7 @@
 {% block breadcrumbs %}
   <nav class="breadcrumbs">
     <div>
-      <a href="{{ static_export ? (base_url is same as('') ? './index.html' : base_url) : '/' }}">Home</a>
+      <a href="{{ static_export ? (base_url is same as('') ? (depth > 0 ? '../' : './') ~ 'index.html' : base_url) : '/' }}">Home</a>
       <span>/</span>
       Stats
     </div>

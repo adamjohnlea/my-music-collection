@@ -138,6 +138,7 @@ class ExportStaticCommand extends Command
                 'back_url' => ($baseUrl === '' ? '../index.html' : ($baseUrl . '/')),
                 'auth_user' => null,
                 'static_export' => true,
+                'depth' => 1,
             ]);
             file_put_contents($pagesDir . '/' . $rid . '.html', $html);
             $n++;
@@ -166,6 +167,7 @@ class ExportStaticCommand extends Command
             'base_url' => $baseUrl,
             'data_is_chunked' => $chunkSize > 0 && $count > $chunkSize,
             'view' => 'collection',
+            'depth' => 0,
             // Provide inline JSON as a fallback when opening via file:// where fetch() may be blocked
             'releases_json' => ($chunkSize > 0 && $count > $chunkSize) ? null : json_encode($all, JSON_UNESCAPED_SLASHES),
         ]);
@@ -176,6 +178,7 @@ class ExportStaticCommand extends Command
             'total' => $wantsCount,
             'base_url' => $baseUrl,
             'view' => 'wantlist',
+            'depth' => 0,
             'releases_json' => json_encode($wants, JSON_UNESCAPED_SLASHES),
         ]);
         file_put_contents($outDir . '/wantlist.html', $wantlistHtml);
@@ -184,6 +187,7 @@ class ExportStaticCommand extends Command
             'title' => 'About this app',
             'base_url' => $baseUrl,
             'static_export' => true,
+            'depth' => 0,
         ]);
         file_put_contents($outDir . '/about.html', $aboutHtml);
 
@@ -192,6 +196,7 @@ class ExportStaticCommand extends Command
             'title' => 'Collection Statistics',
             'base_url' => $baseUrl,
             'static_export' => true,
+            'depth' => 0,
         ], $statsData));
         file_put_contents($outDir . '/stats.html', $statsHtml);
 
