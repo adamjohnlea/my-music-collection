@@ -1,0 +1,11 @@
+Database ready.
+HTTP client configured for Discogs API.
+Verifying Discogs user "aj_vinyl_and_music" …
+Starting collection import for user aj_vinyl_and_music …
+  - Page 1/2: 100 items
+  - Page 2/2: 54 items
+Collection import complete. 154 items processed.
+Starting wantlist import for user aj_vinyl_and_music …
+  - Page 1/1: 6 items
+Wantlist import complete. 6 items processed.
+Next: download local cover images with php bin/console images:backfill --limit=200

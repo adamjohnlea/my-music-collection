@@ -241,10 +241,11 @@ file_put_contents($progressFile, json_encode([
 PHP;
 
         file_put_contents($scriptPath, $script);
+        chmod($scriptPath, 0755);
 
-        // Execute the script in the background
+        // Execute the script in the background using nohup for better reliability
         $cmd = sprintf(
-            'php %s %s %s %s %s > /dev/null 2>&1 &',
+            'nohup php %s %s %s %s %s > /dev/null 2>&1 & echo $!',
             escapeshellarg($scriptPath),
             escapeshellarg($command),
             escapeshellarg($jobId),
@@ -252,7 +253,14 @@ PHP;
             escapeshellarg($outputFile)
         );
 
-        exec($cmd);
+        $pid = exec($cmd);
+
+        // Store the PID so we can check if it's running
+        if ($pid) {
+            $progressData = json_decode(file_get_contents($progressFile), true);
+            $progressData['pid'] = $pid;
+            file_put_contents($progressFile, json_encode($progressData));
+        }
     }
 
     private function updateProgress(string $jobId, array $data): void
