@@ -52,7 +52,7 @@
         <div class="meta">
           <h2 style="margin:0 0 6px 0">Initial Sync</h2>
           <p class="help">Imports your entire Discogs collection into the local database. Run this once to get started.</p>
-          <form method="post" action="/tools/run" onsubmit="return startSpin(this)">
+          <form method="post" action="/tools/run">
             <input type="hidden" name="_token" value="{{ csrf_token }}">
             <input type="hidden" name="task" value="initial">
             <label class="row">
@@ -60,7 +60,6 @@
             </label>
             <div class="actions">
               <button type="submit">Run initial sync</button>
-              <span class="spinner" aria-live="polite"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Working…</span>
             </div>
           </form>
         </div>
@@ -70,7 +69,7 @@
         <div class="meta">
           <h2 style="margin:0 0 6px 0">Refresh</h2>
           <p class="help">Scans for newly added/changed items since the last run. Safe to run anytime.</p>
-          <form method="post" action="/tools/run" onsubmit="return startSpin(this)">
+          <form method="post" action="/tools/run">
             <input type="hidden" name="_token" value="{{ csrf_token }}">
             <input type="hidden" name="task" value="refresh">
             <div class="row">
@@ -80,7 +79,6 @@
             </div>
             <div class="actions">
               <button type="submit">Run refresh</button>
-              <span class="spinner" aria-live="polite"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Working…</span>
             </div>
           </form>
         </div>
@@ -90,7 +88,7 @@
         <div class="meta">
           <h2 style="margin:0 0 6px 0">Enrich</h2>
           <p class="help">Fetch full release details (tracklist, credits, companies, identifiers, notes, videos). Either target a specific release ID or process items missing details.</p>
-          <form method="post" action="/tools/run" onsubmit="return startSpin(this)">
+          <form method="post" action="/tools/run">
             <input type="hidden" name="_token" value="{{ csrf_token }}">
             <input type="hidden" name="task" value="enrich">
             <div class="row">
@@ -103,7 +101,6 @@
             </div>
             <div class="actions">
               <button type="submit">Run enrich</button>
-              <span class="spinner" aria-live="polite"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Working…</span>
             </div>
           </form>
         </div>
@@ -113,7 +110,7 @@
         <div class="meta">
           <h2 style="margin:0 0 6px 0">Backfill Images</h2>
           <p class="help">Downloads missing cover images to your local cache. For reliability, web runs fetch up to ~60 images per request (~1 req/sec, 1000/day cap). You can re-run safely to continue.</p>
-          <form method="post" action="/tools/run" onsubmit="return startSpin(this)">
+          <form method="post" action="/tools/run">
             <input type="hidden" name="_token" value="{{ csrf_token }}">
             <input type="hidden" name="task" value="images">
             <div class="row">
@@ -123,7 +120,6 @@
             </div>
             <div class="actions">
               <button type="submit">Run backfill</button>
-              <span class="spinner" aria-live="polite"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Working…</span>
             </div>
           </form>
         </div>
@@ -133,12 +129,11 @@
         <div class="meta">
           <h2 style="margin:0 0 6px 0">Rebuild Search Index</h2>
           <p class="help">Repairs or rebuilds the full‑text search index if results seem off. Safe to run anytime.</p>
-          <form method="post" action="/tools/run" onsubmit="return startSpin(this)">
+          <form method="post" action="/tools/run">
             <input type="hidden" name="_token" value="{{ csrf_token }}">
             <input type="hidden" name="task" value="search">
             <div class="actions">
               <button type="submit">Rebuild index</button>
-              <span class="spinner" aria-live="polite"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Working…</span>
             </div>
           </form>
         </div>
@@ -148,12 +143,11 @@
         <div class="meta">
           <h2 style="margin:0 0 6px 0">Push Changes to Discogs</h2>
           <p class="help">Pushes queued changes (ratings, conditions, notes) back to Discogs. Processes items in the push_queue table.</p>
-          <form method="post" action="/tools/run" onsubmit="return startSpin(this)">
+          <form method="post" action="/tools/run">
             <input type="hidden" name="_token" value="{{ csrf_token }}">
             <input type="hidden" name="task" value="push">
             <div class="actions">
               <button type="submit">Push to Discogs</button>
-              <span class="spinner" aria-live="polite"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Working…</span>
             </div>
           </form>
         </div>
@@ -163,7 +157,7 @@
         <div class="meta">
           <h2 style="margin:0 0 6px 0">Export Static Site</h2>
           <p class="help">Generates a static HTML site with JSON data files for offline hosting. Images can optionally be copied.</p>
-          <form method="post" action="/tools/run" onsubmit="return startSpin(this)">
+          <form method="post" action="/tools/run">
             <input type="hidden" name="_token" value="{{ csrf_token }}">
             <input type="hidden" name="task" value="export">
             <div class="row">
@@ -184,7 +178,6 @@
             </div>
             <div class="actions">
               <button type="submit">Export static site</button>
-              <span class="spinner" aria-live="polite"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Working…</span>
             </div>
           </form>
         </div>
@@ -197,12 +190,6 @@
 <script>
   let pollInterval = null;
   let currentJobId = null;
-
-  function startSpin(form){
-    form.querySelectorAll('button').forEach(btn => btn.disabled = true);
-    var s=form.querySelector('.spinner'); if(s){ s.classList.add('show'); }
-    return true;
-  }
 
   function submitCommand(form, event) {
     event.preventDefault();

@@ -91,10 +91,29 @@ class ToolsController extends BaseController
         echo json_encode($data);
     }
 
+    private function getPhpCliBinary(): string
+    {
+        // Get the full path to PHP CLI binary (not FPM)
+        $phpBinary = PHP_BINARY ?: '/usr/bin/php';
+
+        // If PHP_BINARY points to php-fpm, find the CLI version
+        if (str_contains($phpBinary, '-fpm')) {
+            $phpBinary = str_replace('-fpm', '', $phpBinary);
+        }
+
+        // Verify the CLI binary exists, otherwise fall back to 'php' in PATH
+        if (!file_exists($phpBinary)) {
+            $phpBinary = trim(shell_exec('which php') ?: 'php');
+        }
+
+        return $phpBinary;
+    }
+
     private function buildCommand(string $task, array $params): string
     {
         $basePath = dirname(__DIR__, 3);
         $console = $basePath . '/bin/console';
+        $phpBinary = $this->getPhpCliBinary();
 
         $command = match($task) {
             'initial' => 'sync:initial' . (isset($params['force']) ? ' --force' : ''),
@@ -107,7 +126,7 @@ class ToolsController extends BaseController
             default => throw new \InvalidArgumentException('Unknown task: ' . $task),
         };
 
-        return sprintf('php %s %s 2>&1', escapeshellarg($console), $command);
+        return sprintf('%s %s %s 2>&1', escapeshellarg($phpBinary), escapeshellarg($console), $command);
     }
 
     private function buildEnrichCommand(array $params): string
@@ -146,24 +165,29 @@ class ToolsController extends BaseController
 
         // Create a PHP script that will execute the command and update progress
         $scriptPath = $this->progressDir . '/' . $jobId . '.php';
-        $script = <<<'PHP'
+        $projectRoot = dirname(__DIR__, 3);
+
+        $script = <<<PHP
 <?php
-$command = $argv[1];
-$jobId = $argv[2];
-$progressFile = $argv[3];
-$outputFile = $argv[4];
+\$command = \$argv[1];
+\$jobId = \$argv[2];
+\$progressFile = \$argv[3];
+\$outputFile = \$argv[4];
+
+// Change to project root directory
+chdir('{$projectRoot}');
 
 // Open process
-$descriptorspec = [
+\$descriptorspec = [
     0 => ['pipe', 'r'],
     1 => ['pipe', 'w'],
     2 => ['pipe', 'w'],
 ];
 
-$process = proc_open($command, $descriptorspec, $pipes);
+\$process = proc_open(\$command, \$descriptorspec, \$pipes);
 
-if (!is_resource($process)) {
-    file_put_contents($progressFile, json_encode([
+if (!is_resource(\$process)) {
+    file_put_contents(\$progressFile, json_encode([
         'status' => 'error',
         'output' => ['Failed to start process'],
         'finished_at' => date('Y-m-d H:i:s'),
@@ -171,45 +195,45 @@ if (!is_resource($process)) {
     exit(1);
 }
 
-fclose($pipes[0]);
+fclose(\$pipes[0]);
 
-$output = [];
-$allOutput = '';
+\$output = [];
+\$allOutput = '';
 
 // Get the started_at timestamp once at the beginning
-$initialData = @json_decode(@file_get_contents($progressFile), true);
-$startedAt = $initialData['started_at'] ?? date('Y-m-d H:i:s');
+\$initialData = @json_decode(@file_get_contents(\$progressFile), true);
+\$startedAt = \$initialData['started_at'] ?? date('Y-m-d H:i:s');
 
 // Read output in real-time
-stream_set_blocking($pipes[1], false);
-stream_set_blocking($pipes[2], false);
+stream_set_blocking(\$pipes[1], false);
+stream_set_blocking(\$pipes[2], false);
 
 while (true) {
-    $stdout = fgets($pipes[1]);
-    $stderr = fgets($pipes[2]);
+    \$stdout = fgets(\$pipes[1]);
+    \$stderr = fgets(\$pipes[2]);
 
-    if ($stdout !== false) {
-        $allOutput .= $stdout;
-        $output[] = rtrim($stdout);
-        file_put_contents($progressFile, json_encode([
+    if (\$stdout !== false) {
+        \$allOutput .= \$stdout;
+        \$output[] = rtrim(\$stdout);
+        file_put_contents(\$progressFile, json_encode([
             'status' => 'running',
-            'output' => $output,
-            'started_at' => $startedAt,
+            'output' => \$output,
+            'started_at' => \$startedAt,
         ]));
     }
 
-    if ($stderr !== false) {
-        $allOutput .= $stderr;
-        $output[] = rtrim($stderr);
-        file_put_contents($progressFile, json_encode([
+    if (\$stderr !== false) {
+        \$allOutput .= \$stderr;
+        \$output[] = rtrim(\$stderr);
+        file_put_contents(\$progressFile, json_encode([
             'status' => 'running',
-            'output' => $output,
-            'started_at' => $startedAt,
+            'output' => \$output,
+            'started_at' => \$startedAt,
         ]));
     }
 
-    $status = proc_get_status($process);
-    if (!$status['running']) {
+    \$status = proc_get_status(\$process);
+    if (!\$status['running']) {
         break;
     }
 
@@ -217,29 +241,29 @@ while (true) {
 }
 
 // Get any remaining output
-while ($line = fgets($pipes[1])) {
-    $allOutput .= $line;
-    $output[] = rtrim($line);
+while (\$line = fgets(\$pipes[1])) {
+    \$allOutput .= \$line;
+    \$output[] = rtrim(\$line);
 }
-while ($line = fgets($pipes[2])) {
-    $allOutput .= $line;
-    $output[] = rtrim($line);
+while (\$line = fgets(\$pipes[2])) {
+    \$allOutput .= \$line;
+    \$output[] = rtrim(\$line);
 }
 
-fclose($pipes[1]);
-fclose($pipes[2]);
+fclose(\$pipes[1]);
+fclose(\$pipes[2]);
 
-$exitCode = proc_close($process);
+\$exitCode = proc_close(\$process);
 
 // Save final output
-file_put_contents($outputFile, $allOutput);
+file_put_contents(\$outputFile, \$allOutput);
 
 // Update final status
-file_put_contents($progressFile, json_encode([
-    'status' => $exitCode === 0 ? 'completed' : 'error',
-    'output' => $output,
-    'exit_code' => $exitCode,
-    'started_at' => $startedAt,
+file_put_contents(\$progressFile, json_encode([
+    'status' => \$exitCode === 0 ? 'completed' : 'error',
+    'output' => \$output,
+    'exit_code' => \$exitCode,
+    'started_at' => \$startedAt,
     'finished_at' => date('Y-m-d H:i:s'),
 ]));
 PHP;
@@ -247,9 +271,14 @@ PHP;
         file_put_contents($scriptPath, $script);
         chmod($scriptPath, 0755);
 
-        // Execute the script in the background using nohup for better reliability
-        $cmd = sprintf(
-            'nohup php %s %s %s %s %s > /dev/null 2>&1 & echo $!',
+        // Get the full path to PHP CLI binary
+        $phpBinary = $this->getPhpCliBinary();
+
+        // Create a shell wrapper script to properly background the process
+        $wrapperPath = $this->progressDir . '/' . $jobId . '.sh';
+        $wrapperScript = sprintf(
+            "#!/bin/bash\n%s %s %s %s %s %s > /dev/null 2>&1 &\n",
+            escapeshellarg($phpBinary),
             escapeshellarg($scriptPath),
             escapeshellarg($command),
             escapeshellarg($jobId),
@@ -257,14 +286,18 @@ PHP;
             escapeshellarg($outputFile)
         );
 
-        $pid = exec($cmd);
+        file_put_contents($wrapperPath, $wrapperScript);
+        chmod($wrapperPath, 0755);
 
-        // Store the PID so we can check if it's running
-        if ($pid) {
-            $progressData = json_decode(file_get_contents($progressFile), true);
-            $progressData['pid'] = $pid;
-            file_put_contents($progressFile, json_encode($progressData));
-        }
+        // Log the launch command for debugging
+        $debugLog = $this->progressDir . '/' . $jobId . '.debug';
+        file_put_contents($debugLog, "Wrapper script:\n" . $wrapperScript);
+
+        // Execute the wrapper script - it will background the PHP process and exit immediately
+        exec($wrapperPath . ' > /dev/null 2>&1 &');
+
+        // Give the process a moment to start
+        usleep(200000); // 200ms
     }
 
     private function updateProgress(string $jobId, array $data): void
