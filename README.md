@@ -58,6 +58,12 @@ php -S 127.0.0.1:8000 -t public
 Open http://127.0.0.1:8000/
 
 4) Initial sync (creates DB and imports your collection and wantlist)
+
+**Option A: Web Interface** (Recommended)
+- Navigate to http://127.0.0.1:8000/tools
+- Click "Run initial sync" and watch the progress in real-time
+
+**Option B: Command Line**
 ```
 php bin/console sync:initial
 ```
@@ -90,6 +96,28 @@ php bin/console sync:refresh --since=2024-01-01T00:00:00Z
 ```
 php bin/console search:rebuild
 ```
+
+## Web Console Interface
+All console commands can be run from a web-based interface with real-time progress indicators:
+
+1. **Access**: Navigate to `/tools` or click "Tools" in the navigation menu
+2. **Features**:
+   - Execute all console commands from your browser
+   - Real-time output streaming as commands run
+   - Progress indicators showing status and line counts
+   - Two-column responsive layout for easy access
+   - No need to use the terminal
+
+3. **Available Tools**:
+   - Initial Sync - Import your entire collection
+   - Refresh - Incremental sync of new/changed items
+   - Enrich - Fetch full release details
+   - Backfill Images - Download cover images
+   - Rebuild Search Index - Maintain search functionality
+   - Push Changes - Sync local edits to Discogs
+   - Export Static Site - Generate standalone HTML
+
+For detailed documentation, see [docs/web-console-commands.md](docs/web-console-commands.md)
 
 ## Search
 The application features a powerful search engine powered by SQLite FTS5 for local browsing and direct integration with the Discogs API for live searches.
@@ -169,6 +197,8 @@ The application can embed an Apple Music player on release pages by matching the
 - Refreshing: You can pull the latest values from Discogs at any time using `php bin/console sync:refresh`.
 
 ## Commands overview
+All commands below can be run from the **command line** or from the **Web Console Interface** at `/tools`:
+
 - `php bin/console sync:initial` — initial import of collection and wantlist
 - `php bin/console sync:refresh [--pages=N | --since=ISO8601]` — incremental refresh
 - `php bin/console sync:enrich [--limit=N | --id=RELEASE_ID]` — full details
@@ -177,7 +207,9 @@ The application can embed an Apple Music player on release pages by matching the
 - `php bin/console sync:push` — push queued rating/note/collection changes to Discogs
 - `php bin/console export:static [--out=dist] [--base-url=/] [--copy-images] [--chunk-size=N]` — generate a static site of your collection
 
-For a function‑by‑function breakdown and safety notes for each command, see docs/console-commands.md
+For detailed command documentation:
+- CLI usage and safety notes: [docs/console-commands.md](docs/console-commands.md)
+- Web interface usage: [docs/web-console-commands.md](docs/web-console-commands.md)
 
 ## FAQ
 - Where are images stored?
