@@ -176,6 +176,10 @@ fclose($pipes[0]);
 $output = [];
 $allOutput = '';
 
+// Get the started_at timestamp once at the beginning
+$initialData = @json_decode(@file_get_contents($progressFile), true);
+$startedAt = $initialData['started_at'] ?? date('Y-m-d H:i:s');
+
 // Read output in real-time
 stream_set_blocking($pipes[1], false);
 stream_set_blocking($pipes[2], false);
@@ -190,7 +194,7 @@ while (true) {
         file_put_contents($progressFile, json_encode([
             'status' => 'running',
             'output' => $output,
-            'started_at' => json_decode(file_get_contents($progressFile), true)['started_at'] ?? date('Y-m-d H:i:s'),
+            'started_at' => $startedAt,
         ]));
     }
 
@@ -200,7 +204,7 @@ while (true) {
         file_put_contents($progressFile, json_encode([
             'status' => 'running',
             'output' => $output,
-            'started_at' => json_decode(file_get_contents($progressFile), true)['started_at'] ?? date('Y-m-d H:i:s'),
+            'started_at' => $startedAt,
         ]));
     }
 
@@ -235,7 +239,7 @@ file_put_contents($progressFile, json_encode([
     'status' => $exitCode === 0 ? 'completed' : 'error',
     'output' => $output,
     'exit_code' => $exitCode,
-    'started_at' => json_decode(file_get_contents($progressFile), true)['started_at'] ?? date('Y-m-d H:i:s'),
+    'started_at' => $startedAt,
     'finished_at' => date('Y-m-d H:i:s'),
 ]));
 PHP;
