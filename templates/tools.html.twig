@@ -59,20 +59,22 @@
 
 {% block content %}
   <div class="wrap">
-    {% if results %}
-      <div class="card" style="margin-bottom:16px"><div class="meta">
-        <h2 style="margin:0 0 8px 0">Results — {{ results.task|capitalize }}</h2>
-        {% if results.ok %}
-          <div class="ok">{{ results.messages|join(' ') }}</div>
-        {% else %}
-          <div class="err">{{ results.messages|join(' ') }}</div>
-        {% endif %}
-        {% if results.stats %}
-          <pre class="muted" style="white-space:pre-wrap;margin:8px 0 0 0">{{ results.stats|json_encode(constant('JSON_PRETTY_PRINT')) }}</pre>
-        {% endif %}
-        {% if results.next %}<p class="help" style="margin:8px 0 0 0">Next: {{ results.next }}</p>{% endif %}
-      </div></div>
-    {% endif %}
+    <div id="progress-container" style="display:none;margin-bottom:16px">
+      <div class="card">
+        <div class="meta">
+          <h2 style="margin:0 0 8px 0">Running Command</h2>
+          <div style="margin-bottom:12px">
+            <div class="spinner show" style="justify-content:flex-start">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span style="margin-left:8px" id="status-text">Starting...</span>
+            </div>
+          </div>
+          <div style="background:#101114;border:1px solid #2a2b2f;border-radius:8px;padding:12px;max-height:400px;overflow-y:auto;font-family:ui-monospace,monospace;font-size:0.85rem;line-height:1.4">
+            <pre id="output" style="margin:0;white-space:pre-wrap;word-wrap:break-word"></pre>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div class="grid">
       <div class="card">
@@ -170,15 +172,172 @@
           </form>
         </div>
       </div>
+
+      <div class="card">
+        <div class="meta">
+          <h2 style="margin:0 0 6px 0">Push Changes to Discogs</h2>
+          <p class="help">Pushes queued changes (ratings, conditions, notes) back to Discogs. Processes items in the push_queue table.</p>
+          <form method="post" action="/tools/run" onsubmit="return startSpin(this)">
+            <input type="hidden" name="_token" value="{{ csrf_token }}">
+            <input type="hidden" name="task" value="push">
+            <div class="actions">
+              <button type="submit">Push to Discogs</button>
+              <span class="spinner" aria-live="polite"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Working…</span>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="meta">
+          <h2 style="margin:0 0 6px 0">Export Static Site</h2>
+          <p class="help">Generates a static HTML site with JSON data files for offline hosting. Images can optionally be copied.</p>
+          <form method="post" action="/tools/run" onsubmit="return startSpin(this)">
+            <input type="hidden" name="_token" value="{{ csrf_token }}">
+            <input type="hidden" name="task" value="export">
+            <div class="row">
+              <label>Output Directory
+                <input type="text" name="out" value="dist" placeholder="dist">
+              </label>
+              <label>Base URL
+                <input type="text" name="base_url" value="/" placeholder="/">
+              </label>
+            </div>
+            <div class="row">
+              <label>Chunk Size (0=none)
+                <input type="number" name="chunk_size" value="0" min="0" max="5000">
+              </label>
+              <label class="row" style="align-items:center">
+                <span class="help" style="flex:1 1 auto"><input type="checkbox" name="copy_images"> Copy cached images</span>
+              </label>
+            </div>
+            <div class="actions">
+              <button type="submit">Export static site</button>
+              <span class="spinner" aria-live="polite"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Working…</span>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
+  let pollInterval = null;
+  let currentJobId = null;
+
   function startSpin(form){
+    form.querySelectorAll('button').forEach(btn => btn.disabled = true);
     var s=form.querySelector('.spinner'); if(s){ s.classList.add('show'); }
     return true;
   }
+
+  function submitCommand(form, event) {
+    event.preventDefault();
+
+    // Show progress container
+    const progressContainer = document.getElementById('progress-container');
+    const outputEl = document.getElementById('output');
+    const statusText = document.getElementById('status-text');
+
+    progressContainer.style.display = 'block';
+    outputEl.textContent = '';
+    statusText.textContent = 'Starting command...';
+
+    // Disable all form buttons
+    document.querySelectorAll('form button').forEach(btn => btn.disabled = true);
+
+    // Get form data
+    const formData = new FormData(form);
+
+    // Submit via AJAX
+    fetch('/tools/run', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        outputEl.textContent = 'Error: ' + data.error;
+        statusText.textContent = 'Error';
+        enableAllButtons();
+        return;
+      }
+
+      currentJobId = data.job_id;
+      statusText.textContent = 'Running...';
+
+      // Start polling for progress
+      startPolling(currentJobId);
+    })
+    .catch(error => {
+      outputEl.textContent = 'Failed to start command: ' + error;
+      statusText.textContent = 'Error';
+      enableAllButtons();
+    });
+
+    return false;
+  }
+
+  function startPolling(jobId) {
+    if (pollInterval) {
+      clearInterval(pollInterval);
+    }
+
+    pollInterval = setInterval(() => {
+      fetch('/tools/progress/' + jobId)
+        .then(response => response.json())
+        .then(data => {
+          updateProgress(data);
+
+          if (data.status === 'completed' || data.status === 'error') {
+            clearInterval(pollInterval);
+            pollInterval = null;
+            enableAllButtons();
+          }
+        })
+        .catch(error => {
+          console.error('Polling error:', error);
+        });
+    }, 500); // Poll every 500ms
+  }
+
+  function updateProgress(data) {
+    const outputEl = document.getElementById('output');
+    const statusText = document.getElementById('status-text');
+    const spinner = document.querySelector('#progress-container .spinner');
+
+    if (data.output && data.output.length > 0) {
+      outputEl.textContent = data.output.join('\n');
+      // Auto-scroll to bottom
+      outputEl.parentElement.scrollTop = outputEl.parentElement.scrollHeight;
+    }
+
+    if (data.status === 'running') {
+      statusText.textContent = 'Running... (' + (data.output ? data.output.length : 0) + ' lines)';
+    } else if (data.status === 'completed') {
+      statusText.textContent = 'Completed successfully!';
+      statusText.style.color = 'var(--accent)';
+      spinner.classList.remove('show');
+    } else if (data.status === 'error') {
+      statusText.textContent = 'Command failed (exit code: ' + (data.exit_code || 'unknown') + ')';
+      statusText.style.color = '#ff6b6b';
+      spinner.classList.remove('show');
+    }
+  }
+
+  function enableAllButtons() {
+    document.querySelectorAll('form button').forEach(btn => btn.disabled = false);
+  }
+
+  // Update all forms to use AJAX submission
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('form[action="/tools/run"]').forEach(form => {
+      form.onsubmit = function(event) {
+        return submitCommand(form, event);
+      };
+    });
+  });
 </script>
 {% endblock %}

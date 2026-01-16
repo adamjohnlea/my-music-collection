@@ -185,6 +185,7 @@
           <a href="{{ static_export ? 'javascript:void(0)' : '/random' }}" class="muted" {% if static_export %}onclick="if(window.surpriseMe)window.surpriseMe();"{% endif %}>Surprise Me</a>
           <a href="{{ static_export ? (base_url is same as('') ? (depth > 0 ? '../' : './') ~ 'stats.html' : base_url ~ '/stats.html') : '/stats' }}" class="muted">Stats</a>
           <a href="{{ static_export ? (base_url is same as('') ? (depth > 0 ? '../' : './') ~ 'about.html' : base_url ~ '/about.html') : '/about' }}" class="muted">About</a>
+          {% if not static_export %}<a href="/tools" class="muted">Tools</a>{% endif %}
         </div>
 
         <button class="mobile-nav-toggle" id="mobile-toggle" aria-label="Toggle menu">☰</button>
@@ -198,6 +199,7 @@
     <a href="{{ static_export ? 'javascript:void(0)' : '/random' }}" class="nav-item" {% if static_export %}onclick="if(window.surpriseMe)window.surpriseMe();"{% endif %}>Surprise Me</a>
     <a href="{{ static_export ? (base_url is same as('') ? (depth > 0 ? '../' : './') ~ 'stats.html' : base_url ~ '/stats.html') : '/stats' }}" class="nav-item">Stats</a>
     <a href="{{ static_export ? (base_url is same as('') ? (depth > 0 ? '../' : './') ~ 'about.html' : base_url ~ '/about.html') : '/about' }}" class="nav-item">About</a>
+    {% if not static_export %}<a href="/tools" class="nav-item">Tools</a>{% endif %}
   </div>
 
   <div class="wrap">
