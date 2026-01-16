@@ -51,10 +51,13 @@
       <div class="meta">
         <h2 style="margin:0 0 8px 0; font-size:1.2rem;">Key features</h2>
         <ul style="margin:0 0 0 20px; padding:0;">
+          <li>Web Console Interface: run all maintenance commands from your browser with real-time progress indicators (no terminal required).</li>
           <li>Fast, local browsing from SQLite + cached images (no live API calls during normal use).</li>
           <li>Smart rate limiting and retries that respect Discogs headers and Retry‑After.</li>
           <li>Full release details (optional) including tracklist, credits, companies, identifiers, videos, and notes.</li>
           <li>Wantlist support: view and manage your Discogs wantlist locally.</li>
+          <li>AI-powered recommendations: get personalized artist and release suggestions powered by Anthropic Claude.</li>
+          <li>Apple Music integration: listen to releases directly in the app with embedded player (when barcodes available).</li>
           <li>Smart Collections: save any search as a shortcut in your sidebar for quick access.</li>
           <li>Collection Statistics: view insights on your collection by artist, genre, decade, and format.</li>
           <li>Randomizer: use the "Surprise Me" button to pick a random release from your collection.</li>
@@ -62,6 +65,7 @@
           <li>Image gallery with a lightbox viewer; collection grid prefers the original cover image.</li>
           <li>Powerful search (SQLite FTS5): search by artist, title, label, format, genre/style, country, year, identifiers (barcode/catno/matrix), credits/companies, and notes.</li>
           <li>Useful sorts: Added date, Year, Artist, Title, Rating (with stable tie‑breakers).</li>
+          <li>Static site export: generate a portable, standalone web app of your collection.</li>
           <li>Incremental refresh with a stored cursor so you can safely run it anytime.</li>
         </ul>
       </div>
@@ -127,6 +131,7 @@
     <div class="card" style="margin-top:16px;">
       <div class="meta">
         <h2 style="margin:0 0 8px 0; font-size:1.2rem;">Commands</h2>
+        <p class="muted" style="margin-top:0">All commands can be run from the <strong>Web Console Interface</strong> at <a href="/tools" style="color:var(--accent)">/tools</a> or from the command line:</p>
         <ul style="margin:0 0 0 20px; padding:0;">
           <li><code>php bin/console sync:initial</code> — initial import (collection and wantlist)</li>
           <li><code>php bin/console sync:refresh</code> — incremental refresh (new/changed items)</li>
@@ -141,16 +146,19 @@
 
     <div class="card" style="margin-top:16px;">
       <div class="meta">
-        <h2 style="margin:0 0 8px 0; font-size:1.2rem;">What’s new</h2>
-        <p class="muted" style="margin-top:0">Last updated: 2025-12-24 01:30</p>
+        <h2 style="margin:0 0 8px 0; font-size:1.2rem;">What's new</h2>
+        <p class="muted" style="margin-top:0">Last updated: 2026-01-16</p>
         <ul style="margin:0 0 0 20px; padding:0;">
+          <li>Web Console Interface: Run all console commands from your browser at <a href="/tools" style="color:var(--accent)">/tools</a> with real-time progress indicators and output streaming. Two-column responsive layout for easy access.</li>
+          <li>AI-powered recommendations: Get personalized suggestions using Anthropic Claude. On any release page, click "Recommendations" to discover similar artists and releases based on your collection.</li>
+          <li>Apple Music integration: Listen to releases directly in the app with an embedded player (requires barcodes and Apple Music Developer Token).</li>
           <li>Wantlist support: Initial sync and refresh now include your Discogs wantlist. Toggle between Collection and Wantlist in the header.</li>
           <li>Live Discogs Search: Search the Discogs database directly (use <code>discogs:</code> prefix or the button) and add releases to your local DB.</li>
           <li>Smart Collections: Save your frequent searches as shortcuts in the sidebar.</li>
           <li>Statistics page: Visualize your collection's composition by artist, genre, decade, and format.</li>
           <li>Randomizer: "Surprise Me" button to help you pick what to listen to.</li>
-          <li>Static Site Generator: Export your collection as a portable static site using <code>php bin/console export:static</code>.</li>
-          <li>Ratings and notes push: Edit ratings and notes locally and push them to Discogs via <code>php bin/console sync:push</code>.</li>
+          <li>Static Site Generator: Export your collection as a portable static site.</li>
+          <li>Ratings and notes push: Edit ratings and notes locally and push them to Discogs via sync:push.</li>
         </ul>
       </div>
     </div>
@@ -169,12 +177,13 @@
       <div class="meta">
         <h2 style="margin:0 0 8px 0; font-size:1.2rem;">Troubleshooting</h2>
         <ul style="margin:0 0 0 20px; padding:0;">
-          <li>No items on home page? Ensure both CLI and web use the same DB path (<code>var/app.db</code>) and run <code>sync:initial</code>.</li>
-          <li>Images not local? Run <code>images:backfill</code>; the UI will switch to local files automatically.</li>
+          <li>No items on home page? Ensure both CLI and web use the same DB path (<code>var/app.db</code>) and run <code>sync:initial</code> from the <a href="/tools" style="color:var(--accent)">Tools page</a> or command line.</li>
+          <li>Images not local? Run <code>images:backfill</code> from the <a href="/tools" style="color:var(--accent)">Tools page</a>; the UI will switch to local files automatically.</li>
           <li>Missing notes/credits? Run <code>sync:enrich</code> again; it now targets releases missing notes as well.</li>
           <li>Search feels off? Try <code>search:rebuild</code> to repopulate the FTS index.</li>
+          <li>Prefer the browser? All commands can be run from the <a href="/tools" style="color:var(--accent)">Web Console Interface</a> with real-time progress indicators.</li>
         </ul>
-        <p class="muted" style="margin-top:8px">We’ll keep this page updated as features evolve.</p>
+        <p class="muted" style="margin-top:8px">We'll keep this page updated as features evolve.</p>
       </div>
     </div>
   </div>
