@@ -243,6 +243,8 @@ tests/
 | `Http/Middleware/RetryMiddleware.php` | `Unit/RetryMiddlewareTest.php` | ~90% | Retry logic, backoff, status codes |
 | `Infrastructure/KvStore.php` | `Integration/KvStoreTest.php` | ~95% | get/set/incr, edge cases |
 | `Images/ImageCache.php` | `Integration/ImageCacheTest.php` | ~90% | Fetch, quota, rate limiting |
+| `Http/Controllers/CollectionController.php` | `Integration/CollectionControllerTest.php` | ~75% | index, stats, random, about |
+| `Http/Controllers/SearchController.php` | `Integration/SearchControllerTest.php` | ~90% | save, delete, CSRF, validation |
 
 ### Partially Tested
 
@@ -262,8 +264,6 @@ All high-priority items are now tested.
 | File | Why Important | Suggested Test Type |
 |------|---------------|---------------------|
 | `Http/Controllers/ReleaseController.php` | User-facing, handles saves | Integration |
-| `Http/Controllers/CollectionController.php` | Main browse functionality | Integration |
-| `Http/Controllers/SearchController.php` | Search/save functionality | Integration |
 
 #### Low Priority
 
