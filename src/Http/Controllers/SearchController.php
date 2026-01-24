@@ -17,6 +17,7 @@ class SearchController extends BaseController
         parent::__construct($twig, $validator);
     }
 
+    /** @param array<string, mixed>|null $currentUser */
     public function save(?array $currentUser): void
     {
         if (!$currentUser) { $this->redirect('/'); }
@@ -34,6 +35,7 @@ class SearchController extends BaseController
         }
     }
 
+    /** @param array<string, mixed>|null $currentUser */
     public function delete(?array $currentUser): void
     {
         if (!$currentUser) { $this->redirect('/'); }

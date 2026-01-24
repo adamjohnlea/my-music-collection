@@ -10,6 +10,7 @@ class SqliteReleaseRepository implements ReleaseRepositoryInterface
 {
     public function __construct(private readonly PDO $pdo) {}
 
+    /** @return array<string, mixed>|null */
     public function findById(int $id): ?array
     {
         $st = $this->pdo->prepare('SELECT * FROM releases WHERE id = :id');
@@ -18,6 +19,7 @@ class SqliteReleaseRepository implements ReleaseRepositoryInterface
         return $row ?: null;
     }
 
+    /** @param array<string, mixed> $data */
     public function save(array $data): void
     {
         $st = $this->pdo->prepare('INSERT INTO releases (id, title, artist, year, thumb_url, cover_url, imported_at, updated_at, raw_json) VALUES (:id, :title, :artist, :year, :thumb_url, :cover_url, :imported_at, :updated_at, :raw_json) ON CONFLICT(id) DO UPDATE SET title = COALESCE(excluded.title, releases.title), artist = COALESCE(excluded.artist, releases.artist), year = COALESCE(excluded.year, releases.year), thumb_url = COALESCE(excluded.thumb_url, releases.thumb_url), cover_url = COALESCE(excluded.cover_url, releases.cover_url), updated_at = excluded.updated_at, raw_json = COALESCE(excluded.raw_json, releases.raw_json)');
@@ -38,6 +40,7 @@ class SqliteReleaseRepository implements ReleaseRepositoryInterface
         return $st->fetchColumn() ?: null;
     }
 
+    /** @return array<int, array<string, mixed>> */
     public function search(string $match, ?int $yearFrom, ?int $yearTo, ?int $masterId, string $username, string $itemsTable, string $orderBy, int $limit, int $offset): array
     {
         $hasMatch = $match !== '';
@@ -86,6 +89,7 @@ class SqliteReleaseRepository implements ReleaseRepositoryInterface
         return (int)$st->fetchColumn();
     }
 
+    /** @return array<int, array<string, mixed>> */
     public function getAll(string $username, string $itemsTable, string $orderBy, int $limit, int $offset): array
     {
         $sql = "SELECT r.id, r.title, r.artist, r.year, r.thumb_url, r.cover_url,
@@ -114,6 +118,7 @@ class SqliteReleaseRepository implements ReleaseRepositoryInterface
         $st->execute();
         return (int)$st->fetchColumn();
     }
+    /** @return array<int, array{source_url: string, local_path: string|null}> */
     public function getImages(int $releaseId): array
     {
         $st = $this->pdo->prepare('SELECT source_url, local_path FROM images WHERE release_id = :rid ORDER BY id ASC');
@@ -121,6 +126,7 @@ class SqliteReleaseRepository implements ReleaseRepositoryInterface
         return $st->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /** @return array<string, mixed>|null */
     public function getCachedRecommendations(int $releaseId): ?array
     {
         $st = $this->pdo->prepare('SELECT recommendation_json FROM ai_recommendations WHERE release_id = :rid AND created_at > datetime("now", "-30 days")');
@@ -130,6 +136,7 @@ class SqliteReleaseRepository implements ReleaseRepositoryInterface
         return json_decode($row['recommendation_json'], true);
     }
 
+    /** @param array<string, mixed> $recommendations */
     public function saveRecommendations(int $releaseId, array $recommendations): void
     {
         $st = $this->pdo->prepare('INSERT INTO ai_recommendations (release_id, recommendation_json, created_at) VALUES (:rid, :json, datetime("now")) ON CONFLICT(release_id) DO UPDATE SET recommendation_json = excluded.recommendation_json, created_at = excluded.created_at');

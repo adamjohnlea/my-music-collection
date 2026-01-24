@@ -108,6 +108,7 @@ class ToolsController extends BaseController
         return $phpBinary;
     }
 
+    /** @param array<string, mixed> $params */
     private function buildCommand(string $task, array $params): string
     {
         $basePath = dirname(__DIR__, 3);
@@ -128,6 +129,7 @@ class ToolsController extends BaseController
         return sprintf('%s %s %s 2>&1', escapeshellarg($phpBinary), escapeshellarg($console), $command);
     }
 
+    /** @param array<string, mixed> $params */
     private function buildEnrichCommand(array $params): string
     {
         $cmd = 'sync:enrich';
@@ -139,6 +141,7 @@ class ToolsController extends BaseController
         return $cmd;
     }
 
+    /** @param array<string, mixed> $params */
     private function buildExportCommand(array $params): string
     {
         $cmd = 'export:static';
@@ -299,6 +302,7 @@ PHP;
         usleep(200000); // 200ms
     }
 
+    /** @param array<string, mixed> $data */
     private function updateProgress(string $jobId, array $data): void
     {
         $progressFile = $this->progressDir . '/' . $jobId . '.json';

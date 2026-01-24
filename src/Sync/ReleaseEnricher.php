@@ -8,6 +8,7 @@ use PDO;
 
 class ReleaseEnricher
 {
+    /** @var array<int, array{release_id: int, message: string}> */
     private array $errors = [];
 
     public function __construct(
@@ -19,6 +20,8 @@ class ReleaseEnricher
     /**
      * Returns a list of errors collected during the last enrichMissing() run.
      * Each entry: ['release_id' => int, 'message' => string]
+     *
+     * @return array<int, array{release_id: int, message: string}>
      */
     public function getErrors(): array
     {

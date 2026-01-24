@@ -22,6 +22,7 @@ class AnthropicClient
         ]);
     }
 
+    /** @return array<string, mixed>|null */
     public function getRecommendations(string $prompt): ?array
     {
         $response = $this->client->request('POST', 'messages', [

@@ -235,6 +235,7 @@ class ExportStaticCommand extends Command
         return null;
     }
 
+    /** @return array<int, array<string, mixed>> */
     private function fetchAllReleases(\PDO $pdo, string $username, string $baseDir, string $baseUrl, string $itemsTable = 'collection_items'): array
     {
         $sql = "SELECT r.id, r.title, r.artist, r.year, r.thumb_url, r.cover_url,
@@ -258,12 +259,14 @@ class ExportStaticCommand extends Command
         return $rows;
     }
 
+    /** @return array{total_count: int, top_artists: array<int, array{artist: string, count: int}>, top_genres: array<int, array{genre: string, count: int}>, decades: array<int, array{decade: int, count: int}>, formats: array<int, array{format_name: string, count: int}>} */
     private function fetchStats(\PDO $pdo, string $username): array
     {
         $repo = new \App\Infrastructure\Persistence\SqliteCollectionRepository($pdo);
         return $repo->getCollectionStats($username);
     }
 
+    /** @return array{0: array<string, mixed>|null, 1: array<string, mixed>, 2: array<int, array{url: string, source_url: string, is_primary: bool}>, 3: string|null} */
     private function loadReleaseDetail(\PDO $pdo, int $rid, string $baseDir, string $baseUrl): array
     {
         $stmt = $pdo->prepare("SELECT r.* FROM releases r WHERE r.id = :id");

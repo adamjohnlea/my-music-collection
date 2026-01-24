@@ -220,6 +220,7 @@ class SyncRefreshCommand extends Command
         return [$touched, $newestAdded, $reachedCursor];
     }
 
+    /** @param array<int, array{name?: string}>|mixed $artists */
     private function formatArtists(mixed $artists): ?string
     {
         if (!is_array($artists)) return null;

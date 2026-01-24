@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Images;
 
@@ -7,14 +8,11 @@ use GuzzleHttp\Client;
 
 class ImageCache
 {
-    /** @var Client */
-    private $http;
-    /** @var KvStore */
-    private $kv;
-    /** @var string */
-    private $userAgent;
+    private Client $http;
+    private KvStore $kv;
+    private string $userAgent;
 
-    public function __construct(KvStore $kv, $userAgent = 'MyDiscogsApp/0.1 (+images)')
+    public function __construct(KvStore $kv, string $userAgent = 'MyDiscogsApp/0.1 (+images)')
     {
         $this->kv = $kv;
         $this->userAgent = $userAgent;
@@ -32,7 +30,7 @@ class ImageCache
      * Downloads an image to the specified local path, honoring 1 rps and 1000/day limit.
      * Returns true on success, false if quota reached or HTTP failure.
      */
-    public function fetch($sourceUrl, $localPath)
+    public function fetch(string $sourceUrl, string $localPath): bool
     {
         // Enforce daily cap
         $today = gmdate('Ymd');

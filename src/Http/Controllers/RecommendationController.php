@@ -20,6 +20,7 @@ class RecommendationController extends BaseController
         parent::__construct($twig, $validator);
     }
 
+    /** @param array<string, mixed>|null $currentUser */
     public function getRecommendations(int $rid, ?array $currentUser): void
     {
         if (!$currentUser || empty($currentUser['anthropic_api_key'])) {

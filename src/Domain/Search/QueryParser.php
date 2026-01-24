@@ -12,6 +12,8 @@ final class QueryParser
     /**
      * Parse advanced search query into an FTS MATCH string and optional year filters.
      * Returns an array with keys: match, year_from, year_to, chips.
+     *
+     * @return array{match: string, year_from: int|null, year_to: int|null, master_id: int|null, chips: array<int, array{label: string}>, filters: array<string, string>, is_discogs: bool}
      */
     public function parse(string $q): array
     {
@@ -33,7 +35,8 @@ final class QueryParser
                 'filters' => [],
                 'is_discogs' => $isDiscogsSearch,
                 'year_from' => null,
-                'year_to' => null
+                'year_to' => null,
+                'master_id' => null,
             ];
         }
 

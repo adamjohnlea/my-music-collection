@@ -13,6 +13,7 @@ abstract class BaseController
         protected Validator $validator
     ) {}
 
+    /** @param array<string, mixed> $data */
     protected function render(string $template, array $data = []): void
     {
         echo $this->twig->render($template, $data);

@@ -1,5 +1,5 @@
 parameters:
-    level: 4
+    level: 6
     paths:
         - src
     # Tests excluded - Mockery mocks don't work well with static analysis

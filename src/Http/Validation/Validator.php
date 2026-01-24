@@ -5,8 +5,13 @@ namespace App\Http\Validation;
 
 class Validator
 {
+    /** @var array<string, array<int, string>> */
     private array $errors = [];
 
+    /**
+     * @param array<string, mixed> $data
+     * @param array<string, string|array<int, string>> $rules
+     */
     public function validate(array $data, array $rules): bool
     {
         $this->errors = [];
@@ -43,11 +48,13 @@ class Validator
         return empty($this->errors);
     }
 
+    /** @return array<string, array<int, string>> */
     public function getErrors(): array
     {
         return $this->errors;
     }
 
+    /** @return array<int, string> */
     public function getFirstErrors(): array
     {
         $first = [];

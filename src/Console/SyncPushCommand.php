@@ -148,13 +148,13 @@ class SyncPushCommand extends Command
                     $output->writeln("<info>OK</info> #$id action=$action release=$rid");
                 } else {
                     // store concise error for diagnostics
-                    $body = trim($res['body'] ?? '');
+                    $body = trim($res['body']);
                     if (strlen($body) > 400) { $body = substr($body, 0, 400) . '…'; }
-                    $err = 'HTTP ' . ($res['code'] ?? 0) . ' ' . $body;
+                    $err = 'HTTP ' . $res['code'] . ' ' . $body;
                     $upd = $pdo->prepare("UPDATE push_queue SET attempts = attempts + 1, last_error = :err, status = CASE WHEN attempts + 1 >= 5 THEN 'failed' ELSE status END WHERE id = :id");
                     $upd->execute([':id' => $id, ':err' => $err]);
                     $failed++;
-                    $output->writeln("<error>FAIL</error> #$id action=$action release=$rid code=".($res['code'] ?? 0));
+                    $output->writeln("<error>FAIL</error> #$id action=$action release=$rid code=".$res['code']);
                 }
             } catch (\Throwable $e) {
                 $upd = $pdo->prepare("UPDATE push_queue SET attempts = attempts + 1, last_error = :err, status = CASE WHEN attempts + 1 >= 5 THEN 'failed' ELSE status END WHERE id = :id");

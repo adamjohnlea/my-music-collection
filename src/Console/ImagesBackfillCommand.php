@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand(name: 'images:backfill', description: 'Download missing cover images to the local cache (1 rps, 1000/day).')]
 class ImagesBackfillCommand extends Command
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this->addOption('limit', null, InputOption::VALUE_REQUIRED, 'Max images to download in this run', '200');
     }

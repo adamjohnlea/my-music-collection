@@ -25,6 +25,7 @@ class CollectionController extends BaseController
         parent::__construct($twig, $validator);
     }
 
+    /** @param array<string, mixed>|null $currentUser */
     public function index(?array $currentUser): void
     {
         $config = new \App\Infrastructure\Config();
@@ -51,13 +52,13 @@ class CollectionController extends BaseController
         $view = (string)($_GET['view'] ?? 'collection'); // 'collection' or 'wantlist'
 
         $parsed = $this->queryParser->parse($q);
-        $match = $parsed['match'] ?? '';
-        $yearFrom = $parsed['year_from'] ?? null;
-        $yearTo = $parsed['year_to'] ?? null;
-        $masterId = $parsed['master_id'] ?? null;
-        $chips = $parsed['chips'] ?? [];
-        $filters = $parsed['filters'] ?? [];
-        $isDiscogs = $parsed['is_discogs'] ?? false;
+        $match = $parsed['match'];
+        $yearFrom = $parsed['year_from'];
+        $yearTo = $parsed['year_to'];
+        $masterId = $parsed['master_id'];
+        $chips = $parsed['chips'];
+        $filters = $parsed['filters'];
+        $isDiscogs = $parsed['is_discogs'];
 
         if ($isDiscogs && !empty($currentUser['discogs_username'])) {
             $this->handleDiscogsSearch($currentUser, $usernameFilter, $q, $filters, $page, $perPage, $sort, $chips, $savedSearches, $match);
@@ -152,6 +153,7 @@ class CollectionController extends BaseController
         ]);
     }
 
+    /** @param array<string, mixed>|null $currentUser */
     public function stats(?array $currentUser): void
     {
         if (!$currentUser) { $this->redirect('/'); }
@@ -164,6 +166,7 @@ class CollectionController extends BaseController
         ], $stats));
     }
 
+    /** @param array<string, mixed>|null $currentUser */
     public function random(?array $currentUser): void
     {
         if (!$currentUser) { $this->redirect('/'); }
@@ -181,6 +184,12 @@ class CollectionController extends BaseController
         $this->render('about.html.twig', ['title' => 'About this app']);
     }
 
+    /**
+     * @param array<string, mixed> $currentUser
+     * @param array<string, string> $filters
+     * @param array<int, array{label: string}> $chips
+     * @param array<int, array{id: int, name: string, query: string}> $savedSearches
+     */
     private function handleDiscogsSearch(array $currentUser, string $usernameFilter, string $q, array $filters, int $page, int $perPage, string $sort, array $chips, array $savedSearches, string $match): void
     {
         $discogsClient = new DiscogsHttpClient('MyMusicCollection/1.0', $currentUser['discogs_token'], new KvStore($this->pdo));

@@ -25,6 +25,7 @@ class ReleaseController extends BaseController
         parent::__construct($twig, $validator);
     }
 
+    /** @param array<string, mixed>|null $currentUser */
     public function show(int $rid, ?array $currentUser): void
     {
         $release = $this->releaseRepository->findById($rid);
@@ -147,6 +148,7 @@ class ReleaseController extends BaseController
                 if ($ciRow) {
                     $details['in_collection'] = true;
                     $userNotes = $ciRow['notes'] ?? null;
+                    // @phpstan-ignore function.alreadyNarrowedType (defensive: database values may vary)
                     if ($userNotes && is_string($userNotes) && str_starts_with($userNotes, '[')) {
                         $maybe = json_decode($userNotes, true);
                         if (is_array($maybe)) {
@@ -201,6 +203,7 @@ class ReleaseController extends BaseController
         ]);
     }
 
+    /** @param array<string, mixed>|null $currentUser */
     public function save(?array $currentUser): void
     {
         if (!$currentUser) {
@@ -283,6 +286,7 @@ class ReleaseController extends BaseController
         $this->redirect('/release/' . $rid . '?' . $qs);
     }
 
+    /** @param array<string, mixed>|null $currentUser */
     public function add(?array $currentUser): void
     {
         if (!$currentUser) { $this->redirect('/'); }

@@ -18,6 +18,8 @@ class DiscogsWantlistWriter
     /**
      * Add a release to the user's wantlist.
      * PUT /users/{username}/wants/{release_id}
+     *
+     * @return array{ok: bool, code: int, body: string}
      */
     public function addToWantlist(string $username, int $releaseId): array
     {
@@ -45,6 +47,8 @@ class DiscogsWantlistWriter
     /**
      * Remove a release from the user's wantlist.
      * DELETE /users/{username}/wants/{release_id}
+     *
+     * @return array{ok: bool, code: int, body: string}
      */
     public function removeFromWantlist(string $username, int $releaseId): array
     {
@@ -72,6 +76,8 @@ class DiscogsWantlistWriter
     /**
      * Add a release to the user's collection.
      * POST /users/{username}/collection/folders/{folder_id}/releases/{release_id}
+     *
+     * @return array{ok: bool, code: int, body: string}
      */
     public function addToCollection(string $username, int $releaseId, int $folderId = 1): array
     {

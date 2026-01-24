@@ -10,6 +10,7 @@ class SqliteCollectionRepository implements CollectionRepositoryInterface
 {
     public function __construct(private readonly PDO $pdo) {}
 
+    /** @return array<int, array{id: int, name: string, query: string}> */
     public function getSavedSearches(int $userId): array
     {
         $st = $this->pdo->prepare('SELECT id, name, query FROM saved_searches WHERE user_id = :uid ORDER BY name ASC');
@@ -29,6 +30,7 @@ class SqliteCollectionRepository implements CollectionRepositoryInterface
         $st->execute([':id' => $id, ':uid' => $userId]);
     }
 
+    /** @return array{notes: string|null, rating: int|null, instance_id: int}|null */
     public function findCollectionItem(int $releaseId, string $username): ?array
     {
         $st = $this->pdo->prepare('SELECT notes, rating, instance_id FROM collection_items WHERE release_id = :rid AND username = :u ORDER BY added DESC LIMIT 1');
@@ -51,12 +53,14 @@ class SqliteCollectionRepository implements CollectionRepositoryInterface
         return (bool)$st->fetchColumn();
     }
 
+    /** @param array<string, mixed> $data */
     public function addToPushQueue(array $data): void
     {
         $st = $this->pdo->prepare('INSERT INTO push_queue (instance_id, release_id, username, rating, notes, media_condition, sleeve_condition, action) VALUES (:instance_id, :release_id, :username, :rating, :notes, :media_condition, :sleeve_condition, :action)');
         $st->execute($data);
     }
 
+    /** @param array<string, mixed> $data */
     public function updatePushQueue(int $id, array $data): void
     {
         $sql = 'UPDATE push_queue SET rating = :rating, notes = :notes, media_condition = :media_condition, sleeve_condition = :sleeve_condition, attempts = 0, last_error = NULL, created_at = strftime("%Y-%m-%dT%H:%M:%fZ", "now") WHERE id = :id';
@@ -65,6 +69,7 @@ class SqliteCollectionRepository implements CollectionRepositoryInterface
         $st->execute($data);
     }
 
+    /** @return array{id: int}|null */
     public function findPendingPushJob(int $instanceId, string $action): ?array
     {
         $st = $this->pdo->prepare('SELECT id FROM push_queue WHERE status = "pending" AND instance_id = :iid AND action = :action LIMIT 1');
@@ -85,6 +90,7 @@ class SqliteCollectionRepository implements CollectionRepositoryInterface
         $st->execute([':u' => $username, ':rid' => $releaseId, ':added' => $addedAt]);
     }
 
+    /** @return array{total_count: int, top_artists: array<int, array{artist: string, count: int}>, top_genres: array<int, array{genre: string, count: int}>, decades: array<int, array{decade: int, count: int}>, formats: array<int, array{format_name: string, count: int}>} */
     public function getCollectionStats(string $username): array
     {
         $stats = [];
@@ -137,6 +143,7 @@ class SqliteCollectionRepository implements CollectionRepositoryInterface
     {
         $this->pdo->rollBack();
     }
+    /** @return array{notes: string|null, rating: int|null}|null */
     public function findWantlistItem(int $releaseId, string $username): ?array
     {
         $st = $this->pdo->prepare('SELECT notes, rating FROM wantlist_items WHERE release_id = :rid AND username = :u LIMIT 1');
