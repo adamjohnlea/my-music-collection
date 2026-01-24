@@ -245,6 +245,7 @@ tests/
 | `Images/ImageCache.php` | `Integration/ImageCacheTest.php` | ~90% | Fetch, quota, rate limiting |
 | `Http/Controllers/CollectionController.php` | `Integration/CollectionControllerTest.php` | ~75% | index, stats, random, about |
 | `Http/Controllers/SearchController.php` | `Integration/SearchControllerTest.php` | ~90% | save, delete, CSRF, validation |
+| `Http/Controllers/ReleaseController.php` | `Integration/ReleaseControllerTest.php` | ~80% | show, save, add, CSRF, validation |
 
 ### Partially Tested
 
@@ -261,9 +262,7 @@ All high-priority items are now tested.
 
 #### Medium Priority
 
-| File | Why Important | Suggested Test Type |
-|------|---------------|---------------------|
-| `Http/Controllers/ReleaseController.php` | User-facing, handles saves | Integration |
+All medium-priority items are now tested.
 
 #### Low Priority
 
