@@ -235,6 +235,9 @@ tests/
 | `Infrastructure/AnthropicClient.php` | `Unit/AnthropicClientTest.php` | ~90% | Success, errors, JSON parsing |
 | `Infrastructure/AppleMusicClient.php` | `Unit/AppleMusicClientTest.php` | ~90% | UPC search, text search, matching |
 | `Infrastructure/Persistence/SqliteReleaseRepository.php` | `Integration/ReleaseRepositoryTest.php` | ~85% | CRUD, images, recommendations |
+| `Sync/CollectionImporter.php` | `Integration/CollectionImporterTest.php` | ~85% | Pagination, updates, error handling |
+| `Sync/WantlistImporter.php` | `Integration/WantlistImporterTest.php` | ~85% | Pagination, updates, error handling |
+| `Sync/ReleaseEnricher.php` | `Integration/ReleaseEnricherTest.php` | ~90% | API calls, barcode/tracklist, error handling |
 
 ### Partially Tested
 
@@ -250,9 +253,6 @@ tests/
 | File | Why Important | Suggested Test Type |
 |------|---------------|---------------------|
 | `Http/DiscogsHttpClient.php` | HTTP client setup | Unit (mocked) |
-| `Sync/CollectionImporter.php` | Complex data transformation | Integration |
-| `Sync/WantlistImporter.php` | Complex data transformation | Integration |
-| `Sync/ReleaseEnricher.php` | Complex data transformation | Integration |
 
 #### Medium Priority
 
