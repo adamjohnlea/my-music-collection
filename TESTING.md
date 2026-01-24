@@ -251,12 +251,12 @@ tests/
 | `Infrastructure/Config.php` | `Unit/ConfigTest.php` | ~95% | env(), paths, credentials, validation |
 | `Infrastructure/Storage.php` | `Integration/StorageTest.php` | ~90% | PDO setup, WAL mode, directory creation |
 | `Presentation/Twig/DiscogsFilters.php` | `Unit/DiscogsFiltersTest.php` | ~95% | Numeric suffix stripping, edge cases |
+| `Infrastructure/Persistence/SqliteCollectionRepository.php` | `Integration/CollectionRepositoryTest.php` | ~90% | All methods: searches, collection, wantlist, stats, transactions |
 
 ### Partially Tested
 
 | File | Test File | Coverage | Missing |
 |------|-----------|----------|---------|
-| `Infrastructure/Persistence/SqliteCollectionRepository.php` | `Integration/CollectionRepositoryTest.php` | ~30% | Most query methods untested |
 | `Http/Middleware/HealthCheckMiddleware.php` | `Integration/HealthCheckMiddlewareTest.php` | ~60% | Edge cases |
 
 ### Not Tested (Priority Order)
