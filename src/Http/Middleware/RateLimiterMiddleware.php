@@ -27,7 +27,7 @@ class RateLimiterMiddleware
 
             $promise = $handler($request, $options);
 
-            return $promise->then(function (ResponseInterface $response) use ($request) {
+            return $promise->then(function (ResponseInterface $response) {
                 $this->recordHeaders($response);
                 if ($response->getStatusCode() === 429) {
                     $this->sleepForRetryAfter($response);

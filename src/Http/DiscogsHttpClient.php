@@ -9,11 +9,10 @@ use App\Http\Middleware\HealthCheckMiddleware;
 use App\Infrastructure\KvStore;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
-use Psr\Http\Client\ClientInterface;
 
 class DiscogsHttpClient
 {
-    private ClientInterface $client;
+    private Client $client;
 
     public function __construct(string $userAgent, string $token, KvStore $kv)
     {
@@ -36,7 +35,7 @@ class DiscogsHttpClient
         ]);
     }
 
-    public function client(): ClientInterface
+    public function client(): Client
     {
         return $this->client;
     }

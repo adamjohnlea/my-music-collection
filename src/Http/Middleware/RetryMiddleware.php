@@ -21,7 +21,7 @@ class RetryMiddleware
             $fn = function ($request, $options) use (&$retries, $handler, &$fn): PromiseInterface {
                 $promise = $handler($request, $options);
 
-                return $promise->then(function (ResponseInterface $response) use (&$retries, $request, $options, $handler, $fn) {
+                return $promise->then(function (ResponseInterface $response) use (&$retries, $request, $options, $fn) {
                     $code = $response->getStatusCode();
                     if ($this->shouldRetry($code) && $retries < $this->maxRetries) {
                         $delay = $this->computeBackoff($response, $retries);

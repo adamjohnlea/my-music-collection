@@ -4,11 +4,10 @@ declare(strict_types=1);
 namespace App\Infrastructure;
 
 use GuzzleHttp\Client;
-use Psr\Http\Client\ClientInterface;
 
 class AnthropicClient
 {
-    private ClientInterface $client;
+    private Client $client;
 
     public function __construct(string $apiKey)
     {

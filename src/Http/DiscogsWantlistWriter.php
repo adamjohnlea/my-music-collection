@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace App\Http;
 
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use Psr\Http\Client\ClientInterface;
 
 class DiscogsWantlistWriter
 {
-    private ClientInterface $http;
+    private Client $http;
 
     public function __construct(DiscogsHttpClient $client)
     {
