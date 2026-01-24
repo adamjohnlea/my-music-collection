@@ -239,6 +239,10 @@ tests/
 | `Sync/WantlistImporter.php` | `Integration/WantlistImporterTest.php` | ~85% | Pagination, updates, error handling |
 | `Sync/ReleaseEnricher.php` | `Integration/ReleaseEnricherTest.php` | ~90% | API calls, barcode/tracklist, error handling |
 | `Http/DiscogsHttpClient.php` | `Unit/DiscogsHttpClientTest.php` | ~95% | Config, headers, handler stack |
+| `Http/Middleware/RateLimiterMiddleware.php` | `Unit/RateLimiterMiddlewareTest.php` | ~85% | Header recording, throttling, 429 handling |
+| `Http/Middleware/RetryMiddleware.php` | `Unit/RetryMiddlewareTest.php` | ~90% | Retry logic, backoff, status codes |
+| `Infrastructure/KvStore.php` | `Integration/KvStoreTest.php` | ~95% | get/set/incr, edge cases |
+| `Images/ImageCache.php` | `Integration/ImageCacheTest.php` | ~90% | Fetch, quota, rate limiting |
 
 ### Partially Tested
 
@@ -260,10 +264,6 @@ All high-priority items are now tested.
 | `Http/Controllers/ReleaseController.php` | User-facing, handles saves | Integration |
 | `Http/Controllers/CollectionController.php` | Main browse functionality | Integration |
 | `Http/Controllers/SearchController.php` | Search/save functionality | Integration |
-| `Http/Middleware/RateLimiterMiddleware.php` | Rate limit logic | Unit |
-| `Http/Middleware/RetryMiddleware.php` | Retry logic | Unit |
-| `Images/ImageCache.php` | File operations | Integration |
-| `Infrastructure/KvStore.php` | Key-value persistence | Integration |
 
 #### Low Priority
 
