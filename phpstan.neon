@@ -2,4 +2,5 @@ parameters:
     level: 2
     paths:
         - src
-        - tests
+    # Tests excluded - Mockery mocks don't work well with static analysis
+    # Tests are verified by running them (phpunit), not static analysis

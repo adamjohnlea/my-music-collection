@@ -229,6 +229,12 @@ tests/
 | File | Test File | Coverage | Notes |
 |------|-----------|----------|-------|
 | `Http/Validation/Validator.php` | `Unit/ValidatorTest.php` | ~80% | Core validation rules covered |
+| `Domain/Search/QueryParser.php` | `Unit/QueryParserTest.php` | ~90% | All filters, edge cases, data providers |
+| `Http/DiscogsCollectionWriter.php` | `Unit/DiscogsCollectionWriterTest.php` | ~95% | Rating, fields, error handling |
+| `Http/DiscogsWantlistWriter.php` | `Unit/DiscogsWantlistWriterTest.php` | ~95% | Add/remove wantlist, collection |
+| `Infrastructure/AnthropicClient.php` | `Unit/AnthropicClientTest.php` | ~90% | Success, errors, JSON parsing |
+| `Infrastructure/AppleMusicClient.php` | `Unit/AppleMusicClientTest.php` | ~90% | UPC search, text search, matching |
+| `Infrastructure/Persistence/SqliteReleaseRepository.php` | `Integration/ReleaseRepositoryTest.php` | ~85% | CRUD, images, recommendations |
 
 ### Partially Tested
 
@@ -243,13 +249,7 @@ tests/
 
 | File | Why Important | Suggested Test Type |
 |------|---------------|---------------------|
-| `Infrastructure/Persistence/SqliteReleaseRepository.php` | Core data access | Integration |
-| `Domain/Search/QueryParser.php` | Complex parsing logic | Unit |
-| `Http/DiscogsHttpClient.php` | External API integration | Unit (mocked) |
-| `Http/DiscogsCollectionWriter.php` | Writes to external API | Unit (mocked) |
-| `Http/DiscogsWantlistWriter.php` | Writes to external API | Unit (mocked) |
-| `Infrastructure/AnthropicClient.php` | External API integration | Unit (mocked) |
-| `Infrastructure/AppleMusicClient.php` | External API integration | Unit (mocked) |
+| `Http/DiscogsHttpClient.php` | HTTP client setup | Unit (mocked) |
 | `Sync/CollectionImporter.php` | Complex data transformation | Integration |
 | `Sync/WantlistImporter.php` | Complex data transformation | Integration |
 | `Sync/ReleaseEnricher.php` | Complex data transformation | Integration |
