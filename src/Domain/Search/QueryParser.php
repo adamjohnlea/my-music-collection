@@ -139,6 +139,7 @@ final class QueryParser
             // general term → prefix
             $t = strtolower($tok);
             $t = preg_replace('/[^a-z0-9\-\*\s\"]+/', ' ', $t);
+            // @phpstan-ignore identical.alwaysFalse (defensive: preg_replace can return empty)
             if ($t === '') continue;
             if ($t[0] !== '"' && !str_ends_with($t, '*')) $t .= '*';
             $general[] = $t;

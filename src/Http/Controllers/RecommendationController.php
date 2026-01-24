@@ -6,7 +6,6 @@ namespace App\Http\Controllers;
 use App\Domain\Repositories\ReleaseRepositoryInterface;
 use App\Http\Validation\Validator;
 use App\Infrastructure\AnthropicClient;
-use App\Infrastructure\Config;
 use PDO;
 use Twig\Environment;
 
@@ -15,7 +14,6 @@ class RecommendationController extends BaseController
     public function __construct(
         Environment $twig,
         private ReleaseRepositoryInterface $releaseRepository,
-        private Config $config,
         private PDO $pdo,
         Validator $validator
     ) {

@@ -5,14 +5,12 @@ namespace App\Http\Controllers;
 
 use App\Domain\Repositories\CollectionRepositoryInterface;
 use App\Http\Validation\Validator;
-use PDO;
 use Twig\Environment;
 
 class SearchController extends BaseController
 {
     public function __construct(
         Environment $twig,
-        private PDO $pdo,
         private CollectionRepositoryInterface $collectionRepository,
         Validator $validator
     ) {

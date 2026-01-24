@@ -185,6 +185,7 @@ class ReleaseController extends BaseController
         } elseif ($ref = $_SERVER['HTTP_REFERER'] ?? null) {
             $refPath = parse_url($ref, PHP_URL_PATH) ?: '/';
             $refQuery = parse_url($ref, PHP_URL_QUERY);
+            // @phpstan-ignore booleanAnd.leftAlwaysTrue (defensive: parse_url can return unexpected values)
             if ($refPath && $refPath[0] === '/') $backUrl = $refPath . ($refQuery ? ('?' . $refQuery) : '');
         }
 

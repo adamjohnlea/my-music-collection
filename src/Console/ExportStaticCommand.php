@@ -330,7 +330,9 @@ class ExportStaticCommand extends Command
             $details['user_notes'] = $release['user_notes'] ?? null;
             $details['user_rating'] = $release['user_rating'] ?? null;
             // explode identifiers to specific arrays used by the template
+            // @phpstan-ignore nullCoalesce.offset (defensive: API data structure could change)
             $details['barcodes'] = array_values(array_filter(($details['identifiers'] ?? []), fn($i) => isset($i['type']) && stripos($i['type'], 'barcode') !== false));
+            // @phpstan-ignore nullCoalesce.offset (defensive: API data structure could change)
             $details['other_identifiers'] = array_values(array_filter(($details['identifiers'] ?? []), fn($i) => !isset($i['type']) || stripos($i['type'], 'barcode') === false));
         }
 

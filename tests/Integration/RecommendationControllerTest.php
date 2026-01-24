@@ -6,8 +6,6 @@ namespace Tests\Integration;
 use App\Domain\Repositories\ReleaseRepositoryInterface;
 use App\Http\Controllers\RecommendationController;
 use App\Http\Validation\Validator;
-use App\Infrastructure\AnthropicClient;
-use App\Infrastructure\Config;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use PDO;
@@ -18,7 +16,6 @@ class RecommendationControllerTest extends MockeryTestCase
     private PDO $pdo;
     private $twig;
     private $releaseRepository;
-    private Config $config;
     private Validator $validator;
 
     protected function setUp(): void
@@ -50,7 +47,6 @@ class RecommendationControllerTest extends MockeryTestCase
 
         $this->twig = Mockery::mock(Environment::class);
         $this->releaseRepository = Mockery::mock(ReleaseRepositoryInterface::class);
-        $this->config = new Config();
         $this->validator = new Validator();
     }
 
@@ -397,7 +393,6 @@ class RecommendationControllerTest extends MockeryTestCase
         return new RecommendationController(
             $this->twig,
             $this->releaseRepository,
-            $this->config,
             $this->pdo,
             $this->validator
         );
@@ -409,7 +404,6 @@ class RecommendationControllerTest extends MockeryTestCase
     private function createTestableController(?array $mockResponse): RecommendationController
     {
         $releaseRepo = $this->releaseRepository;
-        $config = $this->config;
         $pdo = $this->pdo;
         $twig = $this->twig;
         $validator = $this->validator;
@@ -417,7 +411,6 @@ class RecommendationControllerTest extends MockeryTestCase
         return new class(
             $twig,
             $releaseRepo,
-            $config,
             $pdo,
             $validator,
             $mockResponse
@@ -428,12 +421,11 @@ class RecommendationControllerTest extends MockeryTestCase
             public function __construct(
                 $twig,
                 $releaseRepo,
-                $config,
                 $pdo,
                 $validator,
                 ?array $mockResponse
             ) {
-                parent::__construct($twig, $releaseRepo, $config, $pdo, $validator);
+                parent::__construct($twig, $releaseRepo, $pdo, $validator);
                 $this->mockResponse = $mockResponse;
                 $this->testReleaseRepo = $releaseRepo;
             }
@@ -483,7 +475,6 @@ class RecommendationControllerTest extends MockeryTestCase
         ?string &$promptCapture
     ): RecommendationController {
         $releaseRepo = $this->releaseRepository;
-        $config = $this->config;
         $pdo = $this->pdo;
         $twig = $this->twig;
         $validator = $this->validator;
@@ -491,7 +482,6 @@ class RecommendationControllerTest extends MockeryTestCase
         return new class(
             $twig,
             $releaseRepo,
-            $config,
             $pdo,
             $validator,
             $mockResponse,
@@ -506,13 +496,12 @@ class RecommendationControllerTest extends MockeryTestCase
             public function __construct(
                 $twig,
                 $releaseRepo,
-                $config,
                 $pdo,
                 $validator,
                 array $mockResponse,
                 ?string &$promptCapture
             ) {
-                parent::__construct($twig, $releaseRepo, $config, $pdo, $validator);
+                parent::__construct($twig, $releaseRepo, $pdo, $validator);
                 $this->mockResponse = $mockResponse;
                 $this->promptRef = &$promptCapture;
                 $this->testReleaseRepo = $releaseRepo;

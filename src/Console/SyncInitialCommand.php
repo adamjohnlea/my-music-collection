@@ -88,8 +88,8 @@ class SyncInitialCommand extends Command
         // Run importers
         // Store relative image paths in DB (e.g., public/images/...)
         $imgDir = $config->env('IMG_DIR', 'public/images') ?? 'public/images';
-        $importer = new CollectionImporter($http, $pdo, $kv, $imgDir);
-        $wantImporter = new \App\Sync\WantlistImporter($http, $pdo, $kv, $imgDir);
+        $importer = new CollectionImporter($http, $pdo, $imgDir);
+        $wantImporter = new \App\Sync\WantlistImporter($http, $pdo, $imgDir);
 
         $output->writeln(sprintf('<info>Starting collection import for user %s …</info>', $username));
         $totalImported = 0;

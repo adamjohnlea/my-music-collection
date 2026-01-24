@@ -25,6 +25,7 @@ class ContainerFactory
             'env' => function() {
                 return static function(string $key, ?string $default = null): ?string {
                     $value = $_ENV[$key] ?? $_SERVER[$key] ?? getenv($key);
+                    // @phpstan-ignore identical.alwaysFalse (defensive: getenv returns false when not found)
                     return ($value === false || $value === null) ? $default : $value;
                 };
             },

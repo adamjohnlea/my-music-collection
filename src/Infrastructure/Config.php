@@ -8,6 +8,7 @@ final class Config
     public function env(string $key, ?string $default = null): ?string
     {
         $value = $_ENV[$key] ?? $_SERVER[$key] ?? getenv($key);
+        // @phpstan-ignore identical.alwaysFalse (defensive: getenv returns false when not found)
         if ($value === false || $value === null) {
             return $default;
         }

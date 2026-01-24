@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Infrastructure\Config;
 use Twig\Environment;
 use App\Http\Validation\Validator;
 
@@ -13,8 +12,7 @@ class ToolsController extends BaseController
 
     public function __construct(
         Environment $twig,
-        Validator $validator,
-        private Config $config
+        Validator $validator
     ) {
         parent::__construct($twig, $validator);
         $this->progressDir = dirname(__DIR__, 3) . '/var/progress';
@@ -94,6 +92,7 @@ class ToolsController extends BaseController
     private function getPhpCliBinary(): string
     {
         // Get the full path to PHP CLI binary (not FPM)
+        // @phpstan-ignore ternary.alwaysTrue (defensive: PHP_BINARY could theoretically be empty)
         $phpBinary = PHP_BINARY ?: '/usr/bin/php';
 
         // If PHP_BINARY points to php-fpm, find the CLI version

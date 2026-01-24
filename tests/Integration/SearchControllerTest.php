@@ -20,7 +20,6 @@ use Twig\Environment;
  */
 class SearchControllerTest extends MockeryTestCase
 {
-    private PDO $pdo;
     private $twig;
     private $collectionRepository;
     private Validator $validator;
@@ -31,7 +30,6 @@ class SearchControllerTest extends MockeryTestCase
     {
         parent::setUp();
 
-        $this->pdo = new PDO('sqlite::memory:');
         $this->twig = Mockery::mock(Environment::class);
         $this->collectionRepository = Mockery::mock(CollectionRepositoryInterface::class);
         $this->validator = new Validator();
@@ -416,7 +414,6 @@ class SearchControllerTest extends MockeryTestCase
 
         return new class(
             $this->twig,
-            $this->pdo,
             $this->collectionRepository,
             $this->validator,
             $test
@@ -425,12 +422,11 @@ class SearchControllerTest extends MockeryTestCase
 
             public function __construct(
                 Environment $twig,
-                PDO $pdo,
                 CollectionRepositoryInterface $collectionRepository,
                 Validator $validator,
                 $testCase
             ) {
-                parent::__construct($twig, $pdo, $collectionRepository, $validator);
+                parent::__construct($twig, $collectionRepository, $validator);
                 $this->testCase = $testCase;
             }
 

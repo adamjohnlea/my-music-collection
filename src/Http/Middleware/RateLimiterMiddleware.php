@@ -52,6 +52,7 @@ class RateLimiterMiddleware
             // Conservative window: 60s from last_seen
             $elapsed = time() - $lastSeen;
             $sleep = max(1, 60 - $elapsed);
+            // @phpstan-ignore greater.alwaysTrue (defensive: max() guarantees >= 1, but explicit check is clearer)
             if ($sleep > 0) {
                 usleep($sleep * 1_000_000);
                 // After sleep, reset remaining optimistically to bucket-1

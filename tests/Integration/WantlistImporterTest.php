@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Tests\Integration;
 
-use App\Infrastructure\KvStore;
 use App\Sync\WantlistImporter;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Response;
@@ -14,7 +13,6 @@ use PDO;
 class WantlistImporterTest extends MockeryTestCase
 {
     private PDO $pdo;
-    private KvStore $kv;
     private ClientInterface $mockHttp;
     private WantlistImporter $importer;
 
@@ -27,9 +25,8 @@ class WantlistImporterTest extends MockeryTestCase
 
         $this->createTables();
 
-        $this->kv = new KvStore($this->pdo);
         $this->mockHttp = Mockery::mock(ClientInterface::class);
-        $this->importer = new WantlistImporter($this->mockHttp, $this->pdo, $this->kv, 'public/images');
+        $this->importer = new WantlistImporter($this->mockHttp, $this->pdo, 'public/images');
     }
 
     private function createTables(): void

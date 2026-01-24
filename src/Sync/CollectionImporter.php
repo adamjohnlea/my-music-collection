@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace App\Sync;
 
-use App\Infrastructure\KvStore;
 use GuzzleHttp\ClientInterface;
 use PDO;
 
@@ -12,7 +11,6 @@ class CollectionImporter
     public function __construct(
         private readonly ClientInterface $http,
         private readonly PDO $pdo,
-        private readonly KvStore $kv,
         private readonly string $imgDir = 'public/images',
     ) {
     }
