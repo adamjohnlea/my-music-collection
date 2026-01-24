@@ -238,6 +238,7 @@ tests/
 | `Sync/CollectionImporter.php` | `Integration/CollectionImporterTest.php` | ~85% | Pagination, updates, error handling |
 | `Sync/WantlistImporter.php` | `Integration/WantlistImporterTest.php` | ~85% | Pagination, updates, error handling |
 | `Sync/ReleaseEnricher.php` | `Integration/ReleaseEnricherTest.php` | ~90% | API calls, barcode/tracklist, error handling |
+| `Http/DiscogsHttpClient.php` | `Unit/DiscogsHttpClientTest.php` | ~95% | Config, headers, handler stack |
 
 ### Partially Tested
 
@@ -250,9 +251,7 @@ tests/
 
 #### High Priority
 
-| File | Why Important | Suggested Test Type |
-|------|---------------|---------------------|
-| `Http/DiscogsHttpClient.php` | HTTP client setup | Unit (mocked) |
+All high-priority items are now tested.
 
 #### Medium Priority
 
