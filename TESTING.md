@@ -246,6 +246,11 @@ tests/
 | `Http/Controllers/CollectionController.php` | `Integration/CollectionControllerTest.php` | ~75% | index, stats, random, about |
 | `Http/Controllers/SearchController.php` | `Integration/SearchControllerTest.php` | ~90% | save, delete, CSRF, validation |
 | `Http/Controllers/ReleaseController.php` | `Integration/ReleaseControllerTest.php` | ~80% | show, save, add, CSRF, validation |
+| `Http/Controllers/AppleMusicController.php` | `Integration/AppleMusicControllerTest.php` | ~90% | Barcode/text search, caching, error handling |
+| `Http/Controllers/RecommendationController.php` | `Integration/RecommendationControllerTest.php` | ~85% | Caching, prompt building, collection summary |
+| `Infrastructure/Config.php` | `Unit/ConfigTest.php` | ~95% | env(), paths, credentials, validation |
+| `Infrastructure/Storage.php` | `Integration/StorageTest.php` | ~90% | PDO setup, WAL mode, directory creation |
+| `Presentation/Twig/DiscogsFilters.php` | `Unit/DiscogsFiltersTest.php` | ~95% | Numeric suffix stripping, edge cases |
 
 ### Partially Tested
 
@@ -268,14 +273,9 @@ All medium-priority items are now tested.
 
 | File | Why | Suggested Test Type |
 |------|-----|---------------------|
-| `Http/Controllers/AppleMusicController.php` | Simple pass-through | Integration |
-| `Http/Controllers/RecommendationController.php` | Simple pass-through | Integration |
 | `Http/Controllers/ToolsController.php` | Admin UI | Integration |
-| `Infrastructure/Config.php` | Simple env wrapper | Unit |
-| `Infrastructure/Storage.php` | Simple PDO wrapper | Integration |
 | `Infrastructure/MigrationRunner.php` | Tested implicitly | - |
 | `Infrastructure/ContainerFactory.php` | Bootstrap code | - |
-| `Presentation/Twig/DiscogsFilters.php` | Simple string manipulation | Unit |
 | `Console/*Command.php` | CLI wrappers, integration-heavy | Feature |
 
 ---
