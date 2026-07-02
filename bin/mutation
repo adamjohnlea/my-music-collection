@@ -8,6 +8,14 @@
 # Usage:
 #   bin/mutation                       # all of src/
 #   bin/mutation Validator.php,QueryParser.php   # specific files (Infection --filter)
+#
+# Set MIN_MSI to fail (non-zero exit) when the Mutation Score Indicator drops
+# below a threshold — use this in CI to gate against test-quality regressions:
+#   MIN_MSI=70 bin/mutation
+#
+# Note on reading results: Infection's summary MSI is authoritative. In the
+# per-line logs, "Timed Out" mutants are DETECTED (an infinite loop a test
+# triggers), not survivors — only the "Escaped mutants:" section is a real gap.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -29,10 +37,14 @@ php -d zend_extension="$XD" -d xdebug.mode=coverage -d memory_limit=512M \
 FILTER_ARG=""
 [ "${1:-}" != "" ] && FILTER_ARG="--filter=$1"
 
+MIN_MSI_ARG=""
+[ "${MIN_MSI:-}" != "" ] && MIN_MSI_ARG="--min-msi=${MIN_MSI}"
+
 echo "==> Running Infection..."
 exec ./vendor/bin/infection \
     --coverage=var/coverage \
     --skip-initial-tests \
     --threads=4 \
     --show-mutations \
+    ${MIN_MSI_ARG} \
     ${FILTER_ARG}

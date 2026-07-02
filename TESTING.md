@@ -224,6 +224,11 @@ tests/
 
 ## Coverage Inventory
 
+> **Note:** the `Coverage` percentages in the tables below are hand estimates —
+> they predate any coverage driver being installed and were never measured. For
+> an actual signal of test quality, see the measured **Mutation Scores** in the
+> Mutation Testing section above. Treat these numbers as rough intent, not data.
+
 ### Fully Tested
 
 | File | Test File | Coverage | Notes |
@@ -317,33 +322,74 @@ Mutation testing answers: "Are my tests actually catching bugs, or just running 
 
 ### Installation
 
-```bash
-composer require --dev infection/infection
-```
+Infection is installed (`infection/infection` in require-dev), configured via
+`infection.json5`. It needs a coverage driver, which Herd's PHP doesn't ship and
+which it won't load via `PHP_INI_SCAN_DIR`. The `bin/mutation` wrapper handles
+this: it generates a coverage report using Herd's bundled Xdebug (loaded with
+`-d`), then runs Infection against that report.
 
 ### Running Mutation Tests
 
 ```bash
-# Run against all tests (slow - do periodically, not every commit)
-./vendor/bin/infection --threads=4
+# All of src/ (slow - the coverage run executes the full suite once)
+bin/mutation
 
-# Run against specific files
-./vendor/bin/infection --filter=QueryParser
+# Specific file(s) - fast, reuses one coverage report (Infection --filter)
+bin/mutation QueryParser.php
+bin/mutation DiscogsCollectionWriter.php,DiscogsWantlistWriter.php
 
-# Generate HTML report
-./vendor/bin/infection --threads=4 --logger-html=infection.html
+# Gate for CI: non-zero exit if MSI drops below the threshold
+MIN_MSI=70 bin/mutation
 ```
 
 ### Interpreting Results
 
 | Term | Meaning |
 |------|---------|
-| Killed | Mutation was caught by tests (good) |
-| Survived | Tests passed despite broken code (bad - test gap) |
-| Escaped | Mutation caused timeout (inconclusive) |
-| MSI | Mutation Score Indicator - percentage killed |
+| Killed | Mutation was caught by a test (good) |
+| Escaped | A test ran the mutated code but still passed — a real test gap |
+| Timed Out | Mutation caused an infinite loop/hang a test triggered — DETECTED (counts as killed) |
+| Not Covered | No test exercises the mutated line at all |
+| MSI | Mutation Score Indicator — % of mutants detected (killed + timed out + errored) |
+
+**Only "Escaped" mutants are real gaps.** When reading the per-line logs, the
+`Timed Out` section is NOT a list of survivors — filter to the `Escaped mutants:`
+section. Infection's summary MSI is the authoritative number.
 
 **Target: 70%+ MSI for critical code.**
+
+### Not every survivor is worth killing
+
+Some mutants are **equivalent** (the mutated code behaves identically — e.g.
+`(int)'1980'` vs `'1980'` in a numeric comparison, or a value that is cast but
+never used) and **cannot** be killed. Others are **structural**: a class that
+hard-constructs its HTTP client (tested via reflection) or calls `usleep()`
+directly can't have that config/timing verified without a source change
+(dependency injection or a clock/sleeper). Chasing these means brittle or
+slow/flaky tests — leave them and note why, rather than inflate the score.
+
+### Measured Mutation Scores
+
+Real MSI, measured with `bin/mutation` (not the coverage estimates below, which
+predate any coverage driver being installed):
+
+| File | MSI | Notes |
+|------|-----|-------|
+| `Domain/Search/QueryParser.php` | 86% | |
+| `Http/Validation/Validator.php` | 97% | 1 equivalent mutant |
+| `Http/DiscogsWantlistWriter.php` | 100% | |
+| `Http/DiscogsCollectionWriter.php` | 95% | |
+| `Sync/CollectionImporter.php` | 87% | rest are DB-round-trip `(int)` casts |
+| `Sync/WantlistImporter.php` | 88% | same |
+| `Infrastructure/AppleMusicClient.php` | 82% | constructor capped (needs DI) |
+| `Infrastructure/AnthropicClient.php` | 65% | constructor capped (needs DI) |
+| `Images/ImageCache.php` | 54% | structural: needs DI + a clock for the rps throttle |
+| `Http/Middleware/*Middleware.php` | not measurable | real `usleep()` — needs a clock injection |
+
+Files not yet strengthened (worst-first): `CollectionController` (~54%),
+`ReleaseController` (~56%), `HealthCheckMiddleware` (~57%), `Storage` (~61%),
+`ReleaseEnricher` (79%). The two big controllers carry many low-value cosmetic
+(view-rendering) mutants — triage before strengthening.
 
 ### When to Run
 
