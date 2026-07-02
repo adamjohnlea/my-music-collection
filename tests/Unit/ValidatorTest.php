@@ -55,4 +55,38 @@ class ValidatorTest extends TestCase
         $data = ['password' => '123456'];
         $this->assertTrue($this->validator->validate($data, $rules));
     }
+
+    // ==================== Empty/Null Values Skip Non-Required Rules ====================
+    // email/numeric must NOT fire on an empty or missing value — enforcing
+    // presence is the job of the 'required' rule alone. Guards the &&-chained
+    // null/empty checks in each rule.
+
+    public function testEmailRuleSkipsEmptyValue(): void
+    {
+        $this->assertTrue($this->validator->validate(['email' => ''], ['email' => 'email']));
+    }
+
+    public function testEmailRuleSkipsMissingValue(): void
+    {
+        $this->assertTrue($this->validator->validate([], ['email' => 'email']));
+    }
+
+    public function testNumericRuleSkipsEmptyValue(): void
+    {
+        $this->assertTrue($this->validator->validate(['age' => ''], ['age' => 'numeric']));
+    }
+
+    public function testNumericRuleSkipsMissingValue(): void
+    {
+        $this->assertTrue($this->validator->validate([], ['age' => 'numeric']));
+    }
+
+    public function testRequiredCombinedWithEmailStillRejectsEmpty(): void
+    {
+        // With 'required' present the empty value is rejected — by the required
+        // rule, not the email rule. Also exercises pipe-combined rules.
+        $this->assertFalse(
+            $this->validator->validate(['email' => ''], ['email' => 'required|email'])
+        );
+    }
 }
