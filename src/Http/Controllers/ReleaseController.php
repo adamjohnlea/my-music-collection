@@ -216,7 +216,7 @@ class ReleaseController extends BaseController
         $action = (string)($_POST['action'] ?? 'update_collection');
         $username = (string)$currentUser['discogs_username'];
 
-        $ok = false; $msg = 'queued';
+        $msg = 'queued';
         if ($rid > 0 && $username) {
             if ($action === 'update_collection') {
                 $ciRow = $this->collectionRepository->findCollectionItem($rid, $username);
@@ -245,8 +245,7 @@ class ReleaseController extends BaseController
                             ]);
                         }
                         $this->collectionRepository->commit();
-                        $ok = true;
-                    } catch (\Throwable $e) { $this->collectionRepository->rollBack(); $ok = false; $msg = 'error'; }
+                    } catch (\Throwable $e) { $this->collectionRepository->rollBack(); $msg = 'error'; }
                 } else { $msg = 'no_instance'; }
             } elseif (in_array($action, ['add_want', 'remove_want', 'want_to_collection'])) {
                 $this->collectionRepository->beginTransaction();
@@ -265,14 +264,13 @@ class ReleaseController extends BaseController
                         $this->collectionRepository->removeFromWantlist($rid, $username);
                     }
                     $this->collectionRepository->commit();
-                    $ok = true;
-                } catch (\Throwable $e) { $this->collectionRepository->rollBack(); $ok = false; $msg = 'error'; }
+                } catch (\Throwable $e) { $this->collectionRepository->rollBack(); $msg = 'error'; }
             }
         } else { $msg = 'invalid'; }
 
         $ret = null;
         if (isset($_POST['return']) && is_string($_POST['return']) && str_starts_with($_POST['return'], '/')) $ret = $_POST['return'];
-        $qs = http_build_query(['saved' => ($ok ? $msg : $msg), 'tab' => 'status', 'sr' => $rating, 'sn' => $notes, 'smc' => $mediaCondition, 'ssc' => $sleeveCondition]);
+        $qs = http_build_query(['saved' => $msg, 'tab' => 'status', 'sr' => $rating, 'sn' => $notes, 'smc' => $mediaCondition, 'ssc' => $sleeveCondition]);
         if ($ret) $qs .= '&return=' . rawurlencode($ret);
         $this->redirect('/release/' . $rid . '?' . $qs);
     }

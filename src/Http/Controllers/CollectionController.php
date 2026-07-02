@@ -220,11 +220,6 @@ class CollectionController extends BaseController
                 $params['q'] = ($params['q'] ?? '') . " $key:$val";
             }
         }
-        
-        if (empty($params['q']) && count($params) <= 3) {
-            // If no specific filters, we might need a default search term if Discogs requires one
-            // but usually at least one parameter is present if $filters is not empty
-        }
 
         try {
             $resp = $http->request('GET', 'database/search', [
