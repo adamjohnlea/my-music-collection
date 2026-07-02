@@ -6,8 +6,7 @@ namespace App\Http\Controllers;
 use App\Domain\Repositories\CollectionRepositoryInterface;
 use App\Domain\Repositories\ReleaseRepositoryInterface;
 use App\Domain\Search\QueryParser;
-use App\Http\DiscogsHttpClient;
-use App\Infrastructure\KvStore;
+use App\Http\DiscogsClientFactory;
 use App\Http\Validation\Validator;
 use PDO;
 use Twig\Environment;
@@ -20,7 +19,8 @@ class CollectionController extends BaseController
         private QueryParser $queryParser,
         private ReleaseRepositoryInterface $releaseRepository,
         private CollectionRepositoryInterface $collectionRepository,
-        Validator $validator
+        Validator $validator,
+        private DiscogsClientFactory $discogsClientFactory
     ) {
         parent::__construct($twig, $validator);
     }
@@ -192,9 +192,8 @@ class CollectionController extends BaseController
      */
     private function handleDiscogsSearch(array $currentUser, string $usernameFilter, string $q, array $filters, int $page, int $perPage, string $sort, array $chips, array $savedSearches, string $match): void
     {
-        $discogsClient = new DiscogsHttpClient('MyMusicCollection/1.0', $currentUser['discogs_token'], new KvStore($this->pdo));
-        $http = $discogsClient->client();
-        
+        $http = $this->discogsClientFactory->forToken($currentUser['discogs_token']);
+
         // Map our internal filter keys to Discogs API search parameters
         $params = [
             'per_page' => $perPage,

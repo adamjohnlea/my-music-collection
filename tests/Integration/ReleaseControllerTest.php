@@ -6,11 +6,12 @@ namespace Tests\Integration;
 use App\Domain\Repositories\CollectionRepositoryInterface;
 use App\Domain\Repositories\ReleaseRepositoryInterface;
 use App\Http\Controllers\ReleaseController;
+use App\Http\DiscogsClientFactory;
 use App\Http\Validation\Validator;
-use App\Infrastructure\Config;
 use Mockery;
+use GuzzleHttp\Psr7\Response;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
-use PDO;
+use Tests\Support\FakeDiscogsClientFactory;
 use Twig\Environment;
 
 /**
@@ -18,9 +19,7 @@ use Twig\Environment;
  */
 class ReleaseControllerTest extends MockeryTestCase
 {
-    private PDO $pdo;
     private $twig;
-    private Config $config;
     private $releaseRepository;
     private $collectionRepository;
     private Validator $validator;
@@ -33,12 +32,7 @@ class ReleaseControllerTest extends MockeryTestCase
     {
         parent::setUp();
 
-        $this->pdo = new PDO('sqlite::memory:');
-        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $this->pdo->exec('CREATE TABLE kv_store (k TEXT PRIMARY KEY, v TEXT)');
-
         $this->twig = Mockery::mock(Environment::class);
-        $this->config = new Config(); // Real instance - class is final
         $this->releaseRepository = Mockery::mock(ReleaseRepositoryInterface::class);
         $this->collectionRepository = Mockery::mock(CollectionRepositoryInterface::class);
         $this->validator = new Validator();
@@ -686,33 +680,128 @@ class ReleaseControllerTest extends MockeryTestCase
         $this->assertStringContainsString('return=', $this->redirectUrl);
     }
 
+    // ============ Live Discogs fetch (via injected factory) ============
+
+    public function testShowFetchesFromDiscogsWhenNotFoundLocally(): void
+    {
+        // Not found locally -> fetch from Discogs, parse, save, re-fetch, render.
+        $currentUser = ['id' => 1, 'discogs_username' => 'u', 'discogs_token' => 'tok'];
+        $saved = ['id' => 999, 'title' => 'Fetched', 'artist' => 'A, B', 'year' => 1977, 'cover_url' => null, 'thumb_url' => null];
+        $this->releaseRepository->shouldReceive('findById')->with(999)->andReturn(null, $saved);
+        $this->releaseRepository->shouldReceive('getImages')->andReturn([]);
+        $this->collectionRepository->shouldReceive('findCollectionItem')->andReturn(null);
+        $this->collectionRepository->shouldReceive('findWantlistItem')->andReturn(null);
+
+        $captured = null;
+        $this->releaseRepository->shouldReceive('save')->once()
+            ->with(Mockery::on(function ($data) use (&$captured) {
+                $captured = $data;
+                return true;
+            }));
+
+        $discogsJson = json_encode([
+            'title' => 'Fetched',
+            'artists' => [['name' => 'A'], ['name' => 'B']],
+            'year' => 1977,
+            'images' => [['uri' => 'http://cover']],
+        ]);
+        $factory = new FakeDiscogsClientFactory([new Response(200, [], $discogsJson)]);
+
+        $this->createController($factory)->show(999, $currentUser);
+
+        $this->assertSame('tok', $factory->lastToken);              // per-user token forwarded
+        $this->assertSame('Fetched', $captured[':title']);
+        $this->assertSame('A, B', $captured[':artist']);            // artist names joined
+        $this->assertSame(1977, $captured[':year']);                // year cast to int
+        $this->assertSame('http://cover', $captured[':cover_url']); // images[0].uri fallback
+        $this->assertSame('release.html.twig', $this->renderedTemplate);
+    }
+
+    public function testShowDoesNotFetchFromDiscogsWithoutToken(): void
+    {
+        // Guard: no token -> no fetch, no save.
+        $currentUser = ['id' => 1, 'discogs_username' => 'u']; // no discogs_token
+        $this->releaseRepository->shouldReceive('findById')->with(999)->andReturn(null);
+        $this->releaseRepository->shouldReceive('save')->never();
+
+        $this->createController()->show(999, $currentUser);
+
+        $this->assertSame('release.html.twig', $this->renderedTemplate);
+        $this->assertNull($this->renderedData['release']);
+    }
+
+    public function testAddFetchesReleaseAndQueuesForCollection(): void
+    {
+        $_SESSION['csrf'] = 'valid-token';
+        $_POST = ['_token' => 'valid-token', 'release_id' => '555', 'action' => 'add_collection', 'return' => '/'];
+        $currentUser = ['id' => 1, 'discogs_username' => 'u', 'discogs_token' => 'tok'];
+
+        $this->releaseRepository->shouldReceive('save')->once();
+        $captured = null;
+        $this->collectionRepository->shouldReceive('addToPushQueue')->once()
+            ->with(Mockery::on(function ($d) use (&$captured) {
+                $captured = $d;
+                return true;
+            }));
+
+        $discogsJson = json_encode(['title' => 'X', 'artists' => [['name' => 'Y']], 'year' => 2000]);
+        $factory = new FakeDiscogsClientFactory([new Response(200, [], $discogsJson)]);
+
+        $this->callWithRedirectCatch(fn() => $this->createController($factory)->add($currentUser));
+
+        $this->assertSame('add_collection', $captured['action']);
+        $this->assertSame(555, $captured['release_id']);
+    }
+
+    public function testAddForWantAlsoAddsToWantlist(): void
+    {
+        $_SESSION['csrf'] = 'valid-token';
+        $_POST = ['_token' => 'valid-token', 'release_id' => '555', 'action' => 'add_want', 'return' => '/'];
+        $currentUser = ['id' => 1, 'discogs_username' => 'u', 'discogs_token' => 'tok'];
+
+        $this->releaseRepository->shouldReceive('save')->once();
+        $captured = null;
+        $this->collectionRepository->shouldReceive('addToPushQueue')->once()
+            ->with(Mockery::on(function ($d) use (&$captured) {
+                $captured = $d;
+                return true;
+            }));
+        $this->collectionRepository->shouldReceive('addToWantlist')->once();
+
+        $discogsJson = json_encode(['title' => 'X', 'artists' => [['name' => 'Y']], 'year' => 2000]);
+        $factory = new FakeDiscogsClientFactory([new Response(200, [], $discogsJson)]);
+
+        $this->callWithRedirectCatch(fn() => $this->createController($factory)->add($currentUser));
+
+        $this->assertSame('add_want', $captured['action']); // add_collection -> add_collection, else add_want
+    }
+
     // ==================== Helper ====================
 
-    private function createController(): ReleaseController
+    private function createController(?DiscogsClientFactory $discogsFactory = null): ReleaseController
     {
         $test = $this;
+        $discogsFactory = $discogsFactory ?? new FakeDiscogsClientFactory();
 
         return new class(
             $this->twig,
-            $this->pdo,
-            $this->config,
             $this->releaseRepository,
             $this->collectionRepository,
             $this->validator,
+            $discogsFactory,
             $test
         ) extends ReleaseController {
             private $testCase;
 
             public function __construct(
                 Environment $twig,
-                PDO $pdo,
-                Config $config,
                 ReleaseRepositoryInterface $releaseRepository,
                 CollectionRepositoryInterface $collectionRepository,
                 Validator $validator,
+                DiscogsClientFactory $discogsClientFactory,
                 $testCase
             ) {
-                parent::__construct($twig, $pdo, $config, $releaseRepository, $collectionRepository, $validator);
+                parent::__construct($twig, $releaseRepository, $collectionRepository, $validator, $discogsClientFactory);
                 $this->testCase = $testCase;
             }
 

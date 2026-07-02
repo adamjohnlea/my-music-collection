@@ -8,6 +8,8 @@ use App\Domain\Repositories\CollectionRepositoryInterface;
 use App\Infrastructure\Persistence\SqliteReleaseRepository;
 use App\Infrastructure\Persistence\SqliteCollectionRepository;
 use App\Http\Validation\Validator;
+use App\Http\DiscogsClientFactory;
+use App\Http\DefaultDiscogsClientFactory;
 use DI\ContainerBuilder;
 use Psr\Container\ContainerInterface;
 use Twig\Environment;
@@ -64,6 +66,12 @@ class ContainerFactory
             },
             AppleMusicClient::class => function(ContainerInterface $c) {
                 return AppleMusicClient::withUserAgent($c->get(Config::class)->getUserAgent());
+            },
+            DiscogsClientFactory::class => function(ContainerInterface $c) {
+                return new DefaultDiscogsClientFactory(
+                    $c->get(Config::class)->getUserAgent(),
+                    new KvStore($c->get(PDO::class))
+                );
             },
         ]);
 

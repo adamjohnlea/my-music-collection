@@ -5,22 +5,18 @@ namespace App\Http\Controllers;
 
 use App\Domain\Repositories\CollectionRepositoryInterface;
 use App\Domain\Repositories\ReleaseRepositoryInterface;
-use App\Http\DiscogsHttpClient;
-use App\Infrastructure\Config;
-use App\Infrastructure\KvStore;
+use App\Http\DiscogsClientFactory;
 use App\Http\Validation\Validator;
-use PDO;
 use Twig\Environment;
 
 class ReleaseController extends BaseController
 {
     public function __construct(
         Environment $twig,
-        private PDO $pdo,
-        private Config $config,
         private ReleaseRepositoryInterface $releaseRepository,
         private CollectionRepositoryInterface $collectionRepository,
-        Validator $validator
+        Validator $validator,
+        private DiscogsClientFactory $discogsClientFactory
     ) {
         parent::__construct($twig, $validator);
     }
@@ -32,12 +28,7 @@ class ReleaseController extends BaseController
 
         // If not found locally, try to fetch from Discogs
         if (!$release && $currentUser && !empty($currentUser['discogs_token'])) {
-            $discogsClient = new DiscogsHttpClient(
-                $this->config->getUserAgent(),
-                $currentUser['discogs_token'],
-                new KvStore($this->pdo)
-            );
-            $http = $discogsClient->client();
+            $http = $this->discogsClientFactory->forToken($currentUser['discogs_token']);
             try {
                 $resp = $http->request('GET', sprintf('releases/%d', $rid));
                 if ($resp->getStatusCode() === 200) {
@@ -302,8 +293,7 @@ class ReleaseController extends BaseController
         }
 
         if ($rid > 0 && $username) {
-            $discogsClient = new DiscogsHttpClient('MyMusicCollection/1.0', $currentUser['discogs_token'], new KvStore($this->pdo));
-            $http = $discogsClient->client();
+            $http = $this->discogsClientFactory->forToken($currentUser['discogs_token']);
             try {
                 $resp = $http->request('GET', sprintf('releases/%d', $rid));
                 if ($resp->getStatusCode() === 200) {

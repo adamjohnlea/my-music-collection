@@ -7,8 +7,11 @@ use App\Domain\Repositories\CollectionRepositoryInterface;
 use App\Domain\Repositories\ReleaseRepositoryInterface;
 use App\Domain\Search\QueryParser;
 use App\Http\Controllers\CollectionController;
+use App\Http\DiscogsClientFactory;
 use App\Http\Validation\Validator;
+use GuzzleHttp\Psr7\Response;
 use Mockery;
+use Tests\Support\FakeDiscogsClientFactory;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 use PDO;
 use Twig\Environment;
@@ -608,11 +611,68 @@ class CollectionControllerTest extends MockeryTestCase
         $this->assertSame(21, $this->renderedData['total_pages']);
     }
 
+    public function testDiscogsSearchRendersResultsAndSkipsOwnedReleases(): void
+    {
+        // handleDiscogsSearch: dedup against the local collection, shape results.
+        $this->pdo->exec('CREATE TABLE collection_items (release_id INTEGER, username TEXT)');
+        $this->pdo->exec('CREATE TABLE wantlist_items (release_id INTEGER, username TEXT)');
+        $this->pdo->exec("INSERT INTO collection_items (release_id, username) VALUES (100, 'testuser')");
+
+        $currentUser = ['id' => 1, 'discogs_username' => 'testuser', 'discogs_token' => 'tok'];
+        $_GET['q'] = 'discogs: artist:beatles';
+
+        $this->collectionRepository->shouldReceive('getSavedSearches')->andReturn([]);
+
+        $discogsJson = json_encode([
+            'pagination' => ['items' => 2, 'pages' => 1],
+            'results' => [
+                ['id' => 100, 'title' => 'Owned Album', 'thumb' => 't1'],           // already owned -> skipped
+                ['id' => 200, 'title' => 'New Album', 'year' => 1969, 'thumb' => 't2', 'uri' => '/r/200'],
+            ],
+        ]);
+        $factory = new FakeDiscogsClientFactory([new Response(200, [], $discogsJson)]);
+
+        $this->createController($factory)->index($currentUser);
+
+        $this->assertSame('tok', $factory->lastToken);
+        $this->assertSame('Discogs Search Results', $this->renderedData['title']);
+        $items = $this->renderedData['items'];
+        $this->assertCount(1, $items);                   // the owned release was deduped out
+        $this->assertSame(200, $items[0]['id']);
+        $this->assertSame('New Album', $items[0]['title']);
+        $this->assertSame(1969, $items[0]['year']);      // year cast to int
+        $this->assertTrue($items[0]['is_discogs_result']);
+    }
+
+    public function testDiscogsSearchMapsFiltersToApiParams(): void
+    {
+        // Filters map to Discogs query params: year range '..' becomes '-',
+        // and the default result type is 'release'.
+        $this->pdo->exec('CREATE TABLE collection_items (release_id INTEGER, username TEXT)');
+        $this->pdo->exec('CREATE TABLE wantlist_items (release_id INTEGER, username TEXT)');
+
+        $currentUser = ['id' => 1, 'discogs_username' => 'testuser', 'discogs_token' => 'tok'];
+        $_GET['q'] = 'discogs: artist:beatles year:1980..1985';
+
+        $this->collectionRepository->shouldReceive('getSavedSearches')->andReturn([]);
+        $factory = new FakeDiscogsClientFactory([
+            new Response(200, [], json_encode(['results' => [], 'pagination' => ['items' => 0, 'pages' => 1]])),
+        ]);
+
+        $this->createController($factory)->index($currentUser);
+
+        $query = $factory->lastQuery();
+        $this->assertSame('beatles', $query['artist']);
+        $this->assertSame('1980-1985', $query['year']); // '..' converted to '-'
+        $this->assertSame('release', $query['type']);    // default type
+    }
+
     // ==================== Helper ====================
 
-    private function createController(): CollectionController
+    private function createController(?DiscogsClientFactory $discogsFactory = null): CollectionController
     {
         $test = $this;
+        $discogsFactory = $discogsFactory ?? new FakeDiscogsClientFactory();
 
         return new class(
             $this->twig,
@@ -621,6 +681,7 @@ class CollectionControllerTest extends MockeryTestCase
             $this->releaseRepository,
             $this->collectionRepository,
             $this->validator,
+            $discogsFactory,
             $test
         ) extends CollectionController {
             private $testCase;
@@ -632,9 +693,10 @@ class CollectionControllerTest extends MockeryTestCase
                 ReleaseRepositoryInterface $releaseRepository,
                 CollectionRepositoryInterface $collectionRepository,
                 Validator $validator,
+                DiscogsClientFactory $discogsClientFactory,
                 $testCase
             ) {
-                parent::__construct($twig, $pdo, $queryParser, $releaseRepository, $collectionRepository, $validator);
+                parent::__construct($twig, $pdo, $queryParser, $releaseRepository, $collectionRepository, $validator, $discogsClientFactory);
                 $this->testCase = $testCase;
             }
 
