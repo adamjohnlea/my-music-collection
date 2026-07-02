@@ -211,6 +211,14 @@ For detailed command documentation:
 - CLI usage and safety notes: [docs/console-commands.md](docs/console-commands.md)
 - Web interface usage: [docs/web-console-commands.md](docs/web-console-commands.md)
 
+## Development
+- Run the test suite: `vendor/bin/phpunit`
+- Static analysis (PHPStan level 6): `vendor/bin/phpstan analyse`
+- Mutation testing: `bin/mutation` (all of `src/`) or `bin/mutation QueryParser.php` (specific files)
+- CI runs the tests and PHPStan on every push and pull request; a mutation gate runs on pull requests.
+
+See [TESTING.md](TESTING.md) for testing standards and measured mutation scores.
+
 ## FAQ
 - Where are images stored?
   - public/images/<release_id>/<sha1>.jpg. The UI prefers local files and falls back to Discogs URLs.
