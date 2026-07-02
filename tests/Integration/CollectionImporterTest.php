@@ -421,6 +421,283 @@ class CollectionImporterTest extends MockeryTestCase
         $this->assertTrue(true);
     }
 
+    // ==================== Field Fallbacks & Image Guard ====================
+
+    public function testReleaseIdFallsBackToBasicInformationId(): void
+    {
+        // No top-level 'id'; the release id must come from basic_information.id.
+        $responseBody = json_encode([
+            'pagination' => ['pages' => 1],
+            'releases' => [[
+                'instance_id' => 1,
+                'basic_information' => ['id' => 777, 'title' => 'T'],
+            ]],
+        ]);
+        $this->mockHttp->shouldReceive('request')->once()
+            ->andReturn(new Response(200, [], $responseBody));
+
+        $this->importer->importAll('testuser', 100);
+
+        $this->assertEquals(777, $this->pdo->query('SELECT release_id FROM collection_items')->fetchColumn());
+        $this->assertNotFalse($this->pdo->query('SELECT id FROM releases WHERE id = 777')->fetch());
+    }
+
+    public function testMissingFolderIdDefaultsToZero(): void
+    {
+        $responseBody = json_encode([
+            'pagination' => ['pages' => 1],
+            'releases' => [[
+                'instance_id' => 2, 'id' => 5,
+                'basic_information' => ['id' => 5],
+            ]],
+        ]);
+        $this->mockHttp->shouldReceive('request')->once()
+            ->andReturn(new Response(200, [], $responseBody));
+
+        $this->importer->importAll('testuser', 100);
+
+        $this->assertEquals(0, $this->pdo->query('SELECT folder_id FROM collection_items WHERE instance_id = 2')->fetchColumn());
+    }
+
+    public function testThumbAndCoverFallBackToItemLevel(): void
+    {
+        // basic_information has no thumb/cover_image; they come from the item level.
+        $responseBody = json_encode([
+            'pagination' => ['pages' => 1],
+            'releases' => [[
+                'instance_id' => 3, 'id' => 9,
+                'thumb' => 'http://item-thumb',
+                'cover_image' => 'http://item-cover',
+                'basic_information' => ['id' => 9],
+            ]],
+        ]);
+        $this->mockHttp->shouldReceive('request')->once()
+            ->andReturn(new Response(200, [], $responseBody));
+
+        $this->importer->importAll('testuser', 100);
+
+        $r = $this->pdo->query('SELECT thumb_url, cover_url FROM releases WHERE id = 9')->fetch(PDO::FETCH_ASSOC);
+        $this->assertEquals('http://item-thumb', $r['thumb_url']);
+        $this->assertEquals('http://item-cover', $r['cover_url']);
+    }
+
+    public function testNoImageRowWhenCoverMissing(): void
+    {
+        // Guards the !empty($cover) half of the image-insert condition.
+        $responseBody = json_encode([
+            'pagination' => ['pages' => 1],
+            'releases' => [[
+                'instance_id' => 4, 'id' => 11,
+                'basic_information' => ['id' => 11],
+            ]],
+        ]);
+        $this->mockHttp->shouldReceive('request')->once()
+            ->andReturn(new Response(200, [], $responseBody));
+
+        $this->importer->importAll('testuser', 100);
+
+        $this->assertEquals(0, (int)$this->pdo->query('SELECT COUNT(*) FROM images')->fetchColumn());
+    }
+
+    public function testNoImageRowWhenReleaseIdIsZero(): void
+    {
+        // Cover present but release id is 0: the ($releaseId > 0) guard blocks it.
+        $responseBody = json_encode([
+            'pagination' => ['pages' => 1],
+            'releases' => [[
+                'instance_id' => 5, 'id' => 0,
+                'basic_information' => ['id' => 0, 'cover_image' => 'http://c'],
+            ]],
+        ]);
+        $this->mockHttp->shouldReceive('request')->once()
+            ->andReturn(new Response(200, [], $responseBody));
+
+        $this->importer->importAll('testuser', 100);
+
+        $this->assertEquals(0, (int)$this->pdo->query('SELECT COUNT(*) FROM images')->fetchColumn());
+    }
+
+    public function testTopLevelIdTakesPrecedenceOverBasicInformationId(): void
+    {
+        // When both are present, the top-level 'id' wins over basic_information.id.
+        $responseBody = json_encode([
+            'pagination' => ['pages' => 1],
+            'releases' => [[
+                'instance_id' => 1, 'id' => 100,
+                'basic_information' => ['id' => 200],
+            ]],
+        ]);
+        $this->mockHttp->shouldReceive('request')->once()
+            ->andReturn(new Response(200, [], $responseBody));
+
+        $this->importer->importAll('testuser', 100);
+
+        $this->assertEquals(100, $this->pdo->query('SELECT release_id FROM collection_items')->fetchColumn());
+        $this->assertFalse($this->pdo->query('SELECT id FROM releases WHERE id = 200')->fetch());
+    }
+
+    public function testReleaseIdIsZeroWhenNoIdAnywhere(): void
+    {
+        $responseBody = json_encode([
+            'pagination' => ['pages' => 1],
+            'releases' => [[
+                'instance_id' => 1,
+                'basic_information' => ['title' => 'No id here'],
+            ]],
+        ]);
+        $this->mockHttp->shouldReceive('request')->once()
+            ->andReturn(new Response(200, [], $responseBody));
+
+        $this->importer->importAll('testuser', 100);
+
+        $this->assertEquals(0, $this->pdo->query('SELECT release_id FROM collection_items')->fetchColumn());
+    }
+
+    public function testMissingInstanceIdDefaultsToZero(): void
+    {
+        $responseBody = json_encode([
+            'pagination' => ['pages' => 1],
+            'releases' => [[
+                'id' => 5,
+                'basic_information' => ['id' => 5],
+            ]],
+        ]);
+        $this->mockHttp->shouldReceive('request')->once()
+            ->andReturn(new Response(200, [], $responseBody));
+
+        $this->importer->importAll('testuser', 100);
+
+        $this->assertEquals(1, (int)$this->pdo->query('SELECT COUNT(*) FROM collection_items WHERE instance_id = 0')->fetchColumn());
+    }
+
+    public function testFolderIdStoredWhenPresent(): void
+    {
+        // Guards against the folder_id fallback collapsing to the 0 default.
+        $responseBody = json_encode([
+            'pagination' => ['pages' => 1],
+            'releases' => [[
+                'instance_id' => 1, 'id' => 5, 'folder_id' => 7,
+                'basic_information' => ['id' => 5],
+            ]],
+        ]);
+        $this->mockHttp->shouldReceive('request')->once()
+            ->andReturn(new Response(200, [], $responseBody));
+
+        $this->importer->importAll('testuser', 100);
+
+        $this->assertEquals(7, $this->pdo->query('SELECT folder_id FROM collection_items')->fetchColumn());
+    }
+
+    public function testBasicInformationThumbAndCoverTakePrecedenceOverItemLevel(): void
+    {
+        // When both levels have thumb/cover, basic_information wins.
+        $responseBody = json_encode([
+            'pagination' => ['pages' => 1],
+            'releases' => [[
+                'instance_id' => 1, 'id' => 9,
+                'thumb' => 'http://item-thumb',
+                'cover_image' => 'http://item-cover',
+                'basic_information' => [
+                    'id' => 9,
+                    'thumb' => 'http://basic-thumb',
+                    'cover_image' => 'http://basic-cover',
+                ],
+            ]],
+        ]);
+        $this->mockHttp->shouldReceive('request')->once()
+            ->andReturn(new Response(200, [], $responseBody));
+
+        $this->importer->importAll('testuser', 100);
+
+        $r = $this->pdo->query('SELECT thumb_url, cover_url FROM releases WHERE id = 9')->fetch(PDO::FETCH_ASSOC);
+        $this->assertEquals('http://basic-thumb', $r['thumb_url']);
+        $this->assertEquals('http://basic-cover', $r['cover_url']);
+    }
+
+    // ==================== Pagination Control ====================
+
+    public function testImportFetchesEveryPageInOrderUntilLastPage(): void
+    {
+        // Guards the loop increment ($page++) and termination condition:
+        // exactly pages 1, 2, 3 are fetched, in order, then it stops.
+        $page = fn(int $n) => json_encode([
+            'pagination' => ['pages' => 3],
+            'releases' => [$this->makeReleaseData($n, "Album $n", "Artist $n", 2000)],
+        ]);
+        $this->mockHttp->shouldReceive('request')->times(3)
+            ->andReturn(
+                new Response(200, [], $page(1)),
+                new Response(200, [], $page(2)),
+                new Response(200, [], $page(3)),
+            );
+
+        $pagesSeen = [];
+        $this->importer->importAll('testuser', 100, function (int $p) use (&$pagesSeen) {
+            $pagesSeen[] = $p;
+        });
+
+        $this->assertSame([1, 2, 3], $pagesSeen);
+        $this->assertEquals(3, (int)$this->pdo->query('SELECT COUNT(*) FROM releases')->fetchColumn());
+    }
+
+    public function testMissingPagesKeyYieldsNullTotalPages(): void
+    {
+        // pagination object present but with no 'pages' key -> total pages is null
+        // (not 0), which is what stops the loop after one page.
+        $responseBody = json_encode([
+            'pagination' => ['items' => 5],
+            'releases' => [$this->makeReleaseData(1, 'A', 'B', 2000)],
+        ]);
+        $this->mockHttp->shouldReceive('request')->once()
+            ->andReturn(new Response(200, [], $responseBody));
+
+        $captured = 'unset';
+        $this->importer->importAll('testuser', 100, function ($p, $c, $tp) use (&$captured) {
+            $captured = $tp;
+        });
+
+        $this->assertNull($captured);
+    }
+
+    // ==================== Request Construction & Path Building ====================
+
+    public function testRequestSendsPerPageAndPageQueryParams(): void
+    {
+        $captured = null;
+        $this->mockHttp->shouldReceive('request')->once()
+            ->withArgs(function ($method, $path, $options) use (&$captured) {
+                $captured = $options;
+                return true;
+            })
+            ->andReturn(new Response(200, [], json_encode(['pagination' => ['pages' => 1], 'releases' => []])));
+
+        $this->importer->importAll('testuser', 50);
+
+        $this->assertSame(50, $captured['query']['per_page']);
+        $this->assertSame(1, $captured['query']['page']);
+    }
+
+    public function testLocalImagePathHasNoDoubleSlashWhenImgDirHasTrailingSlash(): void
+    {
+        // The trailing slash on imgDir must be trimmed so paths aren't malformed.
+        $importer = new CollectionImporter($this->mockHttp, $this->pdo, 'public/images/');
+        $responseBody = json_encode([
+            'pagination' => ['pages' => 1],
+            'releases' => [[
+                'instance_id' => 1, 'id' => 15,
+                'basic_information' => ['id' => 15, 'cover_image' => 'http://c'],
+            ]],
+        ]);
+        $this->mockHttp->shouldReceive('request')->once()
+            ->andReturn(new Response(200, [], $responseBody));
+
+        $importer->importAll('testuser', 100);
+
+        $localPath = $this->pdo->query('SELECT local_path FROM images')->fetchColumn();
+        $this->assertStringStartsWith('public/images/15/', $localPath);
+        $this->assertStringNotContainsString('//', $localPath);
+    }
+
     // ==================== Helper Methods ====================
 
     private function makeReleaseData(int $id, string $title, string $artist, int $year): array
