@@ -375,21 +375,28 @@ predate any coverage driver being installed):
 
 | File | MSI | Notes |
 |------|-----|-------|
-| `Domain/Search/QueryParser.php` | 86% | |
-| `Http/Validation/Validator.php` | 97% | 1 equivalent mutant |
 | `Http/DiscogsWantlistWriter.php` | 100% | |
+| `Http/Validation/Validator.php` | 97% | 1 equivalent mutant |
 | `Http/DiscogsCollectionWriter.php` | 95% | |
+| `Sync/WantlistImporter.php` | 88% | |
 | `Sync/CollectionImporter.php` | 87% | rest are DB-round-trip `(int)` casts |
-| `Sync/WantlistImporter.php` | 88% | same |
-| `Infrastructure/AppleMusicClient.php` | 82% | constructor capped (needs DI) |
-| `Infrastructure/AnthropicClient.php` | 65% | constructor capped (needs DI) |
-| `Images/ImageCache.php` | 54% | structural: needs DI + a clock for the rps throttle |
-| `Http/Middleware/*Middleware.php` | not measurable | real `usleep()` — needs a clock injection |
+| `Infrastructure/AppleMusicClient.php` | 87% | client injected; rest are `error_log` text |
+| `Domain/Search/QueryParser.php` | 86% | |
+| `Infrastructure/AnthropicClient.php` | 77% | client injected; rest are `error_log` text + equivalents |
+| `Http/Controllers/CollectionController.php` | 71% | live-Discogs paths covered via an injected client factory |
+| `Http/Middleware/RetryMiddleware.php` | 66% | rest are randomness-bound backoff math |
+| `Http/Controllers/ReleaseController.php` | 64% | rest are cosmetic (template payloads, redirect URLs) |
+| `Http/Middleware/RateLimiterMiddleware.php` | 62% | sleeper injected; rest are randomness-bound backoff math |
+| `Images/ImageCache.php` | 54% | structural: still needs DI + a clock for the rps throttle |
 
-Files not yet strengthened (worst-first): `CollectionController` (~54%),
-`ReleaseController` (~56%), `HealthCheckMiddleware` (~57%), `Storage` (~61%),
-`ReleaseEnricher` (79%). The two big controllers carry many low-value cosmetic
-(view-rendering) mutants — triage before strengthening.
+Already strong without extra work: `Http/Controllers/SearchController.php` (100%),
+`Infrastructure/Persistence/SqliteReleaseRepository.php` (100%),
+`Infrastructure/KvStore.php` (100%), `SqliteCollectionRepository.php` (93%),
+`Http/Controllers/AppleMusicController.php` (85%).
+
+Not yet strengthened (worst-first): `HealthCheckMiddleware` (~57%), `Storage`
+(~61%), `RecommendationController` (75%), `ReleaseEnricher` (79%). The remaining
+controller survivors are mostly cosmetic (view-rendering) mutants.
 
 ### When to Run
 
