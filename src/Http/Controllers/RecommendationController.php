@@ -62,7 +62,7 @@ class RecommendationController extends BaseController
         $prompt .= "\nUser's Collection Context:\n$collectionSummary\n";
         $prompt .= "\nPlease recommend 5 similar artists or releases. For each, provide the artist name, title (if it's a release), type ('artist' or 'release'), and a Discogs URL if known.";
 
-        $client = new AnthropicClient($currentUser['anthropic_api_key']);
+        $client = AnthropicClient::withApiKey($currentUser['anthropic_api_key']);
         $recommendations = $client->getRecommendations($prompt);
 
         if ($recommendations) {

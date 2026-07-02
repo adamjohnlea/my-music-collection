@@ -4,22 +4,39 @@ declare(strict_types=1);
 namespace App\Infrastructure;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 
 class AppleMusicClient
 {
-    private Client $client;
-
-    public function __construct(string $userAgent)
+    public function __construct(private readonly ClientInterface $client)
     {
-        $this->client = new Client([
+    }
+
+    /**
+     * Build a client configured for the Apple Music catalog API.
+     */
+    public static function withUserAgent(string $userAgent): self
+    {
+        return new self(new Client(self::clientConfig($userAgent)));
+    }
+
+    /**
+     * Guzzle client configuration for the Apple Music API. Exposed so the
+     * base URI, headers, and error handling can be verified in tests.
+     *
+     * @return array<string, mixed>
+     */
+    public static function clientConfig(string $userAgent): array
+    {
+        return [
             'base_uri' => 'https://api.music.apple.com/v1/',
             'headers' => [
                 'User-Agent' => $userAgent,
                 'Accept' => 'application/json',
             ],
             'http_errors' => false,
-        ]);
+        ];
     }
 
     /**

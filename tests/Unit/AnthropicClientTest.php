@@ -8,7 +8,6 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
-use ReflectionClass;
 
 class AnthropicClientTest extends MockeryTestCase
 {
@@ -20,13 +19,19 @@ class AnthropicClientTest extends MockeryTestCase
         parent::setUp();
 
         $this->mockClient = Mockery::mock(Client::class);
+        $this->client = new AnthropicClient($this->mockClient);
+    }
 
-        // Create client and inject mock via reflection
-        $this->client = new AnthropicClient('test-api-key');
-        $reflection = new ReflectionClass($this->client);
-        $property = $reflection->getProperty('client');
-        $property->setAccessible(true);
-        $property->setValue($this->client, $this->mockClient);
+    public function testClientConfigHasBaseUriAuthAndDisablesHttpErrors(): void
+    {
+        $config = AnthropicClient::clientConfig('secret-key');
+
+        $this->assertSame('https://api.anthropic.com/v1/', $config['base_uri']);
+        $this->assertSame('secret-key', $config['headers']['x-api-key']);
+        $this->assertSame('2023-06-01', $config['headers']['anthropic-version']);
+        $this->assertSame('application/json', $config['headers']['content-type']);
+        // http_errors must be false so 4xx/5xx return a response instead of throwing.
+        $this->assertFalse($config['http_errors']);
     }
 
     // ==================== getRecommendations: Happy Path ====================

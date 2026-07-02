@@ -4,14 +4,31 @@ declare(strict_types=1);
 namespace App\Infrastructure;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 
 class AnthropicClient
 {
-    private Client $client;
-
-    public function __construct(string $apiKey)
+    public function __construct(private readonly ClientInterface $client)
     {
-        $this->client = new Client([
+    }
+
+    /**
+     * Build a client configured for the Anthropic Messages API.
+     */
+    public static function withApiKey(string $apiKey): self
+    {
+        return new self(new Client(self::clientConfig($apiKey)));
+    }
+
+    /**
+     * Guzzle client configuration for the Anthropic API. Exposed so the
+     * base URI, auth headers, and error handling can be verified in tests.
+     *
+     * @return array<string, mixed>
+     */
+    public static function clientConfig(string $apiKey): array
+    {
+        return [
             'base_uri' => 'https://api.anthropic.com/v1/',
             'headers' => [
                 'x-api-key' => $apiKey,
@@ -19,7 +36,7 @@ class AnthropicClient
                 'content-type' => 'application/json',
             ],
             'http_errors' => false,
-        ]);
+        ];
     }
 
     /** @return array<string, mixed>|null */

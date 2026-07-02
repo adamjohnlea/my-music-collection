@@ -10,7 +10,6 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
-use ReflectionClass;
 
 class AppleMusicClientTest extends MockeryTestCase
 {
@@ -22,13 +21,18 @@ class AppleMusicClientTest extends MockeryTestCase
         parent::setUp();
 
         $this->mockClient = Mockery::mock(Client::class);
+        $this->client = new AppleMusicClient($this->mockClient);
+    }
 
-        // Create client and inject mock via reflection
-        $this->client = new AppleMusicClient('TestApp/1.0');
-        $reflection = new ReflectionClass($this->client);
-        $property = $reflection->getProperty('client');
-        $property->setAccessible(true);
-        $property->setValue($this->client, $this->mockClient);
+    public function testClientConfigHasBaseUriHeadersAndDisablesHttpErrors(): void
+    {
+        $config = AppleMusicClient::clientConfig('TestApp/2.0');
+
+        $this->assertSame('https://api.music.apple.com/v1/', $config['base_uri']);
+        $this->assertSame('TestApp/2.0', $config['headers']['User-Agent']);
+        $this->assertSame('application/json', $config['headers']['Accept']);
+        // http_errors must be false so 4xx/5xx return a response instead of throwing.
+        $this->assertFalse($config['http_errors']);
     }
 
     // ==================== searchByUpc: Happy Path ====================
