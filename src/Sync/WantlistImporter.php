@@ -61,7 +61,6 @@ class WantlistImporter
             $cReleases = $this->pdo->prepare('INSERT INTO releases (id, title, artist, year, formats, labels, country, thumb_url, cover_url, imported_at, updated_at, raw_json) VALUES (:id, :title, :artist, :year, :formats, :labels, :country, :thumb_url, :cover_url, :imported_at, :updated_at, :raw_json) ON CONFLICT(id) DO UPDATE SET title = COALESCE(excluded.title, releases.title), artist = COALESCE(excluded.artist, releases.artist), year = COALESCE(excluded.year, releases.year), formats = COALESCE(excluded.formats, releases.formats), labels = COALESCE(excluded.labels, releases.labels), country = COALESCE(excluded.country, releases.country), thumb_url = COALESCE(excluded.thumb_url, releases.thumb_url), cover_url = COALESCE(excluded.cover_url, releases.cover_url), updated_at = excluded.updated_at, raw_json = COALESCE(excluded.raw_json, releases.raw_json)');
             $cImage = $this->pdo->prepare('INSERT OR IGNORE INTO images (release_id, source_url, local_path, etag, last_modified, bytes, fetched_at) VALUES (:release_id, :source_url, :local_path, NULL, NULL, NULL, NULL)');
 
-            $imported = 0;
             foreach ($wants as $item) {
                 $releaseId = (int)($item['id'] ?? ($item['basic_information']['id'] ?? 0));
                 $added = $item['date_added'] ?? null;
@@ -111,8 +110,6 @@ class WantlistImporter
                         ':local_path' => $local,
                     ]);
                 }
-
-                $imported++;
             }
 
             $this->pdo->commit();
