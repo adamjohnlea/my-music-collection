@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  tests:
+    name: Tests & Static Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, pdo_sqlite
+          coverage: pcov
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: PHPUnit
+        run: vendor/bin/phpunit
+
+      - name: PHPStan
+        run: vendor/bin/phpstan analyse --no-progress
+
+  mutation:
+    name: Mutation gate (changed lines)
+    runs-on: ubuntu-latest
+    # Only on PRs: mutates the lines this PR changed and requires them to be
+    # well-tested (MSI >= 70). Existing debt is untouched; test-only/docs PRs
+    # pass via --ignore-msi-with-no-mutations.
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, intl, pdo_sqlite
+          coverage: pcov
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Mutation testing on changed lines
+        run: |
+          vendor/bin/infection \
+            --git-diff-lines \
+            --git-diff-base=origin/${{ github.base_ref }} \
+            --min-msi=70 \
+            --ignore-msi-with-no-mutations \
+            --map-source-class-to-test \
+            --threads=max \
+            --no-progress \
+            --no-interaction
