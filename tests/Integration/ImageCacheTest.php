@@ -372,6 +372,38 @@ class ImageCacheTest extends TestCase
         $this->assertEquals('new-content', file_get_contents($localPath));
     }
 
+    public function testFetchReturnsFalseWhenFileWriteFails(): void
+    {
+        // Arrange - localPath's parent is a regular file, so both the mkdir and
+        // the file_put_contents fail even though the HTTP fetch succeeded.
+        $blocker = $this->tempDir . '/blocker';
+        file_put_contents($blocker, 'x');
+        $localPath = $blocker . '/image.jpg';
+
+        $cache = $this->createImageCacheWithMock([
+            new Response(200, [], 'image-bytes'),
+        ]);
+        $today = gmdate('Ymd');
+        $dailyKey = 'rate:images:daily_count:' . $today;
+
+        // Act - the failed write emits an expected E_WARNING; swallow it so the
+        // test output stays clean while still exercising the false-return path.
+        set_error_handler(static fn () => true, E_WARNING);
+        try {
+            $result = $cache->fetch('http://example.com/image.jpg', $localPath);
+        } finally {
+            restore_error_handler();
+        }
+
+        // Assert - failure is reported and the daily counter is NOT incremented.
+        $this->assertFalse($result);
+        $this->assertFileDoesNotExist($localPath);
+        $this->assertNull(
+            $this->kv->get($dailyKey),
+            'counter must not increment when the write fails'
+        );
+    }
+
     // ==================== Helper ====================
 
     private function createImageCacheWithMock(array $responses): ImageCache
