@@ -16,7 +16,12 @@
 
 # PHP caches/tools
 .phpunit.result.cache
+.phpunit.cache/
 .php-cs-fixer.cache
+
+# Coverage reports (regenerated on demand for mutation testing)
+/var/coverage/
+/infection.html
 
 # Runtime / storage (SQLite DB, caches, logs)
 /var/app.db

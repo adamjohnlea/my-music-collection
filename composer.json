@@ -23,7 +23,10 @@
     "platform": {
       "php": "8.4"
     },
-    "sort-packages": true
+    "sort-packages": true,
+    "allow-plugins": {
+      "infection/extension-installer": true
+    }
   },
   "scripts": {
     "post-install-cmd": [
@@ -34,6 +37,7 @@
     ]
   },
   "require-dev": {
+    "infection/infection": "^0.33.2",
     "mockery/mockery": "^1.6",
     "phpstan/phpstan": "^2.1",
     "phpunit/phpunit": "^12.5"

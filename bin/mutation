@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Run Infection mutation testing.
+#
+# Herd's PHP ships without a coverage driver and ignores PHP_INI_SCAN_DIR, so we
+# generate the coverage report once with Herd's bundled Xdebug loaded via -d,
+# then let Infection consume it (--coverage + --skip-initial-tests).
+#
+# Usage:
+#   bin/mutation                       # all of src/
+#   bin/mutation Validator.php,QueryParser.php   # specific files (Infection --filter)
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+# Locate the bundled Xdebug matching this PHP version + arch.
+PHP_MAJMIN="$(php -r 'echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;')"
+ARCH="$(uname -m)"; [ "$ARCH" = "arm64" ] && ARCH="arm64" || ARCH="x86"
+XD="/Applications/Herd.app/Contents/Resources/xdebug/xdebug-${PHP_MAJMIN}-${ARCH}.so"
+if [ ! -f "$XD" ]; then
+  echo "Xdebug not found at $XD — install a coverage driver (xdebug/pcov)." >&2
+  exit 1
+fi
+
+echo "==> Generating coverage report (Xdebug via -d)..."
+php -d zend_extension="$XD" -d xdebug.mode=coverage -d memory_limit=512M \
+    vendor/bin/phpunit \
+    --coverage-xml var/coverage/coverage-xml \
+    --log-junit var/coverage/junit.xml
+
+FILTER_ARG=""
+[ "${1:-}" != "" ] && FILTER_ARG="--filter=$1"
+
+echo "==> Running Infection..."
+exec ./vendor/bin/infection \
+    --coverage=var/coverage \
+    --skip-initial-tests \
+    --threads=4 \
+    --show-mutations \
+    ${FILTER_ARG}
