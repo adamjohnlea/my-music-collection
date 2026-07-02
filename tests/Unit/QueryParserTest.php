@@ -337,4 +337,165 @@ class QueryParserTest extends TestCase
             'barcode maps to identifier_text' => ['barcode', 'identifier_text'],
         ];
     }
+
+    // ==================== Exact-Output Characterization Tests ====================
+    // The tests above use assertStringContainsString on `match` and check chip
+    // counts. These assert the *exact* FTS string, chip label text, and value
+    // types the parser produces today, to catch subtle regressions that broad
+    // "contains" checks miss: wildcard suffixing, col:value construction, int
+    // casting, label formatting, general-vs-fielded ordering, and quoting.
+
+    public function testSimpleTermGetsWildcardSuffix(): void
+    {
+        $result = $this->parser->parse('beatles');
+
+        $this->assertSame('beatles*', $result['match']);
+        $this->assertSame(['q' => 'beatles'], $result['filters']);
+    }
+
+    public function testArtistFilterBuildsExactMatchAndChip(): void
+    {
+        $result = $this->parser->parse('artist:Beatles');
+
+        $this->assertSame('artist:Beatles*', $result['match']);
+        $this->assertSame([['label' => 'Artist: Beatles']], $result['chips']);
+    }
+
+    public function testMasterIdIsIntegerWithExactChipAndNoMatch(): void
+    {
+        $result = $this->parser->parse('master:12345');
+
+        // Cast to int (not the string '12345'); master is a filter, not an FTS column.
+        $this->assertSame(12345, $result['master_id']);
+        $this->assertSame('', $result['match']);
+        $this->assertSame([['label' => 'Master: 12345']], $result['chips']);
+    }
+
+    public function testSingleYearProducesIntegerBoundsAndChip(): void
+    {
+        $result = $this->parser->parse('year:1985');
+
+        $this->assertSame(1985, $result['year_from']);
+        $this->assertSame(1985, $result['year_to']);
+        $this->assertSame('', $result['match']);
+        $this->assertSame([['label' => 'Year 1985']], $result['chips']);
+    }
+
+    public function testYearRangeProducesIntegerBoundsAndEnDashChip(): void
+    {
+        $result = $this->parser->parse('year:1980..1989');
+
+        $this->assertSame(1980, $result['year_from']);
+        $this->assertSame(1989, $result['year_to']);
+        $this->assertSame('1980..1989', $result['filters']['year']);
+        // Label uses an en-dash (U+2013), not a hyphen.
+        $this->assertSame([['label' => 'Year 1980–1989']], $result['chips']);
+    }
+
+    public function testNotesFilterSearchesBothColumnsWithExactMatch(): void
+    {
+        $result = $this->parser->parse('notes:vinyl');
+
+        $this->assertSame('release_notes:vinyl* user_notes:vinyl*', $result['match']);
+        $this->assertSame([['label' => 'Notes: vinyl']], $result['chips']);
+    }
+
+    public function testQuotedPhraseIsLowercasedWithoutWildcard(): void
+    {
+        $result = $this->parser->parse('"Abbey Road"');
+
+        // Quoted phrases are lowercased and kept as an exact phrase (no * suffix).
+        $this->assertSame('"abbey road"', $result['match']);
+        $this->assertSame(['q' => 'abbey road'], $result['filters']);
+    }
+
+    public function testTypeFilterProducesChipButNoMatch(): void
+    {
+        $result = $this->parser->parse('type:LP');
+
+        $this->assertSame('', $result['match']);
+        $this->assertSame('LP', $result['filters']['type']);
+        $this->assertSame([['label' => 'Type: LP']], $result['chips']);
+    }
+
+    public function testGeneralTermsPrecedeFieldedTermsAndPreserveQuotedValues(): void
+    {
+        $result = $this->parser->parse('multi word artist:"Pink Floyd"');
+
+        // General words are wildcard-suffixed and ordered before fielded parts;
+        // a quoted field value is preserved verbatim (not wildcarded).
+        $this->assertSame('multi* word* artist:"Pink Floyd"', $result['match']);
+        $this->assertSame('Pink Floyd', $result['filters']['artist']);
+        $this->assertSame('multi word', $result['filters']['q']);
+    }
+
+    // ==================== Multi-token / Continuation Tests ====================
+    // These guard against a special-case branch stopping the loop early
+    // (continue -> break), which would silently drop every token after a
+    // master:/year:/type: filter.
+
+    public function testMasterFilterDoesNotSwallowLaterTokens(): void
+    {
+        $result = $this->parser->parse('master:12345 artist:Beatles');
+
+        $this->assertSame(12345, $result['master_id']);
+        $this->assertSame('Beatles', $result['filters']['artist']);
+        $this->assertSame('artist:Beatles*', $result['match']);
+        $this->assertSame(
+            [['label' => 'Master: 12345'], ['label' => 'Artist: Beatles']],
+            $result['chips']
+        );
+    }
+
+    public function testYearRangeFilterDoesNotSwallowLaterTokens(): void
+    {
+        $result = $this->parser->parse('year:1980..1989 label:Apple');
+
+        $this->assertSame(1980, $result['year_from']);
+        $this->assertSame('Apple', $result['filters']['label']);
+        $this->assertSame('label_text:Apple*', $result['match']);
+    }
+
+    public function testTypeFilterDoesNotSwallowLaterTokens(): void
+    {
+        $result = $this->parser->parse('type:LP artist:Beatles');
+
+        $this->assertSame('LP', $result['filters']['type']);
+        $this->assertSame('artist:Beatles*', $result['match']);
+        $this->assertSame(
+            [['label' => 'Type: LP'], ['label' => 'Artist: Beatles']],
+            $result['chips']
+        );
+    }
+
+    // ==================== Case-insensitivity & Matching-precision Tests ====================
+
+    public function testFieldPrefixesAreCaseInsensitive(): void
+    {
+        // Uppercase year: prefix is still recognised as a year filter.
+        $year = $this->parser->parse('YEAR:1985');
+        $this->assertSame(1985, $year['year_from']);
+
+        // Uppercase field key is lowercased for both the filter key and column.
+        $artist = $this->parser->parse('ARTIST:Beatles');
+        $this->assertSame('Beatles', $artist['filters']['artist']);
+        $this->assertSame('artist:Beatles*', $artist['match']);
+    }
+
+    public function testValueAlreadyEndingInWildcardIsNotDoubled(): void
+    {
+        $result = $this->parser->parse('artist:Beatles*');
+
+        // A trailing '*' must not gain a second one.
+        $this->assertSame('artist:Beatles*', $result['match']);
+    }
+
+    public function testMasterRequiresFullyNumericValue(): void
+    {
+        // 'master:123abc' is NOT a numeric master filter (the $ anchor matters);
+        // it must not set master_id to 123.
+        $result = $this->parser->parse('master:123abc');
+
+        $this->assertNull($result['master_id']);
+    }
 }

@@ -421,4 +421,110 @@ class AppleMusicClientTest extends MockeryTestCase
         // Assert
         $this->assertNull($result);
     }
+
+    // ==================== Request Construction ====================
+    // The tests above wave the request options through with Mockery::any().
+    // These pin the actual query params and auth header so a broken UPC filter,
+    // search term, result limit, or missing Bearer token is caught.
+
+    public function testSearchByUpcSendsUpcFilterAndAuthHeader(): void
+    {
+        $captured = null;
+        $this->mockClient->shouldReceive('request')
+            ->once()
+            ->withArgs(function ($method, $path, $options) use (&$captured) {
+                $captured = [$method, $path, $options];
+                return true;
+            })
+            ->andReturn(new Response(200, [], json_encode(['data' => [['id' => 'id-1']]])));
+
+        $this->client->searchByUpc('0012345678901', 'test-token');
+
+        [$method, $path, $options] = $captured;
+        $this->assertSame('GET', $method);
+        $this->assertSame('catalog/us/albums', $path);
+        $this->assertSame('0012345678901', $options['query']['filter[upc]']);
+        $this->assertSame('Bearer test-token', $options['headers']['Authorization']);
+    }
+
+    public function testSearchByTextSendsTermTypesLimitAndAuthHeader(): void
+    {
+        $captured = null;
+        $this->mockClient->shouldReceive('request')
+            ->once()
+            ->withArgs(function ($method, $path, $options) use (&$captured) {
+                $captured = [$method, $path, $options];
+                return true;
+            })
+            ->andReturn(new Response(200, [], json_encode(['results' => ['albums' => ['data' => []]]])));
+
+        $this->client->searchByText('The Beatles', 'Abbey Road', 'test-token');
+
+        [$method, $path, $options] = $captured;
+        $this->assertSame('GET', $method);
+        $this->assertSame('catalog/us/search', $path);
+        // term is "artist title", not "title artist" or either alone.
+        $this->assertSame('The Beatles Abbey Road', $options['query']['term']);
+        $this->assertSame('albums', $options['query']['types']);
+        $this->assertSame(5, $options['query']['limit']);
+        $this->assertSame('Bearer test-token', $options['headers']['Authorization']);
+    }
+
+    // ==================== isMatch: Boundary Behaviour ====================
+
+    public function testSearchByTextRejectsGenuineMismatchWithUppercaseResult(): void
+    {
+        // The result names are uppercase; the search terms genuinely don't match.
+        // Guards the strtolower() in normalize(): without it, uppercase names
+        // normalize to '' and str_contains(x, '') is always true — a false match.
+        $responseBody = json_encode([
+            'results' => ['albums' => ['data' => [[
+                'id' => 'wrong',
+                'attributes' => ['name' => 'ABBEY ROAD', 'artistName' => 'THE BEATLES'],
+            ]]]],
+        ]);
+        $this->mockClient->shouldReceive('request')
+            ->once()
+            ->andReturn(new Response(200, [], $responseBody));
+
+        $result = $this->client->searchByText('zebra', 'xylophone', 'test-token');
+
+        $this->assertNull($result);
+    }
+
+    public function testSearchByTextRequiresTitleMatchNotJustArtist(): void
+    {
+        // Artist matches exactly but the title does not: no match (both required).
+        $responseBody = json_encode([
+            'results' => ['albums' => ['data' => [[
+                'id' => 'artist-only',
+                'attributes' => ['name' => 'Abbey Road', 'artistName' => 'The Beatles'],
+            ]]]],
+        ]);
+        $this->mockClient->shouldReceive('request')
+            ->once()
+            ->andReturn(new Response(200, [], $responseBody));
+
+        $result = $this->client->searchByText('The Beatles', 'Nonexistent Title', 'test-token');
+
+        $this->assertNull($result);
+    }
+
+    public function testSearchByTextRequiresArtistMatchNotJustTitle(): void
+    {
+        // Title matches exactly but the artist does not: no match (both required).
+        $responseBody = json_encode([
+            'results' => ['albums' => ['data' => [[
+                'id' => 'title-only',
+                'attributes' => ['name' => 'Abbey Road', 'artistName' => 'The Beatles'],
+            ]]]],
+        ]);
+        $this->mockClient->shouldReceive('request')
+            ->once()
+            ->andReturn(new Response(200, [], $responseBody));
+
+        $result = $this->client->searchByText('Nobody At All', 'Abbey Road', 'test-token');
+
+        $this->assertNull($result);
+    }
 }

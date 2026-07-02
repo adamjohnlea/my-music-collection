@@ -287,4 +287,109 @@ class DiscogsWantlistWriterTest extends MockeryTestCase
         $this->assertFalse($result['ok']);
         $this->assertEquals(500, $result['code']);
     }
+
+    // ==================== Request Options, Boundaries & Response Fidelity ====================
+    // Existing tests wave options through with Mockery::any() and don't pin the
+    // exact 2xx success boundary or the returned body. These do, per method.
+
+    public function testAddToWantlistSendsTimeoutAndMirrorsBody(): void
+    {
+        $captured = null;
+        $this->mockClient->shouldReceive('request')
+            ->once()
+            ->withArgs(function ($method, $path, $options) use (&$captured) {
+                $captured = $options;
+                return true;
+            })
+            ->andReturn(new Response(200, [], '{"want":1}'));
+
+        $result = $this->writer->addToWantlist('testuser', 12345);
+
+        $this->assertSame(30, $captured['timeout']);
+        $this->assertSame('{"want":1}', $result['body']);
+    }
+
+    public function testAddToWantlistStatus300IsFailure(): void
+    {
+        $this->mockClient->shouldReceive('request')
+            ->once()
+            ->andReturn(new Response(300, [], 'Multiple Choices'));
+
+        $result = $this->writer->addToWantlist('testuser', 12345);
+
+        $this->assertFalse($result['ok']);
+        $this->assertSame(300, $result['code']);
+    }
+
+    public function testRemoveFromWantlistSendsTimeoutAndTreats200AsSuccess(): void
+    {
+        $captured = null;
+        $this->mockClient->shouldReceive('request')
+            ->once()
+            ->withArgs(function ($method, $path, $options) use (&$captured) {
+                $captured = $options;
+                return true;
+            })
+            ->andReturn(new Response(200, [], '{"removed":1}'));
+
+        $result = $this->writer->removeFromWantlist('testuser', 12345);
+
+        $this->assertSame(30, $captured['timeout']);
+        $this->assertTrue($result['ok']); // guards the >= 200 lower bound
+        $this->assertSame('{"removed":1}', $result['body']);
+    }
+
+    public function testRemoveFromWantlistStatus300IsFailure(): void
+    {
+        $this->mockClient->shouldReceive('request')
+            ->once()
+            ->andReturn(new Response(300, [], 'Multiple Choices'));
+
+        $result = $this->writer->removeFromWantlist('testuser', 12345);
+
+        $this->assertFalse($result['ok']);
+    }
+
+    public function testRemoveFromWantlistExceptionBodyIsUnderlyingMessage(): void
+    {
+        $request = new Request('DELETE', 'users/testuser/wants/12345');
+        $this->mockClient->shouldReceive('request')
+            ->once()
+            ->andThrow(new ConnectException('connection reset', $request));
+
+        $result = $this->writer->removeFromWantlist('testuser', 12345);
+
+        $this->assertFalse($result['ok']);
+        $this->assertSame(0, $result['code']);
+        $this->assertSame('connection reset', $result['body']);
+    }
+
+    public function testAddToCollectionSendsTimeoutAndTreats200AsSuccess(): void
+    {
+        $captured = null;
+        $this->mockClient->shouldReceive('request')
+            ->once()
+            ->withArgs(function ($method, $path, $options) use (&$captured) {
+                $captured = $options;
+                return true;
+            })
+            ->andReturn(new Response(200, [], '{"added":1}'));
+
+        $result = $this->writer->addToCollection('testuser', 12345);
+
+        $this->assertSame(30, $captured['timeout']);
+        $this->assertTrue($result['ok']); // guards the >= 200 lower bound
+        $this->assertSame('{"added":1}', $result['body']);
+    }
+
+    public function testAddToCollectionStatus300IsFailure(): void
+    {
+        $this->mockClient->shouldReceive('request')
+            ->once()
+            ->andReturn(new Response(300, [], 'Multiple Choices'));
+
+        $result = $this->writer->addToCollection('testuser', 12345);
+
+        $this->assertFalse($result['ok']);
+    }
 }

@@ -272,4 +272,66 @@ class AnthropicClientTest extends MockeryTestCase
         $this->assertIsArray($result);
         $this->assertArrayHasKey('recommendations', $result);
     }
+
+    // ==================== Request Construction ====================
+
+    public function testSendsCorrectRequestPayload(): void
+    {
+        // The tests above only assert response parsing; this pins down the
+        // outgoing request so a broken model id, token limit, message shape,
+        // or dropped system prompt is caught (previously all waved through
+        // with Mockery::any()).
+        $captured = null;
+
+        $this->mockClient->shouldReceive('request')
+            ->once()
+            ->withArgs(function ($method, $path, $options) use (&$captured) {
+                $captured = [$method, $path, $options];
+                return true;
+            })
+            ->andReturn(new Response(200, [], json_encode([
+                'content' => [['text' => '{"recommendations": []}']],
+            ])));
+
+        // Act
+        $this->client->getRecommendations('Recommend albums like Kind of Blue');
+
+        // Assert
+        $this->assertNotNull($captured, 'request() was never called');
+        [$method, $path, $options] = $captured;
+        $this->assertSame('POST', $method);
+        $this->assertSame('messages', $path);
+
+        $payload = $options['json'];
+        $this->assertSame('claude-3-haiku-20240307', $payload['model']);
+        $this->assertSame(1024, $payload['max_tokens']);
+        $this->assertSame(
+            [['role' => 'user', 'content' => 'Recommend albums like Kind of Blue']],
+            $payload['messages']
+        );
+        // A system prompt must be present and non-empty.
+        $this->assertArrayHasKey('system', $payload);
+        $this->assertNotSame('', $payload['system']);
+    }
+
+    public function testErrorStatusReturnsNullEvenWhenBodyContainsValidJson(): void
+    {
+        // Guards against the status check being removed: a 500 whose body is
+        // itself valid recommendation JSON must STILL return null. The earlier
+        // 401/429/500 tests used non-JSON bodies, so they returned null even
+        // with the status guard disabled — passing for the wrong reason.
+        $this->mockClient->shouldReceive('request')
+            ->once()
+            ->andReturn(new Response(500, [], json_encode([
+                'content' => [
+                    ['text' => '{"recommendations": [{"artist": "X", "title": "Y", "type": "release"}]}'],
+                ],
+            ])));
+
+        // Act
+        $result = $this->client->getRecommendations('Recommend albums');
+
+        // Assert
+        $this->assertNull($result);
+    }
 }

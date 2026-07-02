@@ -315,4 +315,121 @@ class DiscogsCollectionWriterTest extends MockeryTestCase
         // Assert
         $this->assertTrue($result['ok']);
     }
+
+    // ==================== Request Options, Boundaries & Response Fidelity ====================
+    // The tests above wave request options through with Mockery::any() and only
+    // exercise 200/401/404/500. These pin the request body/headers/timeout, the
+    // exact 2xx success boundary, and that the returned body mirrors the response.
+
+    public function testRatingRequestSendsJsonPayloadHeadersAndTimeout(): void
+    {
+        $captured = null;
+        $this->mockClient->shouldReceive('request')
+            ->once()
+            ->withArgs(function ($method, $path, $options) use (&$captured) {
+                $captured = $options;
+                return true;
+            })
+            ->andReturn(new Response(200, [], '{}'));
+
+        $this->writer->updateInstance('testuser', 12345, 999, 1, 4);
+
+        $this->assertSame(4, $captured['json']['rating']);
+        $this->assertSame('application/json', $captured['headers']['Content-Type']);
+        $this->assertSame(30, $captured['timeout']);
+    }
+
+    public function testFieldRequestSendsJsonPayloadHeadersAndTimeout(): void
+    {
+        $captured = null;
+        $this->mockClient->shouldReceive('request')
+            ->once()
+            ->withArgs(function ($method, $path, $options) use (&$captured) {
+                $captured = $options;
+                return true;
+            })
+            ->andReturn(new Response(200, [], '{}'));
+
+        $this->writer->updateInstance('testuser', 12345, 999, 1, null, [3 => 'My notes']);
+
+        $this->assertSame('My notes', $captured['json']['value']);
+        $this->assertSame('application/json', $captured['headers']['Content-Type']);
+        $this->assertSame(30, $captured['timeout']);
+    }
+
+    public function testRatingSuccessResultBodyMirrorsResponse(): void
+    {
+        $this->mockClient->shouldReceive('request')
+            ->once()
+            ->andReturn(new Response(200, [], '{"instance":42}'));
+
+        $result = $this->writer->updateInstance('testuser', 12345, 999, 1, 4);
+
+        $this->assertSame('{"instance":42}', $result['body']);
+    }
+
+    public function testFieldSuccessResultBodyMirrorsResponse(): void
+    {
+        $this->mockClient->shouldReceive('request')
+            ->once()
+            ->andReturn(new Response(200, [], '{"field":7}'));
+
+        $result = $this->writer->updateInstance('testuser', 12345, 999, 1, null, [3 => 'x']);
+
+        $this->assertSame('{"field":7}', $result['body']);
+    }
+
+    public function testRatingStatus204IsSuccess(): void
+    {
+        $this->mockClient->shouldReceive('request')
+            ->once()
+            ->andReturn(new Response(204, [], ''));
+
+        $result = $this->writer->updateInstance('testuser', 12345, 999, 1, 4);
+
+        $this->assertTrue($result['ok']);
+        $this->assertSame(204, $result['code']);
+    }
+
+    public function testRatingStatus300IsFailure(): void
+    {
+        // 300 is outside the 2xx success range and must be a failure.
+        $this->mockClient->shouldReceive('request')
+            ->once()
+            ->andReturn(new Response(300, [], 'Multiple Choices'));
+
+        $result = $this->writer->updateInstance('testuser', 12345, 999, 1, 4);
+
+        $this->assertFalse($result['ok']);
+        $this->assertSame(300, $result['code']);
+    }
+
+    public function testFieldStatus300IsFailure(): void
+    {
+        $this->mockClient->shouldReceive('request')
+            ->once()
+            ->andReturn(new Response(300, [], 'Multiple Choices'));
+
+        $result = $this->writer->updateInstance('testuser', 12345, 999, 1, null, [3 => 'x']);
+
+        $this->assertFalse($result['ok']);
+        $this->assertSame(300, $result['code']);
+    }
+
+    public function testNullFieldValueDoesNotSkipSubsequentFields(): void
+    {
+        // A null field is skipped, but the loop must CONTINUE to later fields
+        // (guards continue -> break): field 1 is null, field 2 must still be sent.
+        $this->mockClient->shouldReceive('request')
+            ->with('POST', Mockery::pattern('/fields\/2$/'), Mockery::any())
+            ->once()
+            ->andReturn(new Response(200, [], '{}'));
+
+        $result = $this->writer->updateInstance('testuser', 12345, 999, 1, null, [
+            1 => null,
+            2 => 'Near Mint',
+        ]);
+
+        $this->assertTrue($result['ok']);
+    }
 }
