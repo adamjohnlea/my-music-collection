@@ -12,6 +12,7 @@
 .idea/
 .vscode/
 *.iml
+.phpactor.json
 
 # PHP caches/tools
 .phpunit.result.cache
