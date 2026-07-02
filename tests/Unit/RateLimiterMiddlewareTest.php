@@ -11,11 +11,13 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use PDO;
 use PHPUnit\Framework\TestCase;
+use Tests\Support\RecordingSleeper;
 
 class RateLimiterMiddlewareTest extends TestCase
 {
     private PDO $pdo;
     private KvStore $kv;
+    private RecordingSleeper $sleeper;
 
     protected function setUp(): void
     {
@@ -26,6 +28,7 @@ class RateLimiterMiddlewareTest extends TestCase
         $this->pdo->exec('CREATE TABLE kv_store (k TEXT PRIMARY KEY, v TEXT)');
 
         $this->kv = new KvStore($this->pdo);
+        $this->sleeper = new RecordingSleeper();
     }
 
     // ==================== Basic Functionality ====================
@@ -314,12 +317,75 @@ class RateLimiterMiddlewareTest extends TestCase
         $this->assertLessThan(0.5, $elapsed);
     }
 
+    // ==================== Throttle & Retry-After Behaviour (via recorded sleeps) ====================
+
+    public function testThrottlesWhenRemainingIsZero(): void
+    {
+        $this->kv->set('rate:core:remaining', '0');
+        $this->kv->set('rate:core:last_seen_at', (string)time());
+        $this->kv->set('rate:core:bucket', '60');
+
+        $mock = new MockHandler([new Response(200, [], 'OK')]);
+        $this->createClientWithRateLimiter($mock)->get('/test');
+
+        // Sleeps for (roughly) the remaining 60s window...
+        $this->assertCount(1, $this->sleeper->sleeps);
+        $this->assertGreaterThanOrEqual(59_000_000, $this->sleeper->sleeps[0]);
+        $this->assertLessThanOrEqual(60_000_000, $this->sleeper->sleeps[0]);
+        // ...and optimistically resets remaining to bucket - 1.
+        $this->assertEquals('59', $this->kv->get('rate:core:remaining'));
+    }
+
+    public function testDoesNotSleepWhenRemainingPositive(): void
+    {
+        $this->kv->set('rate:core:remaining', '10');
+        $this->kv->set('rate:core:last_seen_at', (string)time());
+
+        $mock = new MockHandler([new Response(200, [], 'OK')]);
+        $this->createClientWithRateLimiter($mock)->get('/test');
+
+        $this->assertSame(0, $this->sleeper->count());
+    }
+
+    public function testDoesNotSleepWhenLastSeenTooOld(): void
+    {
+        $this->kv->set('rate:core:remaining', '0');
+        $this->kv->set('rate:core:last_seen_at', (string)(time() - 300)); // > 120s ago
+
+        $mock = new MockHandler([new Response(200, [], 'OK')]);
+        $this->createClientWithRateLimiter($mock)->get('/test');
+
+        $this->assertSame(0, $this->sleeper->count());
+    }
+
+    public function testSleepsForRetryAfterOn429(): void
+    {
+        $mock = new MockHandler([new Response(429, ['Retry-After' => '3'], '')]);
+        $this->createClientWithRateLimiter($mock)->get('/test');
+
+        // 3s base + up to 500ms jitter.
+        $this->assertCount(1, $this->sleeper->sleeps);
+        $this->assertGreaterThanOrEqual(3_000_000, $this->sleeper->sleeps[0]);
+        $this->assertLessThanOrEqual(3_500_000, $this->sleeper->sleeps[0]);
+    }
+
+    public function testUses5sDefaultBackoffOn429WithoutRetryAfter(): void
+    {
+        $mock = new MockHandler([new Response(429, [], '')]);
+        $this->createClientWithRateLimiter($mock)->get('/test');
+
+        // Default 5s backoff + up to 500ms jitter.
+        $this->assertCount(1, $this->sleeper->sleeps);
+        $this->assertGreaterThanOrEqual(5_000_000, $this->sleeper->sleeps[0]);
+        $this->assertLessThanOrEqual(5_500_000, $this->sleeper->sleeps[0]);
+    }
+
     // ==================== Helper ====================
 
     private function createClientWithRateLimiter(MockHandler $mock): Client
     {
         $stack = HandlerStack::create($mock);
-        $stack->push(new RateLimiterMiddleware($this->kv));
+        $stack->push(new RateLimiterMiddleware($this->kv, $this->sleeper));
 
         return new Client([
             'handler' => $stack,

@@ -9,9 +9,18 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Tests\Support\RecordingSleeper;
 
 class RetryMiddlewareTest extends TestCase
 {
+    private RecordingSleeper $sleeper;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->sleeper = new RecordingSleeper();
+    }
+
     // ==================== No Retry Needed ====================
 
     public function testDoesNotRetryOn200(): void
@@ -324,12 +333,85 @@ class RetryMiddlewareTest extends TestCase
         $this->assertLessThan(1.5, $elapsed);
     }
 
+    // ==================== Backoff Behaviour (via recorded sleeps) ====================
+
+    public function testSleepsOncePerRetry(): void
+    {
+        $mock = new MockHandler([
+            new Response(500, [], ''),
+            new Response(500, [], ''),
+            new Response(200, [], 'OK'),
+        ]);
+        $this->createClientWithRetry($mock, 5)->get('/test');
+
+        // Two retries -> two backoff sleeps (guards the usleep call being removed).
+        $this->assertSame(2, $this->sleeper->count());
+    }
+
+    public function testDoesNotSleepWhenNoRetryNeeded(): void
+    {
+        $mock = new MockHandler([new Response(200, [], 'OK')]);
+        $this->createClientWithRetry($mock)->get('/test');
+
+        $this->assertSame(0, $this->sleeper->count());
+    }
+
+    public function testHonorsRetryAfterHeaderDuration(): void
+    {
+        $mock = new MockHandler([
+            new Response(429, ['Retry-After' => '2'], ''),
+            new Response(200, [], 'OK'),
+        ]);
+        $this->createClientWithRetry($mock, 3)->get('/test');
+
+        // 2s base + up to 250ms jitter.
+        $this->assertCount(1, $this->sleeper->sleeps);
+        $this->assertGreaterThanOrEqual(2_000_000, $this->sleeper->sleeps[0]);
+        $this->assertLessThanOrEqual(2_250_000, $this->sleeper->sleeps[0]);
+    }
+
+    public function testExponentialBackoffFirstRetryIsAboutOneSecond(): void
+    {
+        $mock = new MockHandler([
+            new Response(500, [], ''),
+            new Response(200, [], 'OK'),
+        ]);
+        $this->createClientWithRetry($mock, 5)->get('/test');
+
+        // First attempt: base = min(60, 2**0) = 1s, plus up to 250ms jitter.
+        $this->assertCount(1, $this->sleeper->sleeps);
+        $this->assertGreaterThanOrEqual(1_000_000, $this->sleeper->sleeps[0]);
+        $this->assertLessThanOrEqual(1_250_000, $this->sleeper->sleeps[0]);
+    }
+
+    public function testStopsSleepingAtMaxRetries(): void
+    {
+        $mock = new MockHandler(array_fill(0, 6, new Response(429, [], '')));
+        $this->createClientWithRetry($mock, 2)->get('/test');
+
+        // Exactly maxRetries backoffs, no more (guards the `$retries < maxRetries` bound).
+        $this->assertSame(2, $this->sleeper->count());
+    }
+
+    public function testDefaultRetryBudgetIsFive(): void
+    {
+        // Constructed with no maxRetries -> the default of 5 backoff sleeps.
+        $mock = new MockHandler(array_fill(0, 8, new Response(500, [], '')));
+        $stack = HandlerStack::create($mock);
+        $stack->push(new RetryMiddleware($this->sleeper)); // default maxRetries
+        $client = new Client(['handler' => $stack, 'http_errors' => false]);
+
+        $client->get('/test');
+
+        $this->assertSame(5, $this->sleeper->count());
+    }
+
     // ==================== Helper ====================
 
     private function createClientWithRetry(MockHandler $mock, int $maxRetries = 5): Client
     {
         $stack = HandlerStack::create($mock);
-        $stack->push(new RetryMiddleware($maxRetries));
+        $stack->push(new RetryMiddleware($this->sleeper, $maxRetries));
 
         return new Client([
             'handler' => $stack,

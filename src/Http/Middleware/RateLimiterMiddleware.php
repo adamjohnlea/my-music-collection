@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Http\Middleware;
 
 use App\Infrastructure\KvStore;
+use App\Infrastructure\Sleeper;
 use GuzzleHttp\Promise\PromiseInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -16,8 +17,10 @@ use Psr\Http\Message\ResponseInterface;
  */
 class RateLimiterMiddleware
 {
-    public function __construct(private readonly KvStore $kv)
-    {
+    public function __construct(
+        private readonly KvStore $kv,
+        private readonly Sleeper $sleeper,
+    ) {
     }
 
     public function __invoke(callable $handler): callable
@@ -54,7 +57,7 @@ class RateLimiterMiddleware
             $sleep = max(1, 60 - $elapsed);
             // @phpstan-ignore greater.alwaysTrue (defensive: max() guarantees >= 1, but explicit check is clearer)
             if ($sleep > 0) {
-                usleep($sleep * 1_000_000);
+                $this->sleeper->usleep($sleep * 1_000_000);
                 // After sleep, reset remaining optimistically to bucket-1
                 $this->kv->set('rate:core:remaining', (string)max(0, $bucket - 1));
                 $this->kv->set('rate:core:last_seen_at', (string)time());
@@ -96,7 +99,7 @@ class RateLimiterMiddleware
         }
         // add small jitter up to 500ms
         $ms = random_int(0, 500);
-        usleep($seconds * 1_000_000 + $ms * 1000);
+        $this->sleeper->usleep($seconds * 1_000_000 + $ms * 1000);
     }
 
     private function headerInt(ResponseInterface $response, string $name): ?int

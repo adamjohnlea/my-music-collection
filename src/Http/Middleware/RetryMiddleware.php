@@ -3,14 +3,17 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Infrastructure\Sleeper;
 use GuzzleHttp\Promise\PromiseInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 class RetryMiddleware
 {
-    public function __construct(private readonly int $maxRetries = 5)
-    {
+    public function __construct(
+        private readonly Sleeper $sleeper,
+        private readonly int $maxRetries = 5,
+    ) {
     }
 
     public function __invoke(callable $handler): callable
@@ -26,7 +29,7 @@ class RetryMiddleware
                     if ($this->shouldRetry($code) && $retries < $this->maxRetries) {
                         $delay = $this->computeBackoff($response, $retries);
                         $retries++;
-                        usleep($delay);
+                        $this->sleeper->usleep($delay);
                         return $fn($request, $options);
                     }
                     return $response;

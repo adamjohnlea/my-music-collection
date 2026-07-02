@@ -7,6 +7,7 @@ use App\Http\Middleware\RateLimiterMiddleware;
 use App\Http\Middleware\RetryMiddleware;
 use App\Http\Middleware\HealthCheckMiddleware;
 use App\Infrastructure\KvStore;
+use App\Infrastructure\RealSleeper;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 
@@ -19,8 +20,9 @@ class DiscogsHttpClient
         $stack = HandlerStack::create();
 
         // Add RateLimiter and Retry middlewares
-        $stack->push(new RateLimiterMiddleware($kv));
-        $stack->push(new RetryMiddleware());
+        $sleeper = new RealSleeper();
+        $stack->push(new RateLimiterMiddleware($kv, $sleeper));
+        $stack->push(new RetryMiddleware($sleeper));
 
         $this->client = new Client([
             'base_uri' => 'https://api.discogs.com/',
