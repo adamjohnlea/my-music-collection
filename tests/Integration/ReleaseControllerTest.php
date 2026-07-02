@@ -599,6 +599,93 @@ class ReleaseControllerTest extends MockeryTestCase
         $this->assertTrue($this->redirectCalled);
     }
 
+    // ============ Security & clamp behaviour ============
+
+    public function testSaveClampsNegativeRatingToZero(): void
+    {
+        // Existing clamp test covers the upper bound (5); this covers max(0, ...).
+        $_SESSION['csrf'] = 'valid-token';
+        $_POST = [
+            '_token' => 'valid-token',
+            'release_id' => '12345',
+            'rating' => '-3',
+            'action' => 'update_collection',
+        ];
+        $currentUser = ['id' => 1, 'discogs_username' => 'testuser'];
+
+        $this->collectionRepository->shouldReceive('findCollectionItem')->andReturn(['instance_id' => 1000]);
+        $this->collectionRepository->shouldReceive('beginTransaction');
+        $this->collectionRepository->shouldReceive('findPendingPushJob')->andReturn(null);
+        $this->collectionRepository->shouldReceive('addToPushQueue')
+            ->once()
+            ->with(Mockery::on(fn($data) => $data['rating'] === 0));
+        $this->collectionRepository->shouldReceive('commit');
+
+        $this->callWithRedirectCatch(fn() => $this->createController()->save($currentUser));
+
+        $this->assertTrue($this->redirectCalled);
+    }
+
+    public function testShowRejectsOffsiteReturnUrl(): void
+    {
+        // An absolute off-site return URL must be ignored (open-redirect guard):
+        // only paths beginning with '/' are honored.
+        $_GET['return'] = 'https://evil.example.com/phish';
+        $release = ['id' => 1, 'title' => 'T', 'artist' => 'A', 'year' => 2000, 'cover_url' => null, 'thumb_url' => null];
+        $this->releaseRepository->shouldReceive('findById')->andReturn($release);
+        $this->releaseRepository->shouldReceive('getImages')->andReturn([]);
+
+        $this->createController()->show(1, null);
+
+        $this->assertSame('/', $this->renderedData['back_url']);
+    }
+
+    public function testSaveIgnoresOffsiteReturnUrl(): void
+    {
+        // The post-save redirect must not carry an off-site return URL.
+        $_SESSION['csrf'] = 'valid-token';
+        $_POST = [
+            '_token' => 'valid-token',
+            'release_id' => '12345',
+            'action' => 'update_collection',
+            'return' => 'https://evil.example.com',
+        ];
+        $currentUser = ['id' => 1, 'discogs_username' => 'testuser'];
+
+        $this->collectionRepository->shouldReceive('findCollectionItem')->andReturn(['instance_id' => 1000]);
+        $this->collectionRepository->shouldReceive('beginTransaction');
+        $this->collectionRepository->shouldReceive('findPendingPushJob')->andReturn(null);
+        $this->collectionRepository->shouldReceive('addToPushQueue');
+        $this->collectionRepository->shouldReceive('commit');
+
+        $this->callWithRedirectCatch(fn() => $this->createController()->save($currentUser));
+
+        $this->assertStringNotContainsString('evil.example.com', $this->redirectUrl);
+    }
+
+    public function testSaveHonorsLocalReturnUrl(): void
+    {
+        // A local ('/'-prefixed) return URL must be carried through the redirect.
+        $_SESSION['csrf'] = 'valid-token';
+        $_POST = [
+            '_token' => 'valid-token',
+            'release_id' => '12345',
+            'action' => 'update_collection',
+            'return' => '/collection?page=2',
+        ];
+        $currentUser = ['id' => 1, 'discogs_username' => 'testuser'];
+
+        $this->collectionRepository->shouldReceive('findCollectionItem')->andReturn(['instance_id' => 1000]);
+        $this->collectionRepository->shouldReceive('beginTransaction');
+        $this->collectionRepository->shouldReceive('findPendingPushJob')->andReturn(null);
+        $this->collectionRepository->shouldReceive('addToPushQueue');
+        $this->collectionRepository->shouldReceive('commit');
+
+        $this->callWithRedirectCatch(fn() => $this->createController()->save($currentUser));
+
+        $this->assertStringContainsString('return=', $this->redirectUrl);
+    }
+
     // ==================== Helper ====================
 
     private function createController(): ReleaseController

@@ -417,6 +417,197 @@ class CollectionControllerTest extends MockeryTestCase
         $this->assertEquals(1, $this->renderedData['page']);
     }
 
+    // ============ index(): pagination, sort whitelist, table selection ============
+
+    public function testIndexClampsPerPageAndComputesOffsetAndTotalPages(): void
+    {
+        $currentUser = ['id' => 1, 'discogs_username' => 'testuser'];
+        $_GET['page'] = '3';
+        $_GET['per_page'] = '200'; // above the max of 60 -> clamped
+
+        $this->collectionRepository->shouldReceive('getSavedSearches')->andReturn([]);
+        $this->releaseRepository->shouldReceive('countAll')->andReturn(500);
+        $captured = null;
+        $this->releaseRepository->shouldReceive('getAll')
+            ->withArgs(function ($u, $t, $orderBy, $perPage, $offset) use (&$captured) {
+                $captured = ['perPage' => $perPage, 'offset' => $offset];
+                return true;
+            })
+            ->andReturn([]);
+
+        $this->createController()->index($currentUser);
+
+        $this->assertSame(60, $captured['perPage']);            // min(60, 200)
+        $this->assertSame(60, $this->renderedData['per_page']);
+        $this->assertSame(3, $this->renderedData['page']);
+        $this->assertSame((3 - 1) * 60, $captured['offset']);   // ($page-1)*$perPage = 120
+        $this->assertSame(9, $this->renderedData['total_pages']); // ceil(500/60)
+    }
+
+    public function testIndexClampsPageAndPerPageToMinimums(): void
+    {
+        $currentUser = ['id' => 1, 'discogs_username' => 'testuser'];
+        $_GET['page'] = '0';
+        $_GET['per_page'] = '0';
+
+        $this->collectionRepository->shouldReceive('getSavedSearches')->andReturn([]);
+        $this->releaseRepository->shouldReceive('countAll')->andReturn(10);
+        $captured = null;
+        $this->releaseRepository->shouldReceive('getAll')
+            ->withArgs(function ($u, $t, $o, $perPage, $offset) use (&$captured) {
+                $captured = ['perPage' => $perPage, 'offset' => $offset];
+                return true;
+            })
+            ->andReturn([]);
+
+        $this->createController()->index($currentUser);
+
+        $this->assertSame(1, $this->renderedData['page']);   // max(1, 0)
+        $this->assertSame(1, $captured['perPage']);           // max(1, min(60, 0))
+        $this->assertSame(0, $captured['offset']);
+    }
+
+    public function testIndexDefaultsPerPageTo24(): void
+    {
+        $currentUser = ['id' => 1, 'discogs_username' => 'testuser'];
+
+        $this->collectionRepository->shouldReceive('getSavedSearches')->andReturn([]);
+        $this->releaseRepository->shouldReceive('countAll')->andReturn(10);
+        $captured = null;
+        $this->releaseRepository->shouldReceive('getAll')
+            ->withArgs(function ($u, $t, $o, $perPage, $off) use (&$captured) {
+                $captured = $perPage;
+                return true;
+            })
+            ->andReturn([]);
+
+        $this->createController()->index($currentUser);
+
+        $this->assertSame(24, $captured);
+        $this->assertSame(24, $this->renderedData['per_page']);
+    }
+
+    public function testIndexFallsBackToDefaultOrderByForUnknownSort(): void
+    {
+        // An unknown ?sort= must map to a whitelisted ORDER BY, never the raw input.
+        $currentUser = ['id' => 1, 'discogs_username' => 'testuser'];
+        $_GET['sort'] = 'nonsense); DROP TABLE releases;--';
+
+        $this->collectionRepository->shouldReceive('getSavedSearches')->andReturn([]);
+        $this->releaseRepository->shouldReceive('countAll')->andReturn(10);
+        $capturedOrderBy = null;
+        $this->releaseRepository->shouldReceive('getAll')
+            ->withArgs(function ($u, $t, $orderBy, $pp, $off) use (&$capturedOrderBy) {
+                $capturedOrderBy = $orderBy;
+                return true;
+            })
+            ->andReturn([]);
+
+        $this->createController()->index($currentUser);
+
+        $this->assertSame('added_at DESC, r.id DESC', $capturedOrderBy);
+    }
+
+    public function testIndexQueriesWantlistTableForWantlistView(): void
+    {
+        $currentUser = ['id' => 1, 'discogs_username' => 'testuser'];
+        $_GET['view'] = 'wantlist';
+
+        $this->collectionRepository->shouldReceive('getSavedSearches')->andReturn([]);
+        $capturedTable = null;
+        $this->releaseRepository->shouldReceive('countAll')
+            ->withArgs(function ($u, $table) use (&$capturedTable) {
+                $capturedTable = $table;
+                return true;
+            })
+            ->andReturn(0);
+        $this->releaseRepository->shouldReceive('getAll')->andReturn([]);
+
+        $this->createController()->index($currentUser);
+
+        $this->assertSame('wantlist_items', $capturedTable);
+        $this->assertSame('My Wantlist', $this->renderedData['title']);
+    }
+
+    public function testIndexQueriesCollectionTableByDefault(): void
+    {
+        $currentUser = ['id' => 1, 'discogs_username' => 'testuser'];
+
+        $this->collectionRepository->shouldReceive('getSavedSearches')->andReturn([]);
+        $capturedTable = null;
+        $this->releaseRepository->shouldReceive('countAll')
+            ->withArgs(function ($u, $table) use (&$capturedTable) {
+                $capturedTable = $table;
+                return true;
+            })
+            ->andReturn(0);
+        $this->releaseRepository->shouldReceive('getAll')->andReturn([]);
+
+        $this->createController()->index($currentUser);
+
+        $this->assertSame('collection_items', $capturedTable);
+    }
+
+    public function testIndexDefaultsSortToRelevanceWhenSearchingElseAdded(): void
+    {
+        $currentUser = ['id' => 1, 'discogs_username' => 'testuser'];
+
+        // Searching -> default sort is 'relevance'.
+        $_GET['q'] = 'beatles';
+        $this->collectionRepository->shouldReceive('getSavedSearches')->andReturn([]);
+        $this->releaseRepository->shouldReceive('countSearch')->andReturn(1);
+        $this->releaseRepository->shouldReceive('search')->andReturn([]);
+        $this->createController()->index($currentUser);
+        $this->assertSame('relevance', $this->renderedData['sort']);
+
+        // Not searching -> default sort is 'added_desc'.
+        $_GET = [];
+        $this->releaseRepository->shouldReceive('countAll')->andReturn(1);
+        $this->releaseRepository->shouldReceive('getAll')->andReturn([]);
+        $this->createController()->index($currentUser);
+        $this->assertSame('added_desc', $this->renderedData['sort']);
+    }
+
+    public function testIndexUsesWhitelistedOrderByForValidSort(): void
+    {
+        // A valid sort must map to its specific ORDER BY, not the default.
+        $currentUser = ['id' => 1, 'discogs_username' => 'testuser'];
+        $_GET['sort'] = 'year_desc';
+
+        $this->collectionRepository->shouldReceive('getSavedSearches')->andReturn([]);
+        $this->releaseRepository->shouldReceive('countAll')->andReturn(10);
+        $capturedOrderBy = null;
+        $this->releaseRepository->shouldReceive('getAll')
+            ->withArgs(function ($u, $t, $orderBy, $pp, $off) use (&$capturedOrderBy) {
+                $capturedOrderBy = $orderBy;
+                return true;
+            })
+            ->andReturn([]);
+
+        $this->createController()->index($currentUser);
+
+        $this->assertSame(
+            'r.year DESC, r.artist COLLATE NOCASE ASC, r.title COLLATE NOCASE ASC, r.id ASC',
+            $capturedOrderBy
+        );
+    }
+
+    public function testIndexComputesTotalPagesOnSearchPath(): void
+    {
+        // The search branch computes total_pages independently of the list branch.
+        $currentUser = ['id' => 1, 'discogs_username' => 'testuser'];
+        $_GET['q'] = 'beatles';
+
+        $this->collectionRepository->shouldReceive('getSavedSearches')->andReturn([]);
+        $this->releaseRepository->shouldReceive('countSearch')->andReturn(500);
+        $this->releaseRepository->shouldReceive('search')->andReturn([]);
+
+        $this->createController()->index($currentUser);
+
+        // ceil(500 / 24 default) = 21
+        $this->assertSame(21, $this->renderedData['total_pages']);
+    }
+
     // ==================== Helper ====================
 
     private function createController(): CollectionController
