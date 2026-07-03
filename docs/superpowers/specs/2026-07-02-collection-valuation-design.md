@@ -65,11 +65,22 @@ Used only when a record's owned grade has no suggestion (or condition is unrecor
 
 ## Condition Mapping
 
-Discogs stores `media_condition` on collection items using the same human-readable grade
-strings as the `price_suggestions` keys (e.g. `"Near Mint (NM or M-)"`), so mapping is
-effectively identity. To stay robust against whitespace/format drift, valuation normalizes
-via an explicit lookup keyed on the canonical grade strings above; an unrecognized or empty
-condition is treated as "unknown" and routed to the fallback.
+Condition is **not** a dedicated column. Discogs delivers it inside each collection instance's
+`notes` field as a JSON array of `{field_id, value}` objects, and the importer stores that
+array verbatim in `collection_items.notes`. The built-in Discogs field ids are `1` = Media
+Condition, `2` = Sleeve Condition, `3` = free-text notes. So the owned media grade is the
+`value` of the entry whose `field_id === 1`, e.g.:
+
+```json
+[{"field_id":1,"value":"Near Mint (NM or M-)"},{"field_id":2,"value":"Very Good Plus (VG+)"}]
+```
+
+Those `value` strings are exactly the same grade strings used as `price_suggestions` keys, so
+mapping is effectively identity once extracted. Valuation therefore needs a small resolver
+that (a) parses `collection_items.notes` and returns the field_id-1 value, then (b) normalizes
+it against the canonical grade list (tolerating whitespace/format drift). A missing entry,
+empty value, or unrecognized grade is treated as "unknown" and routed to the lowest-listed
+fallback. Media condition is used for valuation; sleeve condition is not.
 
 Valuation is computed **per collection instance** (not per release), because condition varies
 between copies and duplicates are possible. Wantlist items have no condition; they are valued
