@@ -28,12 +28,19 @@
       padding:16px 18px; margin:26px 0 30px;
     }
     .console .lbl{font:600 .7rem/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
-    .mode-pill{display:inline-flex;align-items:center;gap:7px;font:600 .72rem/1 var(--mono);
-      letter-spacing:.04em;padding:6px 11px;border-radius:999px;border:1px solid var(--border);
-      color:var(--text);text-transform:uppercase}
-    .mode-pill .pip{width:7px;height:7px;border-radius:50%;background:var(--accent)}
-    .mode-pill.soon{color:var(--faint);border-style:dashed}
-    .mode-pill.soon .pip{background:var(--faint)}
+    /* --- mode toggle (segmented) --- */
+    .mode-toggle{display:inline-flex;padding:3px;gap:3px;border-radius:999px;
+      border:1px solid var(--border);background:var(--input-bg)}
+    .mode-toggle button{appearance:none;display:inline-flex;align-items:center;gap:6px;
+      font:600 .72rem/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;
+      padding:6px 12px;border-radius:999px;border:1px solid transparent;background:transparent;
+      color:var(--faint);cursor:pointer;transition:background .15s ease,color .15s ease,border-color .15s ease}
+    .mode-toggle button .pip{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.55}
+    .mode-toggle button:hover{color:var(--text)}
+    .mode-toggle button[aria-pressed="true"]{background:var(--card-2);border-color:var(--border);color:var(--text)}
+    .mode-toggle button[aria-pressed="true"] .pip{background:var(--accent);opacity:1}
+    .mode-toggle button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+    @media (prefers-reduced-motion:reduce){ .mode-toggle button{transition:none} }
 
     .swatches{display:flex;gap:8px;flex-wrap:wrap}
     .sw{width:30px;height:30px;border-radius:9px;cursor:pointer;
@@ -158,9 +165,6 @@
 {% endblock %}
 
 {% block content %}
-  {% set defaults = {} %}
-  {% for section, tokens in groups %}{% for t in tokens %}{% set defaults = defaults|merge({(t.key): t.dark}) %}{% endfor %}{% endfor %}
-
   <div class="wrap content-wrap">
 
     <div class="theme-head">
@@ -183,14 +187,20 @@
     <!-- control console -->
     <div class="console themed">
       <span class="lbl">Mode</span>
-      <span class="mode-pill"><span class="pip"></span>{{ current.mode|default('dark') }}</span>
-      <span class="mode-pill soon" title="Light mode arrives in a later update">Light · soon</span>
+      {% set curMode = current.mode|default('dark') %}
+      <div class="mode-toggle" role="group" aria-label="Theme mode">
+        <button type="button" class="mode-btn" data-mode="dark"
+          aria-pressed="{{ curMode == 'dark' ? 'true' : 'false' }}"><span class="pip"></span>Dark</button>
+        <button type="button" class="mode-btn" data-mode="light"
+          aria-pressed="{{ curMode == 'light' ? 'true' : 'false' }}"><span class="pip"></span>Light</button>
+      </div>
 
       <span class="lbl">Presets</span>
       <div class="swatches" role="group" aria-label="Theme presets">
         {% for p in presets %}
           <button type="button" class="sw preset-btn"
             data-tokens='{{ p.tokens|json_encode|e('html_attr') }}'
+            data-mode="{{ p.mode }}"
             style="background:{{ p.tokens['--accent']|default('#67e8f9') }}"
             title="{{ p.name }}" aria-label="Preset: {{ p.name }}" aria-pressed="false">
           </button>
@@ -218,7 +228,8 @@
             <h2>{{ section }}</h2>
             <div class="tokens">
               {% for t in tokens %}
-                {% set val = current.overrides[t.key]|default(t.dark) %}
+                {% set base = current.mode == 'light' ? t.light : t.dark %}
+                {% set val = current.overrides[t.key]|default(base) %}
                 <div class="token" data-key="{{ t.key }}">
                   <label for="hex-{{ loop.parent.loop.index }}-{{ loop.index }}">
                     {{ t.label }}<span class="key">{{ t.key }}</span>
@@ -232,7 +243,9 @@
                     name="overrides[{{ t.key }}]"
                     value="{{ val }}"
                     spellcheck="false" autocomplete="off"
-                    data-default="{{ t.dark }}"
+                    data-dark="{{ t.dark }}"
+                    data-light="{{ t.light }}"
+                    data-overridden="{{ current.overrides[t.key] is defined ? '1' : '' }}"
                     data-pair="color"
                     aria-label="{{ t.label }} hex value">
                 </div>
@@ -329,8 +342,23 @@
     if (!form) return;
     var root = document.documentElement;
     var stateEl = document.getElementById('save-state');
+    var modeField = form.querySelector('input[name="mode"]');
     var hexInputs = Array.prototype.slice.call(form.querySelectorAll('.hex-input'));
     var HEX = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
+
+    // Current live mode (starts from the hidden field / server value).
+    var currentMode = (modeField && modeField.value) || root.getAttribute('data-theme') || 'dark';
+
+    // Return the baseline hex a hex-input carries for a given mode.
+    function baselineFor(hex, mode) {
+      return hex.getAttribute(mode === 'light' ? 'data-light' : 'data-dark');
+    }
+
+    // A hex-input should be preserved across a mode switch if it is a saved
+    // override, or the user has edited it this session.
+    function isPinned(hex) {
+      return hex.getAttribute('data-overridden') === '1' || hex.dataset.userEdited === '1';
+    }
 
     function markDirty() {
       if (!stateEl) return;
@@ -352,6 +380,8 @@
     form.querySelectorAll('.color-input').forEach(function (input) {
       input.addEventListener('input', function () {
         var tokenEl = input.closest('.token');
+        var hex = tokenEl.querySelector('.hex-input');
+        if (hex) hex.dataset.userEdited = '1';
         applyToken(tokenEl, input.value, false, true);
         markDirty();
       });
@@ -360,11 +390,41 @@
     // Hex text → color picker + live preview (only when it parses as a colour).
     hexInputs.forEach(function (input) {
       input.addEventListener('input', function () {
+        input.dataset.userEdited = '1';
         var value = input.value.trim();
         var tokenEl = input.closest('.token');
         if (HEX.test(value)) {
           applyToken(tokenEl, value, true, false);
         }
+        markDirty();
+      });
+    });
+
+    // Re-seed every non-pinned input to the given mode's baseline, and flip the
+    // live document + hidden field + toggle state to that mode.
+    function setMode(mode, opts) {
+      opts = opts || {};
+      currentMode = mode;
+      root.setAttribute('data-theme', mode);
+      if (modeField) modeField.value = mode;
+      modeButtons.forEach(function (b) {
+        b.setAttribute('aria-pressed', b.getAttribute('data-mode') === mode ? 'true' : 'false');
+      });
+      if (opts.reseed !== false) {
+        hexInputs.forEach(function (hex) {
+          if (isPinned(hex)) return;
+          applyToken(hex.closest('.token'), baselineFor(hex, mode), true, true);
+        });
+      }
+    }
+
+    // Mode toggle: Dark / Light segmented control.
+    var modeButtons = Array.prototype.slice.call(document.querySelectorAll('.mode-btn'));
+    modeButtons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var mode = btn.getAttribute('data-mode');
+        if (mode === currentMode) return;
+        setMode(mode);
         markDirty();
       });
     });
@@ -377,14 +437,21 @@
         try { tokens = JSON.parse(btn.getAttribute('data-tokens') || '{}'); }
         catch (e) { return; }
 
+        // A preset carries its own mode; adopt it (data-theme + hidden field +
+        // toggle) but skip the re-seed here — we apply preset values below,
+        // which supersede the baseline for every token.
+        var presetMode = btn.getAttribute('data-mode') || currentMode;
+        setMode(presetMode, { reseed: false });
+
         hexInputs.forEach(function (hex) {
           var tokenEl = hex.closest('.token');
           var key = tokenEl.getAttribute('data-key');
           // A preset supplies either the full token set or just --accent;
-          // tokens it omits fall back to that token's dark default.
+          // tokens it omits fall back to that token's baseline for the
+          // preset's mode.
           var value = Object.prototype.hasOwnProperty.call(tokens, key)
             ? tokens[key]
-            : hex.getAttribute('data-default');
+            : baselineFor(hex, presetMode);
           applyToken(tokenEl, value, true, true);
         });
 

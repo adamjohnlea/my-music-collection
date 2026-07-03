@@ -60,7 +60,17 @@ final class ThemeService
             }
             $clean[$k] = $v;
         }
-        $this->kv->set(self::KEY, (string)json_encode(['mode' => $mode, 'overrides' => $clean]));
+        // Strip entries equal to the active mode's baseline so only genuine
+        // diffs persist (overrides = diff over baseline).
+        $baseline = $mode === 'light' ? ThemeRegistry::lightDefaults() : ThemeRegistry::darkDefaults();
+        $diff = [];
+        foreach ($clean as $k => $v) {
+            if (isset($baseline[$k]) && strtolower($v) === strtolower($baseline[$k])) {
+                continue; // equals baseline -> not a diff, don't store
+            }
+            $diff[$k] = $v;
+        }
+        $this->kv->set(self::KEY, (string)json_encode(['mode' => $mode, 'overrides' => $diff]));
     }
 
     public function reset(): void

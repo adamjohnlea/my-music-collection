@@ -79,4 +79,26 @@ class ThemeTemplateRenderTest extends TestCase
         $this->assertStringContainsString('value="#f472b6"', $html);
         $this->assertStringContainsString('name="overrides[--accent]"', $html);
     }
+
+    public function testBaseEmitsLightBaselineBlockAndOverrideInLightMode(): void
+    {
+        // Persist a light-mode override that differs from the light baseline.
+        $this->service->save('light', ['--accent' => '#f472b6']);
+        $this->twig->addGlobal('theme', $this->service->forView());
+
+        $html = $this->twig->render('base.html.twig', [
+            'static_export' => false,
+            'depth' => 0,
+            'base_url' => '',
+        ]);
+
+        // <html> carries the persisted light mode.
+        $this->assertStringContainsString('data-theme="light"', $html);
+        // The light baseline block is present.
+        $this->assertStringContainsString(':root[data-theme="light"]', $html);
+        // The light --bg baseline value is emitted in that block.
+        $this->assertStringContainsString('--bg: #f7f7f8;', $html);
+        // The light override is injected (mode == 'light' branch).
+        $this->assertStringContainsString('--accent: #f472b6;', $html);
+    }
 }

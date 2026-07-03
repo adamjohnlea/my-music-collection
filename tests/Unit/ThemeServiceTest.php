@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
+use App\Domain\Theme\ThemeRegistry;
 use App\Domain\Theme\ThemeService;
 use App\Infrastructure\KvStore;
 use PHPUnit\Framework\TestCase;
@@ -95,6 +96,35 @@ class ThemeServiceTest extends TestCase
         $view = $this->service->forView();
         $this->assertArrayHasKey('light', $view);
         $this->assertMatchesRegularExpression('/^#[0-9a-fA-F]{3,8}$/', $view['light']['--bg']);
+    }
+
+    public function testSaveAllDarkDefaultsStoresEmptyDiff(): void
+    {
+        $this->service->save('dark', ThemeRegistry::darkDefaults());
+        $this->assertSame([], $this->service->current()['overrides']);
+    }
+
+    public function testSaveStripsBaselineEqualValuesCaseInsensitively(): void
+    {
+        // --bg '#0B0B0C' (uppercase) equals the dark default '#0b0b0c' and is stripped;
+        // --accent differs from the dark default and is kept.
+        $this->service->save('dark', ['--accent' => '#f472b6', '--bg' => '#0B0B0C']);
+        $this->assertSame(['--accent' => '#f472b6'], $this->service->current()['overrides']);
+    }
+
+    public function testSaveAllLightDefaultsStoresEmptyDiff(): void
+    {
+        $this->service->save('light', ThemeRegistry::lightDefaults());
+        $this->assertSame([], $this->service->current()['overrides']);
+    }
+
+    public function testSaveLightKeepsValueDifferingFromLightBaseline(): void
+    {
+        // A dark value in light mode differs from the light baseline, so it is kept.
+        $this->service->save('light', ['--bg' => '#0b0b0c']);
+        $current = $this->service->current();
+        $this->assertSame('light', $current['mode']);
+        $this->assertSame(['--bg' => '#0b0b0c'], $current['overrides']);
     }
 
     public function testValidColourFormats(): void

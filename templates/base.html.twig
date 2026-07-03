@@ -19,6 +19,15 @@
       {% if theme.mode == 'dark' %}{% for key, val in theme.overrides %}{{ key }}: {{ val }};
       {% endfor %}{% endif %}
     }
+    :root[data-theme="light"] {
+      {% for key, val in theme.light %}{{ key }}: {{ val }};
+      {% endfor %}
+      --wash: rgba(0,0,0,.045);
+      --raised-bg: linear-gradient(135deg,#eef1f5,#e3e7ee);
+      --skeleton-bg: linear-gradient(90deg,#eceef1 25%,#f4f5f7 37%,#eceef1 63%);
+      {% if theme.mode == 'light' %}{% for key, val in theme.overrides %}{{ key }}: {{ val }};
+      {% endfor %}{% endif %}
+    }
     html, body {
       margin: 0;
       padding: 0;
