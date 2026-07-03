@@ -194,6 +194,9 @@ class CollectionController extends BaseController
             'collection_currency' => $collectionTotals['currency'] ?? '',
             'collection_coverage' => $collectionTotals['valued_count'] . ' of ' . $collectionTotals['item_count'] . ' valued'
                 . ($collectionTotals['assumed_count'] > 0 ? ' · ' . $collectionTotals['assumed_count'] . ' assumed grade' : ''),
+            'collection_valued'   => $collectionTotals['valued_count'],
+            'collection_items'    => $collectionTotals['item_count'],
+            'collection_assumed'  => $collectionTotals['assumed_count'],
             'wantlist_value'      => $wantlistTotals['total'],
             'value_chart'         => SnapshotChart::build($snapshots, 600, 160),
         ], $stats));
