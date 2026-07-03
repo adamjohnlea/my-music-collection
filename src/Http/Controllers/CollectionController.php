@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 
 use App\Domain\Repositories\CollectionRepositoryInterface;
 use App\Domain\Repositories\ReleaseRepositoryInterface;
+use App\Domain\Repositories\ValuationRepositoryInterface;
 use App\Domain\Search\QueryParser;
+use App\Domain\Valuation\SnapshotChart;
 use App\Http\DiscogsClientFactory;
 use App\Http\Validation\Validator;
 use PDO;
@@ -20,7 +22,8 @@ class CollectionController extends BaseController
         private ReleaseRepositoryInterface $releaseRepository,
         private CollectionRepositoryInterface $collectionRepository,
         Validator $validator,
-        private DiscogsClientFactory $discogsClientFactory
+        private DiscogsClientFactory $discogsClientFactory,
+        private ValuationRepositoryInterface $valuationRepository
     ) {
         parent::__construct($twig, $validator);
     }
@@ -161,8 +164,17 @@ class CollectionController extends BaseController
 
         $stats = $this->collectionRepository->getCollectionStats($username);
 
+        $collectionTotals = $this->valuationRepository->getScopeTotals('collection');
+        $wantlistTotals   = $this->valuationRepository->getScopeTotals('wantlist');
+        $snapshots        = $this->valuationRepository->getSnapshots('collection');
+
         $this->render('stats.html.twig', array_merge([
-            'title' => 'Collection Statistics',
+            'title'               => 'Collection Statistics',
+            'collection_value'    => $collectionTotals['total'],
+            'collection_currency' => $collectionTotals['currency'] ?? '',
+            'collection_coverage' => $collectionTotals['valued_count'] . ' of ' . $collectionTotals['item_count'] . ' valued',
+            'wantlist_value'      => $wantlistTotals['total'],
+            'value_chart_points'  => SnapshotChart::polylinePoints($snapshots, 600, 160),
         ], $stats));
     }
 

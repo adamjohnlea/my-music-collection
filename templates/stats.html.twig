@@ -37,6 +37,26 @@
         <div class="muted">Total Releases</div>
       </div>
 
+      <div class="card" style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center">
+        <div class="big-num">{{ collection_currency }}{{ collection_value|number_format(2) }}</div>
+        <div class="muted">Collection Value</div>
+        <div class="muted">{{ collection_coverage }}</div>
+      </div>
+
+      {% if value_chart_points %}
+      <div class="card">
+        <h2>Value over time</h2>
+        <svg viewBox="0 0 600 160" width="100%" height="160" preserveAspectRatio="none" role="img" aria-label="Collection value over time">
+          <polyline fill="none" stroke="var(--accent)" stroke-width="2" points="{{ value_chart_points }}"></polyline>
+        </svg>
+      </div>
+      {% endif %}
+
+      <div class="card" style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center">
+        <div class="big-num">{{ collection_currency }}{{ wantlist_value|number_format(2) }}</div>
+        <div class="muted">Wantlist cost to complete</div>
+      </div>
+
       <div class="card">
         <h2>Top Artists</h2>
         {% for a in top_artists %}
