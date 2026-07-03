@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Console;
 
+use App\Domain\Theme\ThemeService;
+use App\Infrastructure\KvStore;
 use App\Infrastructure\MigrationRunner;
 use App\Infrastructure\Storage;
 use App\Infrastructure\Config;
@@ -74,6 +76,7 @@ class ExportStaticCommand extends Command
         // Register custom Twig extensions/filters used by templates
         $twig->addExtension(new \App\Presentation\Twig\DiscogsFilters());
         $twig->addGlobal('static_export', true);
+        $twig->addGlobal('theme', (new ThemeService(new KvStore($pdo)))->forView());
         // When no base URL, templates should rely on relative links
         $twig->addGlobal('base_url', $baseUrl);
 

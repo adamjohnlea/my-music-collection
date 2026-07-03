@@ -1,0 +1,466 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title|default('Theme') }}{% endblock %}
+
+{% block styles %}
+  <style>
+    /* --- page head --- */
+    .theme-head{padding:34px 0 4px}
+    .kicker{font:600 .72rem/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;
+      color:var(--accent);display:inline-flex;align-items:center;gap:8px}
+    .kicker::before{content:"";width:22px;height:1px;background:var(--accent);opacity:.6}
+    .theme-head h1{font-size:2.1rem;line-height:1.1;letter-spacing:-.02em;margin:.35em 0 .2em;text-wrap:balance}
+    .theme-head .lede{color:var(--muted);max-width:62ch;margin:0}
+
+    /* smooth re-theme sweep */
+    .themed, .themed *{
+      transition: background-color .3s ease, border-color .3s ease,
+                  box-shadow .3s ease, color .3s ease, fill .3s ease;
+    }
+    @media (prefers-reduced-motion:reduce){ .themed, .themed *{ transition:none; } }
+
+    /* --- control console --- */
+    .console{
+      position:sticky; top:74px; z-index:50;
+      display:flex; flex-wrap:wrap; align-items:center; gap:14px 18px;
+      background:var(--header-bg); backdrop-filter:blur(10px);
+      border:1px solid var(--border); border-radius:16px;
+      padding:16px 18px; margin:26px 0 30px;
+    }
+    .console .lbl{font:600 .7rem/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+    /* --- mode toggle (segmented) --- */
+    .mode-toggle{display:inline-flex;padding:3px;gap:3px;border-radius:999px;
+      border:1px solid var(--border);background:var(--input-bg)}
+    .mode-toggle button{appearance:none;display:inline-flex;align-items:center;gap:6px;
+      font:600 .72rem/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;
+      padding:6px 12px;border-radius:999px;border:1px solid transparent;background:transparent;
+      color:var(--faint);cursor:pointer;transition:background .15s ease,color .15s ease,border-color .15s ease}
+    .mode-toggle button .pip{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.55}
+    .mode-toggle button:hover{color:var(--text)}
+    .mode-toggle button[aria-pressed="true"]{background:var(--card-2);border-color:var(--border);color:var(--text)}
+    .mode-toggle button[aria-pressed="true"] .pip{background:var(--accent);opacity:1}
+    .mode-toggle button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+    @media (prefers-reduced-motion:reduce){ .mode-toggle button{transition:none} }
+
+    .swatches{display:flex;gap:8px;flex-wrap:wrap}
+    .sw{width:30px;height:30px;border-radius:9px;cursor:pointer;
+      border:2px solid var(--border);padding:0;position:relative;
+      transition:transform .12s ease,border-color .2s ease}
+    .sw:hover{transform:translateY(-2px)}
+    .sw[aria-pressed="true"]{border-color:var(--text)}
+    .sw[aria-pressed="true"]::after{content:"";position:absolute;inset:-6px;border-radius:12px;
+      border:1px solid var(--text);opacity:.5}
+    .sw:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+    .console-actions{margin-left:auto;display:flex;align-items:center;gap:12px}
+    .state{display:inline-flex;align-items:center;gap:7px;font:600 .72rem/1 var(--mono);
+      letter-spacing:.04em;color:var(--faint);text-transform:uppercase}
+    .state .pip{width:8px;height:8px;border-radius:50%;background:var(--up)}
+    .state.dirty{color:var(--warn)}
+    .state.dirty .pip{background:var(--warn)}
+    .console-actions form{display:inline;margin:0}
+    .btn{background:var(--btn-bg);border:1px solid var(--border);color:var(--btn-ink);border-radius:8px;
+      padding:8px 14px;font:600 .88rem system-ui,sans-serif;cursor:pointer;transition:background .15s}
+    .btn:hover{background:var(--btn-bg-hover)}
+    .btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+    .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+    .btn.primary:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+    .btn.ghost{background:transparent}
+
+    /* --- notices --- */
+    .notice{display:flex;align-items:center;gap:9px;margin:0 0 20px;padding:11px 14px;border-radius:10px;
+      font-size:.9rem;border:1px solid var(--border-soft)}
+    .notice .pip{width:8px;height:8px;border-radius:50%}
+    .notice.ok{color:var(--up);border-color:color-mix(in srgb,var(--up) 35%,transparent)}
+    .notice.ok .pip{background:var(--up)}
+    .notice.err{color:var(--danger);border-color:color-mix(in srgb,var(--danger) 35%,transparent)}
+    .notice.err .pip{background:var(--danger)}
+
+    /* --- layout: editors + preview --- */
+    .theme-body{display:grid;grid-template-columns:minmax(300px,380px) 1fr;gap:24px;align-items:start;margin:8px 0 40px}
+    @media (max-width:900px){ .theme-body{grid-template-columns:1fr} }
+
+    .editors{display:flex;flex-direction:column;gap:22px}
+    .egroup > h2{font:600 .68rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;
+      color:var(--faint);margin:0 0 12px;padding-bottom:10px;border-bottom:1px solid var(--border-soft)}
+    .tokens{display:flex;flex-direction:column;gap:9px}
+    .token{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:10px}
+    .token label{font-size:.9rem;color:var(--text);min-width:0}
+    .token label .key{display:block;font:500 .66rem/1.2 var(--mono);color:var(--faint);margin-top:2px}
+    .token input[type="color"]{width:34px;height:32px;padding:0;border:1px solid var(--border);
+      border-radius:8px;background:var(--input-bg);cursor:pointer}
+    .token input[type="color"]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+    .token input[type="text"]{width:92px;background:var(--input-bg);border:1px solid var(--border);
+      color:var(--text);border-radius:8px;padding:7px 9px;font:500 .82rem/1 var(--mono);
+      font-variant-numeric:tabular-nums;box-sizing:border-box}
+    .token input[type="text"]:focus-visible{outline:none;border-color:var(--accent);
+      box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 20%,transparent)}
+
+    /* --- preview panel --- */
+    .preview{position:sticky;top:150px}
+    @media (max-width:900px){ .preview{position:static} }
+    .preview-cap{font:600 .68rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;
+      color:var(--faint);margin:0 0 14px}
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+    @media (max-width:560px){ .grid{grid-template-columns:1fr} }
+    .demo{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px}
+    .demo > .cap{font:600 .66rem/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;
+      color:var(--faint);margin:0 0 14px}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .row + .row{margin-top:12px}
+    .mini{font:500 .62rem/1 var(--mono);letter-spacing:.06em;color:var(--faint);text-transform:uppercase}
+    .mini code{font-family:var(--mono)}
+
+    /* faithful component slices (from home.html.twig / tools.html.twig) */
+    .search-input{background:var(--input-bg);color:var(--text);border:1px solid var(--border);
+      border-radius:10px;padding:8px 14px;font-size:.92rem;height:40px;flex:1;min-width:140px}
+    .search-input.is-focus{outline:none;border-color:var(--accent);
+      box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 20%,transparent)}
+    .search-input::placeholder{color:var(--faint)}
+
+    .page-btn{display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;
+      padding:0 12px;border-radius:12px;border:1px solid var(--border);background:var(--card-2);
+      color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
+    .page-btn.is-current{background:var(--raised-bg);border-color:var(--raised-border);
+      box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 20%,transparent) inset;color:var(--btn-ink)}
+
+    .chip{white-space:nowrap;background:var(--card-2);border:1px solid var(--border);
+      padding:6px 14px;border-radius:20px;font-size:.9rem;color:var(--text)}
+    .chip.active{background:color-mix(in srgb,var(--accent) 10%,transparent);
+      color:var(--accent);border-color:var(--accent)}
+
+    .sblist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;width:100%}
+    .sblink{display:flex;justify-content:space-between;padding:8px 12px;border-radius:8px;font-size:.92rem;color:var(--text)}
+    .sblink.active{background:color-mix(in srgb,var(--accent) 10%,transparent);
+      color:var(--accent);box-shadow:inset 2px 0 0 var(--accent)}
+    .sblink .n{color:var(--faint);font-variant-numeric:tabular-nums}
+    .sblink.active .n{color:var(--accent)}
+
+    .run{background:var(--btn-bg);border:1px solid var(--border);color:var(--btn-ink);border-radius:8px;
+      padding:8px 14px;font:600 .88rem system-ui,sans-serif;cursor:pointer}
+    .run.hoverdemo{background:var(--btn-bg-hover)}
+    .run.hero{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+    .run.hero.hoverdemo{background:var(--accent-hover);border-color:var(--accent-hover)}
+
+    .badge{display:inline-flex;align-items:center;gap:6px;font:600 .72rem/1 var(--mono);
+      letter-spacing:.02em;padding:5px 9px;border-radius:999px;border:1px solid var(--border);
+      color:var(--text);font-variant-numeric:tabular-nums}
+    .badge .pip{width:7px;height:7px;border-radius:50%;background:currentColor}
+    .badge.live{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,var(--border));
+      background:color-mix(in srgb,var(--accent) 8%,transparent)}
+    .badge.est{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 45%,var(--border));
+      background:color-mix(in srgb,var(--warn) 8%,transparent)}
+    .badge.up{color:var(--up)}
+    .badge.down{color:var(--down)}
+
+    .hero-card{grid-column:1 / -1;
+      background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 7%,var(--card)),var(--card));
+      border:1px solid color-mix(in srgb,var(--accent) 32%,var(--border));border-radius:14px;padding:20px;
+      display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+    .hero-card .primary-tag{font:600 .66rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+    .hero-card h3{margin:6px 0 0;font-size:1.2rem}
+
+    @media (max-width:720px){ .theme-head h1{font-size:1.7rem} }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="wrap content-wrap">
+
+    <div class="theme-head">
+      <span class="kicker">Appearance</span>
+      <h1>Theme</h1>
+      <p class="lede">Tune the console's colour tokens and watch every surface, border, and accent
+        re-theme live. Pick a preset or dial in your own — nothing is saved until you hit Save.</p>
+    </div>
+
+    {% if saved %}
+      <p class="notice ok"><span class="pip"></span>Theme saved.</p>
+    {% endif %}
+    {% if error %}
+      <p class="notice err"><span class="pip"></span>{% if error == 'csrf' %}Session expired — please try again.{% else %}That colour wasn't valid, so nothing was changed.{% endif %}</p>
+    {% endif %}
+    {% if reset %}
+      <p class="notice ok"><span class="pip"></span>Reset to defaults.</p>
+    {% endif %}
+
+    <!-- control console -->
+    <div class="console themed">
+      <span class="lbl">Mode</span>
+      {% set curMode = current.mode|default('dark') %}
+      <div class="mode-toggle" role="group" aria-label="Theme mode">
+        <button type="button" class="mode-btn" data-mode="dark"
+          aria-pressed="{{ curMode == 'dark' ? 'true' : 'false' }}"><span class="pip"></span>Dark</button>
+        <button type="button" class="mode-btn" data-mode="light"
+          aria-pressed="{{ curMode == 'light' ? 'true' : 'false' }}"><span class="pip"></span>Light</button>
+      </div>
+
+      <span class="lbl">Presets</span>
+      <div class="swatches" role="group" aria-label="Theme presets">
+        {% for p in presets %}
+          <button type="button" class="sw preset-btn"
+            data-tokens='{{ p.tokens|json_encode|e('html_attr') }}'
+            data-mode="{{ p.mode }}"
+            style="background:{{ p.tokens['--accent']|default('#67e8f9') }}"
+            title="{{ p.name }}" aria-label="Preset: {{ p.name }}" aria-pressed="false">
+          </button>
+        {% endfor %}
+      </div>
+
+      <div class="console-actions">
+        <span class="state" id="save-state" aria-live="polite"><span class="pip"></span>Saved</span>
+        <form method="post" action="/theme/reset">
+          <input type="hidden" name="_token" value="{{ csrf_token }}">
+          <button type="submit" class="btn ghost">Reset</button>
+        </form>
+        <button type="submit" form="theme-save-form" class="btn primary">Save</button>
+      </div>
+    </div>
+
+    <div class="theme-body">
+      <!-- editors (inside the Save form) -->
+      <form class="editors" id="theme-save-form" method="post" action="/theme/save">
+        <input type="hidden" name="_token" value="{{ csrf_token }}">
+        <input type="hidden" name="mode" value="{{ current.mode|default('dark') }}">
+
+        {% for section, tokens in groups %}
+          <section class="egroup">
+            <h2>{{ section }}</h2>
+            <div class="tokens">
+              {% for t in tokens %}
+                {% set base = current.mode == 'light' ? t.light : t.dark %}
+                {% set val = current.overrides[t.key]|default(base) %}
+                <div class="token" data-key="{{ t.key }}">
+                  <label for="hex-{{ loop.parent.loop.index }}-{{ loop.index }}">
+                    {{ t.label }}<span class="key">{{ t.key }}</span>
+                  </label>
+                  <input type="color" class="color-input"
+                    value="{{ val }}"
+                    aria-label="{{ t.label }} colour picker"
+                    data-pair="hex-{{ loop.parent.loop.index }}-{{ loop.index }}">
+                  <input type="text" class="hex-input"
+                    id="hex-{{ loop.parent.loop.index }}-{{ loop.index }}"
+                    name="overrides[{{ t.key }}]"
+                    value="{{ val }}"
+                    spellcheck="false" autocomplete="off"
+                    data-dark="{{ t.dark }}"
+                    data-light="{{ t.light }}"
+                    data-overridden="{{ current.overrides[t.key] is defined ? '1' : '' }}"
+                    data-pair="color"
+                    aria-label="{{ t.label }} hex value">
+                </div>
+              {% endfor %}
+            </div>
+          </section>
+        {% endfor %}
+      </form>
+
+      <!-- live preview sampler -->
+      <div class="preview">
+        <p class="preview-cap">Live preview</p>
+        <div class="grid themed">
+          <div class="demo">
+            <p class="cap">Toolbar</p>
+            <div class="row">
+              <input class="search-input is-focus" value="pixies" aria-label="Search preview (focused)" readonly>
+            </div>
+            <p class="mini" style="margin:8px 0 0">↑ focus ring · <code>--accent</code></p>
+          </div>
+
+          <div class="demo">
+            <p class="cap">Pagination</p>
+            <div class="row">
+              <span class="page-btn">1</span>
+              <span class="page-btn is-current">2</span>
+              <span class="page-btn">3</span>
+              <span class="page-btn">…</span>
+            </div>
+            <p class="mini" style="margin:10px 0 0">↑ current-page inset ring</p>
+          </div>
+
+          <div class="demo">
+            <p class="cap">Filter chips</p>
+            <div class="row">
+              <span class="chip active">All</span>
+              <span class="chip">Vinyl</span>
+              <span class="chip">CD</span>
+            </div>
+          </div>
+
+          <div class="demo">
+            <p class="cap">Sidebar</p>
+            <ul class="sblist">
+              <li class="sblink active"><span>Collection</span><span class="n">1,204</span></li>
+              <li class="sblink"><span>Wantlist</span><span class="n">88</span></li>
+              <li class="sblink"><span>Valuable</span><span class="n">37</span></li>
+            </ul>
+          </div>
+
+          <div class="demo">
+            <p class="cap">Buttons</p>
+            <div class="row">
+              <button type="button" class="run" tabindex="-1" aria-hidden="true">Run</button>
+              <button type="button" class="run hoverdemo" tabindex="-1" aria-hidden="true">Hover</button>
+            </div>
+            <div class="row">
+              <button type="button" class="run hero" tabindex="-1" aria-hidden="true">Refresh</button>
+              <button type="button" class="run hero hoverdemo" tabindex="-1" aria-hidden="true">Hover</button>
+            </div>
+          </div>
+
+          <div class="demo">
+            <p class="cap">Badges</p>
+            <div class="row">
+              <span class="badge live"><span class="pip"></span>Live</span>
+              <span class="badge est"><span class="pip"></span>Estimated</span>
+            </div>
+            <div class="row">
+              <span class="badge up">▲ +12%</span>
+              <span class="badge down">▼ −4%</span>
+              <span class="badge">VG+ · £42.00</span>
+            </div>
+          </div>
+
+          <div class="hero-card">
+            <div>
+              <span class="primary-tag">Primary action</span>
+              <h3>Refresh collection valuations</h3>
+            </div>
+            <button type="button" class="run hero" tabindex="-1" aria-hidden="true">Run refresh →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  (function () {
+    var form = document.getElementById('theme-save-form');
+    if (!form) return;
+    var root = document.documentElement;
+    var stateEl = document.getElementById('save-state');
+    var modeField = form.querySelector('input[name="mode"]');
+    var hexInputs = Array.prototype.slice.call(form.querySelectorAll('.hex-input'));
+    var HEX = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
+
+    // Current live mode (starts from the hidden field / server value).
+    var currentMode = (modeField && modeField.value) || root.getAttribute('data-theme') || 'dark';
+
+    // Return the baseline hex a hex-input carries for a given mode.
+    function baselineFor(hex, mode) {
+      return hex.getAttribute(mode === 'light' ? 'data-light' : 'data-dark');
+    }
+
+    // A hex-input should be preserved across a mode switch if it is a saved
+    // override, or the user has edited it this session.
+    function isPinned(hex) {
+      return hex.getAttribute('data-overridden') === '1' || hex.dataset.userEdited === '1';
+    }
+
+    function markDirty() {
+      if (!stateEl) return;
+      stateEl.classList.add('dirty');
+      stateEl.lastChild.textContent = 'Custom (unsaved)';
+    }
+
+    // Set the live CSS variable and keep the token's paired inputs in sync.
+    function applyToken(tokenEl, value, syncColor, syncHex) {
+      var key = tokenEl.getAttribute('data-key');
+      root.style.setProperty(key, value);
+      var color = tokenEl.querySelector('.color-input');
+      var hex = tokenEl.querySelector('.hex-input');
+      if (syncHex && hex) hex.value = value;
+      if (syncColor && color && HEX.test(value)) color.value = value;
+    }
+
+    // Color picker → hex text + live preview.
+    form.querySelectorAll('.color-input').forEach(function (input) {
+      input.addEventListener('input', function () {
+        var tokenEl = input.closest('.token');
+        var hex = tokenEl.querySelector('.hex-input');
+        if (hex) hex.dataset.userEdited = '1';
+        applyToken(tokenEl, input.value, false, true);
+        markDirty();
+      });
+    });
+
+    // Hex text → color picker + live preview (only when it parses as a colour).
+    hexInputs.forEach(function (input) {
+      input.addEventListener('input', function () {
+        input.dataset.userEdited = '1';
+        var value = input.value.trim();
+        var tokenEl = input.closest('.token');
+        if (HEX.test(value)) {
+          applyToken(tokenEl, value, true, false);
+        }
+        markDirty();
+      });
+    });
+
+    // Re-seed every non-pinned input to the given mode's baseline, and flip the
+    // live document + hidden field + toggle state to that mode.
+    function setMode(mode, opts) {
+      opts = opts || {};
+      currentMode = mode;
+      root.setAttribute('data-theme', mode);
+      if (modeField) modeField.value = mode;
+      modeButtons.forEach(function (b) {
+        b.setAttribute('aria-pressed', b.getAttribute('data-mode') === mode ? 'true' : 'false');
+      });
+      if (opts.reseed !== false) {
+        hexInputs.forEach(function (hex) {
+          if (isPinned(hex)) return;
+          applyToken(hex.closest('.token'), baselineFor(hex, mode), true, true);
+        });
+      }
+    }
+
+    // Mode toggle: Dark / Light segmented control.
+    var modeButtons = Array.prototype.slice.call(document.querySelectorAll('.mode-btn'));
+    modeButtons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var mode = btn.getAttribute('data-mode');
+        if (mode === currentMode) return;
+        setMode(mode);
+        markDirty();
+      });
+    });
+
+    // Presets: apply the whole token map to inputs + live preview.
+    var presetButtons = Array.prototype.slice.call(document.querySelectorAll('.preset-btn'));
+    presetButtons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var tokens;
+        try { tokens = JSON.parse(btn.getAttribute('data-tokens') || '{}'); }
+        catch (e) { return; }
+
+        // A preset carries its own mode; adopt it (data-theme + hidden field +
+        // toggle) but skip the re-seed here — we apply preset values below,
+        // which supersede the baseline for every token.
+        var presetMode = btn.getAttribute('data-mode') || currentMode;
+        setMode(presetMode, { reseed: false });
+
+        hexInputs.forEach(function (hex) {
+          var tokenEl = hex.closest('.token');
+          var key = tokenEl.getAttribute('data-key');
+          // A preset supplies either the full token set or just --accent;
+          // tokens it omits fall back to that token's baseline for the
+          // preset's mode.
+          var value = Object.prototype.hasOwnProperty.call(tokens, key)
+            ? tokens[key]
+            : baselineFor(hex, presetMode);
+          applyToken(tokenEl, value, true, true);
+        });
+
+        presetButtons.forEach(function (b) {
+          b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
+        });
+        markDirty();
+      });
+    });
+  })();
+</script>
+{% endblock %}

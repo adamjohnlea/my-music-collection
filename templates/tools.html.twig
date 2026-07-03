@@ -63,7 +63,7 @@
     .check{display:flex;align-items:center;gap:8px;font-size:.86rem;color:var(--muted);font-weight:500}
     .check input{accent-color:var(--accent)}
     .foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;padding-top:4px}
-    .run{background:var(--btn-bg);border:1px solid var(--border);color:#fff;border-radius:8px;
+    .run{background:var(--btn-bg);border:1px solid var(--border);color:var(--btn-ink);border-radius:8px;
       padding:8px 14px;font:600 .88rem system-ui,sans-serif;cursor:pointer;transition:background .15s}
     .run:hover{background:var(--btn-bg-hover)}
     .run:disabled{opacity:.5;cursor:not-allowed}
@@ -88,7 +88,7 @@
     .dot:nth-child(2){animation-delay:.2s}
     .dot:nth-child(3){animation-delay:.4s}
     @keyframes b{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
-    .console{margin:32px 0 8px;background:#0e0f11;border:1px solid var(--border-soft);border-radius:12px;
+    .console{margin:32px 0 8px;background:var(--input-bg);border:1px solid var(--border-soft);border-radius:12px;
       padding:14px 16px;display:flex;align-items:center;gap:12px;color:var(--faint);font:500 .82rem/1 var(--mono)}
     .console .live{width:8px;height:8px;border-radius:50%;background:var(--faint)}
     .console b{color:var(--muted);font-weight:600}
@@ -466,7 +466,7 @@
       spinner.classList.remove('show');
     } else if (data.status === 'error') {
       statusText.textContent = 'Command failed (exit code: ' + (data.exit_code || 'unknown') + ')';
-      statusText.style.color = '#ff6b6b';
+      statusText.style.color = 'var(--danger)';
       spinner.classList.remove('show');
     }
   }

@@ -17,7 +17,7 @@
 - CSRF: mutating POSTs validate `hash_equals($_SESSION['csrf'], $_POST['_token'])` (mirror `SearchController::isCsrfValid()`); templates use `<input type="hidden" name="_token" value="{{ csrf_token }}">`.
 - Override values accepted ONLY if they match the colour allowlist (hex `#rgb`/`#rrggbb`/`#rrggbbaa`, or `rgb()/rgba()/hsl()/hsla()`). Override keys accepted ONLY if in `ThemeRegistry::editableKeys()`. A single bad key/value rejects the whole save; nothing persists.
 - Single-user app: exactly one active theme in `kv_store` key `theme`. No per-user, no theme library.
-- Phase 0 is a value-for-value swap with the pre-approved ⚠ unifications ONLY (delta colours → `--up`/`--down`; two near-reds → `--danger`; console inset → `--input-bg`). No other visual change.
+- Phase 0 is a value-for-value swap with the pre-approved ⚠ unifications ONLY: delta colours → `--up`/`--down`; two near-reds → `--danger`; console inset → `--input-bg`; and the `#qb-toggle.active` dark-text-on-accent `#000` → `--accent-ink` (`#04222a`) — the semantically correct token for text on accent-filled surfaces, keeping it re-themeable (imperceptible on bright cyan). No other visual change.
 - Commit messages end with: `Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>`.
 
 ## File map

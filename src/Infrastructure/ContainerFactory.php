@@ -6,6 +6,7 @@ namespace App\Infrastructure;
 use App\Domain\Repositories\ReleaseRepositoryInterface;
 use App\Domain\Repositories\CollectionRepositoryInterface;
 use App\Domain\Repositories\ValuationRepositoryInterface;
+use App\Domain\Theme\ThemeService;
 use App\Infrastructure\Persistence\SqliteReleaseRepository;
 use App\Infrastructure\Persistence\SqliteCollectionRepository;
 use App\Infrastructure\Persistence\SqliteValuationRepository;
@@ -65,6 +66,9 @@ class ContainerFactory
             },
             Validator::class => function() {
                 return new Validator();
+            },
+            ThemeService::class => function(ContainerInterface $c) {
+                return new ThemeService(new KvStore($c->get(PDO::class)));
             },
             Config::class => function() {
                 return new Config();

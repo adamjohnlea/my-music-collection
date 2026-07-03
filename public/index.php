@@ -9,6 +9,8 @@ use App\Http\Controllers\RecommendationController;
 use App\Http\Controllers\AppleMusicController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ToolsController;
+use App\Http\Controllers\ThemeController;
+use App\Domain\Theme\ThemeService;
 use Dotenv\Dotenv;
 use Twig\Environment;
 
@@ -65,6 +67,7 @@ if ($discogsUsername && $discogsToken) {
 $twig = $container->get(Environment::class);
 $twig->addGlobal('auth_user', $currentUser);
 $twig->addGlobal('csrf_token', $_SESSION['csrf'] ?? '');
+$twig->addGlobal('theme', $container->get(ThemeService::class)->forView());
 
 // Router
 $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
@@ -81,6 +84,9 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     $r->addRoute('GET', '/tools', [ToolsController::class, 'index']);
     $r->addRoute('POST', '/tools/run', [ToolsController::class, 'run']);
     $r->addRoute('GET', '/tools/progress/{jobId}', [ToolsController::class, 'progress']);
+    $r->addRoute('GET', '/theme', [ThemeController::class, 'index']);
+    $r->addRoute('POST', '/theme/save', [ThemeController::class, 'save']);
+    $r->addRoute('POST', '/theme/reset', [ThemeController::class, 'reset']);
     $r->addRoute('GET', '/valuable', [CollectionController::class, 'valuable']);
     $r->addRoute('GET', '/', [CollectionController::class, 'index']);
 });
