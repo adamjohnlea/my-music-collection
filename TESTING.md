@@ -257,6 +257,12 @@ tests/
 | `Infrastructure/Storage.php` | `Integration/StorageTest.php` | ~90% | PDO setup, WAL mode, directory creation |
 | `Presentation/Twig/DiscogsFilters.php` | `Unit/DiscogsFiltersTest.php` | ~95% | Numeric suffix stripping, edge cases |
 | `Infrastructure/Persistence/SqliteCollectionRepository.php` | `Integration/CollectionRepositoryTest.php` | ~90% | All methods: searches, collection, wantlist, stats, transactions |
+| `Domain/Valuation/ConditionGrades.php` | `Unit/ConditionGradesTest.php` | ~90% | normalize, fromDiscogsFields, CANONICAL list |
+| `Domain/Valuation/SnapshotChart.php` | `Unit/ValuationChartTest.php` | ~90% | SVG polyline rendering, empty/single-point edge cases |
+| `Domain/Valuation/InsuranceManifest.php` | `Unit/InsuranceManifestTest.php` | ~90% | CSV rows, totals footer, coverage string, quoting |
+| `Infrastructure/DiscogsPricingClient.php` | `Integration/DiscogsPricingClientTest.php` | ~85% | suggestion/lowest_listed paths, seller-settings fallback, rate-limit reuse |
+| `Infrastructure/Persistence/SqliteValuationRepository.php` | `Integration/SqliteValuationRepositoryTest.php` | ~85% | save/load snapshots, schema migration, reset |
+| `Sync/CollectionValuer.php` | `Integration/CollectionValuerTest.php` | ~80% | stale-days skip, --force, --id, scope, source labelling |
 
 ### Partially Tested
 
