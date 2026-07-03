@@ -83,6 +83,7 @@ class CollectionController extends BaseController
             'imported_asc' => 'COALESCE(r.imported_at, r.updated_at) ASC, r.id ASC',
             'label_asc'    => "json_extract(r.labels, '$[0].name') COLLATE NOCASE ASC, r.artist COLLATE NOCASE ASC, r.title COLLATE NOCASE ASC",
             'format_asc'   => "json_extract(r.formats, '$[0].name') COLLATE NOCASE ASC, r.artist COLLATE NOCASE ASC, r.title COLLATE NOCASE ASC",
+            'value'        => '(iv.value IS NULL), iv.value DESC',
         ];
 
         if ($match !== '') {
@@ -189,6 +190,20 @@ class CollectionController extends BaseController
         } else {
             $this->redirect('/');
         }
+    }
+
+    /** @param array<string, mixed>|null $currentUser */
+    public function valuable(?array $currentUser): void
+    {
+        if (!$currentUser) {
+            $this->redirect('/');
+            return;
+        }
+        $rows = $this->valuationRepository->getMostValuable('collection', 25, 0);
+        $this->render('valuable.html.twig', [
+            'title' => 'Most Valuable',
+            'rows' => $rows,
+        ]);
     }
 
     public function about(): void
