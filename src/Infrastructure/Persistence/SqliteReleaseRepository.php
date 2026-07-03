@@ -14,6 +14,17 @@ class SqliteReleaseRepository implements ReleaseRepositoryInterface
      */
     private const VALUE_ORDER_BY = '(MAX(iv.value) IS NULL), MAX(iv.value) DESC';
 
+    /**
+     * Per-release valuation columns for card badges (value, currency, grade, source).
+     * Correlated scalar subqueries picking the highest-valued collection valuation —
+     * same style as the `rating` subquery, safe under the query's GROUP BY r.id.
+     */
+    private const VALUATION_SELECT =
+        ", (SELECT iv.value FROM item_valuations iv WHERE iv.scope = 'collection' AND iv.release_id = r.id ORDER BY iv.value DESC LIMIT 1) AS value"
+        . ", (SELECT iv.currency FROM item_valuations iv WHERE iv.scope = 'collection' AND iv.release_id = r.id ORDER BY iv.value DESC LIMIT 1) AS value_currency"
+        . ", (SELECT iv.condition_used FROM item_valuations iv WHERE iv.scope = 'collection' AND iv.release_id = r.id ORDER BY iv.value DESC LIMIT 1) AS value_condition"
+        . ", (SELECT iv.source FROM item_valuations iv WHERE iv.scope = 'collection' AND iv.release_id = r.id ORDER BY iv.value DESC LIMIT 1) AS value_source";
+
     public function __construct(private readonly PDO $pdo) {}
 
     /** @return array<string, mixed>|null */
@@ -54,7 +65,7 @@ class SqliteReleaseRepository implements ReleaseRepositoryInterface
             (SELECT local_path FROM images i WHERE i.release_id = r.id AND i.source_url = r.cover_url ORDER BY id ASC LIMIT 1) AS primary_local_path,
             (SELECT local_path FROM images i WHERE i.release_id = r.id ORDER BY id ASC LIMIT 1) AS any_local_path,
             (SELECT MAX(ci2.added) FROM $itemsTable ci2 WHERE ci2.release_id = r.id AND ci2.username = :u) AS added_at,
-            (SELECT MAX(ci3.rating) FROM $itemsTable ci3 WHERE ci3.release_id = r.id AND ci3.username = :u) AS rating
+            (SELECT MAX(ci3.rating) FROM $itemsTable ci3 WHERE ci3.release_id = r.id AND ci3.username = :u) AS rating" . self::VALUATION_SELECT . "
         FROM " . ($hasMatch ? "releases_fts f JOIN releases r ON r.id = f.rowid" : "releases r") . "
         WHERE " . ($hasMatch ? "releases_fts MATCH :match" : "1=1") .
         ($yearFrom !== null ? " AND r.year >= :y1" : "") .
@@ -107,7 +118,7 @@ class SqliteReleaseRepository implements ReleaseRepositoryInterface
             (SELECT local_path FROM images i WHERE i.release_id = r.id AND i.source_url = r.cover_url ORDER BY id ASC LIMIT 1) AS primary_local_path,
             (SELECT local_path FROM images i WHERE i.release_id = r.id ORDER BY id ASC LIMIT 1) AS any_local_path,
             (SELECT MAX(ci2.added) FROM $itemsTable ci2 WHERE ci2.release_id = r.id AND ci2.username = :u) AS added_at,
-            (SELECT MAX(ci3.rating) FROM $itemsTable ci3 WHERE ci3.release_id = r.id AND ci3.username = :u) AS rating
+            (SELECT MAX(ci3.rating) FROM $itemsTable ci3 WHERE ci3.release_id = r.id AND ci3.username = :u) AS rating" . self::VALUATION_SELECT . "
         FROM releases r
         $valueJoin
         WHERE EXISTS (SELECT 1 FROM $itemsTable ci WHERE ci.release_id = r.id AND ci.username = :u)

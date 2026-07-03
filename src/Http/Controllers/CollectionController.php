@@ -134,12 +134,28 @@ class CollectionController extends BaseController
             if (!$img) {
                 $img = $r['cover_url'] ?: ($r['thumb_url'] ?? null);
             }
+            // Short condition grade from the valuation's condition_used,
+            // e.g. "Very Good Plus (VG+)" -> "VG+", "Near Mint (NM or M-)" -> "NM".
+            $grade = null;
+            $cond = (string)($r['value_condition'] ?? '');
+            if (preg_match('/\(([^)]+)\)/', $cond, $mm)) {
+                $grade = trim(explode(' or ', $mm[1])[0]);
+            }
+            $value = null;
+            if (isset($r['value']) && $r['value'] !== '') {
+                $value = CurrencyFormat::symbol($r['value_currency'] ?? '') . number_format((float)$r['value'], 2);
+            }
+
             $items[] = [
                 'id' => (int)$r['id'],
                 'title' => $r['title'] ?? '',
                 'artist' => $r['artist'] ?? '',
                 'year' => $r['year'] ?? null,
                 'image' => $img,
+                'rating' => isset($r['rating']) ? (int)$r['rating'] : null,
+                'value' => $value,
+                'value_grade' => $grade,
+                'value_assumed' => ($r['value_source'] ?? '') === 'assumed_suggestion',
             ];
         }
 

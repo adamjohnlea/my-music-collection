@@ -17,6 +17,22 @@
     .meta{padding:12px}
     .title{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .artist{color:var(--muted);font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+    /* Item cards (grid) — distinct from the .card panels used for setup/welcome */
+    .rec{display:flex;flex-direction:column}
+    .rec .cover-wrap{border-radius:10px;border:1px solid var(--border-soft)}
+    .rec .meta{padding:10px 2px 0}
+    .rec .title{font-weight:650;font-size:.92rem;letter-spacing:-.01em}
+    .rec .title a{color:var(--text)}
+    .rec .artist{font-size:.82rem;margin-top:2px}
+    .rmeta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:8px}
+    .badge{font:600 .66rem/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;display:inline-flex;align-items:center;gap:5px;padding:5px 7px;border-radius:999px;border:1px solid var(--border-soft);color:var(--muted);white-space:nowrap}
+    .badge .pip{width:6px;height:6px;border-radius:50%;background:currentColor}
+    .badge.good{color:var(--up)}
+    .badge.warn{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 35%,transparent)}
+    .badge .star{color:var(--warn)}
+    .val{font:700 .82rem var(--mono);font-variant-numeric:tabular-nums;margin-left:auto;color:var(--text)}
+    .side-count{margin-left:auto;font:600 .74rem var(--mono);color:var(--faint)}
     nav{display:flex;justify-content:center;gap:12px;margin-top:20px}
     /* Toolbar */
     .toolbar{display:flex;gap:8px;align-items:center;margin:0;flex-wrap:wrap;flex:1}
@@ -45,7 +61,7 @@
     .sidebar-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:4px}
     .sidebar-link{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-radius:8px;font-size:.95rem;color:var(--text);text-decoration:none;transition:background .2s;white-space:nowrap}
     .sidebar-link:hover{background:rgba(255,255,255,.05);text-decoration:none}
-    .sidebar-link.active{background:rgba(103,232,249,.1);color:var(--accent)}
+    .sidebar-link.active{background:rgba(103,232,249,.1);color:var(--accent);box-shadow:inset 2px 0 0 var(--accent)}
     .sidebar-link .delete-btn{opacity:0;background:transparent;border:none;color:var(--muted);cursor:pointer;padding:4px;line-height:1}
     .sidebar-link:hover .delete-btn{opacity:1}
     .sidebar-link .delete-btn:hover{color:#ff4444}
@@ -195,6 +211,7 @@
             <li>
               <a href="/" class="sidebar-link {{ q == '' ? 'active' : '' }}">
                 <span class="link-text">All Items</span>
+                {% if total is defined %}<span class="side-count">{{ total|number_format }}</span>{% endif %}
               </a>
             </li>
             {% if saved_searches is defined %}
@@ -254,7 +271,7 @@
           <div class="grid">
             {% for it in items %}
               {% set item_url = it.is_discogs_result and it.uri ? 'https://www.discogs.com' ~ it.uri : '/release/' ~ it.id ~ '?return=' ~ (return_to|url_encode) %}
-              <div class="card" title="{{ it.title }} — {{ it.artist|strip_discogs_suffix }}">
+              <div class="rec" title="{{ it.title }} — {{ it.artist|strip_discogs_suffix }}">
                 <div class="cover-wrap">
                   {% if it.image %}
                     <a href="{{ item_url }}" {{ it.is_discogs_result ? 'target="_blank" rel="noopener"' : '' }}>
@@ -284,6 +301,16 @@
                       <a href="/?view={{ view|default('collection') }}&per_page={{ per_page }}&sort={{ sort }}&q={{ ('year:' ~ it.year)|url_encode }}">{{ it.year }}</a>
                     {% endif %}
                   </div>
+
+                  {% if view != 'wantlist' and not it.is_discogs_result %}
+                    <div class="rmeta">
+                      {% if it.rating %}<span class="badge"><span class="pip star">★</span>{{ it.rating }}/5</span>{% endif %}
+                      {% if it.value_grade %}
+                        <span class="badge {{ it.value_assumed ? 'warn' : (it.value_grade in ['M', 'NM'] ? 'good' : '') }}"><span class="pip"></span>{{ it.value_grade }}{{ it.value_assumed ? ' · assumed' : '' }}</span>
+                      {% endif %}
+                      {% if it.value %}<span class="val">{{ it.value }}</span>{% endif %}
+                    </div>
+                  {% endif %}
 
                   {% if view == 'wantlist' %}
                     {% if it.market_as_of is null or it.market_as_of == '' %}

@@ -69,6 +69,19 @@ class ReleaseRepositoryTest extends TestCase
             created_at DATETIME
         )');
 
+        // Valuation table (part of the app schema; card badges read value/condition from it)
+        $this->pdo->exec('CREATE TABLE item_valuations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            scope TEXT NOT NULL,
+            release_id INTEGER NOT NULL,
+            instance_id INTEGER NOT NULL DEFAULT 0,
+            condition_used TEXT,
+            value REAL,
+            currency TEXT,
+            source TEXT NOT NULL,
+            valued_at TEXT NOT NULL
+        )');
+
         // Create FTS table for search tests
         $this->pdo->exec('CREATE VIRTUAL TABLE releases_fts USING fts5(
             artist, title, content="releases", content_rowid="id"
