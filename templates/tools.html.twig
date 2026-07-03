@@ -4,39 +4,150 @@
 
 {% block styles %}
   <style>
-    .grid{display:grid;grid-template-columns:repeat(2, 1fr);gap:16px}
-    .card{background:var(--card);border-radius:12px;overflow:hidden}
+    /* --- tokens this page adds on top of base :root --- */
+    :root{
+      --card-2:#191b1f;
+      --faint:#6c6f77;
+      --warn:#e0a458;               /* amber, desaturated to sit on near-black */
+      --border-soft:#212226;
+      --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    }
+
+    /* --- page head --- */
+    .tools-head{padding:34px 0 4px}
+    .kicker{font:600 .72rem/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;
+      color:var(--accent);display:inline-flex;align-items:center;gap:8px}
+    .kicker::before{content:"";width:22px;height:1px;background:var(--accent);opacity:.6}
+    .tools-head h1{font-size:2.1rem;line-height:1.1;letter-spacing:-.02em;margin:.35em 0 .2em;text-wrap:balance}
+    .tools-head .lede{color:var(--muted);max-width:60ch;margin:0}
+
+    /* --- pipeline overview strip --- */
+    .pipe{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap;margin:24px 0 6px}
+    .stage{flex:1 1 200px;display:flex;align-items:center;gap:12px;background:var(--card);
+      border:1px solid var(--border-soft);border-radius:10px;padding:12px 14px}
+    .stage .n{font:600 .72rem/1 var(--mono);color:var(--faint)}
+    .stage .txt{display:flex;flex-direction:column;gap:3px}
+    .stage .lab{font-weight:600;font-size:.92rem}
+    .stage .sub{font:500 .74rem/1.2 var(--mono);color:var(--muted)}
+    .pipe .arrow{align-self:center;color:var(--faint);font-size:1.1rem;padding:0 2px}
+    .stage.maint{flex-basis:180px;border-style:dashed}
+
+    /* --- section --- */
+    .tool-section{margin:38px 0 0}
+    .sec-head{display:flex;align-items:baseline;gap:14px;padding-bottom:14px;
+      border-bottom:1px solid var(--border-soft);margin-bottom:20px}
+    .sec-num{font:600 .8rem/1 var(--mono);color:var(--accent);letter-spacing:.05em}
+    .sec-title{font-size:1.12rem;font-weight:700;letter-spacing:-.01em}
+    .sec-desc{color:var(--muted);font-size:.9rem;margin-left:auto;text-align:right}
+    .tool-section.maint .sec-num{color:var(--faint)}
+
+    /* --- card grid --- */
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+    .card{background:var(--card);border:1px solid var(--border-soft);border-radius:12px;
+      padding:16px 16px 14px;display:flex;flex-direction:column;gap:10px;
+      transition:border-color .15s ease,transform .15s ease}
+    .card:hover{border-color:var(--border);transform:translateY(-1px)}
+    .card-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .tool-title{font-size:1.02rem;font-weight:650;letter-spacing:-.01em;margin:0}
+    .desc{color:var(--muted);font-size:.875rem;margin:0}
+
+    /* --- badges (static cadence / risk signals) --- */
+    .badge{font:600 .66rem/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;
+      display:inline-flex;align-items:center;gap:6px;padding:5px 8px;border-radius:999px;
+      border:1px solid var(--border-soft);color:var(--muted);white-space:nowrap}
+    .badge .pip{width:6px;height:6px;border-radius:50%;background:currentColor}
+    .badge.safe{color:var(--up)}
+    .badge.net{color:var(--accent)}
+    .badge.once{color:var(--faint)}
+    .badge.care{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 35%,transparent)}
+
+    /* --- form controls --- */
+    form{display:flex;flex-direction:column;gap:10px;margin:0}
+    .fields{display:flex;flex-wrap:wrap;gap:8px}
+    .field{display:flex;flex-direction:column;gap:5px;flex:1 1 120px}
+    .field label{font:600 .7rem/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+    .card input[type="text"],.card input[type="number"],.card input[type="password"],.card select{
+      background:#101114;border:1px solid var(--border);color:var(--text);border-radius:8px;
+      padding:8px 10px;font:inherit;font-size:.86rem;width:100%;box-sizing:border-box}
+    .check{display:flex;align-items:center;gap:8px;font-size:.86rem;color:var(--muted);font-weight:500}
+    .check input{accent-color:var(--accent)}
+    .foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;padding-top:4px}
+    .run{background:#1f2937;border:1px solid var(--border);color:#fff;border-radius:8px;
+      padding:8px 14px;font:600 .88rem system-ui,sans-serif;cursor:pointer;transition:background .15s}
+    .run:hover{background:#232f41}
+    .run:disabled{opacity:.5;cursor:not-allowed}
+
+    /* --- hero variant (Refresh) --- */
+    .card.hero{grid-column:1 / -1;
+      background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 7%,var(--card)),var(--card));
+      border-color:color-mix(in srgb,var(--accent) 32%,var(--border));
+      display:grid;grid-template-columns:1.3fr 1fr;gap:18px;align-items:center}
+    .card.hero .tool-title{font-size:1.3rem}
+    .hero-l{display:flex;flex-direction:column;gap:10px}
+    .hero-r{display:flex;flex-direction:column;gap:12px;border-left:1px solid var(--border-soft);padding-left:18px}
+    .card.hero .run{background:var(--accent);border-color:var(--accent);color:#04222a;font-weight:700}
+    .card.hero .run:hover{background:#8af1ff}
+    .primary-tag{font:600 .66rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+
+    /* --- running-command panel + idle console --- */
     .meta{padding:16px}
-    form{display:grid;gap:10px;margin-top:8px}
-    label{font-weight:600}
-    input[type="text"],input[type="number"],input[type="password"],select{padding:10px 12px;border:1px solid #2a2b2f;border-radius:8px;background:#101114;color:var(--text);width:100%;box-sizing:border-box}
-    .row{display:flex;gap:10px;flex-wrap:wrap}
-    .row > *{flex:1 1 200px}
-    .actions{display:flex;gap:8px;align-items:center}
-    button{background:#1f2937;border:1px solid #2a2b2f;color:#fff;border-radius:8px;padding:8px 12px;cursor:pointer}
-    button:hover{background:#232f41}
-    button:disabled{opacity:0.5;cursor:not-allowed}
-    .ok{background:#0c3b21;border:1px solid #1e6b3a;color:#d6ffe6;padding:10px;border-radius:8px}
-    .err{background:#3b0a0a;border:1px solid #742a2a;color:#ffd2d2;padding:10px;border-radius:8px}
-    .help{color:var(--muted);font-size:.9rem}
     .spinner{display:none;gap:8px;align-items:center}
     .spinner.show{display:inline-flex}
     .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:b 1.2s infinite ease-in-out}
     .dot:nth-child(2){animation-delay:.2s}
     .dot:nth-child(3){animation-delay:.4s}
     @keyframes b{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
+    .console{margin:32px 0 8px;background:#0e0f11;border:1px solid var(--border-soft);border-radius:12px;
+      padding:14px 16px;display:flex;align-items:center;gap:12px;color:var(--faint);font:500 .82rem/1 var(--mono)}
+    .console .live{width:8px;height:8px;border-radius:50%;background:var(--faint)}
+    .console b{color:var(--muted);font-weight:600}
 
-    /* Responsive: single column on smaller screens */
-    @media (max-width: 900px) {
-      .grid{grid-template-columns:1fr}
+    @media (max-width:720px){
+      .card.hero{grid-template-columns:1fr}
+      .hero-r{border-left:0;border-top:1px solid var(--border-soft);padding-left:0;padding-top:12px}
+      .sec-desc{display:none}
+      .pipe .arrow{display:none}
+      .tools-head h1{font-size:1.7rem}
     }
+    @media (prefers-reduced-motion:reduce){.card,.run{transition:none}}
   </style>
 {% endblock %}
 
 {% block content %}
   <div class="wrap content-wrap">
-    <div id="progress-container" style="display:none;margin-bottom:16px">
-      <div class="card">
+
+    <div class="tools-head">
+      <span class="kicker">Operations console</span>
+      <h1>Tools</h1>
+      <p class="lede">Everything that moves data between your collection and Discogs — grouped by
+        where it sits in the pipeline.</p>
+    </div>
+
+    <!-- pipeline overview -->
+    <div class="pipe" aria-hidden="true">
+      <div class="stage">
+        <span class="n">01</span>
+        <div class="txt"><span class="lab">Intake</span><span class="sub">discogs → local</span></div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="stage">
+        <span class="n">02</span>
+        <div class="txt"><span class="lab">Value</span><span class="sub">market pricing</span></div>
+      </div>
+      <span class="arrow">→</span>
+      <div class="stage">
+        <span class="n">03</span>
+        <div class="txt"><span class="lab">Publish</span><span class="sub">local → out</span></div>
+      </div>
+      <div class="stage maint">
+        <span class="n">·</span>
+        <div class="txt"><span class="lab">Maintenance</span><span class="sub">as needed</span></div>
+      </div>
+    </div>
+
+    <!-- running-command panel (revealed by JS) -->
+    <div id="progress-container" style="display:none;margin:24px 0 0">
+      <div class="card" style="display:block">
         <div class="meta">
           <h2 style="margin:0 0 8px 0">Running Command</h2>
           <div style="margin-bottom:12px">
@@ -45,202 +156,225 @@
               <span style="margin-left:8px" id="status-text">Starting...</span>
             </div>
           </div>
-          <div style="background:#101114;border:1px solid #2a2b2f;border-radius:8px;padding:12px;max-height:400px;overflow-y:auto;font-family:ui-monospace,monospace;font-size:0.85rem;line-height:1.4">
+          <div style="background:#101114;border:1px solid var(--border);border-radius:8px;padding:12px;max-height:400px;overflow-y:auto;font-family:var(--mono);font-size:0.85rem;line-height:1.4">
             <pre id="output" style="margin:0;white-space:pre-wrap;word-wrap:break-word"></pre>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="grid">
-      <div class="card">
-        <div class="meta">
-          <h2 style="margin:0 0 6px 0">Initial Sync</h2>
-          <p class="help">Imports your entire Discogs collection into the local database. Run this once to get started.</p>
-          <form method="post" action="/tools/run">
-            <input type="hidden" name="_token" value="{{ csrf_token }}">
-            <input type="hidden" name="task" value="initial">
-            <label class="row">
-              <span class="help" style="flex:1 1 auto"><input type="checkbox" name="force"> Force (override safety check if DB already has data)</span>
-            </label>
-            <div class="actions">
-              <button type="submit">Run initial sync</button>
-            </div>
-          </form>
-        </div>
+    <!-- 01 · INTAKE -->
+    <section class="tool-section">
+      <div class="sec-head">
+        <span class="sec-num">01</span>
+        <span class="sec-title">Intake</span>
+        <span class="sec-desc">Pulls records and details from Discogs into your local database</span>
       </div>
+      <div class="grid">
 
-      <div class="card">
-        <div class="meta">
-          <h2 style="margin:0 0 6px 0">Refresh</h2>
-          <p class="help">Scans for newly added/changed items since the last run. Safe to run anytime.</p>
-          <form method="post" action="/tools/run">
+        <div class="card hero">
+          <div class="hero-l">
+            <span class="primary-tag">Your daily driver</span>
+            <h2 class="tool-title">Refresh</h2>
+            <p class="desc">Scans for newly added or changed items since the last run. Safe to run
+              anytime — this is the one you'll reach for most.</p>
+            <span class="badge safe"><span class="pip"></span>Safe anytime</span>
+          </div>
+          <form class="hero-r" method="post" action="/tools/run">
             <input type="hidden" name="_token" value="{{ csrf_token }}">
             <input type="hidden" name="task" value="refresh">
-            <div class="row">
-              <label>Pages to scan
-                <input type="number" name="pages" value="5" min="1" max="50">
-              </label>
+            <div class="field">
+              <label for="refresh-pages">Pages to scan</label>
+              <input id="refresh-pages" type="number" name="pages" value="5" min="1" max="50">
             </div>
-            <div class="actions">
-              <button type="submit">Run refresh</button>
-            </div>
+            <div class="foot"><button class="run" type="submit">Run refresh</button></div>
           </form>
         </div>
-      </div>
 
-      <div class="card">
-        <div class="meta">
-          <h2 style="margin:0 0 6px 0">Enrich</h2>
-          <p class="help">Fetch full release details (tracklist, credits, companies, identifiers, notes, videos). Either target a specific release ID or process items missing details.</p>
+        <div class="card">
+          <div class="card-top"><h2 class="tool-title">Enrich</h2>
+            <span class="badge net"><span class="pip"></span>Fetches from Discogs</span></div>
+          <p class="desc">Fetches full release details — tracklist, credits, companies, identifiers,
+            notes, videos. Target one release ID or process items missing details.</p>
           <form method="post" action="/tools/run">
             <input type="hidden" name="_token" value="{{ csrf_token }}">
             <input type="hidden" name="task" value="enrich">
-            <div class="row">
-              <label>Release ID (optional)
-                <input type="number" name="release_id" placeholder="123456">
-              </label>
-              <label>Limit (when no ID)
-                <input type="number" name="limit" value="100" min="1" max="1000">
-              </label>
+            <div class="fields">
+              <div class="field"><label for="enrich-id">Release ID</label>
+                <input id="enrich-id" type="number" name="release_id" placeholder="optional"></div>
+              <div class="field"><label for="enrich-limit">Limit</label>
+                <input id="enrich-limit" type="number" name="limit" value="100" min="1" max="1000"></div>
             </div>
-            <div class="actions">
-              <button type="submit">Run enrich</button>
-            </div>
+            <div class="foot"><button class="run" type="submit">Run enrich</button></div>
           </form>
         </div>
-      </div>
 
-      <div class="card">
-        <div class="meta">
-          <h2 style="margin:0 0 6px 0">Backfill Images</h2>
-          <p class="help">Downloads missing cover images to your local cache. For reliability, web runs fetch up to ~60 images per request (~1 req/sec, 1000/day cap). You can re-run safely to continue.</p>
+        <div class="card">
+          <div class="card-top"><h2 class="tool-title">Backfill Images</h2>
+            <span class="badge net"><span class="pip"></span>Fetches from Discogs</span></div>
+          <p class="desc">Downloads missing cover art to your local cache. Fetches ~60 per run
+            (~1 req/sec, 1000/day cap). Re-run safely to continue.</p>
           <form method="post" action="/tools/run">
             <input type="hidden" name="_token" value="{{ csrf_token }}">
             <input type="hidden" name="task" value="images">
-            <div class="row">
-              <label>Limit
-                <input type="number" name="limit" value="60" min="1" max="2000">
-              </label>
+            <div class="fields">
+              <div class="field"><label for="images-limit">Limit</label>
+                <input id="images-limit" type="number" name="limit" value="60" min="1" max="2000"></div>
             </div>
-            <div class="actions">
-              <button type="submit">Run backfill</button>
-            </div>
+            <div class="foot"><button class="run" type="submit">Run backfill</button></div>
           </form>
         </div>
-      </div>
 
-      <div class="card">
-        <div class="meta">
-          <h2 style="margin:0 0 6px 0">Rebuild Search Index</h2>
-          <p class="help">Repairs or rebuilds the full‑text search index if results seem off. Safe to run anytime.</p>
+        <div class="card">
+          <div class="card-top"><h2 class="tool-title">Initial Sync</h2>
+            <span class="badge once"><span class="pip"></span>Run once</span></div>
+          <p class="desc">Imports your entire Discogs collection into the local database. Run once to
+            get started — only re-run to rebuild from scratch.</p>
           <form method="post" action="/tools/run">
             <input type="hidden" name="_token" value="{{ csrf_token }}">
-            <input type="hidden" name="task" value="search">
-            <div class="actions">
-              <button type="submit">Rebuild index</button>
-            </div>
+            <input type="hidden" name="task" value="initial">
+            <label class="check"><input type="checkbox" name="force"> Force — override the safety check
+              <span class="badge care"><span class="pip"></span>Careful</span></label>
+            <div class="foot"><button class="run" type="submit">Run initial sync</button></div>
           </form>
         </div>
-      </div>
 
-      <div class="card">
-        <div class="meta">
-          <h2 style="margin:0 0 6px 0">Push Changes to Discogs</h2>
-          <p class="help">Pushes queued changes (ratings, conditions, notes) back to Discogs. Processes items in the push_queue table.</p>
-          <form method="post" action="/tools/run">
-            <input type="hidden" name="_token" value="{{ csrf_token }}">
-            <input type="hidden" name="task" value="push">
-            <div class="actions">
-              <button type="submit">Push to Discogs</button>
-            </div>
-          </form>
-        </div>
       </div>
+    </section>
 
-      <div class="card">
-        <div class="meta">
-          <h2 style="margin:0 0 6px 0">Export Static Site</h2>
-          <p class="help">Generates a static HTML site with JSON data files for offline hosting. Images can optionally be copied.</p>
-          <form method="post" action="/tools/run">
-            <input type="hidden" name="_token" value="{{ csrf_token }}">
-            <input type="hidden" name="task" value="export">
-            <div class="row">
-              <label>Output Directory
-                <input type="text" name="out" value="dist" placeholder="dist">
-              </label>
-              <label>Base URL
-                <input type="text" name="base_url" value="/" placeholder="/">
-              </label>
-            </div>
-            <div class="row">
-              <label>Chunk Size (0=none)
-                <input type="number" name="chunk_size" value="0" min="0" max="5000">
-              </label>
-              <label class="row" style="align-items:center">
-                <span class="help" style="flex:1 1 auto"><input type="checkbox" name="copy_images"> Copy cached images</span>
-              </label>
-            </div>
-            <div class="actions">
-              <button type="submit">Export static site</button>
-            </div>
-          </form>
-        </div>
+    <!-- 02 · VALUE -->
+    <section class="tool-section">
+      <div class="sec-head">
+        <span class="sec-num">02</span>
+        <span class="sec-title">Value</span>
+        <span class="sec-desc">Pulls current market prices and marketplace availability</span>
       </div>
-      <div class="card">
-        <div class="meta">
-          <h2 style="margin:0 0 6px 0">Export Insurance CSV</h2>
-          <p class="help">Generates a dated CSV insurance manifest of all valued collection items with a coverage summary.</p>
-          <form method="post" action="/tools/run">
-            <input type="hidden" name="_token" value="{{ csrf_token }}">
-            <input type="hidden" name="task" value="export-valuation">
-            <div class="actions">
-              <button type="submit">Export insurance CSV</button>
-            </div>
-          </form>
-        </div>
-      </div>
+      <div class="grid">
 
-      <div class="card">
-        <div class="meta">
-          <h2 style="margin:0 0 6px 0">Refresh Wantlist Availability</h2>
-          <p class="help">Fetches the current for-sale count and lowest marketplace price for each wantlist item.</p>
-          <form method="post" action="/tools/run">
-            <input type="hidden" name="_token" value="{{ csrf_token }}">
-            <input type="hidden" name="task" value="value-wants">
-            <div class="actions">
-              <button type="submit">Refresh availability</button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="meta">
-          <h2 style="margin:0 0 6px 0">Value Collection</h2>
-          <p class="help">Fetches current market prices from Discogs for collection and/or wantlist items and stores a valuation snapshot.</p>
+        <div class="card">
+          <div class="card-top"><h2 class="tool-title">Value Collection</h2>
+            <span class="badge net"><span class="pip"></span>Fetches from Discogs</span></div>
+          <p class="desc">Fetches current market prices for collection and/or wantlist items and
+            stores a valuation snapshot.</p>
           <form method="post" action="/tools/run">
             <input type="hidden" name="_token" value="{{ csrf_token }}">
             <input type="hidden" name="task" value="value">
-            <div class="row">
-              <label>Scope
-                <select name="scope">
+            <div class="fields">
+              <div class="field"><label for="value-scope">Scope</label>
+                <select id="value-scope" name="scope">
                   <option value="both">Collection + Wantlist</option>
                   <option value="collection">Collection</option>
                   <option value="wantlist">Wantlist</option>
-                </select>
-              </label>
+                </select></div>
             </div>
-            <label class="row">
-              <span class="help" style="flex:1 1 auto"><input type="checkbox" name="force" value="1"> Re-value all (ignore staleness)</span>
-            </label>
-            <div class="actions">
-              <button type="submit">Value collection</button>
-            </div>
+            <label class="check"><input type="checkbox" name="force" value="1"> Re-value all — ignore staleness
+              <span class="badge care"><span class="pip"></span>Careful</span></label>
+            <div class="foot"><button class="run" type="submit">Value collection</button></div>
           </form>
         </div>
+
+        <div class="card">
+          <div class="card-top"><h2 class="tool-title">Refresh Wantlist Availability</h2>
+            <span class="badge net"><span class="pip"></span>Fetches from Discogs</span></div>
+          <p class="desc">Updates the for-sale count and lowest marketplace price for each wantlist item.</p>
+          <form method="post" action="/tools/run">
+            <input type="hidden" name="_token" value="{{ csrf_token }}">
+            <input type="hidden" name="task" value="value-wants">
+            <div class="foot"><button class="run" type="submit">Refresh availability</button></div>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-top"><h2 class="tool-title">Export Insurance CSV</h2>
+            <span class="badge"><span class="pip"></span>On demand</span></div>
+          <p class="desc">Generates a dated CSV insurance manifest of every valued item with a
+            coverage summary.</p>
+          <form method="post" action="/tools/run">
+            <input type="hidden" name="_token" value="{{ csrf_token }}">
+            <input type="hidden" name="task" value="export-valuation">
+            <div class="foot"><button class="run" type="submit">Export insurance CSV</button></div>
+          </form>
+        </div>
+
       </div>
+    </section>
+
+    <!-- 03 · PUBLISH -->
+    <section class="tool-section">
+      <div class="sec-head">
+        <span class="sec-num">03</span>
+        <span class="sec-title">Publish</span>
+        <span class="sec-desc">Sends changes back to Discogs or exports your collection outward</span>
+      </div>
+      <div class="grid">
+
+        <div class="card">
+          <div class="card-top"><h2 class="tool-title">Push Changes to Discogs</h2>
+            <span class="badge net"><span class="pip"></span>Writes to Discogs</span></div>
+          <p class="desc">Sends queued ratings, conditions, and notes back to Discogs. Processes items
+            in the push queue.</p>
+          <form method="post" action="/tools/run">
+            <input type="hidden" name="_token" value="{{ csrf_token }}">
+            <input type="hidden" name="task" value="push">
+            <div class="foot"><button class="run" type="submit">Push to Discogs</button></div>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-top"><h2 class="tool-title">Export Static Site</h2>
+            <span class="badge"><span class="pip"></span>On demand</span></div>
+          <p class="desc">Generates a static HTML site with JSON data files for offline hosting.
+            Images can optionally be copied.</p>
+          <form method="post" action="/tools/run">
+            <input type="hidden" name="_token" value="{{ csrf_token }}">
+            <input type="hidden" name="task" value="export">
+            <div class="fields">
+              <div class="field"><label for="export-out">Output directory</label>
+                <input id="export-out" type="text" name="out" value="dist" placeholder="dist"></div>
+              <div class="field"><label for="export-base">Base URL</label>
+                <input id="export-base" type="text" name="base_url" value="/" placeholder="/"></div>
+            </div>
+            <div class="fields">
+              <div class="field"><label for="export-chunk">Chunk size (0 = none)</label>
+                <input id="export-chunk" type="number" name="chunk_size" value="0" min="0" max="5000"></div>
+            </div>
+            <label class="check"><input type="checkbox" name="copy_images"> Copy cached images</label>
+            <div class="foot"><button class="run" type="submit">Export static site</button></div>
+          </form>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- MAINTENANCE -->
+    <section class="tool-section maint">
+      <div class="sec-head">
+        <span class="sec-num">·</span>
+        <span class="sec-title">Maintenance</span>
+        <span class="sec-desc">Housekeeping — run only when something looks off</span>
+      </div>
+      <div class="grid">
+
+        <div class="card">
+          <div class="card-top"><h2 class="tool-title">Rebuild Search Index</h2>
+            <span class="badge safe"><span class="pip"></span>Safe anytime</span></div>
+          <p class="desc">Repairs or rebuilds the full-text search index if results seem off.</p>
+          <form method="post" action="/tools/run">
+            <input type="hidden" name="_token" value="{{ csrf_token }}">
+            <input type="hidden" name="task" value="search">
+            <div class="foot"><button class="run" type="submit">Rebuild index</button></div>
+          </form>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- idle console -->
+    <div class="console" id="console-idle">
+      <span class="live"></span><b>Console idle</b>
+      <span>— output streams here while a tool runs</span>
     </div>
+
   </div>
 {% endblock %}
 
@@ -256,9 +390,12 @@
     const progressContainer = document.getElementById('progress-container');
     const outputEl = document.getElementById('output');
     const statusText = document.getElementById('status-text');
+    const consoleIdle = document.getElementById('console-idle');
 
+    if (consoleIdle) consoleIdle.style.display = 'none';
     progressContainer.style.display = 'block';
     outputEl.textContent = '';
+    statusText.style.color = '';
     statusText.textContent = 'Starting command...';
 
     // Disable all form buttons
