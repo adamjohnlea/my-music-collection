@@ -87,4 +87,62 @@ final class ValuationChartTest extends TestCase
         $this->assertSame(-50.0, $m['deltaAbs']);
         $this->assertEqualsWithDelta(-25.0, $m['deltaPct'], 0.001);
     }
+
+    public function testEmptyReturnsEmptyState(): void
+    {
+        $m = SnapshotChart::build([], 600, 160);
+        $this->assertSame('empty', $m['state']);
+        $this->assertSame('', $m['linePoints']);
+        $this->assertSame([], $m['dots']);
+        $this->assertNull($m['current']);
+        $this->assertNull($m['start']);
+    }
+
+    public function testSingleSnapshotIsSingleStateWithNoLine(): void
+    {
+        $snaps = [['total_value' => 500.0, 'captured_at' => '2026-05-02T00:00:00+00:00']];
+        $m = SnapshotChart::build($snaps, 600, 160);
+        $this->assertSame('single', $m['state']);
+        $this->assertSame('', $m['linePoints']);
+        $this->assertSame([], $m['dots']);
+        $this->assertSame(500.0, $m['current']['value']);
+        $this->assertSame('2 May 2026', $m['start']['date']);
+        $this->assertSame(0.0, $m['deltaAbs']);
+    }
+
+    public function testFlatSeriesCentresLineAndReportsNoChange(): void
+    {
+        $snaps = [
+            ['total_value' => 300.0, 'captured_at' => '2026-05-01T00:00:00+00:00'],
+            ['total_value' => 300.0, 'captured_at' => '2026-06-01T00:00:00+00:00'],
+        ];
+        $m = SnapshotChart::build($snaps, 600, 160);
+        $this->assertSame('flat', $m['direction']);
+        $this->assertSame(0.0, $m['deltaAbs']);
+        $this->assertSame(80, $m['dots'][0]['y']); // height/2
+        $this->assertSame(80, $m['dots'][1]['y']);
+    }
+
+    public function testSameTimestampFallsBackToIndexSpacing(): void
+    {
+        $snaps = [
+            ['total_value' => 100.0, 'captured_at' => '2026-05-01T12:00:00+00:00'],
+            ['total_value' => 120.0, 'captured_at' => '2026-05-01T12:00:00+00:00'],
+        ];
+        $m = SnapshotChart::build($snaps, 600, 160);
+        $this->assertSame(0, $m['dots'][0]['x']);
+        $this->assertSame(600, $m['dots'][1]['x']); // even index spacing, no divide-by-zero
+    }
+
+    public function testZeroStartSuppressesPercent(): void
+    {
+        $snaps = [
+            ['total_value' => 0.0, 'captured_at' => '2026-05-01T00:00:00+00:00'],
+            ['total_value' => 50.0, 'captured_at' => '2026-06-01T00:00:00+00:00'],
+        ];
+        $m = SnapshotChart::build($snaps, 600, 160);
+        $this->assertSame(50.0, $m['deltaAbs']);
+        $this->assertNull($m['deltaPct']);
+        $this->assertSame('up', $m['direction']);
+    }
 }
