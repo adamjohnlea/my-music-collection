@@ -176,7 +176,7 @@ class CollectionController extends BaseController
             'collection_coverage' => $collectionTotals['valued_count'] . ' of ' . $collectionTotals['item_count'] . ' valued'
                 . ($collectionTotals['assumed_count'] > 0 ? ' · ' . $collectionTotals['assumed_count'] . ' assumed grade' : ''),
             'wantlist_value'      => $wantlistTotals['total'],
-            'value_chart_points'  => SnapshotChart::polylinePoints($snapshots, 600, 160),
+            'value_chart_points'  => SnapshotChart::build($snapshots, 600, 160)['linePoints'],
         ], $stats));
     }
 
