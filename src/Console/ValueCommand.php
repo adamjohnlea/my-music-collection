@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Console;
 
+use App\Domain\Valuation\CurrencyFormat;
 use App\Http\DiscogsHttpClient;
 use App\Infrastructure\Config;
 use App\Infrastructure\DiscogsPricingClient;
@@ -71,7 +72,7 @@ final class ValueCommand extends Command
             $totals = $repo->getScopeTotals($scope);
             $output->writeln(sprintf(
                 '<info>%s: %d items valued this run. Total %s%s (%d of %d valued).</info>',
-                ucfirst($scope), $n, $totals['currency'] ?? '', number_format($totals['total'], 2),
+                ucfirst($scope), $n, CurrencyFormat::symbol($totals['currency'] ?? null), number_format($totals['total'], 2),
                 $totals['valued_count'], $totals['item_count']
             ));
         }

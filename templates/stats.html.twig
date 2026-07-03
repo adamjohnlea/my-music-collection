@@ -38,7 +38,7 @@
       </div>
 
       <div class="card" style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center">
-        <div class="big-num">{{ collection_currency }}{{ collection_value|number_format(2) }}</div>
+        <div class="big-num">{{ collection_currency|currency_symbol }}{{ collection_value|number_format(2) }}</div>
         <div class="muted">Collection Value</div>
         <div class="muted">{{ collection_coverage }}</div>
       </div>
@@ -53,7 +53,7 @@
       {% endif %}
 
       <div class="card" style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center">
-        <div class="big-num">{{ collection_currency }}{{ wantlist_value|number_format(2) }}</div>
+        <div class="big-num">{{ collection_currency|currency_symbol }}{{ wantlist_value|number_format(2) }}</div>
         <div class="muted">Wantlist cost to complete</div>
       </div>
 
