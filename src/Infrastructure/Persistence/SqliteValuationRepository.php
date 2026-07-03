@@ -81,10 +81,10 @@ final class SqliteValuationRepository implements ValuationRepositoryInterface
                COALESCE(SUM(CASE WHEN value IS NOT NULL THEN value ELSE 0 END), 0) AS total,
                COUNT(*) AS item_count,
                SUM(CASE WHEN value IS NOT NULL THEN 1 ELSE 0 END) AS valued_count,
-               (SELECT currency FROM item_valuations WHERE scope = :s AND currency IS NOT NULL LIMIT 1) AS currency
+               (SELECT currency FROM item_valuations WHERE scope = :s2 AND currency IS NOT NULL LIMIT 1) AS currency
              FROM item_valuations WHERE scope = :s'
         );
-        $st->execute([':s' => $scope]);
+        $st->execute([':s' => $scope, ':s2' => $scope]);
         $row = $st->fetch(PDO::FETCH_ASSOC) ?: [];
         return [
             'total' => (float)($row['total'] ?? 0),

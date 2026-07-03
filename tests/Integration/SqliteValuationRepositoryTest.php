@@ -94,4 +94,41 @@ final class SqliteValuationRepositoryTest extends TestCase
         $this->assertContains(2, $stale);
         $this->assertNotContains(1, $stale);
     }
+
+    public function testBestValuationForReleaseReturnsHighestValue(): void
+    {
+        // Insert two valuations for the same release_id with different values
+        $lower = $this->baseRow();
+        $lower['value'] = 10.0;
+        $lower['instance_id'] = 10;
+        $this->repo->upsertItemValuation($lower);
+
+        $higher = $this->baseRow();
+        $higher['value'] = 30.0;
+        $higher['instance_id'] = 20;
+        $this->repo->upsertItemValuation($higher);
+
+        $result = $this->repo->bestValuationForRelease(1);
+        $this->assertNotNull($result);
+        $this->assertSame(30.0, (float)$result['value']);
+        $this->assertSame(20, (int)$result['instance_id']);
+    }
+
+    public function testBestValuationForReleaseReturnsNullWhenNoValuations(): void
+    {
+        $result = $this->repo->bestValuationForRelease(999);
+        $this->assertNull($result);
+    }
+
+    public function testBestValuationForReleaseIgnoresNullValues(): void
+    {
+        // Insert only a null-valued row
+        $unvalued = $this->baseRow();
+        $unvalued['value'] = null;
+        $unvalued['source'] = 'unvalued';
+        $this->repo->upsertItemValuation($unvalued);
+
+        $result = $this->repo->bestValuationForRelease(1);
+        $this->assertNull($result);
+    }
 }
