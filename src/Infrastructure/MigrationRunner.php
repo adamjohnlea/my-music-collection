@@ -465,6 +465,10 @@ class MigrationRunner
     private function migrateToV17(): void
     {
         // Live marketplace availability for wantlist items (refreshed on demand).
+        // Existence checks via PRAGMA table_info are REQUIRED for idempotency: ValuationTeardown::reset()
+        // rewinds schema_version to '15', causing migration runner to re-run migrations 15→16→17 on a database
+        // whose wantlist_items table already has v17 columns. Plain ALTER TABLE ADD COLUMN would fail with
+        // "duplicate column name" SQLite error; these guards make the migration safe on re-run (see ValueResetTest).
         $cols = array_map(
             fn($r) => (string)$r['name'],
             $this->pdo->query("PRAGMA table_info(wantlist_items)")->fetchAll(PDO::FETCH_ASSOC)
