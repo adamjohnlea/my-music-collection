@@ -5,6 +5,7 @@ namespace Tests\Integration;
 
 use App\Domain\Repositories\CollectionRepositoryInterface;
 use App\Domain\Repositories\ReleaseRepositoryInterface;
+use App\Domain\Repositories\ValuationRepositoryInterface;
 use App\Http\Controllers\ReleaseController;
 use App\Http\DiscogsClientFactory;
 use App\Http\Validation\Validator;
@@ -22,6 +23,7 @@ class ReleaseControllerTest extends MockeryTestCase
     private $twig;
     private $releaseRepository;
     private $collectionRepository;
+    private $valuationRepository;
     private Validator $validator;
     public string $redirectUrl = '';
     public bool $redirectCalled = false;
@@ -35,6 +37,8 @@ class ReleaseControllerTest extends MockeryTestCase
         $this->twig = Mockery::mock(Environment::class);
         $this->releaseRepository = Mockery::mock(ReleaseRepositoryInterface::class);
         $this->collectionRepository = Mockery::mock(CollectionRepositoryInterface::class);
+        $this->valuationRepository = Mockery::mock(ValuationRepositoryInterface::class);
+        $this->valuationRepository->shouldReceive('bestValuationForRelease')->andReturn(null);
         $this->validator = new Validator();
         $this->redirectUrl = '';
         $this->redirectCalled = false;
@@ -789,6 +793,7 @@ class ReleaseControllerTest extends MockeryTestCase
             $this->collectionRepository,
             $this->validator,
             $discogsFactory,
+            $this->valuationRepository,
             $test
         ) extends ReleaseController {
             private $testCase;
@@ -799,9 +804,10 @@ class ReleaseControllerTest extends MockeryTestCase
                 CollectionRepositoryInterface $collectionRepository,
                 Validator $validator,
                 DiscogsClientFactory $discogsClientFactory,
+                ValuationRepositoryInterface $valuationRepository,
                 $testCase
             ) {
-                parent::__construct($twig, $releaseRepository, $collectionRepository, $validator, $discogsClientFactory);
+                parent::__construct($twig, $releaseRepository, $collectionRepository, $validator, $discogsClientFactory, $valuationRepository);
                 $this->testCase = $testCase;
             }
 
