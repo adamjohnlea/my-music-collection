@@ -51,3 +51,6 @@
 
 # Superpowers subagent-driven-development scratch
 .superpowers/
+
+# Generated valuation export manifests
+var/valuation-*.csv
