@@ -23,7 +23,7 @@ class DiscogsFiltersTest extends TestCase
         $filters = $this->filters->getFilters();
 
         $this->assertIsArray($filters);
-        $this->assertCount(1, $filters);
+        $this->assertCount(2, $filters);
     }
 
     public function testGetFiltersIncludesStripDiscogsSuffix(): void
@@ -32,6 +32,21 @@ class DiscogsFiltersTest extends TestCase
 
         $filterNames = array_map(fn($f) => $f->getName(), $filters);
         $this->assertContains('strip_discogs_suffix', $filterNames);
+    }
+
+    public function testGetFiltersIncludesCurrencySymbol(): void
+    {
+        $filters = $this->filters->getFilters();
+
+        $filterNames = array_map(fn($f) => $f->getName(), $filters);
+        $this->assertContains('currency_symbol', $filterNames);
+    }
+
+    public function testCurrencySymbolDelegatesToFormatter(): void
+    {
+        $this->assertEquals('$', $this->filters->currencySymbol('USD'));
+        $this->assertEquals('£', $this->filters->currencySymbol('GBP'));
+        $this->assertEquals('SEK', $this->filters->currencySymbol('SEK'));
     }
 
     // ==================== stripDiscogsSuffix(): Happy Path ====================

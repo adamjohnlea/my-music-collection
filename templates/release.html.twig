@@ -317,7 +317,7 @@
                         {% if release_valuation %}
                         <div class="valuation muted" style="margin-bottom:6px">
                           <strong>Value:</strong>
-                          {{ release_valuation.currency }}{{ release_valuation.value|number_format(2) }}
+                          {{ release_valuation.currency|currency_symbol }}{{ release_valuation.value|number_format(2) }}
                           {% if release_valuation.condition_used %}· {{ release_valuation.condition_used }}{% endif %}
                           · {{ release_valuation.source == 'suggestion' ? 'suggested' : 'lowest listed' }}
                           · as of {{ release_valuation.valued_at|date('M j, Y') }}

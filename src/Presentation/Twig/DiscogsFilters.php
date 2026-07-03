@@ -2,6 +2,7 @@
 
 namespace App\Presentation\Twig;
 
+use App\Domain\Valuation\CurrencyFormat;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
@@ -11,7 +12,17 @@ final class DiscogsFilters extends AbstractExtension
     {
         return [
             new TwigFilter('strip_discogs_suffix', [$this, 'stripDiscogsSuffix']),
+            new TwigFilter('currency_symbol', [$this, 'currencySymbol']),
         ];
+    }
+
+    /**
+     * Display prefix for an ISO currency code, e.g. "USD" -> "$".
+     * Falls back to the code itself for unmapped currencies.
+     */
+    public function currencySymbol(?string $code): string
+    {
+        return CurrencyFormat::symbol($code);
     }
 
     /**
