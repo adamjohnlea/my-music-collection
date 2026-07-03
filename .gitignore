@@ -48,3 +48,6 @@
 # Local working status file (intentionally untracked)
 /CURRENTSTATUS.md
 /var/progress/
+
+# Superpowers subagent-driven-development scratch
+.superpowers/
