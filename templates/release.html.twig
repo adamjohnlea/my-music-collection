@@ -314,6 +314,15 @@
                         {% if details.user_sleeve_condition %}
                         <div class="muted" style="margin-bottom:6px">Sleeve Condition: {{ details.user_sleeve_condition }}</div>
                         {% endif %}
+                        {% if release_valuation %}
+                        <div class="valuation muted" style="margin-bottom:6px">
+                          <strong>Value:</strong>
+                          {{ release_valuation.currency }}{{ release_valuation.value|number_format(2) }}
+                          {% if release_valuation.condition_used %}· {{ release_valuation.condition_used }}{% endif %}
+                          · {{ release_valuation.source == 'suggestion' ? 'suggested' : 'lowest listed' }}
+                          · as of {{ release_valuation.valued_at|date('M j, Y') }}
+                        </div>
+                        {% endif %}
                         {% if details.user_notes %}
                         <div style="white-space:pre-wrap; font-size:.95rem" class="muted">{{ details.user_notes }}</div>
                         {% elseif details.in_collection %}

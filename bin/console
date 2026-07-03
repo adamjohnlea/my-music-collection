@@ -27,5 +27,8 @@ $app->add(new \App\Console\SyncRefreshCommand());
 $app->add(new \App\Console\SearchRebuildCommand());
 $app->add(new \App\Console\SyncPushCommand());
 $app->add(new \App\Console\ExportStaticCommand());
+$app->add(new \App\Console\ValueCommand());
+$app->add(new \App\Console\ValueExportCommand());
+$app->add(new \App\Console\ValueResetCommand());
 
 $app->run();

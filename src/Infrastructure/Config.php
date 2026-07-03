@@ -86,8 +86,18 @@ final class Config
         $username = $this->getDiscogsUsername();
         $token = $this->getDiscogsToken();
 
-        return $username && $token && 
-               $username !== 'your_username' && 
+        return $username && $token &&
+               $username !== 'your_username' &&
                $token !== 'your_personal_access_token';
+    }
+
+    public function getValuationStaleDays(): int
+    {
+        return (int)($this->env('VALUATION_STALE_DAYS', '7') ?? '7');
+    }
+
+    public function getValuationWantlistGrade(): string
+    {
+        return $this->env('VALUATION_WANTLIST_GRADE', 'Near Mint (NM or M-)') ?? 'Near Mint (NM or M-)';
     }
 }

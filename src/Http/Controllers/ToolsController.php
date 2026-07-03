@@ -39,7 +39,7 @@ class ToolsController extends BaseController
         }
 
         $task = $_POST['task'] ?? '';
-        $allowedTasks = ['initial', 'refresh', 'enrich', 'images', 'search', 'push', 'export'];
+        $allowedTasks = ['initial', 'refresh', 'enrich', 'images', 'search', 'push', 'export', 'value', 'export-valuation'];
 
         if (!in_array($task, $allowedTasks)) {
             http_response_code(400);
@@ -123,6 +123,10 @@ class ToolsController extends BaseController
             'search' => 'search:rebuild',
             'push' => 'sync:push',
             'export' => $this->buildExportCommand($params),
+            'value' => 'value'
+                . (isset($params['scope']) && in_array($params['scope'], ['collection', 'wantlist', 'both'], true) ? ' --scope=' . $params['scope'] : '')
+                . (isset($params['force']) ? ' --force' : ''),
+            'export-valuation' => 'value:export',
             default => throw new \InvalidArgumentException('Unknown task: ' . $task),
         };
 

@@ -99,6 +99,11 @@ class MigrationRunner
                 $this->setVersion('15');
                 $version = '15';
             }
+            if ($version === '15') {
+                $this->migrateToV16();
+                $this->setVersion('16');
+                $version = '16';
+            }
 
             $this->pdo->commit();
 
@@ -419,6 +424,37 @@ class MigrationRunner
     {
         // Add apple_music_id to releases
         $this->pdo->exec("ALTER TABLE releases ADD COLUMN apple_music_id TEXT");
+    }
+
+    private function migrateToV16(): void
+    {
+        $this->pdo->exec('CREATE TABLE IF NOT EXISTS item_valuations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            scope TEXT NOT NULL,
+            release_id INTEGER NOT NULL,
+            instance_id INTEGER NOT NULL DEFAULT 0,
+            condition_used TEXT,
+            value REAL,
+            currency TEXT,
+            source TEXT NOT NULL,
+            valued_at TEXT NOT NULL
+        )');
+        $this->pdo->exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_item_valuations_key
+            ON item_valuations(scope, release_id, instance_id)');
+        $this->pdo->exec('CREATE INDEX IF NOT EXISTS idx_item_valuations_value
+            ON item_valuations(scope, value)');
+
+        $this->pdo->exec('CREATE TABLE IF NOT EXISTS valuation_snapshots (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            scope TEXT NOT NULL,
+            total_value REAL NOT NULL,
+            currency TEXT,
+            item_count INTEGER NOT NULL,
+            valued_count INTEGER NOT NULL,
+            captured_at TEXT NOT NULL
+        )');
+        $this->pdo->exec('CREATE INDEX IF NOT EXISTS idx_valuation_snapshots_scope_time
+            ON valuation_snapshots(scope, captured_at)');
     }
 
     public function rebuildSearch(): void

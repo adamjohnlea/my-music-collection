@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 
 use App\Domain\Repositories\CollectionRepositoryInterface;
 use App\Domain\Repositories\ReleaseRepositoryInterface;
+use App\Domain\Repositories\ValuationRepositoryInterface;
 use App\Http\DiscogsClientFactory;
 use App\Http\Validation\Validator;
 use Twig\Environment;
@@ -16,7 +17,8 @@ class ReleaseController extends BaseController
         private ReleaseRepositoryInterface $releaseRepository,
         private CollectionRepositoryInterface $collectionRepository,
         Validator $validator,
-        private DiscogsClientFactory $discogsClientFactory
+        private DiscogsClientFactory $discogsClientFactory,
+        private ValuationRepositoryInterface $valuationRepository
     ) {
         parent::__construct($twig, $validator);
     }
@@ -182,6 +184,8 @@ class ReleaseController extends BaseController
             if ($refPath && $refPath[0] === '/') $backUrl = $refPath . ($refQuery ? ('?' . $refQuery) : '');
         }
 
+        $releaseValuation = $this->valuationRepository->bestValuationForRelease($rid);
+
         $this->render('release.html.twig', [
             'title' => $release ? ($release['title'] . ' — ' . ($release['artist'] ?? '')) : 'Not found',
             'release' => $release,
@@ -191,6 +195,7 @@ class ReleaseController extends BaseController
             'saved' => $_GET['saved'] ?? null,
             'tab' => $_GET['tab'] ?? null,
             'back_url' => $backUrl,
+            'release_valuation' => $releaseValuation,
         ]);
     }
 

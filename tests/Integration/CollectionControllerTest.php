@@ -5,6 +5,7 @@ namespace Tests\Integration;
 
 use App\Domain\Repositories\CollectionRepositoryInterface;
 use App\Domain\Repositories\ReleaseRepositoryInterface;
+use App\Domain\Repositories\ValuationRepositoryInterface;
 use App\Domain\Search\QueryParser;
 use App\Http\Controllers\CollectionController;
 use App\Http\DiscogsClientFactory;
@@ -25,6 +26,7 @@ class CollectionControllerTest extends MockeryTestCase
     private $twig;
     private $releaseRepository;
     private $collectionRepository;
+    private $valuationRepository;
     private QueryParser $queryParser;
     private Validator $validator;
     public string $redirectUrl = '';
@@ -42,6 +44,7 @@ class CollectionControllerTest extends MockeryTestCase
         $this->twig = Mockery::mock(Environment::class);
         $this->releaseRepository = Mockery::mock(ReleaseRepositoryInterface::class);
         $this->collectionRepository = Mockery::mock(CollectionRepositoryInterface::class);
+        $this->valuationRepository = Mockery::mock(ValuationRepositoryInterface::class);
         $this->queryParser = new QueryParser();
         $this->validator = new Validator();
         $this->redirectUrl = '';
@@ -95,6 +98,18 @@ class CollectionControllerTest extends MockeryTestCase
             ->with('testuser')
             ->andReturn($statsData);
 
+        $this->valuationRepository->shouldReceive('getScopeTotals')
+            ->with('collection')
+            ->andReturn(['total' => 1234.56, 'item_count' => 10, 'valued_count' => 8, 'currency' => 'USD']);
+
+        $this->valuationRepository->shouldReceive('getScopeTotals')
+            ->with('wantlist')
+            ->andReturn(['total' => 99.00, 'item_count' => 5, 'valued_count' => 3, 'currency' => 'USD']);
+
+        $this->valuationRepository->shouldReceive('getSnapshots')
+            ->with('collection')
+            ->andReturn([]);
+
         $controller = $this->createController();
 
         // Act
@@ -104,6 +119,10 @@ class CollectionControllerTest extends MockeryTestCase
         $this->assertEquals('stats.html.twig', $this->renderedTemplate);
         $this->assertEquals('Collection Statistics', $this->renderedData['title']);
         $this->assertEquals(100, $this->renderedData['total_releases']);
+        $this->assertEquals(1234.56, $this->renderedData['collection_value']);
+        $this->assertEquals('8 of 10 valued', $this->renderedData['collection_coverage']);
+        $this->assertEquals(99.00, $this->renderedData['wantlist_value']);
+        $this->assertEquals('', $this->renderedData['value_chart_points']);
     }
 
     // ==================== random(): Tests ====================
@@ -682,6 +701,7 @@ class CollectionControllerTest extends MockeryTestCase
             $this->collectionRepository,
             $this->validator,
             $discogsFactory,
+            $this->valuationRepository,
             $test
         ) extends CollectionController {
             private $testCase;
@@ -694,9 +714,10 @@ class CollectionControllerTest extends MockeryTestCase
                 CollectionRepositoryInterface $collectionRepository,
                 Validator $validator,
                 DiscogsClientFactory $discogsClientFactory,
+                ValuationRepositoryInterface $valuationRepository,
                 $testCase
             ) {
-                parent::__construct($twig, $pdo, $queryParser, $releaseRepository, $collectionRepository, $validator, $discogsClientFactory);
+                parent::__construct($twig, $pdo, $queryParser, $releaseRepository, $collectionRepository, $validator, $discogsClientFactory, $valuationRepository);
                 $this->testCase = $testCase;
             }
 

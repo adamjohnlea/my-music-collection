@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+  <div class="wrap content-wrap">
+    <h1>{{ title }}</h1>
+    <ol class="valuable-list">
+      {% for row in rows %}
+        <li>
+          <a href="/release/{{ row.release_id }}">{{ row.artist|strip_discogs_suffix }} — {{ row.title }}</a>
+          <span class="value">{{ row.currency }}{{ row.value|number_format(2) }}</span>
+          <span class="muted">{{ row.condition_used }} · {{ row.source == 'suggestion' ? 'suggested' : 'lowest listed' }}</span>
+        </li>
+      {% else %}
+        <li class="muted">No valuations yet. Run "Value collection" from Tools.</li>
+      {% endfor %}
+    </ol>
+  </div>
+{% endblock %}

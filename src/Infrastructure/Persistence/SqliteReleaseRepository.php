@@ -8,6 +8,12 @@ use PDO;
 
 class SqliteReleaseRepository implements ReleaseRepositoryInterface
 {
+    /**
+     * The exact ORDER BY expression for the value sort.
+     * Must stay in sync with CollectionController::$sorts['value'].
+     */
+    private const VALUE_ORDER_BY = '(MAX(iv.value) IS NULL), MAX(iv.value) DESC';
+
     public function __construct(private readonly PDO $pdo) {}
 
     /** @return array<string, mixed>|null */
@@ -92,12 +98,18 @@ class SqliteReleaseRepository implements ReleaseRepositoryInterface
     /** @return array<int, array<string, mixed>> */
     public function getAll(string $username, string $itemsTable, string $orderBy, int $limit, int $offset): array
     {
+        $needsValuationJoin = ($orderBy === self::VALUE_ORDER_BY);
+        $valueJoin = $needsValuationJoin
+            ? "LEFT JOIN item_valuations iv ON iv.scope = 'collection' AND iv.release_id = r.id"
+            : '';
+
         $sql = "SELECT r.id, r.title, r.artist, r.year, r.thumb_url, r.cover_url,
             (SELECT local_path FROM images i WHERE i.release_id = r.id AND i.source_url = r.cover_url ORDER BY id ASC LIMIT 1) AS primary_local_path,
             (SELECT local_path FROM images i WHERE i.release_id = r.id ORDER BY id ASC LIMIT 1) AS any_local_path,
             (SELECT MAX(ci2.added) FROM $itemsTable ci2 WHERE ci2.release_id = r.id AND ci2.username = :u) AS added_at,
             (SELECT MAX(ci3.rating) FROM $itemsTable ci3 WHERE ci3.release_id = r.id AND ci3.username = :u) AS rating
         FROM releases r
+        $valueJoin
         WHERE EXISTS (SELECT 1 FROM $itemsTable ci WHERE ci.release_id = r.id AND ci.username = :u)
         GROUP BY r.id
         ORDER BY $orderBy

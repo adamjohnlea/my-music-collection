@@ -81,6 +81,7 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     $r->addRoute('GET', '/tools', [ToolsController::class, 'index']);
     $r->addRoute('POST', '/tools/run', [ToolsController::class, 'run']);
     $r->addRoute('GET', '/tools/progress/{jobId}', [ToolsController::class, 'progress']);
+    $r->addRoute('GET', '/valuable', [CollectionController::class, 'valuable']);
     $r->addRoute('GET', '/', [CollectionController::class, 'index']);
 });
 

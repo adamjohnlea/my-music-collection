@@ -196,6 +196,58 @@ The application can embed an Apple Music player on release pages by matching the
 - Local storage: All your personal metadata is stored in your local SQLite database and is fully searchable.
 - Refreshing: You can pull the latest values from Discogs at any time using `php bin/console sync:refresh`.
 
+## Collection valuation
+
+The `value` command prices each owned record at its actual playing condition using Discogs marketplace data, and records snapshots over time so you can track how your collection's value changes.
+
+### Commands
+
+```
+php bin/console value [--scope=collection|wantlist|both] [--limit=N] [--force] [--id=ID]
+```
+Values releases in the given scope (default: `collection`). Releases priced within the last `VALUATION_STALE_DAYS` days are skipped unless `--force` is passed. Use `--id` to value a single release immediately.
+
+```
+php bin/console value:export [--out=var/valuation-YYYYMMDD.csv] [--scope=collection|wantlist|both]
+```
+Writes a dated CSV insurance manifest with one row per release (Artist, Title, Condition, Value, Currency, Source) plus a totals footer showing coverage ("X of Y valued").
+
+```
+php bin/console value:reset --confirm
+```
+Removes all valuation data: drops the two valuation tables and rewinds the schema version so migrations recreate them empty on the next run. All other collection data is untouched. This is the documented one-line undo.
+
+### Web console
+
+The `/tools` page has two new buttons:
+- **Value collection** — runs `value` with a scope selector and an optional re-value-all toggle
+- **Export insurance CSV** — triggers `value:export` and streams the output in real time
+
+### UI
+
+- **Stats page** — shows total collection value, a value-over-time sparkline chart, and wantlist cost-to-complete
+- **Release detail page** — shows the per-release value and the condition used for pricing
+- **/valuable** — most-valuable releases page, sorted descending by value
+- **Main browser** — new "Value" sort option (highest value first)
+
+### Configuration
+
+| Variable | Default | Description |
+| :--- | :--- | :--- |
+| `VALUATION_STALE_DAYS` | `7` | Re-value a release if its stored price is older than this many days |
+| `VALUATION_WANTLIST_GRADE` | `Near Mint (NM or M-)` | Condition assumed when pricing wantlist items |
+
+### Pricing source and coverage
+
+Condition-matched prices come from the Discogs `price_suggestions` endpoint, which requires **Discogs Seller Settings** to be enabled on your account. Without them, the endpoint returns an error and the valuer falls back to the lowest active listing price instead.
+
+Every stored value carries a source label:
+- `suggestion` — condition-matched price from `price_suggestions`
+- `lowest_listed` — cheapest active listing regardless of condition
+- `unvalued` — no marketplace data found for this release
+
+Totals always show coverage (e.g. "42 of 50 valued") so you always know how complete the estimate is, never a false total.
+
 ## Commands overview
 All commands below can be run from the **command line** or from the **Web Console Interface** at `/tools`:
 
@@ -206,6 +258,9 @@ All commands below can be run from the **command line** or from the **Web Consol
 - `php bin/console search:rebuild` — rebuild FTS index
 - `php bin/console sync:push` — push queued rating/note/collection changes to Discogs
 - `php bin/console export:static [--out=dist] [--base-url=/] [--copy-images] [--chunk-size=N]` — generate a static site of your collection
+- `php bin/console value [--scope=collection|wantlist|both] [--limit=N] [--force] [--id=ID]` — price releases using Discogs marketplace data
+- `php bin/console value:export [--out=PATH] [--scope=…]` — export insurance CSV manifest
+- `php bin/console value:reset --confirm` — remove all valuation data (reversible via re-run of `value`)
 
 For detailed command documentation:
 - CLI usage and safety notes: [docs/console-commands.md](docs/console-commands.md)
