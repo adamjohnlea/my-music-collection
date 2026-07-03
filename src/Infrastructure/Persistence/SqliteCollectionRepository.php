@@ -151,4 +151,54 @@ class SqliteCollectionRepository implements CollectionRepositoryInterface
         $row = $st->fetch(PDO::FETCH_ASSOC);
         return $row ?: null;
     }
+
+    /** @return int[] */
+    public function getWantlistReleaseIds(string $username): array
+    {
+        $st = $this->pdo->prepare('SELECT release_id FROM wantlist_items WHERE username = :u ORDER BY release_id');
+        $st->execute([':u' => $username]);
+        return array_map('intval', $st->fetchAll(PDO::FETCH_COLUMN));
+    }
+
+    public function updateWantlistMarketplace(int $releaseId, string $username, ?int $numForSale, ?float $lowestPrice, ?string $currency, string $fetchedAt): void
+    {
+        $st = $this->pdo->prepare(
+            'UPDATE wantlist_items
+                SET num_for_sale = :n, lowest_price = :p, lowest_price_currency = :c, market_fetched_at = :at
+              WHERE release_id = :rid AND username = :u'
+        );
+        $st->execute([
+            ':n' => $numForSale, ':p' => $lowestPrice, ':c' => $currency,
+            ':at' => $fetchedAt, ':rid' => $releaseId, ':u' => $username,
+        ]);
+    }
+
+    /**
+     * @param int[] $releaseIds
+     * @return array<int, array{num_for_sale:?int, lowest_price:?float, lowest_price_currency:?string, market_fetched_at:?string}>
+     */
+    public function getWantlistMarketplaceStats(array $releaseIds, string $username): array
+    {
+        if ($releaseIds === []) {
+            return [];
+        }
+        $ints = array_map('intval', $releaseIds);
+        $placeholders = implode(',', array_fill(0, count($ints), '?'));
+        $sql = "SELECT release_id, num_for_sale, lowest_price, lowest_price_currency, market_fetched_at
+                  FROM wantlist_items
+                 WHERE username = ? AND release_id IN ($placeholders)";
+        $st = $this->pdo->prepare($sql);
+        $st->execute(array_merge([$username], $ints));
+
+        $out = [];
+        foreach ($st->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $out[(int)$row['release_id']] = [
+                'num_for_sale' => $row['num_for_sale'] === null ? null : (int)$row['num_for_sale'],
+                'lowest_price' => $row['lowest_price'] === null ? null : (float)$row['lowest_price'],
+                'lowest_price_currency' => $row['lowest_price_currency'] !== null ? (string)$row['lowest_price_currency'] : null,
+                'market_fetched_at' => $row['market_fetched_at'] !== null ? (string)$row['market_fetched_at'] : null,
+            ];
+        }
+        return $out;
+    }
 }

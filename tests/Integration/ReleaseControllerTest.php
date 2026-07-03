@@ -780,6 +780,28 @@ class ReleaseControllerTest extends MockeryTestCase
         $this->assertSame('add_want', $captured['action']); // add_collection -> add_collection, else add_want
     }
 
+    public function testShowPassesCommunityStatsToView(): void
+    {
+        $release = [
+            'id' => 12345,
+            'title' => 'Abbey Road',
+            'artist' => 'The Beatles',
+            'raw_json' => json_encode(['community' => [
+                'have' => 3382, 'want' => 213,
+                'rating' => ['count' => 187, 'average' => 3.9],
+            ]]),
+        ];
+        $this->releaseRepository->shouldReceive('findById')->once()->with(12345)->andReturn($release);
+        $this->releaseRepository->shouldReceive('getImages')->once()->with(12345)->andReturn([]);
+
+        $controller = $this->createController();
+        $controller->show(12345, null);
+
+        $this->assertSame(3382, $this->renderedData['community']['have']);
+        $this->assertSame(213, $this->renderedData['community']['want']);
+        $this->assertSame(3.9, $this->renderedData['community']['rating_average']);
+    }
+
     // ==================== Helper ====================
 
     private function createController(?DiscogsClientFactory $discogsFactory = null): ReleaseController

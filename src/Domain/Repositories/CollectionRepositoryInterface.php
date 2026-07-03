@@ -29,4 +29,15 @@ interface CollectionRepositoryInterface
     public function rollBack(): void;
     /** @return array{notes: string|null, rating: int|null}|null */
     public function findWantlistItem(int $releaseId, string $username): ?array;
+
+    /** @return int[] */
+    public function getWantlistReleaseIds(string $username): array;
+
+    public function updateWantlistMarketplace(int $releaseId, string $username, ?int $numForSale, ?float $lowestPrice, ?string $currency, string $fetchedAt): void;
+
+    /**
+     * @param int[] $releaseIds
+     * @return array<int, array{num_for_sale:?int, lowest_price:?float, lowest_price_currency:?string, market_fetched_at:?string}>
+     */
+    public function getWantlistMarketplaceStats(array $releaseIds, string $username): array;
 }

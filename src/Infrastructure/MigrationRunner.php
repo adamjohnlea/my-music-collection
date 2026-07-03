@@ -104,6 +104,11 @@ class MigrationRunner
                 $this->setVersion('16');
                 $version = '16';
             }
+            if ($version === '16') {
+                $this->migrateToV17();
+                $this->setVersion('17');
+                $version = '17';
+            }
 
             $this->pdo->commit();
 
@@ -455,6 +460,32 @@ class MigrationRunner
         )');
         $this->pdo->exec('CREATE INDEX IF NOT EXISTS idx_valuation_snapshots_scope_time
             ON valuation_snapshots(scope, captured_at)');
+    }
+
+    private function migrateToV17(): void
+    {
+        // Live marketplace availability for wantlist items (refreshed on demand).
+        // Existence checks via PRAGMA table_info are REQUIRED for idempotency: ValuationTeardown::reset()
+        // rewinds schema_version to '15', causing migration runner to re-run migrations 15→16→17 on a database
+        // whose wantlist_items table already has v17 columns. Plain ALTER TABLE ADD COLUMN would fail with
+        // "duplicate column name" SQLite error; these guards make the migration safe on re-run (see ValueResetTest).
+        $cols = array_map(
+            fn($r) => (string)$r['name'],
+            $this->pdo->query("PRAGMA table_info(wantlist_items)")->fetchAll(PDO::FETCH_ASSOC)
+        );
+
+        if (!in_array('num_for_sale', $cols, true)) {
+            $this->pdo->exec('ALTER TABLE wantlist_items ADD COLUMN num_for_sale INTEGER');
+        }
+        if (!in_array('lowest_price', $cols, true)) {
+            $this->pdo->exec('ALTER TABLE wantlist_items ADD COLUMN lowest_price REAL');
+        }
+        if (!in_array('lowest_price_currency', $cols, true)) {
+            $this->pdo->exec('ALTER TABLE wantlist_items ADD COLUMN lowest_price_currency TEXT');
+        }
+        if (!in_array('market_fetched_at', $cols, true)) {
+            $this->pdo->exec('ALTER TABLE wantlist_items ADD COLUMN market_fetched_at TEXT');
+        }
     }
 
     public function rebuildSearch(): void

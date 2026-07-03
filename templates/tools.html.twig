@@ -203,6 +203,20 @@
 
       <div class="card">
         <div class="meta">
+          <h2 style="margin:0 0 6px 0">Refresh Wantlist Availability</h2>
+          <p class="help">Fetches the current for-sale count and lowest marketplace price for each wantlist item.</p>
+          <form method="post" action="/tools/run">
+            <input type="hidden" name="_token" value="{{ csrf_token }}">
+            <input type="hidden" name="task" value="value-wants">
+            <div class="actions">
+              <button type="submit">Refresh availability</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="meta">
           <h2 style="margin:0 0 6px 0">Value Collection</h2>
           <p class="help">Fetches current market prices from Discogs for collection and/or wantlist items and stores a valuation snapshot.</p>
           <form method="post" action="/tools/run">

@@ -355,6 +355,49 @@ class CollectionControllerTest extends MockeryTestCase
         $this->assertEquals('My Wantlist', $this->renderedData['title']);
     }
 
+    public function testWantlistViewAttachesMarketplaceFields(): void
+    {
+        // Arrange
+        $currentUser = ['id' => 1, 'discogs_username' => 'testuser'];
+        $_GET['view'] = 'wantlist';
+
+        $this->collectionRepository->shouldReceive('getSavedSearches')
+            ->once()
+            ->with(1)
+            ->andReturn([]);
+
+        $this->releaseRepository->shouldReceive('countAll')
+            ->once()
+            ->andReturn(1);
+
+        $this->releaseRepository->shouldReceive('getAll')
+            ->once()
+            ->andReturn([
+                ['id' => 111, 'title' => 'X', 'artist' => 'Y', 'year' => 2001, 'cover_url' => null, 'thumb_url' => null, 'primary_local_path' => null, 'any_local_path' => null],
+            ]);
+
+        $this->collectionRepository->shouldReceive('getWantlistMarketplaceStats')
+            ->once()
+            ->with([111], 'testuser')
+            ->andReturn([111 => [
+                'num_for_sale' => 3,
+                'lowest_price' => 12.0,
+                'lowest_price_currency' => 'GBP',
+                'market_fetched_at' => gmdate('c'),
+            ]]);
+
+        $controller = $this->createController();
+
+        // Act
+        $controller->index($currentUser);
+
+        // Assert
+        $item = $this->renderedData['items'][0];
+        $this->assertSame(3, $item['num_for_sale']);
+        $this->assertSame('£12.00', $item['market_price']);
+        $this->assertSame('just now', $item['market_as_of']);
+    }
+
     public function testIndexHandlesSortOptions(): void
     {
         // Arrange

@@ -30,5 +30,6 @@ $app->add(new \App\Console\ExportStaticCommand());
 $app->add(new \App\Console\ValueCommand());
 $app->add(new \App\Console\ValueExportCommand());
 $app->add(new \App\Console\ValueResetCommand());
+$app->add(new \App\Console\ValueWantsCommand());
 
 $app->run();

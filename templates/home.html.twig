@@ -284,7 +284,17 @@
                       <a href="/?view={{ view|default('collection') }}&per_page={{ per_page }}&sort={{ sort }}&q={{ ('year:' ~ it.year)|url_encode }}">{{ it.year }}</a>
                     {% endif %}
                   </div>
-                  
+
+                  {% if view == 'wantlist' %}
+                    {% if it.market_as_of is null or it.market_as_of == '' %}
+                      <div class="market" style="color:var(--muted);font-size:.8rem;margin-top:4px">Not checked yet</div>
+                    {% elseif it.num_for_sale and it.num_for_sale > 0 %}
+                      <div class="market" style="font-size:.8rem;margin-top:4px">{{ it.num_for_sale }} for sale from {{ it.market_price }} · <span style="color:var(--muted)">as of {{ it.market_as_of }}</span></div>
+                    {% else %}
+                      <div class="market" style="color:var(--muted);font-size:.8rem;margin-top:4px">None for sale · as of {{ it.market_as_of }}</div>
+                    {% endif %}
+                  {% endif %}
+
                   {% if it.is_discogs_result %}
                     <div class="action-btns">
                       <form method="post" action="/release/add">

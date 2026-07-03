@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Domain\CommunityStats;
 use App\Domain\Repositories\CollectionRepositoryInterface;
 use App\Domain\Repositories\ReleaseRepositoryInterface;
 use App\Domain\Repositories\ValuationRepositoryInterface;
@@ -185,6 +186,7 @@ class ReleaseController extends BaseController
         }
 
         $releaseValuation = $this->valuationRepository->bestValuationForRelease($rid);
+        $community = $release ? CommunityStats::fromReleaseRaw($release['raw_json'] ?? null) : null;
 
         $this->render('release.html.twig', [
             'title' => $release ? ($release['title'] . ' — ' . ($release['artist'] ?? '')) : 'Not found',
@@ -196,6 +198,7 @@ class ReleaseController extends BaseController
             'tab' => $_GET['tab'] ?? null,
             'back_url' => $backUrl,
             'release_valuation' => $releaseValuation,
+            'community' => $community,
         ]);
     }
 
