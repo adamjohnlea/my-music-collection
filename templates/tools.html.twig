@@ -58,14 +58,14 @@
     .field{display:flex;flex-direction:column;gap:5px;flex:1 1 120px}
     .field label{font:600 .7rem/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
     .card input[type="text"],.card input[type="number"],.card input[type="password"],.card select{
-      background:#101114;border:1px solid var(--border);color:var(--text);border-radius:8px;
+      background:var(--input-bg);border:1px solid var(--border);color:var(--text);border-radius:8px;
       padding:8px 10px;font:inherit;font-size:.86rem;width:100%;box-sizing:border-box}
     .check{display:flex;align-items:center;gap:8px;font-size:.86rem;color:var(--muted);font-weight:500}
     .check input{accent-color:var(--accent)}
     .foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;padding-top:4px}
-    .run{background:#1f2937;border:1px solid var(--border);color:#fff;border-radius:8px;
+    .run{background:var(--btn-bg);border:1px solid var(--border);color:#fff;border-radius:8px;
       padding:8px 14px;font:600 .88rem system-ui,sans-serif;cursor:pointer;transition:background .15s}
-    .run:hover{background:#232f41}
+    .run:hover{background:var(--btn-bg-hover)}
     .run:disabled{opacity:.5;cursor:not-allowed}
 
     /* --- hero variant (Refresh) --- */
@@ -76,8 +76,8 @@
     .card.hero .tool-title{font-size:1.3rem}
     .hero-l{display:flex;flex-direction:column;gap:10px}
     .hero-r{display:flex;flex-direction:column;gap:12px;border-left:1px solid var(--border-soft);padding-left:18px}
-    .card.hero .run{background:var(--accent);border-color:var(--accent);color:#04222a;font-weight:700}
-    .card.hero .run:hover{background:#8af1ff}
+    .card.hero .run{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+    .card.hero .run:hover{background:var(--accent-hover)}
     .primary-tag{font:600 .66rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
 
     /* --- running-command panel + idle console --- */
@@ -147,7 +147,7 @@
               <span style="margin-left:8px" id="status-text">Starting...</span>
             </div>
           </div>
-          <div style="background:#101114;border:1px solid var(--border);border-radius:8px;padding:12px;max-height:400px;overflow-y:auto;font-family:var(--mono);font-size:0.85rem;line-height:1.4">
+          <div style="background:var(--input-bg);border:1px solid var(--border);border-radius:8px;padding:12px;max-height:400px;overflow-y:auto;font-family:var(--mono);font-size:0.85rem;line-height:1.4">
             <pre id="output" style="margin:0;white-space:pre-wrap;word-wrap:break-word"></pre>
           </div>
         </div>

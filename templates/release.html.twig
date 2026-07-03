@@ -21,7 +21,7 @@
     .dot.active { background: var(--accent); opacity: 1; }
 
     /* Tabs */
-    .tabs { display: flex; gap: 4px; border-bottom: 1px solid #2a2b2f; margin-top: 24px; overflow-x: auto; scrollbar-width: none; }
+    .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-top: 24px; overflow-x: auto; scrollbar-width: none; }
     .tabs::-webkit-scrollbar { display: none; }
     .tab { padding: 12px 20px; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; white-space: nowrap; }
     .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
@@ -61,8 +61,8 @@
     .valueline .asof{color:var(--faint);font:500 .74rem var(--mono);margin-left:auto}
     #notesForm{gap:14px !important}
     #notesForm label{font:600 .72rem var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);display:flex;flex-direction:column;gap:6px}
-    #notesForm select,#notesForm textarea{width:100%;background:#101114;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:9px 10px;font:inherit;font-size:.9rem;box-sizing:border-box}
-    #notesForm .save{background:var(--accent);color:#04222a;border:0;border-radius:8px;padding:10px 18px;cursor:pointer;font-weight:700;font-size:.9rem}
+    #notesForm select,#notesForm textarea{width:100%;background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:9px 10px;font:inherit;font-size:.9rem;box-sizing:border-box}
+    #notesForm .save{background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:10px 18px;cursor:pointer;font-weight:700;font-size:.9rem}
     /* Tracks / Details / Credits sections */
     .sec + .sec{margin-top:22px;padding-top:20px;border-top:1px solid var(--border-soft)}
     .sec .eyebrow + *{margin-top:12px}
@@ -137,7 +137,7 @@
 {% block content %}
   <div class="wrap content-wrap">
     <div style="margin-bottom:24px">
-      <p style="margin:0"><a href="{{ back_url|default('/') }}" style="background:var(--card);border:1px solid #2a2b2f;padding:6px 12px;border-radius:8px;color:var(--text);font-size:.9rem;text-decoration:none">← Back</a></p>
+      <p style="margin:0"><a href="{{ back_url|default('/') }}" style="background:var(--card);border:1px solid var(--border);padding:6px 12px;border-radius:8px;color:var(--text);font-size:.9rem;text-decoration:none">← Back</a></p>
     </div>
     {% if release %}
       {% if saved %}
@@ -195,7 +195,7 @@
             <div class="thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;">
               {% for img in images %}
                 <button class="thumb" data-idx="{{ loop.index0 }}" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="{{ img.url }}" alt="thumb {{ loop.index }}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:{% if img.is_primary %}1{% else %}.7{% endif %}" />
+                  <img src="{{ img.url }}" alt="thumb {{ loop.index }}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:{% if img.is_primary %}1{% else %}.7{% endif %}" />
                 </button>
               {% endfor %}
             </div>
@@ -598,7 +598,7 @@
                     <div style="display:flex; justify-content:space-between; align-items:center; gap:8px">
                       <span><strong>${label}</strong> <span class="muted">(${item.type})</span></span>
                       <div style="display:flex; gap:8px">
-                        <a href="${searchUrl}" class="muted" style="font-size:0.8rem; border:1px solid #2a2b2f; padding:2px 8px; border-radius:4px; text-decoration:none; color:var(--accent)">Live Search</a>
+                        <a href="${searchUrl}" class="muted" style="font-size:0.8rem; border:1px solid var(--border); padding:2px 8px; border-radius:4px; text-decoration:none; color:var(--accent)">Live Search</a>
                       </div>
                     </div>
                   </li>`;
