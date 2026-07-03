@@ -8,6 +8,12 @@ use PDO;
 
 class SqliteReleaseRepository implements ReleaseRepositoryInterface
 {
+    /**
+     * The exact ORDER BY expression for the value sort.
+     * Must stay in sync with CollectionController::$sorts['value'].
+     */
+    private const VALUE_ORDER_BY = '(iv.value IS NULL), iv.value DESC';
+
     public function __construct(private readonly PDO $pdo) {}
 
     /** @return array<string, mixed>|null */
@@ -92,7 +98,8 @@ class SqliteReleaseRepository implements ReleaseRepositoryInterface
     /** @return array<int, array<string, mixed>> */
     public function getAll(string $username, string $itemsTable, string $orderBy, int $limit, int $offset): array
     {
-        $valueJoin = str_contains($orderBy, 'iv.')
+        $needsValuationJoin = ($orderBy === self::VALUE_ORDER_BY);
+        $valueJoin = $needsValuationJoin
             ? "LEFT JOIN item_valuations iv ON iv.scope = 'collection' AND iv.release_id = r.id"
             : '';
 
