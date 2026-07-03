@@ -42,6 +42,9 @@
 /public/var/
 /public/*.db
 
+# Stray SQLite file created when an in-memory DSN (":memory:") is treated as a path
+/:memory:
+
 # Swap files
 *.swp
 *.swo
