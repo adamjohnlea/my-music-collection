@@ -49,7 +49,7 @@ final class ValueCommand extends Command
         $http = (new DiscogsHttpClient($config->getUserAgent('MyDiscogsApp/0.1 (+value)'), $token, $kv))->client();
         $pricing = new DiscogsPricingClient($http);
         $repo = new SqliteValuationRepository($pdo);
-        $valuer = new CollectionValuer($pricing, $repo, $pdo, $config->getValuationWantlistGrade());
+        $valuer = new CollectionValuer($pricing, $repo, $pdo, $config->getValuationWantlistGrade(), $config->getValuationAssumedGrade());
 
         $scopeOpt = (string)$input->getOption('scope');
         $scopes = $scopeOpt === 'both' ? ['collection', 'wantlist'] : [$scopeOpt];
@@ -70,10 +70,11 @@ final class ValueCommand extends Command
             $n = $valuer->valueReleases($ids, $scope, $username);
             $valuer->writeSnapshot($scope);
             $totals = $repo->getScopeTotals($scope);
+            $assumedNote = $totals['assumed_count'] > 0 ? sprintf(', %d assumed', $totals['assumed_count']) : '';
             $output->writeln(sprintf(
-                '<info>%s: %d items valued this run. Total %s%s (%d of %d valued).</info>',
+                '<info>%s: %d items valued this run. Total %s%s (%d of %d valued%s).</info>',
                 ucfirst($scope), $n, CurrencyFormat::symbol($totals['currency'] ?? null), number_format($totals['total'], 2),
-                $totals['valued_count'], $totals['item_count']
+                $totals['valued_count'], $totals['item_count'], $assumedNote
             ));
         }
 

@@ -100,11 +100,11 @@ class CollectionControllerTest extends MockeryTestCase
 
         $this->valuationRepository->shouldReceive('getScopeTotals')
             ->with('collection')
-            ->andReturn(['total' => 1234.56, 'item_count' => 10, 'valued_count' => 8, 'currency' => 'USD']);
+            ->andReturn(['total' => 1234.56, 'item_count' => 10, 'valued_count' => 8, 'assumed_count' => 2, 'currency' => 'USD']);
 
         $this->valuationRepository->shouldReceive('getScopeTotals')
             ->with('wantlist')
-            ->andReturn(['total' => 99.00, 'item_count' => 5, 'valued_count' => 3, 'currency' => 'USD']);
+            ->andReturn(['total' => 99.00, 'item_count' => 5, 'valued_count' => 3, 'assumed_count' => 0, 'currency' => 'USD']);
 
         $this->valuationRepository->shouldReceive('getSnapshots')
             ->with('collection')
@@ -120,7 +120,7 @@ class CollectionControllerTest extends MockeryTestCase
         $this->assertEquals('Collection Statistics', $this->renderedData['title']);
         $this->assertEquals(100, $this->renderedData['total_releases']);
         $this->assertEquals(1234.56, $this->renderedData['collection_value']);
-        $this->assertEquals('8 of 10 valued', $this->renderedData['collection_coverage']);
+        $this->assertEquals('8 of 10 valued · 2 assumed grade', $this->renderedData['collection_coverage']);
         $this->assertEquals(99.00, $this->renderedData['wantlist_value']);
         $this->assertEquals('', $this->renderedData['value_chart_points']);
     }

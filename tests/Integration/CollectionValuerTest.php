@@ -42,7 +42,7 @@ final class CollectionValuerTest extends MockeryTestCase
             ->with('GET', 'marketplace/price_suggestions/1')->once()
             ->andReturn(new Response(200, [], json_encode(['Very Good Plus (VG+)' => ['currency' => 'GBP', 'value' => 18.5]])));
 
-        $valuer = new CollectionValuer(new DiscogsPricingClient($http), $this->repo, $this->pdo, 'Near Mint (NM or M-)');
+        $valuer = new CollectionValuer(new DiscogsPricingClient($http), $this->repo, $this->pdo, 'Near Mint (NM or M-)', 'Very Good Plus (VG+)');
         $n = $valuer->valueReleases([1], 'collection', 'me');
 
         $this->assertSame(1, $n);
@@ -62,7 +62,7 @@ final class CollectionValuerTest extends MockeryTestCase
             ->with('GET', 'marketplace/stats/2')->once()
             ->andReturn(new Response(200, [], json_encode(['lowest_price' => ['currency' => 'GBP', 'value' => 9.0], 'num_for_sale' => 3])));
 
-        $valuer = new CollectionValuer(new DiscogsPricingClient($http), $this->repo, $this->pdo, 'Near Mint (NM or M-)');
+        $valuer = new CollectionValuer(new DiscogsPricingClient($http), $this->repo, $this->pdo, 'Near Mint (NM or M-)', 'Very Good Plus (VG+)');
         $valuer->valueReleases([2], 'collection', 'me');
 
         $got = $this->repo->getItemValuation('collection', 2, 11);
@@ -77,7 +77,7 @@ final class CollectionValuerTest extends MockeryTestCase
         $http->shouldReceive('request')
             ->with('GET', 'marketplace/price_suggestions/1')->once()
             ->andReturn(new Response(200, [], json_encode(['Very Good Plus (VG+)' => ['currency' => 'GBP', 'value' => 18.5]])));
-        $valuer = new CollectionValuer(new DiscogsPricingClient($http), $this->repo, $this->pdo, 'Near Mint (NM or M-)');
+        $valuer = new CollectionValuer(new DiscogsPricingClient($http), $this->repo, $this->pdo, 'Near Mint (NM or M-)', 'Very Good Plus (VG+)');
         $valuer->valueReleases([1], 'collection', 'me');
         $valuer->writeSnapshot('collection');
 
@@ -92,7 +92,7 @@ final class CollectionValuerTest extends MockeryTestCase
         $http->shouldReceive('request')
             ->with('GET', 'marketplace/price_suggestions/1')->once()
             ->andThrow(new \RuntimeException('boom'));
-        $valuer = new CollectionValuer(new DiscogsPricingClient($http), $this->repo, $this->pdo, 'Near Mint (NM or M-)');
+        $valuer = new CollectionValuer(new DiscogsPricingClient($http), $this->repo, $this->pdo, 'Near Mint (NM or M-)', 'Very Good Plus (VG+)');
         $valuer->valueReleases([1], 'collection', 'me');
 
         $errors = $valuer->getErrors();
@@ -110,7 +110,7 @@ final class CollectionValuerTest extends MockeryTestCase
             ->with('GET', 'marketplace/stats/2')->once()
             ->andReturn(new Response(200, [], json_encode(['lowest_price' => null, 'num_for_sale' => 0])));
 
-        $valuer = new CollectionValuer(new DiscogsPricingClient($http), $this->repo, $this->pdo, 'Near Mint (NM or M-)');
+        $valuer = new CollectionValuer(new DiscogsPricingClient($http), $this->repo, $this->pdo, 'Near Mint (NM or M-)', 'Very Good Plus (VG+)');
         $valuer->valueReleases([2], 'collection', 'me');
 
         $got = $this->repo->getItemValuation('collection', 2, 11);
@@ -130,7 +130,7 @@ final class CollectionValuerTest extends MockeryTestCase
             ->with('GET', 'marketplace/price_suggestions/1')->once()
             ->andReturn(new Response(200, [], json_encode(['Near Mint (NM or M-)' => ['currency' => 'GBP', 'value' => 25.0]])));
 
-        $valuer = new CollectionValuer(new DiscogsPricingClient($http), $this->repo, $this->pdo, 'Near Mint (NM or M-)');
+        $valuer = new CollectionValuer(new DiscogsPricingClient($http), $this->repo, $this->pdo, 'Near Mint (NM or M-)', 'Very Good Plus (VG+)');
         $n = $valuer->valueReleases([1], 'wantlist', 'me');
 
         $this->assertSame(1, $n);
@@ -138,5 +138,27 @@ final class CollectionValuerTest extends MockeryTestCase
         $this->assertSame(25.0, (float)$got['value']);
         $this->assertSame('suggestion', $got['source']);
         $this->assertSame('Near Mint (NM or M-)', $got['condition_used']);
+    }
+
+    public function testUnknownConditionValuedAtAssumedGrade(): void
+    {
+        // Release 2 (instance 11) has no recorded condition. The assumed grade (VG+) has a
+        // suggestion, so it is used and labelled 'assumed_suggestion' — no lowest-listed call.
+        $http = Mockery::mock(ClientInterface::class);
+        $http->shouldReceive('request')
+            ->with('GET', 'marketplace/price_suggestions/2')->once()
+            ->andReturn(new Response(200, [], json_encode([
+                'Mint (M)' => ['currency' => 'GBP', 'value' => 30.0],
+                'Very Good Plus (VG+)' => ['currency' => 'GBP', 'value' => 12.0],
+            ])));
+        // stats/2 must NOT be called — assumed suggestion resolves first.
+
+        $valuer = new CollectionValuer(new DiscogsPricingClient($http), $this->repo, $this->pdo, 'Near Mint (NM or M-)', 'Very Good Plus (VG+)');
+        $valuer->valueReleases([2], 'collection', 'me');
+
+        $got = $this->repo->getItemValuation('collection', 2, 11);
+        $this->assertSame(12.0, (float)$got['value']);
+        $this->assertSame('assumed_suggestion', $got['source']);
+        $this->assertSame('Very Good Plus (VG+)', $got['condition_used']);
     }
 }

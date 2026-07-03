@@ -51,10 +51,16 @@ final class SqliteValuationRepositoryTest extends TestCase
         $unvalued['value'] = null; $unvalued['source'] = 'unvalued';
         $this->repo->upsertItemValuation($unvalued);
 
+        $assumed = $this->baseRow();
+        $assumed['release_id'] = 3; $assumed['instance_id'] = 12;
+        $assumed['value'] = 10.0; $assumed['source'] = 'assumed_suggestion';
+        $this->repo->upsertItemValuation($assumed);
+
         $totals = $this->repo->getScopeTotals('collection');
-        $this->assertSame(18.5, $totals['total']);
-        $this->assertSame(2, $totals['item_count']);
-        $this->assertSame(1, $totals['valued_count']);
+        $this->assertSame(28.5, $totals['total']);
+        $this->assertSame(3, $totals['item_count']);
+        $this->assertSame(2, $totals['valued_count']);
+        $this->assertSame(1, $totals['assumed_count']);
     }
 
     public function testSnapshotAppendAndRead(): void
