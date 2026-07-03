@@ -250,7 +250,7 @@
                     {% endif %}
                     <div class="track">
                       <span class="pos">{{ t.position }}</span>
-                      <span class="tt">{{ t.title }}</span>
+                      <span class="tt">{{ t.title|discogs_markup }}</span>
                       {% if t.duration %}<span class="dur">{{ t.duration }}</span>{% endif %}
                     </div>
                   {% endfor %}
@@ -280,7 +280,7 @@
                     {% if details.notes %}
                         <div class="sec">
                             <div class="eyebrow">Release notes</div>
-                            <div class="notes">{{ details.notes }}</div>
+                            <div class="notes">{{ details.notes|discogs_markup }}</div>
                         </div>
                     {% endif %}
 
@@ -321,8 +321,8 @@
                                 <div>
                                 {% for a in details.extraartists %}
                                     <div class="credit">
-                                        <span class="cname">{{ a.name|strip_discogs_suffix }}</span>
-                                        <span class="crole">{% if a.role %}{{ a.role }}{% endif %}{% if a.tracks %} <span class="ctracks">· {{ a.tracks }}</span>{% endif %}</span>
+                                        <span class="cname">{{ a.name|strip_discogs_suffix|discogs_markup }}</span>
+                                        <span class="crole">{% if a.role %}{{ a.role|discogs_markup }}{% endif %}{% if a.tracks %} <span class="ctracks">· {{ a.tracks }}</span>{% endif %}</span>
                                     </div>
                                 {% endfor %}
                                 </div>
@@ -335,8 +335,8 @@
                                 <div>
                                 {% for c in details.companies %}
                                     <div class="credit">
-                                        <span class="cname">{{ c.name|strip_discogs_suffix }}</span>
-                                        <span class="crole">{{ c.role ?: c.entity_type_name }}</span>
+                                        <span class="cname">{{ c.name|strip_discogs_suffix|discogs_markup }}</span>
+                                        <span class="crole">{{ (c.role ?: c.entity_type_name)|discogs_markup }}</span>
                                     </div>
                                 {% endfor %}
                                 </div>
@@ -409,7 +409,7 @@
                             {% endif %}
                         </div>
                         {% if details.user_notes %}
-                        <div class="note-text">{{ details.user_notes }}</div>
+                        <div class="note-text">{{ details.user_notes|discogs_markup }}</div>
                         {% elseif details.in_collection %}
                         <div class="note-text">(none)</div>
                         {% endif %}

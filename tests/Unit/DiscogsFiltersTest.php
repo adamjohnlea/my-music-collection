@@ -23,7 +23,80 @@ class DiscogsFiltersTest extends TestCase
         $filters = $this->filters->getFilters();
 
         $this->assertIsArray($filters);
-        $this->assertCount(2, $filters);
+        $this->assertCount(3, $filters);
+    }
+
+    public function testGetFiltersIncludesDiscogsMarkup(): void
+    {
+        $filterNames = array_map(fn($f) => $f->getName(), $this->filters->getFilters());
+        $this->assertContains('discogs_markup', $filterNames);
+    }
+
+    // ==================== discogsMarkup() ====================
+
+    public function testDiscogsMarkupReturnsEmptyForNullOrEmpty(): void
+    {
+        $this->assertSame('', $this->filters->discogsMarkup(null));
+        $this->assertSame('', $this->filters->discogsMarkup(''));
+    }
+
+    public function testDiscogsMarkupLeavesPlainTextEscaped(): void
+    {
+        $this->assertSame(
+            'Larry Mullen Jr plays Yamaha Drums',
+            $this->filters->discogsMarkup('Larry Mullen Jr plays Yamaha Drums')
+        );
+    }
+
+    public function testDiscogsMarkupNamedLabelBecomesPlainName(): void
+    {
+        $this->assertSame(
+            'Crowd funded through Bandcamp',
+            $this->filters->discogsMarkup('Crowd funded through [l=Bandcamp]')
+        );
+    }
+
+    public function testDiscogsMarkupReleaseReferenceBecomesLink(): void
+    {
+        $result = $this->filters->discogsMarkup('See [r=1678402] for the clear rim');
+        $this->assertStringContainsString('href="https://www.discogs.com/release/1678402"', $result);
+        $this->assertStringContainsString('>release</a>', $result);
+    }
+
+    public function testDiscogsMarkupMasterAndBareIdReferences(): void
+    {
+        $result = $this->filters->discogsMarkup('versions of [m=48830] and [r2170344]');
+        $this->assertStringContainsString('https://www.discogs.com/master/48830', $result);
+        $this->assertStringContainsString('https://www.discogs.com/release/2170344', $result);
+    }
+
+    public function testDiscogsMarkupBoldAndItalic(): void
+    {
+        $this->assertSame(
+            '<strong>heavy</strong> and <em>light</em>',
+            $this->filters->discogsMarkup('[b]heavy[/b] and [i]light[/i]')
+        );
+    }
+
+    public function testDiscogsMarkupEscapesHtmlToPreventInjection(): void
+    {
+        $result = $this->filters->discogsMarkup('<script>alert(1)</script>');
+        $this->assertStringNotContainsString('<script>', $result);
+        $this->assertStringContainsString('&lt;script&gt;', $result);
+    }
+
+    public function testDiscogsMarkupRejectsUnsafeUrlScheme(): void
+    {
+        $result = $this->filters->discogsMarkup('[url=javascript:alert(1)]click[/url]');
+        $this->assertStringNotContainsString('href', $result);
+        $this->assertStringContainsString('click', $result);
+    }
+
+    public function testDiscogsMarkupAllowsHttpLink(): void
+    {
+        $result = $this->filters->discogsMarkup('[url=https://example.com]site[/url]');
+        $this->assertStringContainsString('href="https://example.com"', $result);
+        $this->assertStringContainsString('>site</a>', $result);
     }
 
     public function testGetFiltersIncludesStripDiscogsSuffix(): void
