@@ -313,29 +313,29 @@
                         {% endif %}
                     </div>
 
-                    <div id="notesView" style="margin-top:8px">
+                    <div id="notesView" style="margin-top:10px">
                         {% if details.user_rating is not null %}
-                        <div class="muted" style="margin-bottom:6px">Rating: {{ details.user_rating }}/5</div>
+                        <div class="muted" style="margin-bottom:8px">Rating: {{ details.user_rating }}/5</div>
                         {% endif %}
                         {% if details.user_media_condition %}
-                        <div class="muted" style="margin-bottom:6px">Media Condition: {{ details.user_media_condition }}</div>
+                        <div class="muted" style="margin-bottom:8px">Media Condition: {{ details.user_media_condition }}</div>
                         {% endif %}
                         {% if details.user_sleeve_condition %}
-                        <div class="muted" style="margin-bottom:6px">Sleeve Condition: {{ details.user_sleeve_condition }}</div>
+                        <div class="muted" style="margin-bottom:8px">Sleeve Condition: {{ details.user_sleeve_condition }}</div>
+                        {% endif %}
+                        {% if details.user_notes %}
+                        <div style="white-space:pre-wrap; font-size:.95rem; margin-bottom:8px" class="muted">{{ details.user_notes }}</div>
+                        {% elseif details.in_collection %}
+                        <div class="muted" style="margin-bottom:8px">(none)</div>
                         {% endif %}
                         {% if release_valuation %}
-                        <div class="valuation muted" style="margin-bottom:6px">
+                        <div class="valuation muted" style="margin-top:12px;padding-top:12px;border-top:1px solid #2a2b2f">
                           <strong>Value:</strong>
                           {{ release_valuation.currency|currency_symbol }}{{ release_valuation.value|number_format(2) }}
                           {% if release_valuation.condition_used %}· {{ release_valuation.condition_used }}{% endif %}
                           · {{ release_valuation.source == 'suggestion' ? 'suggested' : (release_valuation.source == 'assumed_suggestion' ? 'assumed grade' : 'lowest listed') }}
                           · as of {{ release_valuation.valued_at|date('M j, Y') }}
                         </div>
-                        {% endif %}
-                        {% if details.user_notes %}
-                        <div style="white-space:pre-wrap; font-size:.95rem" class="muted">{{ details.user_notes }}</div>
-                        {% elseif details.in_collection %}
-                        <div class="muted">(none)</div>
                         {% endif %}
                     </div>
                     {# (form remains similar but inside the tab) #}
