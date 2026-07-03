@@ -187,6 +187,31 @@
           </form>
         </div>
       </div>
+      <div class="card">
+        <div class="meta">
+          <h2 style="margin:0 0 6px 0">Value Collection</h2>
+          <p class="help">Fetches current market prices from Discogs for collection and/or wantlist items and stores a valuation snapshot.</p>
+          <form method="post" action="/tools/run">
+            <input type="hidden" name="_token" value="{{ csrf_token }}">
+            <input type="hidden" name="task" value="value">
+            <div class="row">
+              <label>Scope
+                <select name="scope">
+                  <option value="both">Collection + Wantlist</option>
+                  <option value="collection">Collection</option>
+                  <option value="wantlist">Wantlist</option>
+                </select>
+              </label>
+            </div>
+            <label class="row">
+              <span class="help" style="flex:1 1 auto"><input type="checkbox" name="force" value="1"> Re-value all (ignore staleness)</span>
+            </label>
+            <div class="actions">
+              <button type="submit">Value collection</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 {% endblock %}
