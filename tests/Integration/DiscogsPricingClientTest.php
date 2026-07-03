@@ -73,4 +73,38 @@ final class DiscogsPricingClientTest extends MockeryTestCase
         $client = new DiscogsPricingClient($http);
         $this->assertNull($client->lowestListed(123));
     }
+
+    public function testMarketplaceStatsParsesForSaleAndPrice(): void
+    {
+        $body = json_encode(['num_for_sale' => 3, 'lowest_price' => ['currency' => 'GBP', 'value' => 12.0]]);
+        $http = Mockery::mock(ClientInterface::class);
+        $http->shouldReceive('request')->with('GET', 'marketplace/stats/123')->once()
+            ->andReturn(new Response(200, [], $body));
+
+        $out = (new DiscogsPricingClient($http))->marketplaceStats(123);
+        $this->assertSame(3, $out['num_for_sale']);
+        $this->assertSame(12.0, $out['lowest_price']['value']);
+        $this->assertSame('GBP', $out['lowest_price']['currency']);
+    }
+
+    public function testMarketplaceStatsZeroForSaleNullPrice(): void
+    {
+        $body = json_encode(['num_for_sale' => 0, 'lowest_price' => null]);
+        $http = Mockery::mock(ClientInterface::class);
+        $http->shouldReceive('request')->with('GET', 'marketplace/stats/123')->once()
+            ->andReturn(new Response(200, [], $body));
+
+        $out = (new DiscogsPricingClient($http))->marketplaceStats(123);
+        $this->assertSame(0, $out['num_for_sale']);
+        $this->assertNull($out['lowest_price']);
+    }
+
+    public function testMarketplaceStatsNullOnNon200(): void
+    {
+        $http = Mockery::mock(ClientInterface::class);
+        $http->shouldReceive('request')->with('GET', 'marketplace/stats/123')->once()
+            ->andReturn(new Response(404, [], '{"message":"none"}'));
+
+        $this->assertNull((new DiscogsPricingClient($http))->marketplaceStats(123));
+    }
 }
