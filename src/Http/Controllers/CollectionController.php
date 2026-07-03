@@ -3,10 +3,12 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Domain\RelativeTime;
 use App\Domain\Repositories\CollectionRepositoryInterface;
 use App\Domain\Repositories\ReleaseRepositoryInterface;
 use App\Domain\Repositories\ValuationRepositoryInterface;
 use App\Domain\Search\QueryParser;
+use App\Domain\Valuation\CurrencyFormat;
 use App\Domain\Valuation\SnapshotChart;
 use App\Http\DiscogsClientFactory;
 use App\Http\Validation\Validator;
@@ -139,6 +141,23 @@ class CollectionController extends BaseController
                 'year' => $r['year'] ?? null,
                 'image' => $img,
             ];
+        }
+
+        if ($view === 'wantlist' && $items !== []) {
+            $ids = array_map(static fn (array $it): int => $it['id'], $items);
+            $market = $this->collectionRepository->getWantlistMarketplaceStats($ids, $usernameFilter);
+            $now = time();
+            foreach ($items as &$it) {
+                $m = $market[$it['id']] ?? null;
+                $it['num_for_sale'] = $m['num_for_sale'] ?? null;
+                $it['market_price'] = ($m && $m['lowest_price'] !== null)
+                    ? CurrencyFormat::symbol($m['lowest_price_currency']) . number_format($m['lowest_price'], 2)
+                    : null;
+                $it['market_as_of'] = ($m && $m['market_fetched_at'] !== null)
+                    ? RelativeTime::ago($m['market_fetched_at'], $now)
+                    : null;
+            }
+            unset($it);
         }
 
         $this->render('home.html.twig', [
