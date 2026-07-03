@@ -31,4 +31,20 @@ final class InsuranceManifestTest extends TestCase
         $csv = InsuranceManifest::toCsv($rows, $totals);
         $this->assertStringContainsString('"Earth, Wind & Fire"', $csv);
     }
+
+    public function testNullValueRendersAsEmptyField(): void
+    {
+        $rows = [['artist' => 'Pink Floyd', 'title' => 'The Wall', 'condition_used' => 'Excellent (EX)', 'value' => null, 'currency' => 'GBP', 'source' => 'suggestion']];
+        $totals = ['total' => 0.0, 'item_count' => 1, 'valued_count' => 0, 'currency' => 'GBP'];
+        $csv = InsuranceManifest::toCsv($rows, $totals);
+        $this->assertStringContainsString('Pink Floyd,The Wall,Excellent (EX),,GBP,suggestion', $csv);
+    }
+
+    public function testEmbeddedDoubleQuoteIsDoubled(): void
+    {
+        $rows = [['artist' => 'AC/DC "Live"', 'title' => 'Live at Donington', 'condition_used' => 'Very Good Plus (VG+)', 'value' => 12.5, 'currency' => 'GBP', 'source' => 'suggestion']];
+        $totals = ['total' => 12.5, 'item_count' => 1, 'valued_count' => 1, 'currency' => 'GBP'];
+        $csv = InsuranceManifest::toCsv($rows, $totals);
+        $this->assertStringContainsString('"AC/DC ""Live"""', $csv);
+    }
 }
