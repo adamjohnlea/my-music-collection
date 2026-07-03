@@ -59,14 +59,12 @@
         <div class="voc-hero">
           <span class="voc-current">{{ collection_currency|currency_symbol }}{{ value_chart.current.value|number_format(2) }}</span>
           {% if value_chart.state == 'series' %}
-            {% set sign = value_chart.direction == 'down' ? '' : '+' %}
+            {% set prefix = value_chart.direction == 'down' ? '−' : (value_chart.direction == 'up' ? '+' : '') %}
             <span class="voc-chip {{ value_chart.direction }}">
-              {% if value_chart.direction == 'up' %}▲{% elseif value_chart.direction == 'down' %}▼{% endif %}
-              {{ sign }}{{ collection_currency|currency_symbol }}{{ value_chart.deltaAbs|number_format(2) }}{% if value_chart.deltaPct is not null %} · {{ sign }}{{ value_chart.deltaPct|number_format(1) }}%{% endif %}
+              {% if value_chart.direction == 'up' %}<span aria-hidden="true">▲</span>{% elseif value_chart.direction == 'down' %}<span aria-hidden="true">▼</span>{% endif %}
+              {{ prefix }}{{ collection_currency|currency_symbol }}{{ (value_chart.deltaAbs|abs)|number_format(2) }}{% if value_chart.deltaPct is not null %} · {{ prefix }}{{ (value_chart.deltaPct|abs)|number_format(1) }}%{% endif %}
             </span>
             <span class="voc-since">since {{ value_chart.start.date }}</span>
-          {% else %}
-            <span class="voc-chip flat">no change</span>
           {% endif %}
         </div>
 
