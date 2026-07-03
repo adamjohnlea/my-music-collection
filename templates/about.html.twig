@@ -56,6 +56,11 @@
           <li>Smart rate limiting and retries that respect Discogs headers and Retry‑After.</li>
           <li>Full release details (optional) including tracklist, credits, companies, identifiers, videos, and notes.</li>
           <li>Wantlist support: view and manage your Discogs wantlist locally.</li>
+          <li>Collection valuation: estimate what your collection is worth using Discogs marketplace prices, with a per-release value on detail pages, a "Most Valuable" page, and a value-over-time chart on the stats page.</li>
+          <li>Insurance export: generate a dated CSV manifest of your collection's values for insurance records.</li>
+          <li>Community stats: see Discogs community have/want counts and average rating on each release page.</li>
+          <li>Wantlist marketplace availability: view live for-sale counts and lowest prices for your wantlist items.</li>
+          <li>Currency symbols: prices display with their symbol ($, £, €) instead of ISO codes.</li>
           <li>AI-powered recommendations: get personalized artist and release suggestions powered by Anthropic Claude.</li>
           <li>Apple Music integration: listen to releases directly in the app with embedded player (when barcodes available).</li>
           <li>Smart Collections: save any search as a shortcut in your sidebar for quick access.</li>
@@ -64,7 +69,7 @@
           <li>Live Search: find releases on Discogs and add them to your collection or wantlist directly.</li>
           <li>Image gallery with a lightbox viewer; collection grid prefers the original cover image.</li>
           <li>Powerful search (SQLite FTS5): search by artist, title, label, format, genre/style, country, year, identifiers (barcode/catno/matrix), credits/companies, and notes.</li>
-          <li>Useful sorts: Added date, Year, Artist, Title, Rating (with stable tie‑breakers).</li>
+          <li>Useful sorts: Added date, Year, Artist, Title, Rating, and Value (with stable tie‑breakers).</li>
           <li>Static site export: generate a portable, standalone web app of your collection.</li>
           <li>Incremental refresh with a stored cursor so you can safely run it anytime.</li>
         </ul>
@@ -92,7 +97,7 @@
         <h2 style="margin:0 0 8px 0; font-size:1.2rem;">Sorting</h2>
         <ul style="margin:0 0 0 20px; padding:0;">
           <li>Default: Added (newest first).</li>
-          <li>Other options: Year, Artist, Title, Rating. Advanced sorts (Label/Format) are wired server‑side and may appear later.</li>
+          <li>Other options: Year, Artist, Title, Rating, and Value (high → low). Advanced sorts (Label/Format) are wired server‑side and may appear later.</li>
         </ul>
       </div>
     </div>
@@ -138,6 +143,10 @@
           <li><code>php bin/console sync:enrich --limit=100</code> — fetch full release details</li>
           <li><code>php bin/console images:backfill --limit=200</code> — download covers to local cache</li>
           <li><code>php bin/console search:rebuild</code> — rebuild search index</li>
+          <li><code>php bin/console value</code> — value your collection and wantlist using Discogs marketplace prices</li>
+          <li><code>php bin/console value:wants</code> — refresh live marketplace availability for wantlist items</li>
+          <li><code>php bin/console value:export</code> — export a dated CSV insurance manifest of values</li>
+          <li><code>php bin/console value:reset</code> — remove all valuation data (other data untouched)</li>
           <li><code>php bin/console sync:push</code> — push queued rating/note/collection changes to Discogs</li>
           <li><code>php bin/console export:static</code> — generate a portable static site</li>
         </ul>
@@ -147,8 +156,12 @@
     <div class="card" style="margin-top:16px;">
       <div class="meta">
         <h2 style="margin:0 0 8px 0; font-size:1.2rem;">What's new</h2>
-        <p class="muted" style="margin-top:0">Last updated: 2026-01-16</p>
+        <p class="muted" style="margin-top:0">Last updated: 2026-07-03</p>
         <ul style="margin:0 0 0 20px; padding:0;">
+          <li>Collection valuation: Estimate your collection's worth from Discogs marketplace prices. See per-release values on detail pages, a "Most Valuable" page, a value-over-time chart on the stats page, and export a dated insurance CSV via <code>value:export</code>.</li>
+          <li>Community stats: Release pages now show Discogs community have/want counts and the average rating.</li>
+          <li>Wantlist marketplace availability: Wantlist items show live for-sale counts and lowest prices; refresh from <a href="/tools" style="color:var(--accent)">/tools</a> or via <code>value:wants</code>.</li>
+          <li>Currency symbols: Prices now display with their symbol ($, £, €) instead of ISO codes.</li>
           <li>Web Console Interface: Run all console commands from your browser at <a href="/tools" style="color:var(--accent)">/tools</a> with real-time progress indicators and output streaming. Two-column responsive layout for easy access.</li>
           <li>AI-powered recommendations: Get personalized suggestions using Anthropic Claude. On any release page, click "Recommendations" to discover similar artists and releases based on your collection.</li>
           <li>Apple Music integration: Listen to releases directly in the app with an embedded player (requires barcodes and Apple Music Developer Token).</li>
