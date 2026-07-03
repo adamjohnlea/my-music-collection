@@ -23,6 +23,13 @@
       --border-soft: #212226;
       --btn-bg: #1f2937;            /* neutral action button */
       --btn-bg-hover: #232f41;
+      --danger: #ff4444;            /* delete / error */
+      --hover-surface: #1d1f24;     /* raised control hover */
+      --raised-border: #3a3d44;     /* active/raised control border */
+      --btn-ink: #fff;              /* text on neutral button */
+      --wash: rgba(255,255,255,.05);            /* neutral hover/overlay wash */
+      --raised-bg: linear-gradient(135deg,#222631,#1a1d24);  /* active page control */
+      --skeleton-bg: linear-gradient(90deg,#1a1b1f 25%,#22242a 37%,#1a1b1f 63%);
       --header-bg: color-mix(in srgb, var(--bg) 80%, transparent);  /* frosted translucent surface */
       --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
     }
@@ -117,7 +124,7 @@
       color: var(--text);
       text-decoration: none;
     }
-    .dropdown-item:hover { background: rgba(255,255,255,0.05); }
+    .dropdown-item:hover { background: var(--wash); }
 
     /* Mobile Nav / Hamburger */
     .mobile-nav-toggle {

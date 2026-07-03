@@ -11,7 +11,7 @@
     .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px}
     .card{background:var(--card);border-radius:12px;overflow:hidden}
     .cover-wrap{aspect-ratio:1/1;width:100%;overflow:hidden;position:relative}
-    .cover{width:100%;height:100%;object-fit:cover;background:linear-gradient(90deg,#1a1b1f 25%,#22242a 37%,#1a1b1f 63%);background-size:400% 100%;animation:shimmer 1.2s infinite}
+    .cover{width:100%;height:100%;object-fit:cover;background:var(--skeleton-bg);background-size:400% 100%;animation:shimmer 1.2s infinite}
     .cover.ready{animation:none;background:#222}
     @keyframes shimmer{0%{background-position:100% 0}100%{background-position:0 0}}
     .meta{padding:12px}
@@ -55,8 +55,8 @@
     /* Modern pagination */
     .pagination{display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap}
     .page-btn{display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:0 12px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--text);text-decoration:none;font-weight:600}
-    .page-btn:hover{background:#1d1f24;text-decoration:none}
-    .page-btn.is-current{background:linear-gradient(135deg,#222631,#1a1d24);border-color:#3a3d44;box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 20%,transparent) inset;color:#fff}
+    .page-btn:hover{background:var(--hover-surface);text-decoration:none}
+    .page-btn.is-current{background:var(--raised-bg);border-color:var(--raised-border);box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 20%,transparent) inset;color:var(--btn-ink)}
     .page-btn.is-disabled{opacity:.5;pointer-events:none}
     .page-ellipsis{color:var(--muted);padding:0 6px}
 
@@ -69,17 +69,17 @@
     .main-layout.collapsed .sidebar-section h3{display:none}
     .sidebar-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:4px}
     .sidebar-link{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-radius:8px;font-size:.95rem;color:var(--text);text-decoration:none;transition:background .2s;white-space:nowrap}
-    .sidebar-link:hover{background:rgba(255,255,255,.05);text-decoration:none}
+    .sidebar-link:hover{background:var(--wash);text-decoration:none}
     .sidebar-link.active{background:color-mix(in srgb,var(--accent) 10%,transparent);color:var(--accent);box-shadow:inset 2px 0 0 var(--accent)}
     .sidebar-link .delete-btn{opacity:0;background:transparent;border:none;color:var(--muted);cursor:pointer;padding:4px;line-height:1}
     .sidebar-link:hover .delete-btn{opacity:1}
-    .sidebar-link .delete-btn:hover{color:#ff4444}
+    .sidebar-link .delete-btn:hover{color:var(--danger)}
     
     .sidebar-toggle-btn{background:var(--card);border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:6px;cursor:pointer;margin-bottom:16px;display:inline-flex;align-items:center;justify-content:center;transition:all .2s;width:36px;height:36px}
-    .sidebar-toggle-btn:hover{color:var(--accent);border-color:var(--accent);background:rgba(255,255,255,.05)}
+    .sidebar-toggle-btn:hover{color:var(--accent);border-color:var(--accent);background:var(--wash)}
     .sidebar-toggle-btn svg{width:20px;height:20px;fill:currentColor}
 
-    #qb-toggle.active { background: var(--accent); color: #000; border-color: var(--accent); }
+    #qb-toggle.active { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 
     .mobile-chips{display:none;gap:8px;overflow-x:auto;padding-bottom:12px;margin-bottom:16px;scrollbar-width:none}
     .mobile-chips::-webkit-scrollbar{display:none}
@@ -194,8 +194,8 @@
 {% block content %}
   <div class="wrap content-wrap">
     {% if error is defined or app.request.query.get('error') %}
-      <div style="background:rgba(255, 68, 68, 0.1); border-left: 4px solid #ff4444; padding: 12px; margin-bottom: 16px;">
-        <p style="margin:0; color:#ff4444; font-weight:bold;">Error</p>
+      <div style="background:rgba(255, 68, 68, 0.1); border-left: 4px solid var(--danger); padding: 12px; margin-bottom: 16px;">
+        <p style="margin:0; color:var(--danger); font-weight:bold;">Error</p>
         <p style="margin:8px 0 0 0; font-size: 0.9rem;">{{ error|default(app.request.query.get('error')) }}</p>
       </div>
     {% endif %}
@@ -255,8 +255,8 @@
           <div class="card"><div class="meta">
             <h2 style="margin:0 0 8px 0">Connect your Discogs account</h2>
             {% if missing_credentials %}
-              <div style="background:rgba(255, 68, 68, 0.1); border-left: 4px solid #ff4444; padding: 12px; margin-bottom: 16px;">
-                <p style="margin:0; color:#ff4444; font-weight:bold;">Action Required: Discogs credentials missing</p>
+              <div style="background:rgba(255, 68, 68, 0.1); border-left: 4px solid var(--danger); padding: 12px; margin-bottom: 16px;">
+                <p style="margin:0; color:var(--danger); font-weight:bold;">Action Required: Discogs credentials missing</p>
                 <p style="margin:8px 0 0 0; font-size: 0.9rem;">The default placeholders are still in your <code>.env</code> file. You must add your actual Discogs username and personal access token.</p>
                 <p style="margin:8px 0 0 0; font-size: 0.85rem; color: var(--muted);">
                   <strong>How to get your token:</strong><br>
