@@ -5,8 +5,10 @@ namespace App\Infrastructure;
 
 use App\Domain\Repositories\ReleaseRepositoryInterface;
 use App\Domain\Repositories\CollectionRepositoryInterface;
+use App\Domain\Repositories\ValuationRepositoryInterface;
 use App\Infrastructure\Persistence\SqliteReleaseRepository;
 use App\Infrastructure\Persistence\SqliteCollectionRepository;
+use App\Infrastructure\Persistence\SqliteValuationRepository;
 use App\Http\Validation\Validator;
 use App\Http\DiscogsClientFactory;
 use App\Http\DefaultDiscogsClientFactory;
@@ -57,6 +59,9 @@ class ContainerFactory
             },
             CollectionRepositoryInterface::class => function(ContainerInterface $c) {
                 return new SqliteCollectionRepository($c->get(PDO::class));
+            },
+            ValuationRepositoryInterface::class => function(ContainerInterface $c) {
+                return new SqliteValuationRepository($c->get(PDO::class));
             },
             Validator::class => function() {
                 return new Validator();
