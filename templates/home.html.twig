@@ -33,6 +33,15 @@
     .badge .star{color:var(--warn)}
     .val{font:700 .82rem var(--mono);font-variant-numeric:tabular-nums;margin-left:auto;color:var(--text)}
     .side-count{margin-left:auto;font:600 .74rem var(--mono);color:var(--faint)}
+    /* Wantlist marketplace availability */
+    .avail{margin-top:8px;display:flex;flex-direction:column;gap:5px}
+    .avail-top{display:flex;align-items:center;gap:6px}
+    .badge.live{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 30%,transparent)}
+    .badge.none{color:var(--faint)}
+    .badge.unchecked{color:var(--faint);border-style:dashed}
+    .price{margin-left:auto;font:700 .84rem var(--mono);font-variant-numeric:tabular-nums;color:var(--accent)}
+    .price .from{color:var(--faint);font-weight:600;font-size:.72rem}
+    .checked{font:500 .72rem var(--mono);color:var(--faint)}
     nav{display:flex;justify-content:center;gap:12px;margin-top:20px}
     /* Toolbar */
     .toolbar{display:flex;gap:8px;align-items:center;margin:0;flex-wrap:wrap;flex:1}
@@ -313,13 +322,20 @@
                   {% endif %}
 
                   {% if view == 'wantlist' %}
-                    {% if it.market_as_of is null or it.market_as_of == '' %}
-                      <div class="market" style="color:var(--muted);font-size:.8rem;margin-top:4px">Not checked yet</div>
-                    {% elseif it.num_for_sale and it.num_for_sale > 0 %}
-                      <div class="market" style="font-size:.8rem;margin-top:4px">{{ it.num_for_sale }} for sale from {{ it.market_price }} · <span style="color:var(--muted)">as of {{ it.market_as_of }}</span></div>
-                    {% else %}
-                      <div class="market" style="color:var(--muted);font-size:.8rem;margin-top:4px">None for sale · as of {{ it.market_as_of }}</div>
-                    {% endif %}
+                    <div class="avail">
+                      {% if it.market_as_of is null or it.market_as_of == '' %}
+                        <div class="avail-top"><span class="badge unchecked"><span class="pip"></span>Not checked yet</span></div>
+                      {% elseif it.num_for_sale and it.num_for_sale > 0 %}
+                        <div class="avail-top">
+                          <span class="badge live"><span class="pip"></span>{{ it.num_for_sale }} for sale</span>
+                          {% if it.market_price %}<span class="price"><span class="from">from</span> {{ it.market_price }}</span>{% endif %}
+                        </div>
+                        <span class="checked">checked {{ it.market_as_of }}</span>
+                      {% else %}
+                        <div class="avail-top"><span class="badge none"><span class="pip"></span>None for sale</span></div>
+                        <span class="checked">checked {{ it.market_as_of }}</span>
+                      {% endif %}
+                    </div>
                   {% endif %}
 
                   {% if it.is_discogs_result %}
