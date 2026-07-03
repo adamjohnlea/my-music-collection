@@ -43,7 +43,7 @@ final class CollectionValuer
                     $this->repo->upsertItemValuation([
                         'scope' => $scope,
                         'release_id' => $releaseId,
-                        'instance_id' => (int)($item['instance_id'] ?? 0),
+                        'instance_id' => $item['instance_id'],
                         'condition_used' => $conditionUsed,
                         'value' => $value,
                         'currency' => $currency,
