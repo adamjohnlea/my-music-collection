@@ -170,13 +170,13 @@
         re-theme live. Pick a preset or dial in your own — nothing is saved until you hit Save.</p>
     </div>
 
-    {% if saved is defined %}
+    {% if saved %}
       <p class="notice ok"><span class="pip"></span>Theme saved.</p>
     {% endif %}
-    {% if error is defined %}
+    {% if error %}
       <p class="notice err"><span class="pip"></span>{% if error == 'csrf' %}Session expired — please try again.{% else %}That colour wasn't valid, so nothing was changed.{% endif %}</p>
     {% endif %}
-    {% if reset is defined %}
+    {% if reset %}
       <p class="notice ok"><span class="pip"></span>Reset to defaults.</p>
     {% endif %}
 

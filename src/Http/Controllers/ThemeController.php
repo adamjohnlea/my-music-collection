@@ -20,11 +20,15 @@ class ThemeController extends BaseController
 
     public function index(): void
     {
+        $error = $_GET['error'] ?? null;
         $this->render('theme.html.twig', [
             'title' => 'Theme - Appearance',
             'groups' => ThemeRegistry::groups(),
             'presets' => ThemeRegistry::presets(),
             'current' => $this->themes->current(),
+            'saved' => isset($_GET['saved']),
+            'reset' => isset($_GET['reset']),
+            'error' => in_array($error, ['csrf', 'invalid'], true) ? $error : null,
         ]);
     }
 

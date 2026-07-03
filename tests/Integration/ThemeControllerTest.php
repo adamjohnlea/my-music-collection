@@ -36,6 +36,7 @@ class ThemeControllerTest extends TestCase
         };
         $_SESSION['csrf'] = 'tok';
         $_POST = [];
+        $_GET = [];
     }
 
     public function testIndexRendersEditor(): void
@@ -45,6 +46,34 @@ class ThemeControllerTest extends TestCase
         $this->assertArrayHasKey('groups', $this->rendered);
         $this->assertArrayHasKey('presets', $this->rendered);
         $this->assertArrayHasKey('current', $this->rendered);
+    }
+
+    public function testIndexSurfacesSavedFlag(): void
+    {
+        $_GET = ['saved' => '1'];
+        $this->controller->index();
+        $this->assertTrue($this->rendered['saved']);
+    }
+
+    public function testIndexSurfacesResetFlag(): void
+    {
+        $_GET = ['reset' => '1'];
+        $this->controller->index();
+        $this->assertTrue($this->rendered['reset']);
+    }
+
+    public function testIndexSurfacesAllowListedErrorCode(): void
+    {
+        $_GET = ['error' => 'invalid'];
+        $this->controller->index();
+        $this->assertSame('invalid', $this->rendered['error']);
+    }
+
+    public function testIndexRejectsNonAllowListedErrorCode(): void
+    {
+        $_GET = ['error' => 'javascript:alert(1)'];
+        $this->controller->index();
+        $this->assertNull($this->rendered['error']);
     }
 
     public function testSavePersistsValidOverrides(): void
