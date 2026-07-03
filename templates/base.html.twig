@@ -1,37 +1,23 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="{{ theme.mode|default('dark') }}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{% block title %}{{ title|default('My Music Collection') }}{% endblock %}</title>
   <style>
     :root {
-      --bg: #0b0b0c;
-      --card: #16171a;
-      --card-2: #191b1f;
-      --input-bg: #101114;          /* form field / inset track background */
-      --text: #e7e7ea;
-      --muted: #a0a3aa;
-      --faint: #6c6f77;
-      --accent: #67e8f9;
-      --accent-hover: #8af1ff;      /* lighter accent for hover states */
-      --accent-ink: #04222a;        /* dark text on accent-filled surfaces */
-      --up: #34d399;
-      --down: #f87171;
-      --warn: #e0a458;              /* estimated / needs attention */
-      --border: #2a2b2f;
-      --border-soft: #212226;
-      --btn-bg: #1f2937;            /* neutral action button */
-      --btn-bg-hover: #232f41;
-      --danger: #ff4444;            /* delete / error */
-      --hover-surface: #1d1f24;     /* raised control hover */
-      --raised-border: #3a3d44;     /* active/raised control border */
-      --btn-ink: #fff;              /* text on neutral button */
-      --wash: rgba(255,255,255,.05);            /* neutral hover/overlay wash */
-      --raised-bg: linear-gradient(135deg,#222631,#1a1d24);  /* active page control */
+      {% for key, val in theme.dark %}{{ key }}: {{ val }};
+      {% endfor %}
+      /* derived — follow the editable tokens above */
+      --accent-hover: color-mix(in srgb, var(--accent) 74%, #fff);
+      --accent-ink: color-mix(in srgb, var(--accent) 22%, #000);
+      --header-bg: color-mix(in srgb, var(--bg) 80%, transparent);
+      --wash: rgba(255,255,255,.05);
+      --raised-bg: linear-gradient(135deg,#222631,#1a1d24);
       --skeleton-bg: linear-gradient(90deg,#1a1b1f 25%,#22242a 37%,#1a1b1f 63%);
-      --header-bg: color-mix(in srgb, var(--bg) 80%, transparent);  /* frosted translucent surface */
       --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      {% if theme.mode == 'dark' %}{% for key, val in theme.overrides %}{{ key }}: {{ val }};
+      {% endfor %}{% endif %}
     }
     html, body {
       margin: 0;
@@ -205,6 +191,7 @@
           <a href="{{ static_export ? (base_url is same as('') ? (depth > 0 ? '../' : './') ~ 'stats.html' : base_url ~ '/stats.html') : '/stats' }}" class="muted">Stats</a>
           <a href="{{ static_export ? (base_url is same as('') ? (depth > 0 ? '../' : './') ~ 'about.html' : base_url ~ '/about.html') : '/about' }}" class="muted">About</a>
           {% if not static_export %}<a href="/tools" class="muted">Tools</a>{% endif %}
+          {% if not static_export %}<a href="/theme" class="muted">Theme</a>{% endif %}
         </div>
 
         <button class="mobile-nav-toggle" id="mobile-toggle" aria-label="Toggle menu">☰</button>
@@ -219,6 +206,7 @@
     <a href="{{ static_export ? (base_url is same as('') ? (depth > 0 ? '../' : './') ~ 'stats.html' : base_url ~ '/stats.html') : '/stats' }}" class="nav-item">Stats</a>
     <a href="{{ static_export ? (base_url is same as('') ? (depth > 0 ? '../' : './') ~ 'about.html' : base_url ~ '/about.html') : '/about' }}" class="nav-item">About</a>
     {% if not static_export %}<a href="/tools" class="nav-item">Tools</a>{% endif %}
+    {% if not static_export %}<a href="/theme" class="nav-item">Theme</a>{% endif %}
   </div>
 
   <div class="wrap">
