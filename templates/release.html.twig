@@ -143,6 +143,15 @@
           <h1>{{ release.title }}</h1>
           <p class="muted" style="font-size:1.2rem">{{ release.artist|strip_discogs_suffix }}{% if release.year %} • {{ release.year }}{% endif %}</p>
           {% if release.country %}<p class="muted">{{ release.country }}</p>{% endif %}
+          {% if community %}
+            <div class="community" style="color:var(--muted);font-size:.9rem;margin-top:6px">
+              Have {{ community.have|number_format }} ·
+              Want {{ community.want|number_format }}
+              {% if community.rating_count > 0 %}
+                · ★ {{ community.rating_average }} ({{ community.rating_count|number_format }} votes)
+              {% endif %}
+            </div>
+          {% endif %}
 
           <div style="margin:16px 0; display:flex; gap:8px; flex-wrap:wrap">
             {% for g in details.genres %}<span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">{{ g }}</span>{% endfor %}
