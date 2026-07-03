@@ -90,6 +90,13 @@ class ThemeServiceTest extends TestCase
         $this->assertSame(['--accent' => '#f472b6'], $view['overrides']);
     }
 
+    public function testForViewIncludesLightBaseline(): void
+    {
+        $view = $this->service->forView();
+        $this->assertArrayHasKey('light', $view);
+        $this->assertMatchesRegularExpression('/^#[0-9a-fA-F]{3,8}$/', $view['light']['--bg']);
+    }
+
     public function testValidColourFormats(): void
     {
         $this->assertTrue(ThemeService::isValidColor('#fff'));

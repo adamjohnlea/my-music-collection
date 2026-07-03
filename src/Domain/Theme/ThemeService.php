@@ -69,13 +69,14 @@ final class ThemeService
         $this->kv->set(self::KEY, (string)json_encode(['mode' => $mode, 'overrides' => []]));
     }
 
-    /** @return array{mode:string, dark:array<string,string>, overrides:array<string,string>} */
+    /** @return array{mode:string, dark:array<string,string>, light:array<string,string>, overrides:array<string,string>} */
     public function forView(): array
     {
         $current = $this->current();
         return [
             'mode' => $current['mode'],
             'dark' => ThemeRegistry::darkDefaults(),
+            'light' => ThemeRegistry::lightDefaults(),
             'overrides' => $current['overrides'],
         ];
     }
