@@ -68,6 +68,7 @@ final class CollectionValuerTest extends MockeryTestCase
         $got = $this->repo->getItemValuation('collection', 2, 11);
         $this->assertSame(9.0, (float)$got['value']);
         $this->assertSame('lowest_listed', $got['source']);
+        $this->assertNull($got['condition_used']);
     }
 
     public function testWriteSnapshotRecordsTotals(): void
@@ -97,5 +98,45 @@ final class CollectionValuerTest extends MockeryTestCase
         $errors = $valuer->getErrors();
         $this->assertSame(1, $errors[0]['release_id']);
         $this->assertStringContainsString('boom', $errors[0]['message']);
+    }
+
+    public function testFallsBackToUnvaluedWhenNoSuggestionAndNoLowestListed(): void
+    {
+        $http = Mockery::mock(ClientInterface::class);
+        $http->shouldReceive('request')
+            ->with('GET', 'marketplace/price_suggestions/2')->once()
+            ->andReturn(new Response(200, [], json_encode(['Mint (M)' => ['currency' => 'GBP', 'value' => 30.0]])));
+        $http->shouldReceive('request')
+            ->with('GET', 'marketplace/stats/2')->once()
+            ->andReturn(new Response(200, [], json_encode(['lowest_price' => null, 'num_for_sale' => 0])));
+
+        $valuer = new CollectionValuer(new DiscogsPricingClient($http), $this->repo, $this->pdo, 'Near Mint (NM or M-)');
+        $valuer->valueReleases([2], 'collection', 'me');
+
+        $got = $this->repo->getItemValuation('collection', 2, 11);
+        $this->assertNull($got['value']);
+        $this->assertSame('unvalued', $got['source']);
+        $this->assertNull($got['condition_used']);
+    }
+
+    public function testValuesWantlistItemAtConfiguredGrade(): void
+    {
+        // Insert a wantlist item for release 1
+        $st = $this->pdo->prepare("INSERT INTO wantlist_items (username, release_id) VALUES (:u, :r)");
+        $st->execute([':u' => 'me', ':r' => 1]);
+
+        $http = Mockery::mock(ClientInterface::class);
+        $http->shouldReceive('request')
+            ->with('GET', 'marketplace/price_suggestions/1')->once()
+            ->andReturn(new Response(200, [], json_encode(['Near Mint (NM or M-)' => ['currency' => 'GBP', 'value' => 25.0]])));
+
+        $valuer = new CollectionValuer(new DiscogsPricingClient($http), $this->repo, $this->pdo, 'Near Mint (NM or M-)');
+        $n = $valuer->valueReleases([1], 'wantlist', 'me');
+
+        $this->assertSame(1, $n);
+        $got = $this->repo->getItemValuation('wantlist', 1, 0);
+        $this->assertSame(25.0, (float)$got['value']);
+        $this->assertSame('suggestion', $got['source']);
+        $this->assertSame('Near Mint (NM or M-)', $got['condition_used']);
     }
 }
