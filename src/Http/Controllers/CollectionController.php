@@ -83,7 +83,7 @@ class CollectionController extends BaseController
             'imported_asc' => 'COALESCE(r.imported_at, r.updated_at) ASC, r.id ASC',
             'label_asc'    => "json_extract(r.labels, '$[0].name') COLLATE NOCASE ASC, r.artist COLLATE NOCASE ASC, r.title COLLATE NOCASE ASC",
             'format_asc'   => "json_extract(r.formats, '$[0].name') COLLATE NOCASE ASC, r.artist COLLATE NOCASE ASC, r.title COLLATE NOCASE ASC",
-            'value'        => '(iv.value IS NULL), iv.value DESC',
+            'value'        => '(MAX(iv.value) IS NULL), MAX(iv.value) DESC',
         ];
 
         if ($match !== '') {

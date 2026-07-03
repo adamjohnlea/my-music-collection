@@ -47,4 +47,17 @@ final class InsuranceManifestTest extends TestCase
         $csv = InsuranceManifest::toCsv($rows, $totals);
         $this->assertStringContainsString('"AC/DC ""Live"""', $csv);
     }
+
+    public function testFormulaInjectionArtistIsPrefixedWithSingleQuote(): void
+    {
+        $rows = [['artist' => '=1+2', 'title' => 'Exploit', 'condition_used' => 'Mint (M)', 'value' => 9.99, 'currency' => 'GBP', 'source' => 'suggestion']];
+        $totals = ['total' => 9.99, 'item_count' => 1, 'valued_count' => 1, 'currency' => 'GBP'];
+        $csv = InsuranceManifest::toCsv($rows, $totals);
+        // Artist field must be prefixed with a single quote to neutralize the formula.
+        $this->assertStringContainsString("'=1+2", $csv);
+        // Numeric value column must not be altered.
+        $this->assertStringContainsString('9.99', $csv);
+        // Header row must not be altered.
+        $this->assertStringContainsString('Artist,Title,Condition,Value,Currency,Source', $csv);
+    }
 }

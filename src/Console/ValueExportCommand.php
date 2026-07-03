@@ -39,7 +39,11 @@ final class ValueExportCommand extends Command
         if ($out === '') {
             $out = $baseDir . '/var/valuation-' . gmdate('Ymd') . '.csv';
         }
-        file_put_contents($out, $csv);
+        $written = file_put_contents($out, $csv);
+        if ($written === false) {
+            $output->writeln('<error>Failed to write manifest to ' . $out . '</error>');
+            return Command::FAILURE;
+        }
         $output->writeln('<info>Wrote manifest to ' . $out . '</info>');
         return Command::SUCCESS;
     }

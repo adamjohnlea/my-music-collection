@@ -16,7 +16,7 @@ final class InsuranceManifest
         $lines = [];
         $lines[] = self::csvLine(['Artist', 'Title', 'Condition', 'Value', 'Currency', 'Source']);
         foreach ($rows as $r) {
-            $lines[] = self::csvLine([
+            $lines[] = self::csvDataLine([
                 (string)($r['artist'] ?? ''),
                 (string)($r['title'] ?? ''),
                 (string)($r['condition_used'] ?? ''),
@@ -31,6 +31,21 @@ final class InsuranceManifest
         return implode("\n", $lines) . "\n";
     }
 
+    /**
+     * Neutralize a field value against spreadsheet formula injection.
+     *
+     * A field whose first character is one of `= + - @ \t \r` is interpreted as
+     * a formula by Excel and Google Sheets. Prefix such values with a single quote
+     * so they are treated as plain text.
+     */
+    private static function neutralizeFormula(string $f): string
+    {
+        if ($f !== '' && strpos('=+-@' . "\t\r", $f[0]) !== false) {
+            return "'" . $f;
+        }
+        return $f;
+    }
+
     /** @param array<int, string> $fields */
     private static function csvLine(array $fields): string
     {
@@ -40,5 +55,24 @@ final class InsuranceManifest
             }
             return $f;
         }, $fields));
+    }
+
+    /**
+     * Apply formula-injection neutralization to data fields only (not the header row
+     * and not the numeric value column), then delegate to csvLine().
+     *
+     * Field layout: [artist, title, condition, value, currency, source]
+     * Index 3 (value) is numeric and must not be prefixed.
+     *
+     * @param array<int, string> $fields
+     */
+    private static function csvDataLine(array $fields): string
+    {
+        foreach ($fields as $i => $f) {
+            if ($i !== 3) { // skip the numeric value column
+                $fields[$i] = self::neutralizeFormula($f);
+            }
+        }
+        return self::csvLine($fields);
     }
 }

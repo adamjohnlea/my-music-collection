@@ -12,7 +12,7 @@ class SqliteReleaseRepository implements ReleaseRepositoryInterface
      * The exact ORDER BY expression for the value sort.
      * Must stay in sync with CollectionController::$sorts['value'].
      */
-    private const VALUE_ORDER_BY = '(iv.value IS NULL), iv.value DESC';
+    private const VALUE_ORDER_BY = '(MAX(iv.value) IS NULL), MAX(iv.value) DESC';
 
     public function __construct(private readonly PDO $pdo) {}
 
