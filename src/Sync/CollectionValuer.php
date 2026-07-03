@@ -18,6 +18,7 @@ final class CollectionValuer
         private readonly ValuationRepositoryInterface $repo,
         private readonly PDO $pdo,
         private readonly string $wantlistGrade,
+        private readonly string $assumedGrade,
     ) {}
 
     /**
@@ -38,7 +39,14 @@ final class CollectionValuer
                         ? ConditionGrades::normalize($this->wantlistGrade)
                         : ConditionGrades::mediaConditionFromNotes($item['notes'] ?? null);
 
-                    [$value, $currency, $conditionUsed, $source] = $this->resolveValue($releaseId, $grade, $suggestions);
+                    // Collection items with no recorded condition get valued at an assumed
+                    // reference grade (labelled separately). Wantlist items already price at
+                    // their reference grade, so no assumption is layered on top.
+                    $assumedGrade = ($scope !== 'wantlist' && $grade === null)
+                        ? ConditionGrades::normalize($this->assumedGrade)
+                        : null;
+
+                    [$value, $currency, $conditionUsed, $source] = $this->resolveValue($releaseId, $grade, $assumedGrade, $suggestions);
 
                     $this->repo->upsertItemValuation([
                         'scope' => $scope,
@@ -87,15 +95,22 @@ final class CollectionValuer
     }
 
     /**
-     * Applies the fallback chain: suggestion → lowest_listed → unvalued.
+     * Applies the fallback chain:
+     * suggestion → assumed-grade suggestion → lowest_listed → unvalued.
+     *
+     * The assumed-grade step only fires when the owned grade is unknown ($grade === null)
+     * and an $assumedGrade is supplied; it never overrides a known owned grade.
      *
      * @param array<string, array{value: float, currency: string}> $suggestions
      * @return array{0: float|null, 1: string|null, 2: string|null, 3: string}
      */
-    private function resolveValue(int $releaseId, ?string $grade, array $suggestions): array
+    private function resolveValue(int $releaseId, ?string $grade, ?string $assumedGrade, array $suggestions): array
     {
         if ($grade !== null && isset($suggestions[$grade])) {
             return [$suggestions[$grade]['value'], $suggestions[$grade]['currency'], $grade, 'suggestion'];
+        }
+        if ($grade === null && $assumedGrade !== null && isset($suggestions[$assumedGrade])) {
+            return [$suggestions[$assumedGrade]['value'], $suggestions[$assumedGrade]['currency'], $assumedGrade, 'assumed_suggestion'];
         }
         $lowest = $this->pricing->lowestListed($releaseId);
         if ($lowest !== null) {

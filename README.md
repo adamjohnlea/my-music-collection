@@ -236,17 +236,19 @@ The `/tools` page has two new buttons:
 | :--- | :--- | :--- |
 | `VALUATION_STALE_DAYS` | `7` | Re-value a release if its stored price is older than this many days |
 | `VALUATION_WANTLIST_GRADE` | `Near Mint (NM or M-)` | Condition assumed when pricing wantlist items |
+| `VALUATION_ASSUMED_GRADE` | `Very Good Plus (VG+)` | Grade assumed for collection items that have **no recorded condition**, so they can still be valued from price suggestions |
 
 ### Pricing source and coverage
 
 Condition-matched prices come from the Discogs `price_suggestions` endpoint, which requires **Discogs Seller Settings** to be enabled on your account. Without them, the endpoint returns an error and the valuer falls back to the lowest active listing price instead.
 
 Every stored value carries a source label:
-- `suggestion` — condition-matched price from `price_suggestions`
+- `suggestion` — condition-matched price from `price_suggestions` (your recorded grade)
+- `assumed_suggestion` — a price suggestion at the `VALUATION_ASSUMED_GRADE`, used when a collection item has no recorded condition; shown as "assumed grade" in the UI
 - `lowest_listed` — cheapest active listing regardless of condition
 - `unvalued` — no marketplace data found for this release
 
-Totals always show coverage (e.g. "42 of 50 valued") so you always know how complete the estimate is, never a false total.
+Totals always show coverage (e.g. "42 of 50 valued · 5 assumed grade") so you always know how complete the estimate is and how much rests on an assumed grade, never a false total.
 
 ## Commands overview
 All commands below can be run from the **command line** or from the **Web Console Interface** at `/tools`:

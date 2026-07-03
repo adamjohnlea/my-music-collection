@@ -8,7 +8,7 @@
         <li>
           <a href="/release/{{ row.release_id }}">{{ row.artist|strip_discogs_suffix }} — {{ row.title }}</a>
           <span class="value">{{ row.currency|currency_symbol }}{{ row.value|number_format(2) }}</span>
-          <span class="muted">{{ row.condition_used }} · {{ row.source == 'suggestion' ? 'suggested' : 'lowest listed' }}</span>
+          <span class="muted">{{ row.condition_used }} · {{ row.source == 'suggestion' ? 'suggested' : (row.source == 'assumed_suggestion' ? 'assumed grade' : 'lowest listed') }}</span>
         </li>
       {% else %}
         <li class="muted">No valuations yet. Run "Value collection" from Tools.</li>

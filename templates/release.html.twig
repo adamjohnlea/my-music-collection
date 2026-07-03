@@ -319,7 +319,7 @@
                           <strong>Value:</strong>
                           {{ release_valuation.currency|currency_symbol }}{{ release_valuation.value|number_format(2) }}
                           {% if release_valuation.condition_used %}· {{ release_valuation.condition_used }}{% endif %}
-                          · {{ release_valuation.source == 'suggestion' ? 'suggested' : 'lowest listed' }}
+                          · {{ release_valuation.source == 'suggestion' ? 'suggested' : (release_valuation.source == 'assumed_suggestion' ? 'assumed grade' : 'lowest listed') }}
                           · as of {{ release_valuation.valued_at|date('M j, Y') }}
                         </div>
                         {% endif %}

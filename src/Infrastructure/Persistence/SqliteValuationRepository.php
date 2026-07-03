@@ -81,6 +81,7 @@ final class SqliteValuationRepository implements ValuationRepositoryInterface
                COALESCE(SUM(CASE WHEN value IS NOT NULL THEN value ELSE 0 END), 0) AS total,
                COUNT(*) AS item_count,
                SUM(CASE WHEN value IS NOT NULL THEN 1 ELSE 0 END) AS valued_count,
+               SUM(CASE WHEN source = \'assumed_suggestion\' THEN 1 ELSE 0 END) AS assumed_count,
                (SELECT currency FROM item_valuations WHERE scope = :s2 AND currency IS NOT NULL LIMIT 1) AS currency
              FROM item_valuations WHERE scope = :s'
         );
@@ -90,6 +91,7 @@ final class SqliteValuationRepository implements ValuationRepositoryInterface
             'total' => (float)($row['total'] ?? 0),
             'item_count' => (int)($row['item_count'] ?? 0),
             'valued_count' => (int)($row['valued_count'] ?? 0),
+            'assumed_count' => (int)($row['assumed_count'] ?? 0),
             'currency' => $row['currency'] ?? null,
         ];
     }

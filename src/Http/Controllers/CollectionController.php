@@ -173,7 +173,8 @@ class CollectionController extends BaseController
             'title'               => 'Collection Statistics',
             'collection_value'    => $collectionTotals['total'],
             'collection_currency' => $collectionTotals['currency'] ?? '',
-            'collection_coverage' => $collectionTotals['valued_count'] . ' of ' . $collectionTotals['item_count'] . ' valued',
+            'collection_coverage' => $collectionTotals['valued_count'] . ' of ' . $collectionTotals['item_count'] . ' valued'
+                . ($collectionTotals['assumed_count'] > 0 ? ' · ' . $collectionTotals['assumed_count'] . ' assumed grade' : ''),
             'wantlist_value'      => $wantlistTotals['total'],
             'value_chart_points'  => SnapshotChart::polylinePoints($snapshots, 600, 160),
         ], $stats));

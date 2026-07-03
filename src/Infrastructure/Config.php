@@ -100,4 +100,9 @@ final class Config
     {
         return $this->env('VALUATION_WANTLIST_GRADE', 'Near Mint (NM or M-)') ?? 'Near Mint (NM or M-)';
     }
+
+    public function getValuationAssumedGrade(): string
+    {
+        return $this->env('VALUATION_ASSUMED_GRADE', 'Very Good Plus (VG+)') ?? 'Very Good Plus (VG+)';
+    }
 }

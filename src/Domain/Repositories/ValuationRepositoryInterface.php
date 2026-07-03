@@ -17,7 +17,7 @@ interface ValuationRepositoryInterface
     /** @return array<string, mixed>|null */
     public function bestValuationForRelease(int $releaseId): ?array;
 
-    /** @return array{total: float, item_count: int, valued_count: int, currency: ?string} */
+    /** @return array{total: float, item_count: int, valued_count: int, assumed_count: int, currency: ?string} */
     public function getScopeTotals(string $scope): array;
 
     /** @return array<int, array<string, mixed>> */
