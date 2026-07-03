@@ -188,6 +188,10 @@ class ReleaseController extends BaseController
         $releaseValuation = $this->valuationRepository->bestValuationForRelease($rid);
         $community = $release ? CommunityStats::fromReleaseRaw($release['raw_json'] ?? null) : null;
 
+        // Short condition grades for badges (e.g. "Near Mint (NM or M-)" -> "NM").
+        $details['user_media_grade'] = self::shortGrade($details['user_media_condition'] ?? null);
+        $details['user_sleeve_grade'] = self::shortGrade($details['user_sleeve_condition'] ?? null);
+
         $this->render('release.html.twig', [
             'title' => $release ? ($release['title'] . ' — ' . ($release['artist'] ?? '')) : 'Not found',
             'release' => $release,
@@ -200,6 +204,22 @@ class ReleaseController extends BaseController
             'release_valuation' => $releaseValuation,
             'community' => $community,
         ]);
+    }
+
+    /**
+     * Reduce a Discogs condition string to its short grade for a badge,
+     * e.g. "Near Mint (NM or M-)" -> "NM", "Very Good Plus (VG+)" -> "VG+".
+     * Non-graded sleeve values ("Generic", "No Cover") pass through unchanged.
+     */
+    private static function shortGrade(?string $condition): ?string
+    {
+        if ($condition === null || $condition === '') {
+            return null;
+        }
+        if (preg_match('/\(([^)]+)\)/', $condition, $m)) {
+            return trim(explode(' or ', $m[1])[0]);
+        }
+        return $condition;
     }
 
     /** @param array<string, mixed>|null $currentUser */
