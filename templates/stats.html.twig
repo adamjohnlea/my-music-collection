@@ -14,6 +14,15 @@
     .stat-bar{background:var(--accent);height:100%;border-radius:4px}
     .stat-count{flex:0 0 40px;text-align:right;font-size:.9rem;color:var(--muted)}
     .big-num{font-size:3rem;font-weight:700;color:var(--accent);margin-bottom:4px}
+    .voc-hero{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+    .voc-current{font-size:2rem;font-weight:700;color:var(--accent)}
+    .voc-chip{font-size:.95rem;font-weight:600;padding:2px 8px;border-radius:999px}
+    .voc-chip.up{color:var(--up);background:color-mix(in srgb, var(--up) 15%, transparent)}
+    .voc-chip.down{color:var(--down);background:color-mix(in srgb, var(--down) 15%, transparent)}
+    .voc-chip.flat{color:var(--muted);background:color-mix(in srgb, var(--muted) 15%, transparent)}
+    .voc-since{color:var(--muted);font-size:.9rem}
+    .voc-axis{display:flex;justify-content:space-between;color:var(--muted);font-size:.8rem;margin-top:6px}
+    .voc-empty{color:var(--muted)}
   </style>
 {% endblock %}
 
@@ -43,12 +52,45 @@
         <div class="muted">{{ collection_coverage }}</div>
       </div>
 
-      {% if value_chart_points %}
+      {% if value_chart is defined and value_chart.state != 'empty' %}
       <div class="card">
         <h2>Value over time</h2>
-        <svg viewBox="0 0 600 160" width="100%" height="160" preserveAspectRatio="none" role="img" aria-label="Collection value over time">
-          <polyline fill="none" stroke="var(--accent)" stroke-width="2" points="{{ value_chart_points }}"></polyline>
-        </svg>
+
+        <div class="voc-hero">
+          <span class="voc-current">{{ collection_currency|currency_symbol }}{{ value_chart.current.value|number_format(2) }}</span>
+          {% if value_chart.state == 'series' %}
+            {% set prefix = value_chart.direction == 'down' ? '−' : (value_chart.direction == 'up' ? '+' : '') %}
+            <span class="voc-chip {{ value_chart.direction }}">
+              {% if value_chart.direction == 'up' %}<span aria-hidden="true">▲</span>{% elseif value_chart.direction == 'down' %}<span aria-hidden="true">▼</span>{% endif %}
+              {{ prefix }}{{ collection_currency|currency_symbol }}{{ (value_chart.deltaAbs|abs)|number_format(2) }}{% if value_chart.deltaPct is not null %} · {{ prefix }}{{ (value_chart.deltaPct|abs)|number_format(1) }}%{% endif %}
+            </span>
+            <span class="voc-since">since {{ value_chart.start.date }}</span>
+          {% endif %}
+        </div>
+
+        {% if value_chart.state == 'series' %}
+          <svg viewBox="0 0 600 160" width="100%" height="160" role="img"
+               aria-label="Collection value from {{ collection_currency|currency_symbol }}{{ value_chart.start.value|number_format(2) }} on {{ value_chart.start.date }} to {{ collection_currency|currency_symbol }}{{ value_chart.current.value|number_format(2) }} on {{ value_chart.current.date }}">
+            <defs>
+              <linearGradient id="vocFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.35"/>
+                <stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <polygon fill="url(#vocFill)" points="{{ value_chart.areaPoints }}"></polygon>
+            <polyline fill="none" stroke="var(--accent)" stroke-width="2"
+                      stroke-linejoin="round" stroke-linecap="round" points="{{ value_chart.linePoints }}"></polyline>
+            {% for dot in value_chart.dots %}
+              <circle cx="{{ dot.x }}" cy="{{ dot.y }}" r="3" fill="var(--accent)"></circle>
+            {% endfor %}
+          </svg>
+          <div class="voc-axis">
+            <span>{{ value_chart.axis.startDate }}</span>
+            <span>{{ value_chart.axis.currentDate }}</span>
+          </div>
+        {% else %}
+          <p class="voc-empty">Tracking started {{ value_chart.start.date }} — your first change will appear after the next valuation.</p>
+        {% endif %}
       </div>
       {% endif %}
 

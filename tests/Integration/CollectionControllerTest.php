@@ -122,7 +122,7 @@ class CollectionControllerTest extends MockeryTestCase
         $this->assertEquals(1234.56, $this->renderedData['collection_value']);
         $this->assertEquals('8 of 10 valued · 2 assumed grade', $this->renderedData['collection_coverage']);
         $this->assertEquals(99.00, $this->renderedData['wantlist_value']);
-        $this->assertEquals('', $this->renderedData['value_chart_points']);
+        $this->assertEquals('empty', $this->renderedData['value_chart']['state']);
     }
 
     // ==================== random(): Tests ====================
