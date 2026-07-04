@@ -2,7 +2,8 @@
 //
 // Prerequisites:
 //   1. App running:   php -S 127.0.0.1:8000 -t public
-//   2. One-time:       npx playwright install chromium
+//   2. One-time:       npm install playwright --no-save
+//                       npx playwright install chromium
 // Run:                 node bin/capture-help-screenshots.mjs
 //
 // Edit CLEAN_SEARCH / RELEASE_ID to point at tidy content in your local DB.
@@ -15,7 +16,7 @@ const BASE_URL = process.env.HELP_BASE_URL ?? 'http://127.0.0.1:8000';
 
 // Curated views so shots look intentional, not like a full library dump.
 const CLEAN_SEARCH = 'artist:devo';
-const RELEASE_ID = 137459; // Devo - "Live: The Mongoloid Years"
+const RELEASE_ID = 5609869; // Devo - "Live At Max's Kansas City - November 15, 1977" (owned)
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_DIR = join(__dirname, '..', 'public', 'help', 'img');
