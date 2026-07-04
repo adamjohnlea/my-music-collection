@@ -181,7 +181,7 @@
         <h2 style="margin:0 0 8px 0; font-size:1.2rem;">Notes and ratings</h2>
         <ul style="margin:0 0 0 20px; padding:0;">
           <li>Ratings: editable here and synced to Discogs via <code>sync:push</code>. Use <code>sync:refresh</code> to pull updates.</li>
-          <li>Personal notes: stored locally and searchable here; they do not sync to Discogs.</li>
+          <li>Personal notes: stored locally and searchable here. They stay local unless notes-pushing is explicitly enabled (<code>PUSH_NOTES=1</code>), in which case <code>sync:push</code> sends them to Discogs.</li>
         </ul>
       </div>
     </div>
