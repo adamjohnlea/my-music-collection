@@ -14,8 +14,8 @@ import { mkdirSync } from 'node:fs';
 const BASE_URL = process.env.HELP_BASE_URL ?? 'http://127.0.0.1:8000';
 
 // Curated views so shots look intentional, not like a full library dump.
-const CLEAN_SEARCH = 'artist:"miles davis"';
-const RELEASE_ID = 0; // set to a real release id present in your local DB
+const CLEAN_SEARCH = 'artist:devo';
+const RELEASE_ID = 137459; // Devo - "Live: The Mongoloid Years"
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_DIR = join(__dirname, '..', 'public', 'help', 'img');
