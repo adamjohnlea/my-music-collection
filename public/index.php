@@ -10,6 +10,7 @@ use App\Http\Controllers\AppleMusicController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ToolsController;
 use App\Http\Controllers\ThemeController;
+use App\Http\Controllers\HelpController;
 use App\Domain\Theme\ThemeService;
 use Dotenv\Dotenv;
 use Twig\Environment;
@@ -87,6 +88,7 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     $r->addRoute('GET', '/theme', [ThemeController::class, 'index']);
     $r->addRoute('POST', '/theme/save', [ThemeController::class, 'save']);
     $r->addRoute('POST', '/theme/reset', [ThemeController::class, 'reset']);
+    $r->addRoute('GET', '/help', [HelpController::class, 'index']);
     $r->addRoute('GET', '/valuable', [CollectionController::class, 'valuable']);
     $r->addRoute('GET', '/', [CollectionController::class, 'index']);
 });
