@@ -1,0 +1,78 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block styles %}
+  <style>
+    .help-layout { display: grid; grid-template-columns: 220px 1fr; gap: 32px; align-items: start; }
+    .help-toc { position: sticky; top: 88px; }
+    .help-toc ul { list-style: none; margin: 0; padding: 0; }
+    .help-toc li { margin: 0 0 8px 0; }
+    .help-toc a { color: var(--muted); text-decoration: none; font-size: 0.95rem; }
+    .help-toc a:hover { color: var(--accent); }
+    .help-section { background: var(--card); border-radius: 12px; padding: 24px; margin-bottom: 20px; scroll-margin-top: 88px; }
+    .help-section h2 { margin: 0 0 8px 0; font-size: 1.4rem; color: var(--accent); }
+    .help-section .lede { color: var(--muted); margin: 0 0 16px 0; }
+    .help-section ol, .help-section ul { margin: 0 0 0 20px; padding: 0; }
+    .help-section li { margin-bottom: 8px; }
+    .help-shot { display: block; max-width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--border, var(--card)); margin: 16px 0; }
+    .help-tip { border-left: 3px solid var(--accent); background: var(--input-bg, var(--card)); padding: 12px 16px; border-radius: 6px; margin: 16px 0 0 0; }
+    .help-tip strong { color: var(--accent); }
+    @media (max-width: 768px) {
+      .help-layout { grid-template-columns: 1fr; }
+      .help-toc { position: static; top: auto; margin-bottom: 16px; }
+    }
+  </style>
+{% endblock %}
+
+{% block breadcrumbs %}
+  <nav class="breadcrumbs">
+    <div>
+      <a href="{{ static_export ? (base_url is same as('') ? (depth > 0 ? '../' : './') ~ 'index.html' : base_url) : '/' }}">Home</a>
+      <span>/</span>
+      Help
+    </div>
+  </nav>
+{% endblock %}
+
+{% block content %}
+  <div class="wrap content-wrap">
+    <div class="help-layout">
+      <aside class="help-toc">
+        <ul>
+          <li><a href="#getting-started">Getting Started</a></li>
+          <li><a href="#browsing">Browsing your Collection</a></li>
+          <li><a href="#searching">Searching</a></li>
+          <li><a href="#smart-collections">Smart Collections</a></li>
+          <li><a href="#release-detail">Release detail</a></li>
+          <li><a href="#recommendations">AI Recommendations</a></li>
+          <li><a href="#apple-music">Apple Music</a></li>
+          <li><a href="#discogs-search">Live Discogs Search</a></li>
+          <li><a href="#stats">Statistics</a></li>
+          <li><a href="#surprise-me">Surprise Me</a></li>
+          <li><a href="#valuation">Valuation</a></li>
+          <li><a href="#tools">Tools</a></li>
+          <li><a href="#theme">Theme</a></li>
+          <li><a href="#static-export">Static Site Export</a></li>
+        </ul>
+      </aside>
+
+      <div class="help-content">
+        <section id="getting-started" class="help-section"><h2>Getting Started</h2><p class="lede">First-run setup.</p></section>
+        <section id="browsing" class="help-section"><h2>Browsing your Collection</h2><p class="lede">The collection grid.</p></section>
+        <section id="searching" class="help-section"><h2>Searching</h2><p class="lede">Find anything, fast.</p></section>
+        <section id="smart-collections" class="help-section"><h2>Smart Collections</h2><p class="lede">Save searches to the sidebar.</p></section>
+        <section id="release-detail" class="help-section"><h2>Release detail</h2><p class="lede">Everything about one release.</p></section>
+        <section id="recommendations" class="help-section"><h2>AI Recommendations</h2><p class="lede">Personalized suggestions.</p></section>
+        <section id="apple-music" class="help-section"><h2>Apple Music</h2><p class="lede">Listen in the app.</p></section>
+        <section id="discogs-search" class="help-section"><h2>Live Discogs Search</h2><p class="lede">Add releases from the web.</p></section>
+        <section id="stats" class="help-section"><h2>Statistics</h2><p class="lede">Your collection, visualized.</p></section>
+        <section id="surprise-me" class="help-section"><h2>Surprise Me</h2><p class="lede">Pick something at random.</p></section>
+        <section id="valuation" class="help-section"><h2>Valuation</h2><p class="lede">What your collection is worth.</p></section>
+        <section id="tools" class="help-section"><h2>Tools</h2><p class="lede">Sync, refresh, and maintenance.</p></section>
+        <section id="theme" class="help-section"><h2>Theme</h2><p class="lede">Make it yours.</p></section>
+        <section id="static-export" class="help-section"><h2>Static Site Export</h2><p class="lede">A portable copy of your collection.</p></section>
+      </div>
+    </div>
+  </div>
+{% endblock %}
