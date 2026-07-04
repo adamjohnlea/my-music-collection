@@ -66,7 +66,7 @@ class HelpTemplateRenderTest extends TestCase
         $html = $this->twig->render('help.html.twig', ['title' => 'Help', 'static_export' => false]);
 
         foreach (['collection', 'release', 'stats', 'valuable', 'tools', 'theme'] as $shot) {
-            $this->assertStringContainsString('help/img/' . $shot . '.png', $html, "Missing screenshot: $shot");
+            $this->assertStringContainsString('help-assets/' . $shot . '.png', $html, "Missing screenshot: $shot");
         }
     }
 

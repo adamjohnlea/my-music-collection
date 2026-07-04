@@ -19,7 +19,7 @@ const CLEAN_SEARCH = 'artist:devo';
 const RELEASE_ID = 5609869; // Devo - "Live At Max's Kansas City - November 15, 1977" (owned)
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const OUT_DIR = join(__dirname, '..', 'public', 'help', 'img');
+const OUT_DIR = join(__dirname, '..', 'public', 'help-assets');
 mkdirSync(OUT_DIR, { recursive: true });
 
 const shots = [
