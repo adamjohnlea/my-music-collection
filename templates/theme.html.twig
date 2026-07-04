@@ -200,7 +200,6 @@
         {% for p in presets %}
           <button type="button" class="sw preset-btn"
             data-tokens='{{ p.tokens|json_encode|e('html_attr') }}'
-            data-mode="{{ p.mode }}"
             style="background:{{ p.tokens['--accent']|default('#67e8f9') }}"
             title="{{ p.name }}" aria-label="Preset: {{ p.name }}" aria-pressed="false">
           </button>
@@ -437,21 +436,15 @@
         try { tokens = JSON.parse(btn.getAttribute('data-tokens') || '{}'); }
         catch (e) { return; }
 
-        // A preset carries its own mode; adopt it (data-theme + hidden field +
-        // toggle) but skip the re-seed here — we apply preset values below,
-        // which supersede the baseline for every token.
-        var presetMode = btn.getAttribute('data-mode') || currentMode;
-        setMode(presetMode, { reseed: false });
-
+        // Presets are mode-agnostic: apply their tokens on top of the CURRENT
+        // mode's baseline without touching the mode. Tokens the preset omits
+        // fall back to that token's baseline for the current mode.
         hexInputs.forEach(function (hex) {
           var tokenEl = hex.closest('.token');
           var key = tokenEl.getAttribute('data-key');
-          // A preset supplies either the full token set or just --accent;
-          // tokens it omits fall back to that token's baseline for the
-          // preset's mode.
           var value = Object.prototype.hasOwnProperty.call(tokens, key)
             ? tokens[key]
-            : baselineFor(hex, presetMode);
+            : baselineFor(hex, currentMode);
           applyToken(tokenEl, value, true, true);
         });
 

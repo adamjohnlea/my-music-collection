@@ -88,15 +88,21 @@ final class ThemeRegistry
         return $out;
     }
 
-    /** @return list<array{name:string,mode:string,tokens:array<string,string>}> */
+    /**
+     * Accent presets. These are mode-agnostic: each supplies only `--accent`
+     * so it can be applied on top of either the dark or light palette without
+     * changing the current mode. The Dark/Light toggle is the sole mode control.
+     *
+     * @return list<array{name:string,tokens:array<string,string>}>
+     */
     public static function presets(): array
     {
         return [
-            ['name' => 'Console', 'mode' => 'dark', 'tokens' => self::darkDefaults()],
-            ['name' => 'Magenta', 'mode' => 'dark', 'tokens' => ['--accent' => '#f472b6']],
-            ['name' => 'Amber',   'mode' => 'dark', 'tokens' => ['--accent' => '#fbbf24']],
-            ['name' => 'Emerald', 'mode' => 'dark', 'tokens' => ['--accent' => '#34d399']],
-            ['name' => 'Daylight', 'mode' => 'light', 'tokens' => self::lightDefaults()],
+            ['name' => 'Console',  'tokens' => ['--accent' => '#67e8f9']],
+            ['name' => 'Magenta',  'tokens' => ['--accent' => '#f472b6']],
+            ['name' => 'Amber',    'tokens' => ['--accent' => '#fbbf24']],
+            ['name' => 'Emerald',  'tokens' => ['--accent' => '#34d399']],
+            ['name' => 'Daylight', 'tokens' => ['--accent' => '#0891b2']],
         ];
     }
 }

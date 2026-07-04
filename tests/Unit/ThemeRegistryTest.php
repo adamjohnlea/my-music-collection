@@ -37,10 +37,23 @@ class ThemeRegistryTest extends TestCase
     {
         $keys = ThemeRegistry::editableKeys();
         foreach (ThemeRegistry::presets() as $preset) {
-            $this->assertContains($preset['mode'], ['dark', 'light']);
             foreach (array_keys($preset['tokens']) as $tokenKey) {
                 $this->assertContains($tokenKey, $keys, "preset {$preset['name']} has unknown token $tokenKey");
             }
+        }
+    }
+
+    public function testPresetsAreAccentOnlyAndModeAgnostic(): void
+    {
+        foreach (ThemeRegistry::presets() as $preset) {
+            // Presets no longer pin a mode — the Dark/Light toggle is the sole
+            // mode control, so any preset applies to either mode.
+            $this->assertArrayNotHasKey('mode', $preset, "preset {$preset['name']} must not pin a mode");
+            $this->assertSame(
+                ['--accent'],
+                array_keys($preset['tokens']),
+                "preset {$preset['name']} should only set --accent"
+            );
         }
     }
 
