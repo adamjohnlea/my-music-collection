@@ -60,4 +60,27 @@ class HelpTemplateRenderTest extends TestCase
             $this->assertStringContainsString('href="#' . $id . '"', $html, "TOC missing link: $id");
         }
     }
+
+    public function testReferencesCapturedScreenshots(): void
+    {
+        $html = $this->twig->render('help.html.twig', ['title' => 'Help', 'static_export' => false]);
+
+        foreach (['collection', 'release', 'stats', 'valuable', 'tools', 'theme'] as $shot) {
+            $this->assertStringContainsString('help/img/' . $shot . '.png', $html, "Missing screenshot: $shot");
+        }
+    }
+
+    public function testDocumentsKeyGotchas(): void
+    {
+        $html = $this->twig->render('help.html.twig', ['title' => 'Help', 'static_export' => false]);
+
+        // Image cache daily cap.
+        $this->assertStringContainsString('1000', $html);
+        // Valuation requires Discogs Seller Settings.
+        $this->assertStringContainsString('Seller Settings', $html);
+        // Apple Music requires barcodes + a developer token.
+        $this->assertStringContainsString('barcode', $html);
+        // Numbered directions are present.
+        $this->assertStringContainsString('<ol', $html);
+    }
 }
