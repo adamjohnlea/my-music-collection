@@ -250,6 +250,18 @@ Every stored value carries a source label:
 
 Totals always show coverage (e.g. "42 of 50 valued · 5 assumed grade") so you always know how complete the estimate is and how much rests on an assumed grade, never a false total.
 
+## Wantlist price-drop alerts
+
+Monitor prices on items you're hunting for. Set a `🔔 Target` price on any wantlist item (visible in the wantlist grid at `/?view=wantlist`), then run **Refresh Wantlist Availability** from the `/tools` console (or `bin/console value:wants`) to fetch the latest marketplace prices.
+
+The system records price history and triggers alerts when:
+- The current price hits your target, or
+- The price drops by ≥10% or ≥£5 below the previous lowest recorded price.
+
+View triggered alerts at `/alerts` — the navigation bell shows an unread count. Dismiss alerts there to mark them read. Each wantlist card displays a small price-history sparkline showing recent price trends.
+
+Alerts are in-app only; no email notifications. Your target prices persist in your local database.
+
 ## Commands overview
 All commands below can be run from the **command line** or from the **Web Console Interface** at `/tools`:
 

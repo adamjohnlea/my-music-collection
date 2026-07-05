@@ -384,7 +384,13 @@ class CollectionControllerTest extends MockeryTestCase
                 'lowest_price' => 12.0,
                 'lowest_price_currency' => 'GBP',
                 'market_fetched_at' => gmdate('c'),
+                'target_price' => null,
             ]]);
+
+        $this->collectionRepository->shouldReceive('getWantlistPriceHistories')
+            ->once()
+            ->with([111], 'testuser')
+            ->andReturn([]);
 
         $controller = $this->createController();
 
@@ -396,6 +402,9 @@ class CollectionControllerTest extends MockeryTestCase
         $this->assertSame(3, $item['num_for_sale']);
         $this->assertSame('£12.00', $item['market_price']);
         $this->assertSame('just now', $item['market_as_of']);
+        $this->assertNull($item['target_price']);
+        $this->assertFalse($item['target_hit']);
+        $this->assertNull($item['spark']);
     }
 
     public function testIndexHandlesSortOptions(): void

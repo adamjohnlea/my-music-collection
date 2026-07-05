@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Console;
 
+use App\Domain\Wantlist\WantlistAlertEvaluator;
 use App\Http\DiscogsHttpClient;
 use App\Infrastructure\Config;
 use App\Infrastructure\DiscogsPricingClient;
@@ -37,11 +38,11 @@ final class ValueWantsCommand extends Command
 
         $kv = new KvStore($pdo);
         $http = (new DiscogsHttpClient($config->getUserAgent('MyDiscogsApp/0.1 (+value:wants)'), $token, $kv))->client();
-        $refresher = new WantlistMarketplaceRefresher(new DiscogsPricingClient($http), new SqliteCollectionRepository($pdo));
+        $refresher = new WantlistMarketplaceRefresher(new DiscogsPricingClient($http), new SqliteCollectionRepository($pdo), new WantlistAlertEvaluator());
 
         $output->writeln('<info>Refreshing wantlist marketplace availability…</info>');
         $r = $refresher->refresh($username);
-        $output->writeln(sprintf('Refreshed %d of %d wantlist items (%d failed).', $r['updated'], $r['total'], $r['failed']));
+        $output->writeln(sprintf('Refreshed %d of %d wantlist items (%d failed). %d alert(s) raised.', $r['updated'], $r['total'], $r['failed'], $r['alerts']));
 
         return $r['failed'] > 0 && $r['updated'] === 0 ? 1 : 0;
     }

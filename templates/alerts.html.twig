@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block styles %}
+<style>
+  .alert-list { list-style:none; padding:0; margin:16px 0; display:flex; flex-direction:column; gap:8px; }
+  .alert-row { display:flex; align-items:center; gap:12px; padding:10px 12px; border:1px solid var(--border); border-radius:10px; background: var(--card); }
+  .alert-row.unread { border-color: var(--accent); }
+  .alert-thumb { width:48px; height:48px; object-fit:cover; border-radius:6px; }
+  .alert-body { flex:1; min-width:0; }
+  .alert-title { font-weight:600; }
+  .alert-meta { display:flex; align-items:center; gap:8px; margin-top:4px; font-size:.85rem; flex-wrap:wrap; }
+  .badge{font:600 .66rem/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;display:inline-flex;align-items:center;gap:5px;padding:5px 7px;border-radius:999px;border:1px solid var(--border-soft);color:var(--muted);white-space:nowrap}
+  .badge.good{color:var(--up)}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wrap content-wrap">
+  <h1>Price Alerts</h1>
+  {% if alerts is empty %}
+    <p class="muted">No price alerts yet. Set a target on a wantlist item, then run <a href="/tools">Refresh Wantlist Availability</a>.</p>
+  {% else %}
+    <ul class="alert-list">
+      {% for a in alerts %}
+        <li class="alert-row {{ a.is_unread ? 'unread' : '' }}">
+          {% if a.thumb_url or a.cover_url %}
+            <img class="alert-thumb" src="{{ a.thumb_url ?: a.cover_url }}" alt="" loading="lazy">
+          {% endif %}
+          <div class="alert-body">
+            <a class="alert-title" href="/release/{{ a.release_id }}">{{ a.artist ? a.artist ~ ' – ' : '' }}{{ a.title ?: ('Release ' ~ a.release_id) }}</a>
+            <div class="alert-meta">
+              {% if a.reason == 'target' %}<span class="badge good">🎯 target</span>{% else %}<span class="badge">↓ drop</span>{% endif %}
+              {% if a.old_price_display %}<span class="muted">{{ a.old_price_display }} →</span>{% endif %}
+              <strong>{{ a.new_price_display }}</strong>
+              <span class="muted">· {{ a.when }}</span>
+            </div>
+          </div>
+          <form method="post" action="/alerts/dismiss">
+            <input type="hidden" name="_token" value="{{ csrf_token }}">
+            <input type="hidden" name="id" value="{{ a.id }}">
+            <button class="btn-small" type="submit">Dismiss</button>
+          </form>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</div>
+{% endblock %}

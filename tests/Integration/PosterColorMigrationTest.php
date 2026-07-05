@@ -23,7 +23,7 @@ final class PosterColorMigrationTest extends TestCase
         $this->assertContains('cover_color', $cols);
 
         $version = $pdo->query("SELECT v FROM kv_store WHERE k='schema_version'")->fetchColumn();
-        $this->assertSame('18', (string)$version);
+        $this->assertSame('19', (string)$version);
     }
 
     public function testV18IsIdempotentOnRerun(): void
@@ -37,6 +37,6 @@ final class PosterColorMigrationTest extends TestCase
             ->execute([':k' => 'schema_version', ':v' => '17']);
         (new MigrationRunner($pdo))->run();
 
-        $this->assertSame('18', (string)$pdo->query("SELECT v FROM kv_store WHERE k='schema_version'")->fetchColumn());
+        $this->assertSame('19', (string)$pdo->query("SELECT v FROM kv_store WHERE k='schema_version'")->fetchColumn());
     }
 }

@@ -175,7 +175,7 @@ class SqliteCollectionRepository implements CollectionRepositoryInterface
 
     /**
      * @param int[] $releaseIds
-     * @return array<int, array{num_for_sale:?int, lowest_price:?float, lowest_price_currency:?string, market_fetched_at:?string}>
+     * @return array<int, array{num_for_sale:?int, lowest_price:?float, lowest_price_currency:?string, market_fetched_at:?string, target_price:?float}>
      */
     public function getWantlistMarketplaceStats(array $releaseIds, string $username): array
     {
@@ -184,7 +184,7 @@ class SqliteCollectionRepository implements CollectionRepositoryInterface
         }
         $ints = array_map('intval', $releaseIds);
         $placeholders = implode(',', array_fill(0, count($ints), '?'));
-        $sql = "SELECT release_id, num_for_sale, lowest_price, lowest_price_currency, market_fetched_at
+        $sql = "SELECT release_id, num_for_sale, lowest_price, lowest_price_currency, market_fetched_at, target_price
                   FROM wantlist_items
                  WHERE username = ? AND release_id IN ($placeholders)";
         $st = $this->pdo->prepare($sql);
@@ -197,8 +197,141 @@ class SqliteCollectionRepository implements CollectionRepositoryInterface
                 'lowest_price' => $row['lowest_price'] === null ? null : (float)$row['lowest_price'],
                 'lowest_price_currency' => $row['lowest_price_currency'] !== null ? (string)$row['lowest_price_currency'] : null,
                 'market_fetched_at' => $row['market_fetched_at'] !== null ? (string)$row['market_fetched_at'] : null,
+                'target_price' => $row['target_price'] === null ? null : (float)$row['target_price'],
             ];
         }
         return $out;
+    }
+
+    public function insertWantlistPriceHistory(int $releaseId, string $username, ?int $numForSale, ?float $lowestPrice, ?string $currency, string $capturedAt): void
+    {
+        $st = $this->pdo->prepare(
+            'INSERT INTO wantlist_price_history (user_id, release_id, num_for_sale, lowest_price, currency, captured_at)
+             VALUES (1, :rid, :n, :p, :c, :at)'
+        );
+        $st->execute([':rid' => $releaseId, ':n' => $numForSale, ':p' => $lowestPrice, ':c' => $currency, ':at' => $capturedAt]);
+    }
+
+    /**
+     * @param int[] $releaseIds
+     * @return array<int, array<int, array{lowest_price: float, captured_at: string}>>
+     */
+    public function getWantlistPriceHistories(array $releaseIds, string $username): array
+    {
+        if ($releaseIds === []) {
+            return [];
+        }
+        $ints = array_map('intval', $releaseIds);
+        $placeholders = implode(',', array_fill(0, count($ints), '?'));
+        $sql = "SELECT release_id, lowest_price, captured_at
+                  FROM wantlist_price_history
+                 WHERE user_id = 1 AND lowest_price IS NOT NULL AND release_id IN ($placeholders)
+                 ORDER BY release_id, captured_at ASC";
+        $st = $this->pdo->prepare($sql);
+        $st->execute($ints);
+        $out = [];
+        foreach ($st->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $out[(int)$row['release_id']][] = [
+                'lowest_price' => (float)$row['lowest_price'],
+                'captured_at' => (string)$row['captured_at'],
+            ];
+        }
+        return $out;
+    }
+
+    public function getStoredWantlistLowest(int $releaseId, string $username): ?float
+    {
+        $st = $this->pdo->prepare('SELECT lowest_price FROM wantlist_items WHERE release_id = :rid AND username = :u LIMIT 1');
+        $st->execute([':rid' => $releaseId, ':u' => $username]);
+        $v = $st->fetchColumn();
+        return $v === false || $v === null ? null : (float)$v;
+    }
+
+    public function getWantlistTarget(int $releaseId, string $username): ?float
+    {
+        $st = $this->pdo->prepare('SELECT target_price FROM wantlist_items WHERE release_id = :rid AND username = :u LIMIT 1');
+        $st->execute([':rid' => $releaseId, ':u' => $username]);
+        $v = $st->fetchColumn();
+        return $v === false || $v === null ? null : (float)$v;
+    }
+
+    public function setWantlistTarget(int $releaseId, string $username, ?float $target): void
+    {
+        $st = $this->pdo->prepare('UPDATE wantlist_items SET target_price = :t WHERE release_id = :rid AND username = :u');
+        $st->execute([':t' => $target, ':rid' => $releaseId, ':u' => $username]);
+    }
+
+    public function latestActiveAlertPrice(int $releaseId, string $username): ?float
+    {
+        $st = $this->pdo->prepare(
+            'SELECT new_price FROM wantlist_alerts
+              WHERE user_id = 1 AND release_id = :rid AND dismissed_at IS NULL
+              ORDER BY created_at DESC, id DESC LIMIT 1'
+        );
+        $st->execute([':rid' => $releaseId]);
+        $v = $st->fetchColumn();
+        return $v === false || $v === null ? null : (float)$v;
+    }
+
+    public function insertWantlistAlert(int $releaseId, string $username, string $reason, ?float $oldPrice, float $newPrice, ?string $currency, string $createdAt): void
+    {
+        $st = $this->pdo->prepare(
+            'INSERT INTO wantlist_alerts (user_id, release_id, reason, old_price, new_price, currency, created_at)
+             VALUES (1, :rid, :reason, :old, :new, :c, :at)'
+        );
+        $st->execute([
+            ':rid' => $releaseId, ':reason' => $reason, ':old' => $oldPrice,
+            ':new' => $newPrice, ':c' => $currency, ':at' => $createdAt,
+        ]);
+    }
+
+    /** @return array<int, array{id:int, release_id:int, reason:string, old_price:?float, new_price:float, currency:?string, created_at:string, read_at:?string, artist:?string, title:?string, cover_url:?string, thumb_url:?string}> */
+    public function listWantlistAlerts(string $username): array
+    {
+        $st = $this->pdo->prepare(
+            'SELECT a.id, a.release_id, a.reason, a.old_price, a.new_price, a.currency, a.created_at, a.read_at,
+                    r.artist, r.title, r.cover_url, r.thumb_url
+               FROM wantlist_alerts a
+               LEFT JOIN releases r ON r.id = a.release_id
+              WHERE a.user_id = 1 AND a.dismissed_at IS NULL
+              ORDER BY a.created_at DESC, a.id DESC'
+        );
+        $st->execute();
+        $out = [];
+        foreach ($st->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $out[] = [
+                'id' => (int)$row['id'],
+                'release_id' => (int)$row['release_id'],
+                'reason' => (string)$row['reason'],
+                'old_price' => $row['old_price'] === null ? null : (float)$row['old_price'],
+                'new_price' => (float)$row['new_price'],
+                'currency' => $row['currency'] !== null ? (string)$row['currency'] : null,
+                'created_at' => (string)$row['created_at'],
+                'read_at' => $row['read_at'] !== null ? (string)$row['read_at'] : null,
+                'artist' => $row['artist'] !== null ? (string)$row['artist'] : null,
+                'title' => $row['title'] !== null ? (string)$row['title'] : null,
+                'cover_url' => $row['cover_url'] !== null ? (string)$row['cover_url'] : null,
+                'thumb_url' => $row['thumb_url'] !== null ? (string)$row['thumb_url'] : null,
+            ];
+        }
+        return $out;
+    }
+
+    public function countUnreadWantlistAlerts(string $username): int
+    {
+        $st = $this->pdo->query('SELECT COUNT(*) FROM wantlist_alerts WHERE user_id = 1 AND read_at IS NULL AND dismissed_at IS NULL');
+        return (int)$st->fetchColumn();
+    }
+
+    public function markWantlistAlertsRead(string $username, string $readAt): void
+    {
+        $st = $this->pdo->prepare('UPDATE wantlist_alerts SET read_at = :at WHERE user_id = 1 AND read_at IS NULL AND dismissed_at IS NULL');
+        $st->execute([':at' => $readAt]);
+    }
+
+    public function dismissWantlistAlert(int $id, string $username, string $dismissedAt): void
+    {
+        $st = $this->pdo->prepare('UPDATE wantlist_alerts SET dismissed_at = :at WHERE id = :id AND user_id = 1');
+        $st->execute([':at' => $dismissedAt, ':id' => $id]);
     }
 }

@@ -37,7 +37,24 @@ interface CollectionRepositoryInterface
 
     /**
      * @param int[] $releaseIds
-     * @return array<int, array{num_for_sale:?int, lowest_price:?float, lowest_price_currency:?string, market_fetched_at:?string}>
+     * @return array<int, array{num_for_sale:?int, lowest_price:?float, lowest_price_currency:?string, market_fetched_at:?string, target_price:?float}>
      */
     public function getWantlistMarketplaceStats(array $releaseIds, string $username): array;
+
+    public function insertWantlistPriceHistory(int $releaseId, string $username, ?int $numForSale, ?float $lowestPrice, ?string $currency, string $capturedAt): void;
+    /**
+     * @param int[] $releaseIds
+     * @return array<int, array<int, array{lowest_price: float, captured_at: string}>> keyed by release_id, each list ASC by captured_at
+     */
+    public function getWantlistPriceHistories(array $releaseIds, string $username): array;
+    public function getStoredWantlistLowest(int $releaseId, string $username): ?float;
+    public function getWantlistTarget(int $releaseId, string $username): ?float;
+    public function setWantlistTarget(int $releaseId, string $username, ?float $target): void;
+    public function latestActiveAlertPrice(int $releaseId, string $username): ?float;
+    public function insertWantlistAlert(int $releaseId, string $username, string $reason, ?float $oldPrice, float $newPrice, ?string $currency, string $createdAt): void;
+    /** @return array<int, array{id:int, release_id:int, reason:string, old_price:?float, new_price:float, currency:?string, created_at:string, read_at:?string, artist:?string, title:?string, cover_url:?string, thumb_url:?string}> newest first, undismissed only */
+    public function listWantlistAlerts(string $username): array;
+    public function countUnreadWantlistAlerts(string $username): int;
+    public function markWantlistAlertsRead(string $username, string $readAt): void;
+    public function dismissWantlistAlert(int $id, string $username, string $dismissedAt): void;
 }
