@@ -11,6 +11,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ToolsController;
 use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\HelpController;
+use App\Http\Controllers\PosterController;
 use App\Domain\Theme\ThemeService;
 use Dotenv\Dotenv;
 use Twig\Environment;
@@ -89,6 +90,7 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     $r->addRoute('POST', '/theme/save', [ThemeController::class, 'save']);
     $r->addRoute('POST', '/theme/reset', [ThemeController::class, 'reset']);
     $r->addRoute('GET', '/help', [HelpController::class, 'index']);
+    $r->addRoute('GET', '/poster/download', [PosterController::class, 'download']);
     $r->addRoute('GET', '/valuable', [CollectionController::class, 'valuable']);
     $r->addRoute('GET', '/', [CollectionController::class, 'index']);
 });
@@ -115,8 +117,30 @@ switch ($routeInfo[0]) {
     case FastRoute\Dispatcher::FOUND:
         $handler = $routeInfo[1];
         $vars = $routeInfo[2];
-        $controller = $container->get($handler[0]);
         $method = $handler[1];
+
+        // PosterController streams a file directly and is not built via the container
+        // (it has no template/validator dependencies); handle it before the generic dispatch.
+        if ($handler[0] === PosterController::class && $method === 'download') {
+            $result = (new PosterController())->download(
+                (string)($_GET['file'] ?? ''),
+                dirname(__DIR__)
+            );
+            if ($result['status'] !== 200 || $result['path'] === null) {
+                http_response_code($result['status']);
+                echo $result['error'] ?? 'Error';
+                break;
+            }
+            $path = $result['path'];
+            $mime = str_ends_with($path, '.png') ? 'image/png' : 'image/jpeg';
+            header('Content-Type: ' . $mime);
+            header('Content-Disposition: attachment; filename="' . basename($path) . '"');
+            header('Content-Length: ' . (string)filesize($path));
+            readfile($path);
+            break;
+        }
+
+        $controller = $container->get($handler[0]);
 
         // Match existing signatures
         if ($handler[0] === ReleaseController::class && $method === 'show') {
