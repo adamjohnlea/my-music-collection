@@ -23,6 +23,8 @@ interface CollectionRepositoryInterface
     public function addToWantlist(int $releaseId, string $username, string $addedAt): void;
     /** @return array{total_count: int, top_artists: array<int, array{artist: string, count: int}>, top_genres: array<int, array{genre: string, count: int}>, decades: array<int, array{decade: int, count: int}>, formats: array<int, array{format_name: string, count: int}>} */
     public function getCollectionStats(string $username): array;
+    /** @return array<string,int|float> */
+    public function getAchievementMetrics(string $username): array;
     public function getRandomReleaseId(string $username): ?int;
     public function beginTransaction(): void;
     public function commit(): void;
@@ -57,4 +59,13 @@ interface CollectionRepositoryInterface
     public function countUnreadWantlistAlerts(string $username): int;
     public function markWantlistAlertsRead(string $username, string $readAt): void;
     public function dismissWantlistAlert(int $id, string $username, string $dismissedAt): void;
+
+    public function insertAchievementUnlock(string $username, string $key, int $tier, string $unlockedAt): void;
+
+    /** @return list<array{achievement_key:string, tier:int, unlocked_at:string, seen_at:?string}> */
+    public function getUnlockedAchievements(string $username): array;
+
+    public function markAchievementsSeen(string $username): void;
+
+    public function countUnseenAchievements(string $username): int;
 }

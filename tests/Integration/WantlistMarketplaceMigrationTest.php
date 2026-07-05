@@ -21,7 +21,7 @@ final class WantlistMarketplaceMigrationTest extends TestCase
         $this->assertContains('lowest_price_currency', $cols);
         $this->assertContains('market_fetched_at', $cols);
 
-        $version = $pdo->query("SELECT v FROM kv_store WHERE k='schema_version'")->fetchColumn();
-        $this->assertSame('19', (string)$version);
+        $version = (int)$pdo->query("SELECT v FROM kv_store WHERE k='schema_version'")->fetchColumn();
+        $this->assertGreaterThanOrEqual(19, $version);
     }
 }

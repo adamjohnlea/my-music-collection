@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block styles %}
+<style>
+  .ach-head { display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:16px; }
+  .ach-progress-count { color: var(--muted); font-size:.9rem; }
+  .ach-strip { border:1px solid var(--accent); border-radius:10px; padding:12px 14px; margin-bottom:20px; }
+  .ach-strip h2 { font-size:1rem; margin:0 0 8px; }
+  .ach-strip-items { display:flex; flex-wrap:wrap; gap:10px; }
+  .ach-chip { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; background: var(--accent); color: var(--accent-ink); font-size:.85rem; }
+  .ach-cat { margin:22px 0 10px; font-size:1.05rem; }
+  .ach-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px; }
+  .ach-card { border:1px solid var(--border); border-radius:12px; padding:14px; background: var(--card); }
+  .ach-card.locked { opacity:.55; }
+  .ach-card .ach-icon { font-size:1.8rem; }
+  .ach-card h3 { margin:6px 0 2px; font-size:1rem; }
+  .ach-card p { margin:0 0 8px; color: var(--muted); font-size:.85rem; }
+  .ach-tier { font-size:.75rem; color: var(--muted); }
+  .ach-new { color: var(--accent); font-weight:600; font-size:.75rem; }
+  .ach-bar { height:6px; border-radius:999px; background: var(--border); overflow:hidden; margin-top:8px; }
+  .ach-bar > span { display:block; height:100%; background: var(--accent); }
+  .ach-count { font-size:.75rem; color: var(--muted); margin-top:4px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="wrap content-wrap">
+  <div class="ach-head">
+    <h1>Achievements</h1>
+    <span class="ach-progress-count">{{ grid.earned_count }} / {{ grid.total_count }} unlocked</span>
+  </div>
+
+  {% if grid.recently_earned is not empty %}
+    <div class="ach-strip">
+      <h2>Recently earned</h2>
+      <div class="ach-strip-items">
+        {% for b in grid.recently_earned %}
+          <span class="ach-chip">{{ b.icon }} {{ b.name }}</span>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  {% for cat in grid.categories %}
+    <h2 class="ach-cat">{{ cat.name }}</h2>
+    <div class="ach-grid">
+      {% for b in cat.badges %}
+        {% set earned = b.achieved_tier > 0 %}
+        {% set cur = b.unit == 'money' ? '$' ~ (b.current|round|number_format) : b.current %}
+        {% set nxt = b.next_threshold is null ? null : (b.unit == 'money' ? '$' ~ (b.next_threshold|number_format) : b.next_threshold) %}
+        <div class="ach-card {{ earned ? 'earned' : 'locked' }}">
+          <div class="ach-icon">{{ b.icon }}</div>
+          <h3>{{ b.name }}</h3>
+          <p>{{ b.description }}</p>
+          {% if earned %}
+            <div class="ach-tier">Tier {{ b.achieved_tier }} of {{ b.max_tier }}</div>
+            {% if b.is_new %}<div class="ach-new">NEW</div>{% endif %}
+          {% endif %}
+          {% if nxt is not null %}
+            <div class="ach-bar"><span style="width: {{ (b.progress * 100)|round }}%"></span></div>
+            <div class="ach-count">{{ cur }} / {{ nxt }}</div>
+          {% else %}
+            <div class="ach-count">Maxed out</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

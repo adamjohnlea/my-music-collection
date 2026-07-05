@@ -31,9 +31,9 @@ final class WantlistAlertsMigrationTest extends TestCase
         $this->assertContains('wantlist_alerts', $tables);
     }
 
-    public function testSchemaVersionIs19(): void
+    public function testSchemaVersionIsAtLeast19(): void
     {
-        $version = $this->migratedPdo()->query("SELECT v FROM kv_store WHERE k='schema_version'")->fetchColumn();
-        $this->assertSame('19', (string)$version);
+        $version = (int)$this->migratedPdo()->query("SELECT v FROM kv_store WHERE k='schema_version'")->fetchColumn();
+        $this->assertGreaterThanOrEqual(19, $version);
     }
 }

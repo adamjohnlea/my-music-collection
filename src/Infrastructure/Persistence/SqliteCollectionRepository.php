@@ -122,6 +122,117 @@ class SqliteCollectionRepository implements CollectionRepositoryInterface
         return $stats;
     }
 
+    /** @return array<string,int|float> */
+    public function getAchievementMetrics(string $username): array
+    {
+        $scalar = function (string $sql, array $params = []): int {
+            $st = $this->pdo->prepare($sql);
+            $st->execute($params);
+            return (int)$st->fetchColumn();
+        };
+        $u = [':u' => $username];
+
+        $m = [];
+        $m['total_count'] = $scalar(
+            'SELECT COUNT(DISTINCT release_id) FROM collection_items WHERE username = :u', $u);
+
+        $st = $this->pdo->prepare(
+            "SELECT COALESCE(SUM(value),0), COALESCE(MAX(value),0)
+               FROM item_valuations WHERE scope = 'collection'");
+        $st->execute();
+        $row = $st->fetch(PDO::FETCH_NUM) ?: [0, 0];
+        $m['total_value'] = (float)$row[0];
+        $m['max_single_value'] = (float)$row[1];
+
+        $m['distinct_decades'] = $scalar(
+            'SELECT COUNT(DISTINCT (r.year/10)*10)
+               FROM collection_items ci JOIN releases r ON r.id = ci.release_id
+              WHERE ci.username = :u AND r.year > 0', $u);
+
+        try {
+            $m['distinct_genres'] = $scalar(
+                'SELECT COUNT(DISTINCT j.value)
+                   FROM collection_items ci JOIN releases r ON r.id = ci.release_id, json_each(r.genres) j
+                  WHERE ci.username = :u', $u);
+        } catch (\Throwable) { $m['distinct_genres'] = 0; }
+
+        $m['distinct_countries'] = $scalar(
+            "SELECT COUNT(DISTINCT r.country)
+               FROM collection_items ci JOIN releases r ON r.id = ci.release_id
+              WHERE ci.username = :u AND r.country IS NOT NULL AND TRIM(r.country) <> ''", $u);
+
+        try {
+            $m['distinct_formats'] = $scalar(
+                'SELECT COUNT(DISTINCT json_extract(j.value, "$.name"))
+                   FROM collection_items ci JOIN releases r ON r.id = ci.release_id, json_each(r.formats) j
+                  WHERE ci.username = :u', $u);
+        } catch (\Throwable) { $m['distinct_formats'] = 0; }
+
+        $m['max_by_artist'] = $scalar(
+            'SELECT COALESCE(MAX(c), 0) FROM (
+                SELECT COUNT(*) c
+                  FROM collection_items ci JOIN releases r ON r.id = ci.release_id
+                 WHERE ci.username = :u AND r.artist IS NOT NULL AND r.artist <> ""
+                 GROUP BY r.artist)', $u);
+
+        try {
+            $m['max_by_label'] = $scalar(
+                'SELECT COALESCE(MAX(c), 0) FROM (
+                    SELECT COUNT(*) c
+                      FROM collection_items ci JOIN releases r ON r.id = ci.release_id, json_each(r.labels) j
+                     WHERE ci.username = :u
+                     GROUP BY json_extract(j.value, "$.name"))', $u);
+        } catch (\Throwable) { $m['max_by_label'] = 0; }
+
+        $m['rated_count'] = $scalar(
+            'SELECT COUNT(*) FROM collection_items WHERE username = :u AND rating IS NOT NULL AND rating > 0', $u);
+        $m['noted_count'] = $scalar(
+            'SELECT COUNT(*) FROM collection_items WHERE username = :u AND notes IS NOT NULL AND TRIM(notes) <> ""', $u);
+
+        return $m;
+    }
+
+    public function insertAchievementUnlock(string $username, string $key, int $tier, string $unlockedAt): void
+    {
+        $st = $this->pdo->prepare(
+            'INSERT OR IGNORE INTO achievements (user_id, achievement_key, tier, unlocked_at)
+             VALUES (1, :k, :t, :at)');
+        $st->execute([':k' => $key, ':t' => $tier, ':at' => $unlockedAt]);
+    }
+
+    /** @return list<array{achievement_key:string, tier:int, unlocked_at:string, seen_at:?string}> */
+    public function getUnlockedAchievements(string $username): array
+    {
+        $st = $this->pdo->query(
+            'SELECT achievement_key, tier, unlocked_at, seen_at
+               FROM achievements WHERE user_id = 1
+              ORDER BY achievement_key, tier');
+        $out = [];
+        foreach ($st->fetchAll(PDO::FETCH_ASSOC) as $r) {
+            $out[] = [
+                'achievement_key' => (string)$r['achievement_key'],
+                'tier' => (int)$r['tier'],
+                'unlocked_at' => (string)$r['unlocked_at'],
+                'seen_at' => $r['seen_at'] !== null ? (string)$r['seen_at'] : null,
+            ];
+        }
+        return $out;
+    }
+
+    public function markAchievementsSeen(string $username): void
+    {
+        $st = $this->pdo->prepare(
+            'UPDATE achievements SET seen_at = :at WHERE user_id = 1 AND seen_at IS NULL');
+        $st->execute([':at' => gmdate('c')]);
+    }
+
+    public function countUnseenAchievements(string $username): int
+    {
+        $st = $this->pdo->query(
+            'SELECT COUNT(*) FROM achievements WHERE user_id = 1 AND seen_at IS NULL');
+        return (int)$st->fetchColumn();
+    }
+
     public function getRandomReleaseId(string $username): ?int
     {
         $st = $this->pdo->prepare('SELECT release_id FROM collection_items WHERE username = :u ORDER BY RANDOM() LIMIT 1');

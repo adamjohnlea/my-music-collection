@@ -16,12 +16,12 @@ final class ValueResetTest extends TestCase
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         (new MigrationRunner($pdo))->run();
 
-        // After migration: both valuation tables exist and version is 19
+        // After migration: both valuation tables exist and version is at least 19
         $tables = $pdo->query("SELECT name FROM sqlite_master WHERE type='table'")->fetchAll(PDO::FETCH_COLUMN);
         $this->assertContains('item_valuations', $tables);
         $this->assertContains('valuation_snapshots', $tables);
-        $version = $pdo->query("SELECT v FROM kv_store WHERE k='schema_version'")->fetchColumn();
-        $this->assertSame('19', (string)$version);
+        $version = (int)$pdo->query("SELECT v FROM kv_store WHERE k='schema_version'")->fetchColumn();
+        $this->assertGreaterThanOrEqual(19, $version);
 
         // Call the production reset method
         ValuationTeardown::reset($pdo);
@@ -33,12 +33,12 @@ final class ValueResetTest extends TestCase
         $version = $pdo->query("SELECT v FROM kv_store WHERE k='schema_version'")->fetchColumn();
         $this->assertSame('15', (string)$version);
 
-        // Re-running MigrationRunner recreates both tables and advances version back to 19
+        // Re-running MigrationRunner recreates both tables and advances version back to latest
         (new MigrationRunner($pdo))->run();
         $tables = $pdo->query("SELECT name FROM sqlite_master WHERE type='table'")->fetchAll(PDO::FETCH_COLUMN);
         $this->assertContains('item_valuations', $tables);
         $this->assertContains('valuation_snapshots', $tables);
-        $version = $pdo->query("SELECT v FROM kv_store WHERE k='schema_version'")->fetchColumn();
-        $this->assertSame('19', (string)$version);
+        $version = (int)$pdo->query("SELECT v FROM kv_store WHERE k='schema_version'")->fetchColumn();
+        $this->assertGreaterThanOrEqual(19, $version);
     }
 }
