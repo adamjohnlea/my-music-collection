@@ -122,6 +122,44 @@
     }
     .dropdown-item:hover { background: var(--wash); }
 
+    /* Nav "More" Dropdown */
+    .nav-more { position: relative; display: inline-block; }
+    .nav-more-trigger {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font: inherit;
+      color: var(--muted);
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .nav-more-trigger:hover { color: var(--text); }
+    .nav-more-caret { font-size: 0.8em; transition: transform 0.15s ease; }
+    .nav-more[data-open="true"] .nav-more-caret { transform: rotate(180deg); }
+    .nav-more-panel {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: calc(100% + 8px);
+      background: var(--card);
+      min-width: 180px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      padding: 8px 0;
+      z-index: 101;
+    }
+    .nav-more[data-open="true"] .nav-more-panel { display: block; }
+    .nav-more-item {
+      display: block;
+      padding: 8px 16px;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .nav-more-item:hover { background: var(--wash); }
+
     /* Mobile Nav / Hamburger */
     .mobile-nav-toggle {
       display: none;
@@ -197,14 +235,24 @@
         <div class="desktop-nav">
           <a href="{{ static_export ? (base_url is same as('') ? (depth > 0 ? '../' : './') ~ 'index.html' : base_url) : '/?view=collection' }}" class="muted">Collection</a>
           <a href="{{ static_export ? (base_url is same as('') ? (depth > 0 ? '../' : './') ~ 'wantlist.html' : base_url ~ '/wantlist.html') : '/?view=wantlist' }}" class="muted">Wantlist</a>
-          {% if not static_export %}<a href="/alerts" class="muted">Alerts{% if alert_count is defined and alert_count > 0 %} <span class="alert-badge">{{ alert_count }}</span>{% endif %}</a>{% endif %}
-          {% if not static_export %}<a href="/achievements" class="muted">Achievements{% if achievement_count is defined and achievement_count > 0 %} <span class="alert-badge">{{ achievement_count }}</span>{% endif %}</a>{% endif %}
-          <a href="{{ static_export ? 'javascript:void(0)' : '/random' }}" class="muted" {% if static_export %}onclick="if(window.surpriseMe)window.surpriseMe();"{% endif %}>Surprise Me</a>
           <a href="{{ static_export ? (base_url is same as('') ? (depth > 0 ? '../' : './') ~ 'stats.html' : base_url ~ '/stats.html') : '/stats' }}" class="muted">Stats</a>
-          <a href="{{ static_export ? (base_url is same as('') ? (depth > 0 ? '../' : './') ~ 'about.html' : base_url ~ '/about.html') : '/about' }}" class="muted">About</a>
-          {% if not static_export %}<a href="/help" class="muted">Help</a>{% endif %}
-          {% if not static_export %}<a href="/tools" class="muted">Tools</a>{% endif %}
-          {% if not static_export %}<a href="/theme" class="muted">Theme</a>{% endif %}
+          {% if not static_export %}<a href="/alerts" class="muted">Alerts{% if alert_count is defined and alert_count > 0 %} <span class="alert-badge">{{ alert_count }}</span>{% endif %}</a>{% endif %}
+          {% if static_export %}
+            <a href="javascript:void(0)" class="muted" onclick="if(window.surpriseMe)window.surpriseMe();">Surprise Me</a>
+            <a href="{{ base_url is same as('') ? (depth > 0 ? '../' : './') ~ 'about.html' : base_url ~ '/about.html' }}" class="muted">About</a>
+          {% else %}
+            <div class="nav-more" data-open="false">
+              <button type="button" class="nav-more-trigger" id="nav-more-trigger" aria-haspopup="menu" aria-expanded="false" aria-controls="nav-more-panel">More <span class="nav-more-caret" aria-hidden="true">▾</span>{% if achievement_count is defined and achievement_count > 0 %} <span class="nav-more-badge alert-badge" aria-label="{{ achievement_count }} new achievements">{{ achievement_count }}</span>{% endif %}</button>
+              <div class="nav-more-panel" id="nav-more-panel" role="menu">
+                <a href="/random" class="nav-more-item" role="menuitem">Surprise Me</a>
+                <a href="/achievements" class="nav-more-item" role="menuitem">Achievements{% if achievement_count is defined and achievement_count > 0 %} <span class="alert-badge">{{ achievement_count }}</span>{% endif %}</a>
+                <a href="/tools" class="nav-more-item" role="menuitem">Tools</a>
+                <a href="/theme" class="nav-more-item" role="menuitem">Theme</a>
+                <a href="/help" class="nav-more-item" role="menuitem">Help</a>
+                <a href="/about" class="nav-more-item" role="menuitem">About</a>
+              </div>
+            </div>
+          {% endif %}
         </div>
 
         <button class="mobile-nav-toggle" id="mobile-toggle" aria-label="Toggle menu">☰</button>
@@ -240,6 +288,26 @@
       document.getElementById('mobile-menu').classList.toggle('active');
       this.textContent = document.getElementById('mobile-menu').classList.contains('active') ? '✕' : '☰';
     });
+
+    (function () {
+      var more = document.querySelector('.nav-more');
+      if (!more) return;
+      var trigger = more.querySelector('.nav-more-trigger');
+      function setOpen(open) {
+        more.setAttribute('data-open', open ? 'true' : 'false');
+        trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+      }
+      trigger.addEventListener('click', function (e) {
+        e.stopPropagation();
+        setOpen(more.getAttribute('data-open') !== 'true');
+      });
+      document.addEventListener('click', function (e) {
+        if (!more.contains(e.target)) setOpen(false);
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') setOpen(false);
+      });
+    })();
   </script>
 
   {% include 'partials/footer.html.twig' %}
