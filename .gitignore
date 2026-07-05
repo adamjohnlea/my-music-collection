@@ -58,5 +58,8 @@
 # Generated valuation export manifests
 var/valuation-*.csv
 
+# Generated poster images
+/var/posters/
+
 # Node deps for one-off tooling scripts (e.g. bin/capture-help-screenshots.mjs)
 /node_modules/
