@@ -39,7 +39,7 @@ class ToolsController extends BaseController
         }
 
         $task = $_POST['task'] ?? '';
-        $allowedTasks = ['initial', 'refresh', 'enrich', 'images', 'search', 'push', 'export', 'value', 'export-valuation', 'value-wants'];
+        $allowedTasks = ['initial', 'refresh', 'enrich', 'images', 'search', 'push', 'export', 'value', 'export-valuation', 'value-wants', 'poster'];
 
         if (!in_array($task, $allowedTasks)) {
             http_response_code(400);
@@ -128,6 +128,7 @@ class ToolsController extends BaseController
                 . (isset($params['force']) ? ' --force' : ''),
             'export-valuation' => 'value:export',
             'value-wants' => 'value:wants',
+            'poster' => self::buildPosterCommandString($_POST),
             default => throw new \InvalidArgumentException('Unknown task: ' . $task),
         };
 
@@ -161,6 +162,31 @@ class ToolsController extends BaseController
         }
         if (!empty($params['chunk_size'])) {
             $cmd .= ' --chunk-size=' . (int)$params['chunk_size'];
+        }
+        return $cmd;
+    }
+
+    /** @param array<string,mixed> $params */
+    public static function buildPosterCommandString(array $params): string
+    {
+        $allowedOrders = ['added', 'artist', 'title', 'year', 'rating', 'valuation', 'shuffle', 'color'];
+        $order = in_array($params['order'] ?? '', $allowedOrders, true) ? (string)$params['order'] : 'added';
+
+        $resolution = (int)($params['resolution'] ?? 4000);
+        $resolution = max(500, min(7200, $resolution));
+
+        $format = (($params['format'] ?? '') === 'png') ? 'png' : 'jpg';
+
+        $cmd = 'poster:generate'
+            . ' --order=' . $order
+            . ' --resolution=' . $resolution
+            . ' --format=' . $format;
+
+        if (!empty($params['wantlist'])) {
+            $cmd .= ' --wantlist';
+        }
+        if (!empty($params['filter'])) {
+            $cmd .= ' --filter=' . escapeshellarg((string)$params['filter']);
         }
         return $cmd;
     }

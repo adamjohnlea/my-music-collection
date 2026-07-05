@@ -67,6 +67,10 @@
       padding:8px 14px;font:600 .88rem system-ui,sans-serif;cursor:pointer;transition:background .15s}
     .run:hover{background:var(--btn-bg-hover)}
     .run:disabled{opacity:.5;cursor:not-allowed}
+    .btn{background:var(--btn-bg);border:1px solid var(--border);color:var(--btn-ink);border-radius:8px;
+      padding:8px 14px;font:600 .88rem system-ui,sans-serif;cursor:pointer;transition:background .15s;
+      text-decoration:none;display:inline-flex;align-items:center}
+    .btn:hover{background:var(--btn-bg-hover)}
 
     /* --- hero variant (Refresh) --- */
     .card.hero{grid-column:1 / -1;
@@ -334,6 +338,46 @@
           </form>
         </div>
 
+        <div class="card">
+          <div class="card-top"><h2 class="tool-title">Generate Cover-Wall Poster</h2>
+            <span class="badge"><span class="pip"></span>On demand</span></div>
+          <p class="desc">Renders every cover in your collection (or a filtered subset) into a single
+            large poster image, tiled and ordered however you like.</p>
+          <form method="post" action="/tools/run">
+            <input type="hidden" name="_token" value="{{ csrf_token }}">
+            <input type="hidden" name="task" value="poster">
+            <div class="fields">
+              <div class="field"><label for="poster-order">Order</label>
+                <select id="poster-order" name="order">
+                  <option value="added">Date added</option>
+                  <option value="artist">Artist</option>
+                  <option value="title">Title</option>
+                  <option value="year">Year</option>
+                  <option value="rating">Rating</option>
+                  <option value="valuation">Valuation</option>
+                  <option value="shuffle">Shuffle</option>
+                  <option value="color">Color</option>
+                </select></div>
+              <div class="field"><label for="poster-format">Format</label>
+                <select id="poster-format" name="format">
+                  <option value="jpg">JPG</option>
+                  <option value="png">PNG</option>
+                </select></div>
+            </div>
+            <div class="fields">
+              <div class="field"><label for="poster-resolution">Resolution (px)</label>
+                <input id="poster-resolution" type="number" name="resolution" value="4000" min="500" max="7200"></div>
+              <div class="field"><label for="poster-filter">Filter</label>
+                <input id="poster-filter" type="text" name="filter" placeholder="optional"></div>
+            </div>
+            <label class="check"><input type="checkbox" name="wantlist" value="1"> Use wantlist instead of collection</label>
+            <div class="foot">
+              <button class="run" type="submit">Generate poster</button>
+              <a class="btn" href="/poster/download?file=latest" style="display:none" data-poster-download>Download poster</a>
+            </div>
+          </form>
+        </div>
+
       </div>
     </section>
 
@@ -456,6 +500,17 @@
       outputEl.textContent = data.output.join('\n');
       // Auto-scroll to bottom
       outputEl.parentElement.scrollTop = outputEl.parentElement.scrollHeight;
+
+      // Poster download hook: reveal the download link once the command prints
+      // a "Download: /poster/download?file=..." line.
+      const downloadLink = document.querySelector('[data-poster-download]');
+      if (downloadLink) {
+        const downloadLine = data.output.find(line => line.startsWith('Download: '));
+        if (downloadLine) {
+          downloadLink.href = downloadLine.slice('Download: '.length).trim();
+          downloadLink.style.display = '';
+        }
+      }
     }
 
     if (data.status === 'running') {
