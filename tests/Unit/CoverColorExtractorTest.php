@@ -40,4 +40,13 @@ final class CoverColorExtractorTest extends TestCase
     {
         $this->assertNull((new CoverColorExtractor())->extract('/no/such/file.png'));
     }
+
+    public function testReturnsNullForCorruptFile(): void
+    {
+        $path = tempnam(sys_get_temp_dir(), 'cover_') . '.png';
+        file_put_contents($path, 'not a real png, just garbage bytes');
+        $hex = (new CoverColorExtractor())->extract($path);
+        @unlink($path);
+        $this->assertNull($hex);
+    }
 }

@@ -13,15 +13,17 @@ final class CoverColorExtractor
         if (!is_file($path)) {
             return null;
         }
+        $img = null;
         try {
             $img = new Imagick($path);
             $img->setImageColorspace(Imagick::COLORSPACE_SRGB);
             $img->resizeImage(1, 1, Imagick::FILTER_LANCZOS, 1);
             $c = $img->getImagePixelColor(0, 0)->getColor();
-            $img->clear();
             return sprintf('#%02x%02x%02x', (int)$c['r'], (int)$c['g'], (int)$c['b']);
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
             return null;
+        } finally {
+            $img?->clear();
         }
     }
 }

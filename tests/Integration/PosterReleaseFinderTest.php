@@ -60,4 +60,26 @@ final class PosterReleaseFinderTest extends TestCase
         $finder = new PosterReleaseFinder($this->seededPdo(), new QueryParser());
         $this->assertSame([], $finder->find('me', 'collection', 'artist:Nobody'));
     }
+
+    public function testValuationPicksHighestAmongMultipleInstances(): void
+    {
+        $pdo = $this->seededPdo();
+
+        // A second owned instance of release 1, plus two valuations rows keyed by
+        // (scope, release_id, instance_id) with different instance_id and value.
+        $pdo->exec("INSERT INTO collection_items (instance_id, username, folder_id, release_id, added, rating) VALUES
+            (13, 'me', 0, 1, '2020-02-01', 4)");
+        $pdo->exec("INSERT INTO item_valuations (scope, release_id, instance_id, condition_used, value, currency, source, valued_at) VALUES
+            ('collection', 1, 11, 'VG+', 10.0, 'USD', 'discogs', '2024-01-01T00:00:00Z'),
+            ('collection', 1, 13, 'VG+', 25.0, 'USD', 'discogs', '2024-01-02T00:00:00Z')");
+
+        $finder = new PosterReleaseFinder($pdo, new QueryParser());
+        $rows = $finder->find('me', 'collection', null);
+
+        $byId = [];
+        foreach ($rows as $r) { $byId[$r['id']] = $r; }
+
+        $this->assertArrayHasKey(1, $byId);
+        $this->assertSame(25.0, $byId[1]['valuation']);
+    }
 }

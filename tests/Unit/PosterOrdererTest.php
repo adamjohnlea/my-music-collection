@@ -68,4 +68,29 @@ final class PosterOrdererTest extends TestCase
         $this->assertSame($a, $b);
         $this->assertEqualsCanonicalizing([1, 2, 3], $a);
     }
+
+    public function testUnknownKeyPreservesAscendingIdOrder(): void
+    {
+        $o = new PosterOrderer();
+        $this->assertSame([1, 2, 3], $this->ids($o->order($this->rows(), 'bogus')));
+    }
+
+    public function testColorSortsMissingOrInvalidLast(): void
+    {
+        $o = new PosterOrderer();
+        $rows = $this->rows();
+        $rows[0]['cover_color'] = null;
+        $rows[1]['cover_color'] = 'notahex';
+        // Only row 3 (blue, #0000ff) has a valid color; the other two must sort last.
+        $this->assertSame([3, 1, 2], $this->ids($o->order($rows, 'color')));
+    }
+
+    public function testTiesBreakByAscendingId(): void
+    {
+        $o = new PosterOrderer();
+        $rows = $this->rows();
+        $rows[1]['rating'] = 3; // same rating as row 1 (id 1)
+        $rows[2]['rating'] = 3; // same rating as row 1 (id 1)
+        $this->assertSame([1, 2, 3], $this->ids($o->order($rows, 'rating')));
+    }
 }

@@ -40,7 +40,7 @@ final class PosterReleaseFinder
         $sql = "SELECT r.id, r.title, r.artist, r.year,
             (SELECT MAX(ci2.rating) FROM $itemsTable ci2 WHERE ci2.release_id = r.id AND ci2.username = :u) AS rating,
             (SELECT MAX(ci3.added) FROM $itemsTable ci3 WHERE ci3.release_id = r.id AND ci3.username = :u) AS added_at,
-            (SELECT iv.value FROM item_valuations iv WHERE iv.release_id = r.id AND iv.scope = :scope LIMIT 1) AS valuation,
+            (SELECT iv.value FROM item_valuations iv WHERE iv.release_id = r.id AND iv.scope = :scope ORDER BY iv.value DESC LIMIT 1) AS valuation,
             -- Prefer the primary cover (source_url = r.cover_url), else any image. NOTE: the outer
             -- correlation r.cover_url is only valid in a subquery's WHERE, not its ORDER BY (SQLite
             -- rejects the latter), so we use two WHERE-correlated subqueries + COALESCE — the same
