@@ -109,6 +109,11 @@ class MigrationRunner
                 $this->setVersion('17');
                 $version = '17';
             }
+            if ($version === '17') {
+                $this->migrateToV18();
+                $this->setVersion('18');
+                $version = '18';
+            }
 
             $this->pdo->commit();
 
@@ -485,6 +490,19 @@ class MigrationRunner
         }
         if (!in_array('market_fetched_at', $cols, true)) {
             $this->pdo->exec('ALTER TABLE wantlist_items ADD COLUMN market_fetched_at TEXT');
+        }
+    }
+
+    private function migrateToV18(): void
+    {
+        // Add cover_color (dominant-color hex) to images for poster color-sort.
+        // PRAGMA guard for idempotency: ValueResetTest rewinds schema_version and re-runs.
+        $cols = array_map(
+            fn($r) => (string)$r['name'],
+            $this->pdo->query("PRAGMA table_info(images)")->fetchAll(PDO::FETCH_ASSOC)
+        );
+        if (!in_array('cover_color', $cols, true)) {
+            $this->pdo->exec('ALTER TABLE images ADD COLUMN cover_color TEXT');
         }
     }
 
