@@ -23,6 +23,8 @@ interface CollectionRepositoryInterface
     public function addToWantlist(int $releaseId, string $username, string $addedAt): void;
     /** @return array{total_count: int, top_artists: array<int, array{artist: string, count: int}>, top_genres: array<int, array{genre: string, count: int}>, decades: array<int, array{decade: int, count: int}>, formats: array<int, array{format_name: string, count: int}>} */
     public function getCollectionStats(string $username): array;
+    /** @return array<string,int|float> */
+    public function getAchievementMetrics(string $username): array;
     public function getRandomReleaseId(string $username): ?int;
     public function beginTransaction(): void;
     public function commit(): void;
