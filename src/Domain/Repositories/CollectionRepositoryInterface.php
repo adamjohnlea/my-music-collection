@@ -59,4 +59,13 @@ interface CollectionRepositoryInterface
     public function countUnreadWantlistAlerts(string $username): int;
     public function markWantlistAlertsRead(string $username, string $readAt): void;
     public function dismissWantlistAlert(int $id, string $username, string $dismissedAt): void;
+
+    public function insertAchievementUnlock(string $username, string $key, int $tier, string $unlockedAt): void;
+
+    /** @return list<array{achievement_key:string, tier:int, unlocked_at:string, seen_at:?string}> */
+    public function getUnlockedAchievements(string $username): array;
+
+    public function markAchievementsSeen(string $username): void;
+
+    public function countUnseenAchievements(string $username): int;
 }
