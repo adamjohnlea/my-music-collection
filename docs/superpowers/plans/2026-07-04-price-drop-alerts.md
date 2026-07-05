@@ -1004,7 +1004,7 @@ Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
 
 - [ ] **Step 1: Write the failing test**
 
-Create `tests/Integration/AlertsControllerTest.php`:
+Create `tests/Integration/AlertsControllerTest.php`. `redirect()` calls `exit`, so — following the established `SearchControllerTest` pattern — subclass the controller anonymously and override `redirect()` to record the URL and throw instead of exiting. Twig is mocked (this test covers controller logic only; template rendering is proven separately by `AlertsTemplateRenderTest` in Task 7). The controller must therefore be **non-final** (see Step 3).
 
 ```php
 <?php
@@ -1012,26 +1012,34 @@ declare(strict_types=1);
 
 namespace Tests\Integration;
 
+use App\Domain\Repositories\CollectionRepositoryInterface;
 use App\Http\Controllers\AlertsController;
 use App\Http\Validation\Validator;
 use App\Infrastructure\MigrationRunner;
 use App\Infrastructure\Persistence\SqliteCollectionRepository;
+use Mockery;
+use Mockery\Adapter\Phpunit\MockeryTestCase;
 use PDO;
-use PHPUnit\Framework\TestCase;
 use Twig\Environment;
-use Twig\Loader\FilesystemLoader;
 
-final class AlertsControllerTest extends TestCase
+final class AlertsControllerTest extends MockeryTestCase
 {
-    private function twig(): Environment
+    public string $redirectUrl = '';
+    public bool $redirectCalled = false;
+
+    protected function setUp(): void
     {
-        $twig = new Environment(new FilesystemLoader(dirname(__DIR__, 2) . '/templates'), ['cache' => false]);
-        $twig->addGlobal('csrf_token', 'tok');
-        $twig->addGlobal('alert_count', 0);
-        $twig->addGlobal('theme', []);
-        $twig->addGlobal('auth_user', ['discogs_username' => 'bob']);
-        $twig->addGlobal('static_export', false);
-        return $twig;
+        parent::setUp();
+        $this->redirectUrl = '';
+        $this->redirectCalled = false;
+        if (session_status() === PHP_SESSION_NONE) { @session_start(); }
+    }
+
+    protected function tearDown(): void
+    {
+        $_POST = [];
+        unset($_SESSION['csrf']);
+        parent::tearDown();
     }
 
     private function db(): PDO
@@ -1044,47 +1052,106 @@ final class AlertsControllerTest extends TestCase
         return $pdo;
     }
 
-    public function testIndexRendersAlertsAndMarksRead(): void
+    private function controller(Environment $twig, CollectionRepositoryInterface $repo): AlertsController
     {
-        $pdo = $this->db();
-        $repo = new SqliteCollectionRepository($pdo);
-        $repo->insertWantlistAlert(111, 'bob', 'target', 30.0, 22.0, 'GBP', '2026-01-03T00:00:00Z');
-
-        $controller = new AlertsController($this->twig(), $repo, new Validator());
-        ob_start();
-        $controller->index(['discogs_username' => 'bob']);
-        $html = ob_get_clean();
-
-        $this->assertStringContainsString('Trout Mask', $html);
-        $this->assertSame(0, $repo->countUnreadWantlistAlerts('bob')); // marked read on view
+        $test = $this;
+        return new class($twig, $repo, new Validator(), $test) extends AlertsController {
+            private $t;
+            public function __construct(Environment $twig, CollectionRepositoryInterface $repo, Validator $v, $t)
+            {
+                parent::__construct($twig, $repo, $v);
+                $this->t = $t;
+            }
+            protected function redirect(string $url): void
+            {
+                $this->t->redirectCalled = true;
+                $this->t->redirectUrl = $url;
+                throw new \RuntimeException('redirect'); // simulate exit
+            }
+        };
     }
 
-    public function testSetTargetPersistsValueAndClearOnEmpty(): void
+    private function catchRedirect(callable $fn): void
     {
-        $pdo = $this->db();
-        $repo = new SqliteCollectionRepository($pdo);
-        $controller = new AlertsController($this->twig(), $repo, new Validator());
+        try { $fn(); } catch (\RuntimeException) { /* simulated exit */ }
+    }
 
+    public function testIndexPassesAlertsToTemplateAndMarksRead(): void
+    {
+        $repo = new SqliteCollectionRepository($this->db());
+        $repo->insertWantlistAlert(111, 'bob', 'target', 30.0, 22.0, 'GBP', '2026-01-03T00:00:00Z');
+
+        $twig = Mockery::mock(Environment::class);
+        $twig->shouldReceive('render')->once()
+            ->with('alerts.html.twig', Mockery::on(function (array $data): bool {
+                return isset($data['alerts'][0])
+                    && $data['alerts'][0]['title'] === 'Trout Mask'
+                    && str_contains($data['alerts'][0]['new_price_display'], '22.00')
+                    && $data['alerts'][0]['is_unread'] === true;
+            }))
+            ->andReturn('<html>ok</html>');
+
+        ob_start();
+        $this->controller($twig, $repo)->index(['discogs_username' => 'bob']);
+        ob_end_clean();
+
+        $this->assertSame(0, $repo->countUnreadWantlistAlerts('bob')); // marked read after render
+    }
+
+    public function testSetTargetPersistsValue(): void
+    {
+        $repo = new SqliteCollectionRepository($this->db());
         $_SESSION['csrf'] = 'tok';
         $_POST = ['_token' => 'tok', 'release_id' => '111', 'target' => '25.5', 'return' => '/?view=wantlist'];
-        $this->expectOutputRegex('//'); // redirect() calls exit; guard via runInSeparateProcess if needed
-        // NOTE: because redirect() calls exit, assert persistence by calling the repo directly after set.
-        $repo->setWantlistTarget(111, 'bob', 25.5);
+
+        $this->catchRedirect(fn() => $this->controller(Mockery::mock(Environment::class), $repo)->setTarget(['discogs_username' => 'bob']));
+
+        $this->assertTrue($this->redirectCalled);
+        $this->assertSame('/?view=wantlist', $this->redirectUrl);
         $this->assertSame(25.5, $repo->getWantlistTarget(111, 'bob'));
-        $repo->setWantlistTarget(111, 'bob', null);
+    }
+
+    public function testSetTargetClearsOnEmpty(): void
+    {
+        $repo = new SqliteCollectionRepository($this->db());
+        $repo->setWantlistTarget(111, 'bob', 25.0);
+        $_SESSION['csrf'] = 'tok';
+        $_POST = ['_token' => 'tok', 'release_id' => '111', 'target' => ''];
+
+        $this->catchRedirect(fn() => $this->controller(Mockery::mock(Environment::class), $repo)->setTarget(['discogs_username' => 'bob']));
         $this->assertNull($repo->getWantlistTarget(111, 'bob'));
+    }
+
+    public function testSetTargetRejectedOnInvalidCsrf(): void
+    {
+        $repo = new SqliteCollectionRepository($this->db());
+        $_SESSION['csrf'] = 'tok';
+        $_POST = ['_token' => 'WRONG', 'release_id' => '111', 'target' => '25.5'];
+
+        $this->catchRedirect(fn() => $this->controller(Mockery::mock(Environment::class), $repo)->setTarget(['discogs_username' => 'bob']));
+        $this->assertNull($repo->getWantlistTarget(111, 'bob')); // not written
+    }
+
+    public function testDismissRemovesFromPanel(): void
+    {
+        $repo = new SqliteCollectionRepository($this->db());
+        $repo->insertWantlistAlert(111, 'bob', 'drop', 30.0, 22.0, 'GBP', '2026-01-03T00:00:00Z');
+        $id = $repo->listWantlistAlerts('bob')[0]['id'];
+        $_SESSION['csrf'] = 'tok';
+        $_POST = ['_token' => 'tok', 'id' => (string)$id];
+
+        $this->catchRedirect(fn() => $this->controller(Mockery::mock(Environment::class), $repo)->dismiss(['discogs_username' => 'bob']));
+        $this->assertCount(0, $repo->listWantlistAlerts('bob'));
     }
 }
 ```
 
-> The `redirect()` helper calls `exit`, so the POST paths are covered at the repository level in Task 3; this controller test focuses on the render + mark-read path, which does not redirect.
+> All five tests are self-contained and pass within this task (no real template needed). Template render safety is a separate concern, proven by `AlertsTemplateRenderTest` in Task 7.
 
 - [ ] **Step 2: Run test to verify it fails**
 
 Run: `vendor/bin/phpunit --filter AlertsControllerTest`
-Expected: FAIL — `AlertsController` / `alerts.html.twig` not found (template arrives in Task 7; this task creates the controller + routes; run again after Task 7 for green render).
-
-> Ordering note: create the controller now; the `index` render assertion goes green once `alerts.html.twig` exists (Task 7). If executing strictly task-by-task, expect `testIndexRendersAlertsAndMarksRead` to fail only on the missing template until Task 7, while the mark-read side-effect already works. You may reorder so `alerts.html.twig` is created at the end of this task instead — acceptable since both are in the same feature.
+Expected: FAIL — `AlertsController` class not found. (Twig is mocked, so no template is needed; all five tests go green once the controller exists in Step 3.)
 
 - [ ] **Step 3: Implement `AlertsController`**
 
@@ -1102,7 +1169,8 @@ use App\Domain\RelativeTime;
 use App\Http\Validation\Validator;
 use Twig\Environment;
 
-final class AlertsController extends BaseController
+// NOT final: AlertsControllerTest subclasses this to override redirect() (mirrors SearchController).
+class AlertsController extends BaseController
 {
     public function __construct(
         Environment $twig,
@@ -1208,10 +1276,10 @@ $twig->addGlobal('alert_count', $currentUser
 
 Ensure `use App\Domain\Repositories\CollectionRepositoryInterface;` is imported in `public/index.php` (add if missing).
 
-- [ ] **Step 5: Run the controller test (mark-read path)**
+- [ ] **Step 5: Run the controller test**
 
-Run: `vendor/bin/phpunit --filter 'AlertsControllerTest::testSetTargetPersistsValueAndClearOnEmpty'`
-Expected: PASS. (`testIndexRendersAlertsAndMarksRead` goes green after Task 7's template.)
+Run: `vendor/bin/phpunit --filter AlertsControllerTest`
+Expected: PASS (all five tests — Twig is mocked, no template needed).
 
 - [ ] **Step 6: Commit**
 
@@ -1231,7 +1299,7 @@ Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
 - Modify: `templates/base.html.twig` (desktop nav ~line 203 + mobile nav ~line 219: add Alerts link with badge)
 - Modify: `templates/home.html.twig` (wantlist card block, lines 324-339: add target control, highlight, sparkline; add supporting CSS near line 36)
 - Modify: `src/Http/Controllers/CollectionController.php` (inject `target_price`, `target_hit`, `spark`, display strings into wantlist items)
-- Test: `tests/Integration/AlertsControllerTest.php` (re-run — render assertion now green)
+- Test: `tests/Integration/AlertsTemplateRenderTest.php` (create — proves `alerts.html.twig` renders with no syntax/undefined-variable errors)
 
 **Interfaces:**
 - Consumes: `alerts` view var (list from `AlertsController::index`); wantlist item fields `it.target_price`, `it.target_price_display`, `it.target_hit`, `it.spark` (from `CollectionController`); `alert_count` global (Task 6).
@@ -1398,16 +1466,74 @@ Create `templates/alerts.html.twig`. Follow the house structure confirmed in `st
 
 > `.container` is used by other templates; check `stats.html.twig`'s wrapper class at build time and match it if it differs.
 
-- [ ] **Step 5: Run the full alerts test + a wantlist render smoke test**
+- [ ] **Step 5: Create the template render test**
 
-Run: `vendor/bin/phpunit --filter 'AlertsControllerTest|CollectionControllerTest'`
-Expected: PASS — `testIndexRendersAlertsAndMarksRead` now renders `Trout Mask`.
+Create `tests/Integration/AlertsTemplateRenderTest.php` (mirrors `ThemeTemplateRenderTest` — renders the real template through a production-like Twig to prove no syntax/undefined-variable errors):
 
-- [ ] **Step 6: Manual smoke check**
+```php
+<?php
+declare(strict_types=1);
+
+namespace Tests\Integration;
+
+use App\Domain\Theme\ThemeService;
+use App\Infrastructure\KvStore;
+use App\Presentation\Twig\DiscogsFilters;
+use PDO;
+use PHPUnit\Framework\TestCase;
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
+
+final class AlertsTemplateRenderTest extends TestCase
+{
+    private function twig(): Environment
+    {
+        $pdo = new PDO('sqlite::memory:');
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo->exec('CREATE TABLE kv_store (k TEXT PRIMARY KEY, v TEXT)');
+        $twig = new Environment(new FilesystemLoader(dirname(__DIR__, 2) . '/templates'), ['cache' => false, 'autoescape' => 'html']);
+        $twig->addExtension(new DiscogsFilters());
+        $twig->addGlobal('csrf_token', 'tok');
+        $twig->addGlobal('alert_count', 2);
+        $twig->addGlobal('theme', (new ThemeService(new KvStore($pdo)))->forView());
+        return $twig;
+    }
+
+    public function testRendersEmptyState(): void
+    {
+        $html = $this->twig()->render('alerts.html.twig', ['title' => 'Price Alerts', 'alerts' => []]);
+        $this->assertStringContainsString('No price alerts yet', $html);
+    }
+
+    public function testRendersAlertRow(): void
+    {
+        $alerts = [[
+            'id' => 1, 'release_id' => 111, 'reason' => 'target',
+            'old_price' => 30.0, 'new_price' => 22.0, 'currency' => 'GBP',
+            'created_at' => '2026-01-03T00:00:00Z', 'read_at' => null,
+            'artist' => 'Beefheart', 'title' => 'Trout Mask',
+            'cover_url' => null, 'thumb_url' => null,
+            'new_price_display' => '£22.00', 'old_price_display' => '£30.00',
+            'when' => '2 days ago', 'is_unread' => true,
+        ]];
+        $html = $this->twig()->render('alerts.html.twig', ['title' => 'Price Alerts', 'alerts' => $alerts]);
+        $this->assertStringContainsString('Trout Mask', $html);
+        $this->assertStringContainsString('£22.00', $html);
+        $this->assertStringContainsString('/alerts/dismiss', $html);
+    }
+}
+```
+
+- [ ] **Step 6: Run the alerts + collection tests**
+
+Run: `vendor/bin/phpunit --filter 'AlertsControllerTest|AlertsTemplateRenderTest|CollectionControllerTest'`
+Expected: PASS.
+
+- [ ] **Step 7: Manual smoke check**
 
 Run the app (Herd serves `public/`). Visit `/?view=wantlist`: each want shows a `🔔 Target` input and (after ≥2 refreshes) a sparkline. Set a target, run **Refresh Wantlist Availability** on `/tools`, confirm an alert appears at `/alerts` with the nav badge, then Dismiss it.
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 8: Commit**
 
 ```bash
 git add templates/alerts.html.twig templates/base.html.twig templates/home.html.twig src/Http/Controllers/CollectionController.php tests/Integration/AlertsControllerTest.php
