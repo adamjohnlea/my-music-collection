@@ -13,6 +13,7 @@ use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\HelpController;
 use App\Http\Controllers\PosterController;
 use App\Http\Controllers\AlertsController;
+use App\Http\Controllers\AchievementsController;
 use App\Domain\Repositories\CollectionRepositoryInterface;
 use App\Domain\Theme\ThemeService;
 use Dotenv\Dotenv;
@@ -75,6 +76,9 @@ $twig->addGlobal('theme', $container->get(ThemeService::class)->forView());
 $twig->addGlobal('alert_count', $currentUser
     ? $container->get(CollectionRepositoryInterface::class)->countUnreadWantlistAlerts((string)$currentUser['discogs_username'])
     : 0);
+$twig->addGlobal('achievement_count', $currentUser
+    ? $container->get(CollectionRepositoryInterface::class)->countUnseenAchievements((string)$currentUser['discogs_username'])
+    : 0);
 
 // Router
 $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
@@ -100,6 +104,7 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     $r->addRoute('GET', '/alerts', [AlertsController::class, 'index']);
     $r->addRoute('POST', '/alerts/dismiss', [AlertsController::class, 'dismiss']);
     $r->addRoute('POST', '/wantlist/target', [AlertsController::class, 'setTarget']);
+    $r->addRoute('GET', '/achievements', [AchievementsController::class, 'index']);
     $r->addRoute('GET', '/', [CollectionController::class, 'index']);
 });
 
@@ -159,7 +164,7 @@ switch ($routeInfo[0]) {
             $controller->getAppleMusicId((int)$vars['id']);
         } elseif ($handler[0] === ToolsController::class && $method === 'progress') {
             $controller->progress($vars['jobId']);
-        } elseif (in_array($handler[0], [CollectionController::class, SearchController::class, ReleaseController::class, AlertsController::class])) {
+        } elseif (in_array($handler[0], [CollectionController::class, SearchController::class, ReleaseController::class, AlertsController::class, AchievementsController::class])) {
             $controller->$method($currentUser);
         } else {
             $controller->$method();
