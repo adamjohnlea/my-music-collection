@@ -10,6 +10,7 @@ use App\Domain\Repositories\ValuationRepositoryInterface;
 use App\Domain\Search\QueryParser;
 use App\Domain\Valuation\CurrencyFormat;
 use App\Domain\Valuation\SnapshotChart;
+use App\Domain\Wantlist\PriceSparkline;
 use App\Http\DiscogsClientFactory;
 use App\Http\Validation\Validator;
 use PDO;
@@ -181,7 +182,7 @@ class CollectionController extends BaseController
                 $it['target_price_input'] = $target !== null ? rtrim(rtrim(number_format($target, 2, '.', ''), '0'), '.') : '';
                 $it['target_price_display'] = $target !== null ? $currencySymbol . number_format($target, 2) : null;
                 $it['target_hit'] = ($target !== null && $lowest !== null && $lowest <= $target);
-                $it['spark'] = \App\Domain\Wantlist\PriceSparkline::build($histories[$it['id']] ?? []);
+                $it['spark'] = PriceSparkline::build($histories[$it['id']] ?? []);
             }
             unset($it);
         }
