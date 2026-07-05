@@ -162,16 +162,26 @@ class CollectionController extends BaseController
         if ($view === 'wantlist' && $items !== []) {
             $ids = array_map(static fn (array $it): int => $it['id'], $items);
             $market = $this->collectionRepository->getWantlistMarketplaceStats($ids, $usernameFilter);
+            $histories = $this->collectionRepository->getWantlistPriceHistories($ids, $usernameFilter);
             $now = time();
             foreach ($items as &$it) {
                 $m = $market[$it['id']] ?? null;
                 $it['num_for_sale'] = $m['num_for_sale'] ?? null;
-                $it['market_price'] = ($m && $m['lowest_price'] !== null)
-                    ? CurrencyFormat::symbol($m['lowest_price_currency']) . number_format($m['lowest_price'], 2)
+                $lowest = $m['lowest_price'] ?? null;
+                $currencySymbol = CurrencyFormat::symbol($m['lowest_price_currency'] ?? null);
+                $it['market_price'] = ($lowest !== null)
+                    ? $currencySymbol . number_format($lowest, 2)
                     : null;
                 $it['market_as_of'] = ($m && $m['market_fetched_at'] !== null)
                     ? RelativeTime::ago($m['market_fetched_at'], $now)
                     : null;
+
+                $target = $m['target_price'] ?? null;
+                $it['target_price'] = $target;
+                $it['target_price_input'] = $target !== null ? rtrim(rtrim(number_format($target, 2, '.', ''), '0'), '.') : '';
+                $it['target_price_display'] = $target !== null ? $currencySymbol . number_format($target, 2) : null;
+                $it['target_hit'] = ($target !== null && $lowest !== null && $lowest <= $target);
+                $it['spark'] = \App\Domain\Wantlist\PriceSparkline::build($histories[$it['id']] ?? []);
             }
             unset($it);
         }

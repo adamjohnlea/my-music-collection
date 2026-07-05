@@ -70,6 +70,7 @@
       justify-content: center;
     }
     .btn-small:hover { border-color: var(--accent); text-decoration: none; }
+    .alert-badge { display:inline-block; min-width:16px; padding:0 5px; font-size:.7rem; line-height:16px; text-align:center; color:#fff; background: var(--accent, #e5484d); border-radius:999px; vertical-align:middle; }
 
     /* Common Header Components */
     .main-header {
@@ -196,6 +197,7 @@
         <div class="desktop-nav">
           <a href="{{ static_export ? (base_url is same as('') ? (depth > 0 ? '../' : './') ~ 'index.html' : base_url) : '/?view=collection' }}" class="muted">Collection</a>
           <a href="{{ static_export ? (base_url is same as('') ? (depth > 0 ? '../' : './') ~ 'wantlist.html' : base_url ~ '/wantlist.html') : '/?view=wantlist' }}" class="muted">Wantlist</a>
+          {% if not static_export %}<a href="/alerts" class="muted">Alerts{% if alert_count is defined and alert_count > 0 %} <span class="alert-badge">{{ alert_count }}</span>{% endif %}</a>{% endif %}
           <a href="{{ static_export ? 'javascript:void(0)' : '/random' }}" class="muted" {% if static_export %}onclick="if(window.surpriseMe)window.surpriseMe();"{% endif %}>Surprise Me</a>
           <a href="{{ static_export ? (base_url is same as('') ? (depth > 0 ? '../' : './') ~ 'stats.html' : base_url ~ '/stats.html') : '/stats' }}" class="muted">Stats</a>
           <a href="{{ static_export ? (base_url is same as('') ? (depth > 0 ? '../' : './') ~ 'about.html' : base_url ~ '/about.html') : '/about' }}" class="muted">About</a>
@@ -212,6 +214,7 @@
   <div class="mobile-menu" id="mobile-menu">
     <a href="{{ static_export ? (base_url is same as('') ? (depth > 0 ? '../' : './') ~ 'index.html' : base_url) : '/?view=collection' }}" class="nav-item">Collection</a>
     <a href="{{ static_export ? (base_url is same as('') ? (depth > 0 ? '../' : './') ~ 'wantlist.html' : base_url ~ '/wantlist.html') : '/?view=wantlist' }}" class="nav-item">Wantlist</a>
+    {% if not static_export %}<a href="/alerts" class="nav-item">Alerts{% if alert_count is defined and alert_count > 0 %} <span class="alert-badge">{{ alert_count }}</span>{% endif %}</a>{% endif %}
     <a href="{{ static_export ? 'javascript:void(0)' : '/random' }}" class="nav-item" {% if static_export %}onclick="if(window.surpriseMe)window.surpriseMe();"{% endif %}>Surprise Me</a>
     <a href="{{ static_export ? (base_url is same as('') ? (depth > 0 ? '../' : './') ~ 'stats.html' : base_url ~ '/stats.html') : '/stats' }}" class="nav-item">Stats</a>
     <a href="{{ static_export ? (base_url is same as('') ? (depth > 0 ? '../' : './') ~ 'about.html' : base_url ~ '/about.html') : '/about' }}" class="nav-item">About</a>
