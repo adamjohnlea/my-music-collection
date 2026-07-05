@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\Integration;
 
+use App\Domain\Wantlist\WantlistAlertEvaluator;
 use App\Infrastructure\DiscogsPricingClient;
 use App\Infrastructure\MigrationRunner;
 use App\Infrastructure\Persistence\SqliteCollectionRepository;
@@ -34,10 +35,10 @@ final class WantlistMarketplaceRefresherTest extends MockeryTestCase
             ->andReturn(new Response(200, [], json_encode(['num_for_sale' => 0, 'lowest_price' => null])));
 
         $repo = new SqliteCollectionRepository($pdo);
-        $refresher = new WantlistMarketplaceRefresher(new DiscogsPricingClient($http), $repo);
+        $refresher = new WantlistMarketplaceRefresher(new DiscogsPricingClient($http), $repo, new WantlistAlertEvaluator());
         $result = $refresher->refresh('bob');
 
-        $this->assertSame(['updated' => 2, 'failed' => 0, 'total' => 2], $result);
+        $this->assertSame(['updated' => 2, 'failed' => 0, 'total' => 2, 'alerts' => 0], $result);
         $stats = $repo->getWantlistMarketplaceStats([111, 222], 'bob');
         $this->assertSame(3, $stats[111]['num_for_sale']);
         $this->assertSame(12.0, $stats[111]['lowest_price']);
@@ -56,9 +57,9 @@ final class WantlistMarketplaceRefresherTest extends MockeryTestCase
             ->andThrow(new \RuntimeException('boom'));
 
         $repo = new SqliteCollectionRepository($pdo);
-        $result = (new WantlistMarketplaceRefresher(new DiscogsPricingClient($http), $repo))->refresh('bob');
+        $result = (new WantlistMarketplaceRefresher(new DiscogsPricingClient($http), $repo, new WantlistAlertEvaluator()))->refresh('bob');
 
-        $this->assertSame(['updated' => 1, 'failed' => 1, 'total' => 2], $result);
+        $this->assertSame(['updated' => 1, 'failed' => 1, 'total' => 2, 'alerts' => 0], $result);
         $stats = $repo->getWantlistMarketplaceStats([222], 'bob');
         $this->assertNull($stats[222]['market_fetched_at']); // failed item not stamped
     }
@@ -70,7 +71,42 @@ final class WantlistMarketplaceRefresherTest extends MockeryTestCase
         (new MigrationRunner($pdo))->run();
         $http = Mockery::mock(ClientInterface::class);
 
-        $result = (new WantlistMarketplaceRefresher(new DiscogsPricingClient($http), new SqliteCollectionRepository($pdo)))->refresh('bob');
-        $this->assertSame(['updated' => 0, 'failed' => 0, 'total' => 0], $result);
+        $result = (new WantlistMarketplaceRefresher(new DiscogsPricingClient($http), new SqliteCollectionRepository($pdo), new WantlistAlertEvaluator()))->refresh('bob');
+        $this->assertSame(['updated' => 0, 'failed' => 0, 'total' => 0, 'alerts' => 0], $result);
+    }
+
+    public function testDropBelowTargetRaisesAlertThenDedupes(): void
+    {
+        $pdo = $this->makeDb(); // seeds wants 111 & 222 for 'bob'
+        $repo = new SqliteCollectionRepository($pdo);
+        $repo->setWantlistTarget(111, 'bob', 25.0);
+
+        // Run 1: 111 drops to 22 (<= target) -> 1 alert; 222 nothing for sale -> no alert
+        $http1 = Mockery::mock(ClientInterface::class);
+        $http1->shouldReceive('request')->with('GET', 'marketplace/stats/111')->once()
+            ->andReturn(new Response(200, [], json_encode(['num_for_sale' => 2, 'lowest_price' => ['value' => 22.0, 'currency' => 'GBP']])));
+        $http1->shouldReceive('request')->with('GET', 'marketplace/stats/222')->once()
+            ->andReturn(new Response(200, [], json_encode(['num_for_sale' => 0, 'lowest_price' => null])));
+        $r1 = (new WantlistMarketplaceRefresher(new DiscogsPricingClient($http1), $repo, new WantlistAlertEvaluator()))->refresh('bob');
+        $this->assertSame(1, $r1['alerts']);
+        $this->assertSame(1, $repo->countUnreadWantlistAlerts('bob'));
+
+        // Run 2: 111 unchanged at 22 -> de-duped (no new alert)
+        $http2 = Mockery::mock(ClientInterface::class);
+        $http2->shouldReceive('request')->with('GET', 'marketplace/stats/111')->once()
+            ->andReturn(new Response(200, [], json_encode(['num_for_sale' => 2, 'lowest_price' => ['value' => 22.0, 'currency' => 'GBP']])));
+        $http2->shouldReceive('request')->with('GET', 'marketplace/stats/222')->once()
+            ->andReturn(new Response(200, [], json_encode(['num_for_sale' => 0, 'lowest_price' => null])));
+        $r2 = (new WantlistMarketplaceRefresher(new DiscogsPricingClient($http2), $repo, new WantlistAlertEvaluator()))->refresh('bob');
+        $this->assertSame(0, $r2['alerts']);
+
+        // Run 3: 111 drops further to 18 (< last alert 22) -> re-fires
+        $http3 = Mockery::mock(ClientInterface::class);
+        $http3->shouldReceive('request')->with('GET', 'marketplace/stats/111')->once()
+            ->andReturn(new Response(200, [], json_encode(['num_for_sale' => 1, 'lowest_price' => ['value' => 18.0, 'currency' => 'GBP']])));
+        $http3->shouldReceive('request')->with('GET', 'marketplace/stats/222')->once()
+            ->andReturn(new Response(200, [], json_encode(['num_for_sale' => 0, 'lowest_price' => null])));
+        $r3 = (new WantlistMarketplaceRefresher(new DiscogsPricingClient($http3), $repo, new WantlistAlertEvaluator()))->refresh('bob');
+        $this->assertSame(1, $r3['alerts']);
     }
 }
