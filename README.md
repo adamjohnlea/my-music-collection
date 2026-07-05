@@ -264,7 +264,7 @@ Alerts are in-app only; no email notifications. Your target prices persist in yo
 
 ## Achievements
 
-Unlock gamified achievement badges earned entirely from your own collection. Badges are awarded for collection size, total and per-record value, genre/decade/country/format diversity, deep knowledge of a single artist or label, and engagement (ratings and annotations). Each badge is tiered (Bronze, Silver, Gold, Platinum) — you unlock them permanently the first time you earn them, and progress bars show how close you are to the next tier.
+Unlock gamified achievement badges earned entirely from your own collection. Badges are awarded for collection size, total and per-record value, genre/decade/country/format diversity, deep knowledge of a single artist or label, and engagement (ratings and annotations). Each badge has several tiers — you unlock them permanently the first time you reach each tier, and progress bars show how close you are to the next tier.
 
 Visit `/achievements` to view your unlocked (full color) and locked badges (greyed out with progress bars). The navigation badge alerts you to newly-earned achievements you haven't viewed yet. Value-based badges assume USD.
 
