@@ -73,4 +73,16 @@ final class WantlistAlertEvaluatorTest extends TestCase
     {
         $this->assertNull($this->e->evaluate(30.0, null, 25.0, null));
     }
+
+    public function testDropReasonRefiresBelowLastAlert(): void
+    {
+        // no target; 30 -> 24 is a drop (<=27); 24 < last alert 26 -> re-fires as 'drop'
+        $this->assertSame('drop', $this->e->evaluate(30.0, 24.0, null, 26.0)['reason']);
+    }
+
+    public function testDropReasonSuppressedAtOrAboveLastAlert(): void
+    {
+        // no target; 30 -> 26.5 is a drop (<=27) but 26.5 >= last alert 26 -> suppressed
+        $this->assertNull($this->e->evaluate(30.0, 26.5, null, 26.0));
+    }
 }
