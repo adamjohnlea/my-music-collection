@@ -114,6 +114,11 @@ class MigrationRunner
                 $this->setVersion('18');
                 $version = '18';
             }
+            if ($version === '18') {
+                $this->migrateToV19();
+                $this->setVersion('19');
+                $version = '19';
+            }
 
             $this->pdo->commit();
 
@@ -504,6 +509,46 @@ class MigrationRunner
         if (!in_array('cover_color', $cols, true)) {
             $this->pdo->exec('ALTER TABLE images ADD COLUMN cover_color TEXT');
         }
+    }
+
+    private function migrateToV19(): void
+    {
+        // Wantlist price-drop alerts: per-want target, price history, and alert records.
+        // PRAGMA guard for idempotency (ValueReset rewinds schema_version to 15 and re-runs).
+        $cols = array_map(
+            fn($r) => (string)$r['name'],
+            $this->pdo->query("PRAGMA table_info(wantlist_items)")->fetchAll(PDO::FETCH_ASSOC)
+        );
+        if (!in_array('target_price', $cols, true)) {
+            $this->pdo->exec('ALTER TABLE wantlist_items ADD COLUMN target_price REAL');
+        }
+
+        $this->pdo->exec('CREATE TABLE IF NOT EXISTS wantlist_price_history (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL DEFAULT 1,
+            release_id INTEGER NOT NULL,
+            num_for_sale INTEGER,
+            lowest_price REAL,
+            currency TEXT,
+            captured_at TEXT NOT NULL
+        )');
+        $this->pdo->exec('CREATE INDEX IF NOT EXISTS idx_wantlist_price_history_key
+            ON wantlist_price_history(user_id, release_id, captured_at)');
+
+        $this->pdo->exec('CREATE TABLE IF NOT EXISTS wantlist_alerts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL DEFAULT 1,
+            release_id INTEGER NOT NULL,
+            reason TEXT NOT NULL,
+            old_price REAL,
+            new_price REAL NOT NULL,
+            currency TEXT,
+            created_at TEXT NOT NULL,
+            read_at TEXT,
+            dismissed_at TEXT
+        )');
+        $this->pdo->exec('CREATE INDEX IF NOT EXISTS idx_wantlist_alerts_active
+            ON wantlist_alerts(user_id, dismissed_at, created_at)');
     }
 
     public function rebuildSearch(): void

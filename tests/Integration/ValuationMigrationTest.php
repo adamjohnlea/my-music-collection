@@ -24,7 +24,7 @@ final class ValuationMigrationTest extends TestCase
         $this->assertContains('valuation_snapshots', $tables);
 
         $version = $pdo->query("SELECT v FROM kv_store WHERE k='schema_version'")->fetchColumn();
-        $this->assertSame('18', (string)$version);
+        $this->assertSame('19', (string)$version);
     }
 
     public function testItemValuationsUniqueOnScopeReleaseInstance(): void

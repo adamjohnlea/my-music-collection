@@ -22,6 +22,6 @@ final class WantlistMarketplaceMigrationTest extends TestCase
         $this->assertContains('market_fetched_at', $cols);
 
         $version = $pdo->query("SELECT v FROM kv_store WHERE k='schema_version'")->fetchColumn();
-        $this->assertSame('18', (string)$version);
+        $this->assertSame('19', (string)$version);
     }
 }
