@@ -6,11 +6,13 @@
 <style>
   .alert-list { list-style:none; padding:0; margin:16px 0; display:flex; flex-direction:column; gap:8px; }
   .alert-row { display:flex; align-items:center; gap:12px; padding:10px 12px; border:1px solid var(--border); border-radius:10px; background: var(--card); }
-  .alert-row.unread { border-color: var(--accent, #e5484d); }
+  .alert-row.unread { border-color: var(--accent); }
   .alert-thumb { width:48px; height:48px; object-fit:cover; border-radius:6px; }
   .alert-body { flex:1; min-width:0; }
   .alert-title { font-weight:600; }
   .alert-meta { display:flex; align-items:center; gap:8px; margin-top:4px; font-size:.85rem; flex-wrap:wrap; }
+  .badge{font:600 .66rem/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;display:inline-flex;align-items:center;gap:5px;padding:5px 7px;border-radius:999px;border:1px solid var(--border-soft);color:var(--muted);white-space:nowrap}
+  .badge.good{color:var(--up)}
 </style>
 {% endblock %}
 

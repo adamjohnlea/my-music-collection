@@ -18,7 +18,7 @@ final class PriceSparkline
             return null;
         }
 
-        $values = array_map(static fn (array $h): float => $h['lowest_price'], $history);
+        $values = array_values(array_map(static fn (array $h): float => $h['lowest_price'], $history));
         $min = min($values);
         $max = max($values);
         $span = $max - $min;
