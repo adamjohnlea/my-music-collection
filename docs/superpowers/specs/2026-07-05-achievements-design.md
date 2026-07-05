@@ -89,22 +89,28 @@ migration changes.
 
 ---
 
-## 4. Data model — migration V19
+## 4. Data model — migration V20
 
-Current schema version is 18; achievements is **V19**, added as a new
-`migrateToV19()` gate in `MigrationRunner` following the existing pattern.
+The highest existing schema version is 19 (the wantlist price-drop alerts
+feature). Achievements is **V20**, added as a new `migrateToV20()` gate in
+`MigrationRunner` following the existing pattern.
 
 ```sql
 CREATE TABLE IF NOT EXISTS achievements (
-  username        TEXT    NOT NULL,
-  achievement_key TEXT    NOT NULL,   -- 'collector', 'time_traveler', …
-  tier            INTEGER NOT NULL,   -- 1 = bronze, 2 = silver, …
-  unlocked_at     TEXT    NOT NULL,   -- ISO-8601; frozen when first earned
-  seen_at         TEXT,               -- NULL = unacknowledged (drives nav badge)
-  PRIMARY KEY (username, achievement_key, tier)
+  user_id         INTEGER NOT NULL DEFAULT 1,  -- single-user today; multi-user-ready
+  achievement_key TEXT    NOT NULL,            -- 'collector', 'time_traveler', …
+  tier            INTEGER NOT NULL,            -- 1 = bronze, 2 = silver, …
+  unlocked_at     TEXT    NOT NULL,            -- ISO-8601; frozen when first earned
+  seen_at         TEXT,                        -- NULL = unacknowledged (nav badge)
+  PRIMARY KEY (user_id, achievement_key, tier)
 );
 ```
 
+- **`user_id`-scoped** (default 1) to match the immediately-preceding alerts
+  tables (`wantlist_alerts`, `wantlist_price_history`) and the project's
+  multi-user-readiness convention. Repository methods take `string $username`
+  for interface symmetry but bind `user_id = 1` internally, exactly as the
+  wantlist-alert methods do.
 - One row **per unlocked tier**, so each promotion (bronze→silver) is its own
   "recently earned" event with its own `unlocked_at`.
 - A row is **never deleted or downgraded** by evaluation. Unlocks are permanent.
@@ -189,12 +195,17 @@ On `SqliteCollectionRepository` (alongside the existing wantlist-alert methods):
 
 `AchievementService::evaluateAndPersist()` is invoked from:
 1. **`/achievements` page load** — primary; always current, works with no sync.
-2. **End of the sync-refresh and value console commands** — so the nav badge
-   lights up after a background run without visiting the page.
+2. **End of the `value` console command** — after valuations are written, so the
+   nav badge lights up following a routine (or cron) valuation run without the
+   user having to open the page. This is the single most valuable background
+   trigger, since the value milestones are the headline badges.
 
 Both call the same idempotent service — no second implementation. The console
-integration is a single call appended after the existing valuation/sync work
-completes, mirroring how `WantlistMarketplaceRefresher` evaluates alerts.
+integration is a single call appended after the existing valuation work
+completes, mirroring how `ValueCommand` already wires repositories from the
+shared `$pdo`. (A future iteration can add the same one-line call to the
+collection-sync command so diversity/size badges also light the badge in the
+background; the page-load path already covers that case on next visit.)
 
 ---
 
@@ -238,7 +249,7 @@ currency.
   tier, progress-toward-next math.
 - **Unit — `AchievementCatalog`:** every definition has ascending tier
   thresholds and required fields (guards against catalog typos).
-- **Integration — migration V19:** table exists with correct columns after
+- **Integration — migration V20:** table exists with correct columns after
   `MigrationRunner::run()`, and re-running is a no-op. Mirrors
   `WantlistAlertsMigrationTest`.
 - **Integration — `AchievementService`:** evaluate→persist writes expected rows;
@@ -253,4 +264,4 @@ currency.
 Grail Get (needs wantlist-removal tracking), Born This Year (needs a birth-year
 setting), rarity/quality badges (need have-counts/condition data), Night Owl,
 hidden `???` badges, JS toasts, poster stamping, achievements leaderboards. The
-V19 schema accommodates hidden badges and extra tiers without change.
+V20 schema accommodates hidden badges and extra tiers without change.
