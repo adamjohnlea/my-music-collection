@@ -3,12 +3,16 @@ declare(strict_types=1);
 
 namespace App\Console;
 
+use App\Domain\Achievements\AchievementCatalog;
+use App\Domain\Achievements\AchievementEvaluator;
+use App\Domain\Achievements\AchievementService;
 use App\Domain\Valuation\CurrencyFormat;
 use App\Http\DiscogsHttpClient;
 use App\Infrastructure\Config;
 use App\Infrastructure\DiscogsPricingClient;
 use App\Infrastructure\KvStore;
 use App\Infrastructure\MigrationRunner;
+use App\Infrastructure\Persistence\SqliteCollectionRepository;
 use App\Infrastructure\Persistence\SqliteValuationRepository;
 use App\Infrastructure\Storage;
 use App\Sync\CollectionValuer;
@@ -76,6 +80,18 @@ final class ValueCommand extends Command
                 ucfirst($scope), $n, CurrencyFormat::symbol($totals['currency'] ?? null), number_format($totals['total'], 2),
                 $totals['valued_count'], $totals['item_count'], $assumedNote
             ));
+        }
+
+        // Refresh achievements so the nav badge reflects new value milestones.
+        $achievements = new AchievementService(
+            new SqliteCollectionRepository($pdo),
+            new AchievementCatalog(),
+            new AchievementEvaluator(),
+        );
+        $newlyEarned = $achievements->evaluateAndPersist($username)['recently_earned'];
+        if ($newlyEarned !== []) {
+            $names = implode(', ', array_map(static fn(array $b): string => (string)$b['name'], $newlyEarned));
+            $output->writeln(sprintf('<info>🏆 New achievement(s): %s</info>', $names));
         }
 
         foreach ($valuer->getErrors() as $err) {
