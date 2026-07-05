@@ -823,10 +823,18 @@ final class PosterReleaseFinder
             (SELECT MAX(ci2.rating) FROM $itemsTable ci2 WHERE ci2.release_id = r.id AND ci2.username = :u) AS rating,
             (SELECT MAX(ci3.added) FROM $itemsTable ci3 WHERE ci3.release_id = r.id AND ci3.username = :u) AS added_at,
             (SELECT iv.value FROM item_valuations iv WHERE iv.release_id = r.id AND iv.scope = :scope LIMIT 1) AS valuation,
-            (SELECT i.local_path FROM images i WHERE i.release_id = r.id
-                ORDER BY (i.source_url = r.cover_url) DESC, i.id ASC LIMIT 1) AS cover_path,
-            (SELECT i.cover_color FROM images i WHERE i.release_id = r.id
-                ORDER BY (i.source_url = r.cover_url) DESC, i.id ASC LIMIT 1) AS cover_color
+            -- Prefer the primary cover (source_url = r.cover_url), else any image. NOTE: the outer
+            -- correlation r.cover_url is only valid in a subquery's WHERE, not its ORDER BY (SQLite
+            -- rejects the latter), so we use two WHERE-correlated subqueries + COALESCE — the same
+            -- pattern as ExportStaticCommand::fetchAllReleases.
+            COALESCE(
+                (SELECT i.local_path FROM images i WHERE i.release_id = r.id AND i.source_url = r.cover_url ORDER BY i.id ASC LIMIT 1),
+                (SELECT i.local_path FROM images i WHERE i.release_id = r.id ORDER BY i.id ASC LIMIT 1)
+            ) AS cover_path,
+            COALESCE(
+                (SELECT i.cover_color FROM images i WHERE i.release_id = r.id AND i.source_url = r.cover_url ORDER BY i.id ASC LIMIT 1),
+                (SELECT i.cover_color FROM images i WHERE i.release_id = r.id ORDER BY i.id ASC LIMIT 1)
+            ) AS cover_color
         FROM releases r
         WHERE " . implode(' AND ', $where) . "
         GROUP BY r.id
