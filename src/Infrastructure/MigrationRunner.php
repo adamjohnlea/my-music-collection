@@ -119,6 +119,11 @@ class MigrationRunner
                 $this->setVersion('19');
                 $version = '19';
             }
+            if ($version === '19') {
+                $this->migrateToV20();
+                $this->setVersion('20');
+                $version = '20';
+            }
 
             $this->pdo->commit();
 
@@ -549,6 +554,20 @@ class MigrationRunner
         )');
         $this->pdo->exec('CREATE INDEX IF NOT EXISTS idx_wantlist_alerts_active
             ON wantlist_alerts(user_id, dismissed_at, created_at)');
+    }
+
+    private function migrateToV20(): void
+    {
+        // Achievements: one row per unlocked (achievement_key, tier). user_id-scoped
+        // to match the wantlist-alert tables; single-user binds user_id = 1.
+        $this->pdo->exec('CREATE TABLE IF NOT EXISTS achievements (
+            user_id         INTEGER NOT NULL DEFAULT 1,
+            achievement_key TEXT    NOT NULL,
+            tier            INTEGER NOT NULL,
+            unlocked_at     TEXT    NOT NULL,
+            seen_at         TEXT,
+            PRIMARY KEY (user_id, achievement_key, tier)
+        )');
     }
 
     public function rebuildSearch(): void
