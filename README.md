@@ -1,8 +1,38 @@
 # My Music Collection (Discogs)
 
+**Your Discogs collection, local‑first and lightning‑fast — browse, search, value, and theme it, entirely from your own machine.**
+
+[![CI](https://github.com/adamjohnlea/my-music-collection/actions/workflows/ci.yml/badge.svg)](https://github.com/adamjohnlea/my-music-collection/actions/workflows/ci.yml)
+![PHP 8.4](https://img.shields.io/badge/PHP-8.4-777BB4?logo=php&logoColor=white)
+![PHPStan level 6](https://img.shields.io/badge/PHPStan-level%206-2a6a99)
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
+
 Local‑first Discogs collection viewer written in PHP 8.4. Imports your collection into SQLite, caches cover images to disk, and serves a fast Twig UI with powerful full‑text search and optional release enrichment. All browsing is from your local DB + images — no live API calls while you use the app.
 
-• Personal use. If you self‑host publicly, respect Discogs ToU: refresh ≤6h and show attribution (“Data provided by Discogs.” + link/trademark).
+![Collection home](docs/screenshots/home.jpg)
+
+> **Personal use.** If you self‑host publicly, respect Discogs ToU: refresh ≤6h and show attribution (“Data provided by Discogs.” + link/trademark).
+
+## Contents
+- [Features](#features)
+- [Screenshots](#screenshots)
+- [Prerequisites](#prerequisites)
+- [Quick start](#quick-start)
+- [Web Console Interface](#web-console-interface)
+- [Search](#search)
+- [AI Recommendations](#ai-recommendations)
+- [Apple Music Integration](#apple-music-integration)
+- [Appearance & theming](#appearance--theming)
+- [Collection poster](#collection-poster)
+- [Sorting](#sorting)
+- [Notes, ratings, and conditions](#notes-ratings-and-conditions)
+- [Collection valuation](#collection-valuation)
+- [Wantlist price-drop alerts](#wantlist-price-drop-alerts)
+- [Achievements](#achievements)
+- [Commands overview](#commands-overview)
+- [Development](#development)
+- [FAQ](#faq)
+- [Troubleshooting](#troubleshooting)
 
 ## Features
 - Local‑first: SQLite database + cached images (no API calls during normal browsing)
@@ -19,8 +49,22 @@ Local‑first Discogs collection viewer written in PHP 8.4. Imports your collect
 - Randomizer: "Surprise Me" button to pick a random release from your collection
 - Live Discogs Search: find and add releases directly to your collection or wantlist from the web UI
 - AI-Powered Recommendations: get personalized recommendations for artists and releases based on what's in your collection (powered by Anthropic Claude)
+- Collection Valuation: price every record at its actual condition using Discogs marketplace data, with value-over-time tracking and an insurance CSV export
+- Wantlist Price-Drop Alerts: set target prices and get notified when items you're hunting drop in price
+- Achievements: unlock gamified badges earned from your own collection
+- Fully Themeable: a live theme editor with dark/light modes, presets, and per-token colour control
+- Collection Poster: render a high-resolution cover-wall poster of your collection
 - Static Site Generator: export your collection as a standalone, portable web app
 - Apple Music Integration: listen to releases directly in the app (requires barcodes and an Apple Music Developer Token)
+
+## Screenshots
+
+|  |  |
+| --- | --- |
+| **Release detail** — tracklist, credits, gallery, Apple Music | **Collection statistics** — value over time, top artists & genres |
+| [![Release detail](docs/screenshots/release.jpg)](docs/screenshots/release.jpg) | [![Statistics](docs/screenshots/stats.jpg)](docs/screenshots/stats.jpg) |
+| **Achievements** — gamified, tiered badges | **Theme editor** — live, token-level theming |
+| [![Achievements](docs/screenshots/achievements.jpg)](docs/screenshots/achievements.jpg) | [![Theme editor](docs/screenshots/theme.jpg)](docs/screenshots/theme.jpg) |
 
 ## Prerequisites
 - PHP 8.4 (Herd recommended)
@@ -115,6 +159,10 @@ All console commands can be run from a web-based interface with real-time progre
    - Backfill Images - Download cover images
    - Rebuild Search Index - Maintain search functionality
    - Push Changes - Sync local edits to Discogs
+   - Value Collection - Price releases from Discogs marketplace data
+   - Export Insurance CSV - Download a dated valuation manifest
+   - Refresh Wantlist Availability - Update wantlist prices and check alerts
+   - Generate Poster - Render a cover-wall poster image
    - Export Static Site - Generate standalone HTML
 
 For detailed documentation, see [docs/web-console-commands.md](docs/web-console-commands.md)
@@ -185,6 +233,30 @@ The application can embed an Apple Music player on release pages by matching the
    - Run `php bin/console sync:enrich --limit=100` to fetch details for your releases.
 3. **Usage**: Open any release page and click the **"Tracks"** tab. If a matching album is found on Apple Music, the player will appear automatically below the tracklist.
 4. **Caching**: Matches are stored in your local database to ensure the player loads instantly on subsequent visits.
+
+## Appearance & theming
+The entire UI is driven by colour tokens you can customise from a live editor at `/theme` (or **More → Theme** in the navigation).
+
+1. **Modes**: Toggle between **Dark** and **Light** base palettes.
+2. **Presets**: Start from a built-in accent preset, or dial in your own values for every surface, text, border, and accent token.
+3. **Live preview**: A preview panel re-themes in real time as you edit — nothing is persisted until you click **Save**. **Reset** restores the defaults.
+4. **Persistence**: Your customisations are stored as a diff in the local database and are also baked into the static export, so exported sites keep your look.
+
+There is also an in-app **Help** page at `/help` (**More → Help**) that documents search syntax and features without leaving the app.
+
+## Collection poster
+Render a high-resolution "cover wall" poster of your collection as a single image, suitable for printing.
+
+```
+php bin/console poster:generate [--filter="genre:Jazz"] [--smart="Name"] [--wantlist] \
+  [--order=added|artist|title|year|rating|valuation|shuffle|color] [--cols=N] \
+  [--resolution=4000] [--gap=0] [--bg=#111111] [--title="My Wall"] [--format=jpg|png] [--seed=N]
+```
+
+- **Requires the [Imagick](https://www.php.net/manual/en/book.imagick.php) PHP extension.**
+- Filter the poster to any search query (`--filter`) or a saved Smart Collection (`--smart`), or build it from your wantlist (`--wantlist`).
+- Order tiles by metadata or by dominant cover **color** for a gradient effect; `--title` adds a caption bar with collection stats.
+- Images are written to `var/posters/` and can be downloaded from the web UI. You can also run this from the `/tools` console.
 
 ## Sorting
 - Default: Added (newest first)
@@ -279,8 +351,10 @@ All commands below can be run from the **command line** or from the **Web Consol
 - `php bin/console sync:push` — push queued rating/note/collection changes to Discogs
 - `php bin/console export:static [--out=dist] [--base-url=/] [--copy-images] [--chunk-size=N]` — generate a static site of your collection
 - `php bin/console value [--scope=collection|wantlist|both] [--limit=N] [--force] [--id=ID]` — price releases using Discogs marketplace data
+- `php bin/console value:wants` — refresh wantlist marketplace prices and evaluate price-drop alerts
 - `php bin/console value:export [--out=PATH] [--scope=…]` — export insurance CSV manifest
 - `php bin/console value:reset --confirm` — remove all valuation data (reversible via re-run of `value`)
+- `php bin/console poster:generate [--filter=… | --smart=… | --wantlist] [--order=…] [--title=…]` — render a cover-wall poster (requires Imagick)
 
 For detailed command documentation:
 - CLI usage and safety notes: [docs/console-commands.md](docs/console-commands.md)
