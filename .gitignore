@@ -63,3 +63,6 @@ var/valuation-*.csv
 
 # Node deps for one-off tooling scripts (e.g. bin/capture-help-screenshots.mjs)
 /node_modules/
+
+# Claude Code local config
+.claude/
