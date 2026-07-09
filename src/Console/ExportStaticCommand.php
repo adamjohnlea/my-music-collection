@@ -145,7 +145,7 @@ class ExportStaticCommand extends Command
             ]);
             file_put_contents($pagesDir . '/' . $rid . '.html', $html);
             $n++;
-            if (($n % 100) === 0) $output->writeln("  - $n / $totalToExport");
+            if (($n % 100) === 0 || $n === $totalToExport) $output->writeln("  - $n / $totalToExport");
         }
 
         // 3) Copy images (optional)

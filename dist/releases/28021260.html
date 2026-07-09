@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -8,12 +8,56 @@
     :root {
       --bg: #0b0b0c;
       --card: #16171a;
+      --card-2: #191b1f;
+      --input-bg: #101114;
+      --hover-surface: #1d1f24;
+      --btn-bg: #1f2937;
+      --btn-bg-hover: #232f41;
       --text: #e7e7ea;
       --muted: #a0a3aa;
+      --faint: #6c6f77;
+      --btn-ink: #ffffff;
       --accent: #67e8f9;
       --border: #2a2b2f;
-      --header-bg: rgba(11, 11, 12, 0.8);
-    }
+      --border-soft: #212226;
+      --raised-border: #3a3d44;
+      --up: #34d399;
+      --down: #f87171;
+      --warn: #e0a458;
+      --danger: #ff4444;
+            /* derived — follow the editable tokens above */
+      --accent-hover: color-mix(in srgb, var(--accent) 74%, #fff);
+      --accent-ink: color-mix(in srgb, var(--accent) 22%, #000);
+      --header-bg: color-mix(in srgb, var(--bg) 80%, transparent);
+      --wash: rgba(255,255,255,.05);
+      --raised-bg: linear-gradient(135deg,#222631,#1a1d24);
+      --skeleton-bg: linear-gradient(90deg,#1a1b1f 25%,#22242a 37%,#1a1b1f 63%);
+      --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+          }
+    :root[data-theme="light"] {
+      --bg: #f7f7f8;
+      --card: #ffffff;
+      --card-2: #f1f2f4;
+      --input-bg: #ffffff;
+      --hover-surface: #eceef1;
+      --btn-bg: #e5e7eb;
+      --btn-bg-hover: #d7dbe0;
+      --text: #17181b;
+      --muted: #55585f;
+      --faint: #8a8d94;
+      --btn-ink: #17181b;
+      --accent: #0891b2;
+      --border: #d8dae0;
+      --border-soft: #e6e8ec;
+      --raised-border: #c4c8d0;
+      --up: #059669;
+      --down: #dc2626;
+      --warn: #b45309;
+      --danger: #dc2626;
+            --wash: rgba(0,0,0,.045);
+      --raised-bg: linear-gradient(135deg,#eef1f5,#e3e7ee);
+      --skeleton-bg: linear-gradient(90deg,#eceef1 25%,#f4f5f7 37%,#eceef1 63%);
+          }
     html, body {
       margin: 0;
       padding: 0;
@@ -56,6 +100,7 @@
       justify-content: center;
     }
     .btn-small:hover { border-color: var(--accent); text-decoration: none; }
+    .alert-badge { display:inline-block; min-width:16px; padding:0 5px; font-size:.7rem; line-height:16px; text-align:center; color:#fff; background: var(--accent); border-radius:999px; vertical-align:middle; }
 
     /* Common Header Components */
     .main-header {
@@ -105,7 +150,45 @@
       color: var(--text);
       text-decoration: none;
     }
-    .dropdown-item:hover { background: rgba(255,255,255,0.05); }
+    .dropdown-item:hover { background: var(--wash); }
+
+    /* Nav "More" Dropdown */
+    .nav-more { position: relative; display: inline-block; }
+    .nav-more-trigger {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font: inherit;
+      color: var(--muted);
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .nav-more-trigger:hover { color: var(--text); }
+    .nav-more-caret { font-size: 0.8em; transition: transform 0.15s ease; }
+    .nav-more[data-open="true"] .nav-more-caret { transform: rotate(180deg); }
+    .nav-more-panel {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: calc(100% + 8px);
+      background: var(--card);
+      min-width: 180px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      padding: 8px 0;
+      z-index: 101;
+    }
+    .nav-more[data-open="true"] .nav-more-panel { display: block; }
+    .nav-more-item {
+      display: block;
+      padding: 8px 16px;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .nav-more-item:hover { background: var(--wash); }
 
     /* Mobile Nav / Hamburger */
     .mobile-nav-toggle {
@@ -189,12 +272,74 @@
     .dot.active { background: var(--accent); opacity: 1; }
 
     /* Tabs */
-    .tabs { display: flex; gap: 4px; border-bottom: 1px solid #2a2b2f; margin-top: 24px; overflow-x: auto; scrollbar-width: none; }
+    .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-top: 24px; overflow-x: auto; scrollbar-width: none; }
     .tabs::-webkit-scrollbar { display: none; }
     .tab { padding: 12px 20px; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; white-space: nowrap; }
     .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
     .tab-content { display: none; padding-top: 20px; }
     .tab-content.active { display: block; }
+
+    /* --- console design language --- */
+    .num{font-variant-numeric:tabular-nums}
+    .by{color:var(--muted);font-size:1.15rem;margin:0 0 2px}
+    .country{color:var(--faint);font:500 .8rem var(--mono);margin:0}
+    .community{margin:12px 0 0;font:600 .84rem var(--mono);color:var(--muted);font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+    .community b{color:var(--text)}
+    .community .star{color:var(--warn)}
+    .community .sep{color:var(--faint)}
+    .pills{display:flex;gap:7px;flex-wrap:wrap;margin:16px 0}
+    .pill{font:600 .72rem var(--mono);padding:5px 11px;border-radius:999px;border:1px solid var(--border-soft);color:var(--muted)}
+    .pill.style{color:var(--faint)}
+    .labels{color:var(--muted);font-size:.88rem;margin:0 0 4px}
+    .labels b{color:var(--text);font-weight:600}
+    .badge{font:600 .66rem/1 var(--mono);letter-spacing:.05em;text-transform:uppercase;display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border-radius:999px;border:1px solid var(--border-soft);color:var(--muted);white-space:nowrap}
+    .badge .pip{width:6px;height:6px;border-radius:50%;background:currentColor}
+    .badge.good{color:var(--up)}
+    .badge.net{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 30%,transparent)}
+    .badge.warn{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 35%,transparent)}
+    .badge .star{color:var(--warn)}
+    .eyebrow{font:600 .72rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+    .row-between{display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .own{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+    .status-btn{font:600 .72rem var(--mono);letter-spacing:.03em;background:var(--card-2);border:1px solid var(--border-soft);border-radius:999px;padding:6px 11px;cursor:pointer;color:var(--muted)}
+    .status-btn:hover{border-color:var(--border)}
+    .status-btn.primary{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 30%,transparent)}
+    .kv{display:grid;grid-template-columns:auto 1fr;gap:10px 16px;align-items:center;margin-top:10px}
+    .kv .k{font:600 .7rem var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+    .note-text{color:var(--muted);font-size:.92rem;margin-top:14px;white-space:pre-wrap}
+    .valueline{margin-top:16px;padding-top:14px;border-top:1px solid var(--border-soft);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .valueline .big{font-weight:750;font-size:1.3rem;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+    .valueline .asof{color:var(--faint);font:500 .74rem var(--mono);margin-left:auto}
+    #notesForm{gap:14px !important}
+    #notesForm label{font:600 .72rem var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+    #notesForm select,#notesForm textarea{width:100%;background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:9px 10px;font:inherit;font-size:.9rem;box-sizing:border-box}
+    #notesForm .save{background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:10px 18px;cursor:pointer;font-weight:700;font-size:.9rem}
+    /* Tracks / Details / Credits sections */
+    .sec + .sec{margin-top:22px;padding-top:20px;border-top:1px solid var(--border-soft)}
+    .sec .eyebrow + *{margin-top:12px}
+    /* Tracks */
+    .side{font:600 .68rem/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin:2px 0 8px}
+    .track + .side{margin-top:26px}
+    .track{display:grid;grid-template-columns:34px 1fr auto;align-items:baseline;gap:12px;padding:7px 0;border-bottom:1px solid var(--border-soft)}
+    .track:last-child{border-bottom:0}
+    .track .pos{font:600 .8rem var(--mono);color:var(--faint);font-variant-numeric:tabular-nums}
+    .track .tt{font-size:.95rem}
+    .track .dur{font:600 .82rem var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+    /* Details */
+    .fmt-desc{color:var(--faint);font-size:.88rem;margin-left:8px}
+    .notes{color:var(--muted);font-size:.92rem;white-space:pre-wrap;line-height:1.6}
+    .vids{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+    .vids a{display:inline-flex;align-items:center;gap:9px;font-size:.92rem;color:var(--accent)}
+    .vids .play{color:var(--accent);font-size:.7rem}
+    .barcode{display:flex;gap:10px;align-items:baseline;font:600 .84rem var(--mono);color:var(--text);padding:5px 0;font-variant-numeric:tabular-nums}
+    .barcode .bd{color:var(--faint);font-weight:500;font-size:.76rem;text-transform:uppercase;letter-spacing:.04em}
+    /* Credits */
+    .credit{display:grid;grid-template-columns:1fr auto;gap:6px 16px;align-items:baseline;padding:8px 0;border-bottom:1px solid var(--border-soft)}
+    .credit:last-child{border-bottom:0}
+    .credit .cname{font-size:.95rem}
+    .credit .crole{font:600 .74rem var(--mono);color:var(--muted);text-align:right;letter-spacing:.02em}
+    .credit .ctracks{color:var(--faint);font-weight:500}
+    @media (max-width:520px){ .credit{grid-template-columns:1fr} .credit .crole{text-align:left} }
 
     /* Skeleton Loader */
     @keyframes skeleton-loading {
@@ -236,10 +381,10 @@
         <div class="desktop-nav">
           <a href="../index.html" class="muted">Collection</a>
           <a href="../wantlist.html" class="muted">Wantlist</a>
-          <a href="javascript:void(0)" class="muted" onclick="if(window.surpriseMe)window.surpriseMe();">Surprise Me</a>
           <a href="../stats.html" class="muted">Stats</a>
-          <a href="../about.html" class="muted">About</a>
-        </div>
+                                <a href="javascript:void(0)" class="muted" onclick="if(window.surpriseMe)window.surpriseMe();">Surprise Me</a>
+            <a href="../about.html" class="muted">About</a>
+                  </div>
 
         <button class="mobile-nav-toggle" id="mobile-toggle" aria-label="Toggle menu">☰</button>
       </div>
@@ -249,10 +394,10 @@
   <div class="mobile-menu" id="mobile-menu">
     <a href="../index.html" class="nav-item">Collection</a>
     <a href="../wantlist.html" class="nav-item">Wantlist</a>
-    <a href="javascript:void(0)" class="nav-item" onclick="if(window.surpriseMe)window.surpriseMe();">Surprise Me</a>
+            <a href="javascript:void(0)" class="nav-item" onclick="if(window.surpriseMe)window.surpriseMe();">Surprise Me</a>
     <a href="../stats.html" class="nav-item">Stats</a>
     <a href="../about.html" class="nav-item">About</a>
-  </div>
+              </div>
 
   <div class="wrap">
       <nav class="breadcrumbs">
@@ -269,7 +414,7 @@
   
     <div class="wrap content-wrap">
     <div style="margin-bottom:24px">
-      <p style="margin:0"><a href="../index.html" style="background:var(--card);border:1px solid #2a2b2f;padding:6px 12px;border-radius:8px;color:var(--text);font-size:.9rem;text-decoration:none">← Back</a></p>
+      <p style="margin:0"><a href="../index.html" style="background:var(--card);border:1px solid var(--border);padding:6px 12px;border-radius:8px;color:var(--text);font-size:.9rem;text-decoration:none">← Back</a></p>
     </div>
                 <div class="layout">
         <div>
@@ -429,127 +574,127 @@
                           </div>
             <div class="thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;">
                               <button class="thumb" data-idx="0" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/c8bb0d2532635255436d35c5608f7e9831e6cf64.jpg" alt="thumb 1" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:1" />
+                  <img src="../images/28021260/c8bb0d2532635255436d35c5608f7e9831e6cf64.jpg" alt="thumb 1" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:1" />
                 </button>
                               <button class="thumb" data-idx="1" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/d06303e178681606ed2c7f62ec16923cf19a57ae.jpg" alt="thumb 2" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/d06303e178681606ed2c7f62ec16923cf19a57ae.jpg" alt="thumb 2" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="2" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/a8516f65e53a8f201cb9485d9dfe28385cb9c693.jpg" alt="thumb 3" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/a8516f65e53a8f201cb9485d9dfe28385cb9c693.jpg" alt="thumb 3" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="3" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/1d3c5798570182fa383e66a30eba12fcc5479207.jpg" alt="thumb 4" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/1d3c5798570182fa383e66a30eba12fcc5479207.jpg" alt="thumb 4" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="4" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/2d4e75af6825bea6ca68479d2fe7b9fcbe3d7e43.jpg" alt="thumb 5" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/2d4e75af6825bea6ca68479d2fe7b9fcbe3d7e43.jpg" alt="thumb 5" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="5" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/62e799279514126da509a9879be0479066d1ba74.jpg" alt="thumb 6" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/62e799279514126da509a9879be0479066d1ba74.jpg" alt="thumb 6" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="6" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/5ab7692d9d766b7d42cbec9b44594bbf13ea2093.jpg" alt="thumb 7" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/5ab7692d9d766b7d42cbec9b44594bbf13ea2093.jpg" alt="thumb 7" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="7" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/a2253b5fdf4c8decf3e0c3da2fa885a868d5ff7c.jpg" alt="thumb 8" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/a2253b5fdf4c8decf3e0c3da2fa885a868d5ff7c.jpg" alt="thumb 8" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="8" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/10eb537ce4529160a8f454195093ce06a452e038.jpg" alt="thumb 9" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/10eb537ce4529160a8f454195093ce06a452e038.jpg" alt="thumb 9" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="9" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/104e36b69ac301e3571289f3971878e09525f52b.jpg" alt="thumb 10" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/104e36b69ac301e3571289f3971878e09525f52b.jpg" alt="thumb 10" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="10" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/3c853cf5f413e498339ed2abf75f48a2bbfc5242.jpg" alt="thumb 11" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/3c853cf5f413e498339ed2abf75f48a2bbfc5242.jpg" alt="thumb 11" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="11" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/9166c4e3ed3231f9ca17f158275c655945b9eafe.jpg" alt="thumb 12" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/9166c4e3ed3231f9ca17f158275c655945b9eafe.jpg" alt="thumb 12" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="12" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/0a2d1dcd1f8732ff9080e7b4d8d96bc9dbdc07bc.jpg" alt="thumb 13" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/0a2d1dcd1f8732ff9080e7b4d8d96bc9dbdc07bc.jpg" alt="thumb 13" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="13" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/7f41a1b2f3f43dd5222e763cc458385827d264fe.jpg" alt="thumb 14" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/7f41a1b2f3f43dd5222e763cc458385827d264fe.jpg" alt="thumb 14" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="14" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/c04a49a963a052b3d59718690e97da5857db03c8.jpg" alt="thumb 15" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/c04a49a963a052b3d59718690e97da5857db03c8.jpg" alt="thumb 15" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="15" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/b5e9623b88bb77bdf2eebd2ab319753475e520bf.jpg" alt="thumb 16" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/b5e9623b88bb77bdf2eebd2ab319753475e520bf.jpg" alt="thumb 16" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="16" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/a2ea1a9ba97623041e74d2060d121a1cbaa21545.jpg" alt="thumb 17" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/a2ea1a9ba97623041e74d2060d121a1cbaa21545.jpg" alt="thumb 17" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="17" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/ff34c7caeba6ff7f2add5c7b338dc76e40324661.jpg" alt="thumb 18" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/ff34c7caeba6ff7f2add5c7b338dc76e40324661.jpg" alt="thumb 18" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="18" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/004e0488d3922befe0b1fe4a9f5544b402650b26.jpg" alt="thumb 19" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/004e0488d3922befe0b1fe4a9f5544b402650b26.jpg" alt="thumb 19" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="19" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/4737b6ae2fff0acc629e1845a3f9def675cc6877.jpg" alt="thumb 20" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/4737b6ae2fff0acc629e1845a3f9def675cc6877.jpg" alt="thumb 20" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="20" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/6d5268dd62f30fa3919c0a2fa679b91084d0a1de.jpg" alt="thumb 21" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/6d5268dd62f30fa3919c0a2fa679b91084d0a1de.jpg" alt="thumb 21" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="21" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/76c13dc124c37e0a3a1b58423db97c2a6e70e599.jpg" alt="thumb 22" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/76c13dc124c37e0a3a1b58423db97c2a6e70e599.jpg" alt="thumb 22" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="22" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/43e5428794fd6e7e0d6535f54eb7e1e7d7123ca3.jpg" alt="thumb 23" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/43e5428794fd6e7e0d6535f54eb7e1e7d7123ca3.jpg" alt="thumb 23" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="23" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/3762466b434a0f0db1957c0e4f73c268f0892d0f.jpg" alt="thumb 24" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/3762466b434a0f0db1957c0e4f73c268f0892d0f.jpg" alt="thumb 24" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="24" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/3dbd35d1e32bd8324d08552c38f85b98b202f36f.jpg" alt="thumb 25" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/3dbd35d1e32bd8324d08552c38f85b98b202f36f.jpg" alt="thumb 25" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="25" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/2eb744bf21552e0dd0ff2b31a4b7f0bc0484240d.jpg" alt="thumb 26" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/2eb744bf21552e0dd0ff2b31a4b7f0bc0484240d.jpg" alt="thumb 26" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="26" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/4556f8a151c52fae62faa1fbd97a9335b5f6ce54.jpg" alt="thumb 27" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/4556f8a151c52fae62faa1fbd97a9335b5f6ce54.jpg" alt="thumb 27" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="27" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/1277c8a9576a16670ff78ba86b605bf498c103fc.jpg" alt="thumb 28" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/1277c8a9576a16670ff78ba86b605bf498c103fc.jpg" alt="thumb 28" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="28" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/f37d5301aa7912c8e6e50f6c467b8127d4320049.jpg" alt="thumb 29" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/f37d5301aa7912c8e6e50f6c467b8127d4320049.jpg" alt="thumb 29" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="29" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/6e3525b96b9f039c21d4c0d68bb5423d33b84db8.jpg" alt="thumb 30" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/6e3525b96b9f039c21d4c0d68bb5423d33b84db8.jpg" alt="thumb 30" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="30" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/c71bf96d3e23eb01f0eb8facc39bee585da2e483.jpg" alt="thumb 31" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/c71bf96d3e23eb01f0eb8facc39bee585da2e483.jpg" alt="thumb 31" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="31" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/ffa15fc7dbc7fa2e71f702e3e159734205d499f5.jpg" alt="thumb 32" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/ffa15fc7dbc7fa2e71f702e3e159734205d499f5.jpg" alt="thumb 32" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="32" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/10856bbbf7dd0b291ceb09bf57a6efbfdadd356d.jpg" alt="thumb 33" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/10856bbbf7dd0b291ceb09bf57a6efbfdadd356d.jpg" alt="thumb 33" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="33" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/58800f8c7e6b245a9f2691825a6151296e5c5ded.jpg" alt="thumb 34" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/58800f8c7e6b245a9f2691825a6151296e5c5ded.jpg" alt="thumb 34" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="34" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/117b172942172b51d6c5e82afd349d7f197a3cdb.jpg" alt="thumb 35" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/117b172942172b51d6c5e82afd349d7f197a3cdb.jpg" alt="thumb 35" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="35" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/ac624848b0b201f01da63b041496eeff075bb404.jpg" alt="thumb 36" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/ac624848b0b201f01da63b041496eeff075bb404.jpg" alt="thumb 36" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                               <button class="thumb" data-idx="36" style="border:0;background:transparent;padding:0;cursor:pointer">
-                  <img src="../images/28021260/50f0a88a6f04669994ab029762a7f65037475faa.jpg" alt="thumb 37" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #2a2b2f;opacity:.7" />
+                  <img src="../images/28021260/50f0a88a6f04669994ab029762a7f65037475faa.jpg" alt="thumb 37" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
                 </button>
                           </div>
                   </div>
         <div>
           <h1>Stop Making Sense (Music From A Film By Jonathan Demme And Talking Heads)</h1>
-          <p class="muted" style="font-size:1.2rem">Talking Heads • 2023</p>
-          <p class="muted">US</p>
-          <div style="margin:16px 0; display:flex; gap:8px; flex-wrap:wrap">
-            <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Electronic</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Rock</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Funk / Soul</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Stage &amp; Screen</span>            <span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">New Wave</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Post-Punk</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Art Rock</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Soundtrack</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Funk</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Pop Rock</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Indie Rock</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Alternative Rock</span><span class="muted" style="border:1px solid #2a2b2f;border-radius:12px;padding:4px 12px;font-size:.9rem">Leftfield</span>          </div>
+          <p class="by">Talking Heads • 2023</p>
+          <p class="country">US</p>          
+          <div class="pills">
+            <span class="pill">Electronic</span><span class="pill">Rock</span><span class="pill">Funk / Soul</span><span class="pill">Stage &amp; Screen</span>            <span class="pill style">New Wave</span><span class="pill style">Post-Punk</span><span class="pill style">Art Rock</span><span class="pill style">Soundtrack</span><span class="pill style">Funk</span><span class="pill style">Pop Rock</span><span class="pill style">Indie Rock</span><span class="pill style">Alternative Rock</span><span class="pill style">Leftfield</span>          </div>
 
-                      <p class="muted">Labels:
-              Sire (R1 724897), Sire (603497832835)            </p>
+                      <p class="labels">
+              <b>Sire</b> (R1 724897), <b>Sire</b> (603497832835)            </p>
           
           <div class="tabs" id="release-tabs">
             <div class="tab active" data-tab="tracks">Tracks</div>
@@ -561,27 +706,83 @@
           <div id="tab-tracks" class="tab-content active">
                           <div class="card">
                 <div class="meta">
-                  <ol style="margin:0; padding-left:20px">
-                                          <li style="margin-bottom:8px">A1 — Psycho Killer</li>
-                                          <li style="margin-bottom:8px">A2 — Heaven</li>
-                                          <li style="margin-bottom:8px">A3 — Thank You For Sending Me An Angel</li>
-                                          <li style="margin-bottom:8px">A4 — Found A Job</li>
-                                          <li style="margin-bottom:8px">A5 — Slippery People</li>
-                                          <li style="margin-bottom:8px">A6 — Cities</li>
-                                          <li style="margin-bottom:8px">B1 — Burning Down The House</li>
-                                          <li style="margin-bottom:8px">B2 — Life During Wartime</li>
-                                          <li style="margin-bottom:8px">B3 — Making Flippy Floppy</li>
-                                          <li style="margin-bottom:8px">B4 — Swamp</li>
-                                          <li style="margin-bottom:8px">C1 — What A Day That Was</li>
-                                          <li style="margin-bottom:8px">C2 — This Must Be The Place (Naïve Melody)</li>
-                                          <li style="margin-bottom:8px">C3 — Once In A Lifetime</li>
-                                          <li style="margin-bottom:8px">C4 — Big Business / I Zimbra</li>
-                                          <li style="margin-bottom:8px">D1 — Genius Of Love</li>
-                                          <li style="margin-bottom:8px">D2 — Girlfriend Is Better</li>
-                                          <li style="margin-bottom:8px">D3 — Take Me To The River</li>
-                                          <li style="margin-bottom:8px">D4 — Crosseyed And Painless</li>
-                                      </ol>
-                </div>
+                                                                                                    <div class="side">Side A</div>
+                                        <div class="track">
+                      <span class="pos">A1</span>
+                      <span class="tt">Psycho Killer</span>
+                                          </div>
+                                                                                                  <div class="track">
+                      <span class="pos">A2</span>
+                      <span class="tt">Heaven</span>
+                                          </div>
+                                                                                                  <div class="track">
+                      <span class="pos">A3</span>
+                      <span class="tt">Thank You For Sending Me An Angel</span>
+                                          </div>
+                                                                                                  <div class="track">
+                      <span class="pos">A4</span>
+                      <span class="tt">Found A Job</span>
+                                          </div>
+                                                                                                  <div class="track">
+                      <span class="pos">A5</span>
+                      <span class="tt">Slippery People</span>
+                                          </div>
+                                                                                                  <div class="track">
+                      <span class="pos">A6</span>
+                      <span class="tt">Cities</span>
+                                          </div>
+                                                                                                    <div class="side">Side B</div>
+                                        <div class="track">
+                      <span class="pos">B1</span>
+                      <span class="tt">Burning Down The House</span>
+                                          </div>
+                                                                                                  <div class="track">
+                      <span class="pos">B2</span>
+                      <span class="tt">Life During Wartime</span>
+                                          </div>
+                                                                                                  <div class="track">
+                      <span class="pos">B3</span>
+                      <span class="tt">Making Flippy Floppy</span>
+                                          </div>
+                                                                                                  <div class="track">
+                      <span class="pos">B4</span>
+                      <span class="tt">Swamp</span>
+                                          </div>
+                                                                                                    <div class="side">Side C</div>
+                                        <div class="track">
+                      <span class="pos">C1</span>
+                      <span class="tt">What A Day That Was</span>
+                                          </div>
+                                                                                                  <div class="track">
+                      <span class="pos">C2</span>
+                      <span class="tt">This Must Be The Place (Naïve Melody)</span>
+                                          </div>
+                                                                                                  <div class="track">
+                      <span class="pos">C3</span>
+                      <span class="tt">Once In A Lifetime</span>
+                                          </div>
+                                                                                                  <div class="track">
+                      <span class="pos">C4</span>
+                      <span class="tt">Big Business / I Zimbra</span>
+                                          </div>
+                                                                                                    <div class="side">Side D</div>
+                                        <div class="track">
+                      <span class="pos">D1</span>
+                      <span class="tt">Genius Of Love</span>
+                                          </div>
+                                                                                                  <div class="track">
+                      <span class="pos">D2</span>
+                      <span class="tt">Girlfriend Is Better</span>
+                                          </div>
+                                                                                                  <div class="track">
+                      <span class="pos">D3</span>
+                      <span class="tt">Take Me To The River</span>
+                                          </div>
+                                                                                                  <div class="track">
+                      <span class="pos">D4</span>
+                      <span class="tt">Crosseyed And Painless</span>
+                                          </div>
+                                  </div>
               </div>
             
             <div id="apple-music-player-container" style="margin-top:24px; display:none;">
@@ -592,28 +793,34 @@
           <div id="tab-details" class="tab-content">
             <div class="card">
                 <div class="meta">
-                                            <p class="muted"><strong>Formats:</strong>
-                                                    Vinyl (PRP Pressing)                                                </p>
-                                        
+                                            <div class="sec">
+                            <div class="eyebrow">Format</div>
+                            <div>
+                                <span class="pill">Vinyl</span><span class="fmt-desc">PRP Pressing</span>                            </div>
+                        </div>
                     
-                                            <p><strong>Videos:</strong></p>
-                        <ul style="margin:0; padding-left:20px">
-                                                    <li><a href="https://www.youtube.com/watch?v=KgTuKpkHcMo" target="_blank" rel="noopener">Psycho Killer (Live) (2023 Remaster)</a></li>
-                                                    <li><a href="https://www.youtube.com/watch?v=9gzpaAM4y8Y" target="_blank" rel="noopener">Swamp (Live) (2023 Remaster)</a></li>
-                                                    <li><a href="https://www.youtube.com/watch?v=-qDksoGr5WY" target="_blank" rel="noopener">Slippery People (Live) (2023 Remaster)</a></li>
-                                                    <li><a href="https://www.youtube.com/watch?v=MEmgqnqEIAY" target="_blank" rel="noopener">Burning Down the House (Live) (2023 Remaster)</a></li>
-                                                    <li><a href="https://www.youtube.com/watch?v=GMTAjgmJvYs" target="_blank" rel="noopener">Girlfriend is Better (Live) (2023 Remaster)</a></li>
-                                                    <li><a href="https://www.youtube.com/watch?v=RXHKq5j4k4g" target="_blank" rel="noopener">Once In a Lifetime (Live) (2023 Remaster)</a></li>
-                                                    <li><a href="https://www.youtube.com/watch?v=v2_gspH10RQ" target="_blank" rel="noopener">What a Day That Was (Live) (2023 Remaster)</a></li>
-                                                    <li><a href="https://www.youtube.com/watch?v=2tCHeY60nn8" target="_blank" rel="noopener">Life During Wartime (Live) (2023 Remaster)</a></li>
-                                                    <li><a href="https://www.youtube.com/watch?v=R_cdWN_ghQc" target="_blank" rel="noopener">Take Me to the River (Live) (2023 Remaster)</a></li>
-                                                </ul>
                     
-                                            <p><strong>Barcodes:</strong></p>
-                        <ul style="margin:0; padding-left:20px" class="muted">
-                                                    <li>6 03497 83283 5 (Text)</li>
-                                                    <li>603497832835 (Scanned)</li>
-                                                </ul>
+                                            <div class="sec">
+                            <div class="eyebrow">Videos</div>
+                            <ul class="vids">
+                                                            <li><a href="https://www.youtube.com/watch?v=KgTuKpkHcMo" target="_blank" rel="noopener"><span class="play">▶</span>Psycho Killer (Live) (2023 Remaster)</a></li>
+                                                            <li><a href="https://www.youtube.com/watch?v=9gzpaAM4y8Y" target="_blank" rel="noopener"><span class="play">▶</span>Swamp (Live) (2023 Remaster)</a></li>
+                                                            <li><a href="https://www.youtube.com/watch?v=-qDksoGr5WY" target="_blank" rel="noopener"><span class="play">▶</span>Slippery People (Live) (2023 Remaster)</a></li>
+                                                            <li><a href="https://www.youtube.com/watch?v=MEmgqnqEIAY" target="_blank" rel="noopener"><span class="play">▶</span>Burning Down the House (Live) (2023 Remaster)</a></li>
+                                                            <li><a href="https://www.youtube.com/watch?v=GMTAjgmJvYs" target="_blank" rel="noopener"><span class="play">▶</span>Girlfriend is Better (Live) (2023 Remaster)</a></li>
+                                                            <li><a href="https://www.youtube.com/watch?v=RXHKq5j4k4g" target="_blank" rel="noopener"><span class="play">▶</span>Once In a Lifetime (Live) (2023 Remaster)</a></li>
+                                                            <li><a href="https://www.youtube.com/watch?v=v2_gspH10RQ" target="_blank" rel="noopener"><span class="play">▶</span>What a Day That Was (Live) (2023 Remaster)</a></li>
+                                                            <li><a href="https://www.youtube.com/watch?v=2tCHeY60nn8" target="_blank" rel="noopener"><span class="play">▶</span>Life During Wartime (Live) (2023 Remaster)</a></li>
+                                                            <li><a href="https://www.youtube.com/watch?v=R_cdWN_ghQc" target="_blank" rel="noopener"><span class="play">▶</span>Take Me to the River (Live) (2023 Remaster)</a></li>
+                                                        </ul>
+                        </div>
+                    
+                                            <div class="sec">
+                            <div class="eyebrow">Barcodes</div>
+                                                            <div class="barcode"><span>6 03497 83283 5</span><span class="bd">Text</span></div>
+                                                            <div class="barcode"><span>603497832835</span><span class="bd">Scanned</span></div>
+                                                    </div>
+                    
                                     </div>
             </div>
           </div>
@@ -621,226 +828,301 @@
           <div id="tab-credits" class="tab-content">
                              <div class="card">
                     <div class="meta">
-                                                    <p><strong>Credits:</strong></p>
-                            <ul style="margin:0; padding-left:20px" class="muted">
-                                                            <li style="margin-bottom:4px">
-                                Ednah Holt
-                                 — Backing Vocals                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Lynn Mabry
-                                 — Backing Vocals                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Tina Weymouth
-                                 — Bass, Vocals                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Jeffrey Kent Ayeroff
-                                 — Design [Booklet Designed By - With], Liner Notes [Booklet Written By - With]                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Michael Hodgson
-                                 — Design [Booklet Designed By - With], Liner Notes [Booklet Written By - With]                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                David Byrne
-                                 — Design [Booklet Designed By], Liner Notes [Booklet Written By]                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Chris Frantz
-                                 — Drums, Vocals                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Allison Boron
-                                 — Editor [Editorial]                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Sheryl Farber
-                                 — Editor [Editorial]                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Joel Moss
-                                 — Engineer                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Mark Wolfson
-                                 — Engineer                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Robin Laine
-                                 — Engineer [Assistant Engineer At Soundworks]                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Glenn Rosenstein
-                                 — Engineer [Assistant Engineers At Sigma Sound]                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Linda Randazzo
-                                 — Engineer [Assistant Engineers At Sigma Sound]                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Nick Delre
-                                 — Engineer [Assistant Engineers At Sigma Sound]                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Jerry Harrison
-                                 — Guitar, Keyboards, Vocals                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Alex Weir
-                                 — Guitar, Vocals                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                David Byrne
-                                 — Illustration [Drawings]                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Bernie Worrell
-                                 — Keyboards                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Chris Grainger
-                                 — Lacquer Cut By                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Joe Nino-Hernes
-                                 — Lacquer Cut By                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Chris Frantz
-                                 — Liner Notes                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                David Byrne
-                                 — Liner Notes                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Jerry Harrison
-                                 — Liner Notes                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Tina Weymouth
-                                 — Liner Notes                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Jack Skinner
-                                 — Mastered By [Originally Mastered By]                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Ted Jensen
-                                 — Mastered By [Originally Mastered By]                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Eric Thorngren
-                                 — Mixed By                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Chris Frantz
-                                 — Mixed By [With]                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Jerry Harrison
-                                 — Mixed By [With]                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Steve Scales
-                                 — Percussion                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Talking Heads
-                                 — Photography By [Additional Photos Courtesy Of]                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Adelle Lutz
-                                 — Photography By [Cover &amp; Center Photos]                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Dave Friedman
-                                 — Photography By [Other Photos]                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Hugh Brown
-                                 — Photography By [Other Photos]                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Talking Heads
-                                 — Producer                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Ricardo Avendaño Vera
-                                 — Product Manager                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Andrew Campbell
-                                 — Product Manager [Packaging Manager]                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Chris Frantz
-                                 — Project Manager [Project Assistance]                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                David Byrne
-                                 — Project Manager [Project Assistance]                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Eric Thorngren
-                                 — Project Manager [Project Assistance]                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Jerry Harrison
-                                 — Project Manager [Project Assistance]                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Lisa Glines
-                                 — Project Manager [Project Assistance]                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Patrick Tempest
-                                 — Project Manager [Project Assistance]                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Salwa Benloubane
-                                 — Project Manager [Project Assistance]                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Shawn Dailey
-                                 — Project Manager [Project Assistance]                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Susanne Savage
-                                 — Project Manager [Project Assistance]                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Tina Weymouth
-                                 — Project Manager [Project Assistance]                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Tomas Cookman
-                                 — Project Manager [Project Assistance]                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Jason Jones
-                                 — Reissue Producer                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Ted Jensen
-                                 — Remastered By                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                David Byrne
-                                 — Vocals, Guitar                                                                </li>
-                                                        </ul>
+                                                    <div class="sec">
+                                <div class="eyebrow">Credits</div>
+                                <div>
+                                                                    <div class="credit">
+                                        <span class="cname">Ednah Holt</span>
+                                        <span class="crole">Backing Vocals</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Lynn Mabry</span>
+                                        <span class="crole">Backing Vocals</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Tina Weymouth</span>
+                                        <span class="crole">Bass, Vocals</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Jeffrey Kent Ayeroff</span>
+                                        <span class="crole">Design [Booklet Designed By - With], Liner Notes [Booklet Written By - With]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Michael Hodgson</span>
+                                        <span class="crole">Design [Booklet Designed By - With], Liner Notes [Booklet Written By - With]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">David Byrne</span>
+                                        <span class="crole">Design [Booklet Designed By], Liner Notes [Booklet Written By]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Chris Frantz</span>
+                                        <span class="crole">Drums, Vocals</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Allison Boron</span>
+                                        <span class="crole">Editor [Editorial]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Sheryl Farber</span>
+                                        <span class="crole">Editor [Editorial]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Joel Moss</span>
+                                        <span class="crole">Engineer</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Mark Wolfson</span>
+                                        <span class="crole">Engineer</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Robin Laine</span>
+                                        <span class="crole">Engineer [Assistant Engineer At Soundworks]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Glenn Rosenstein</span>
+                                        <span class="crole">Engineer [Assistant Engineers At Sigma Sound]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Linda Randazzo</span>
+                                        <span class="crole">Engineer [Assistant Engineers At Sigma Sound]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Nick Delre</span>
+                                        <span class="crole">Engineer [Assistant Engineers At Sigma Sound]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Jerry Harrison</span>
+                                        <span class="crole">Guitar, Keyboards, Vocals</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Alex Weir</span>
+                                        <span class="crole">Guitar, Vocals</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">David Byrne</span>
+                                        <span class="crole">Illustration [Drawings]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Bernie Worrell</span>
+                                        <span class="crole">Keyboards</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Chris Grainger</span>
+                                        <span class="crole">Lacquer Cut By</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Joe Nino-Hernes</span>
+                                        <span class="crole">Lacquer Cut By</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Chris Frantz</span>
+                                        <span class="crole">Liner Notes</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">David Byrne</span>
+                                        <span class="crole">Liner Notes</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Jerry Harrison</span>
+                                        <span class="crole">Liner Notes</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Tina Weymouth</span>
+                                        <span class="crole">Liner Notes</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Jack Skinner</span>
+                                        <span class="crole">Mastered By [Originally Mastered By]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Ted Jensen</span>
+                                        <span class="crole">Mastered By [Originally Mastered By]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Eric Thorngren</span>
+                                        <span class="crole">Mixed By</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Chris Frantz</span>
+                                        <span class="crole">Mixed By [With]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Jerry Harrison</span>
+                                        <span class="crole">Mixed By [With]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Steve Scales</span>
+                                        <span class="crole">Percussion</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Talking Heads</span>
+                                        <span class="crole">Photography By [Additional Photos Courtesy Of]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Adelle Lutz</span>
+                                        <span class="crole">Photography By [Cover &amp; Center Photos]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Dave Friedman</span>
+                                        <span class="crole">Photography By [Other Photos]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Hugh Brown</span>
+                                        <span class="crole">Photography By [Other Photos]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Talking Heads</span>
+                                        <span class="crole">Producer</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Ricardo Avendaño Vera</span>
+                                        <span class="crole">Product Manager</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Andrew Campbell</span>
+                                        <span class="crole">Product Manager [Packaging Manager]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Chris Frantz</span>
+                                        <span class="crole">Project Manager [Project Assistance]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">David Byrne</span>
+                                        <span class="crole">Project Manager [Project Assistance]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Eric Thorngren</span>
+                                        <span class="crole">Project Manager [Project Assistance]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Jerry Harrison</span>
+                                        <span class="crole">Project Manager [Project Assistance]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Lisa Glines</span>
+                                        <span class="crole">Project Manager [Project Assistance]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Patrick Tempest</span>
+                                        <span class="crole">Project Manager [Project Assistance]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Salwa Benloubane</span>
+                                        <span class="crole">Project Manager [Project Assistance]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Shawn Dailey</span>
+                                        <span class="crole">Project Manager [Project Assistance]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Susanne Savage</span>
+                                        <span class="crole">Project Manager [Project Assistance]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Tina Weymouth</span>
+                                        <span class="crole">Project Manager [Project Assistance]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Tomas Cookman</span>
+                                        <span class="crole">Project Manager [Project Assistance]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Jason Jones</span>
+                                        <span class="crole">Reissue Producer</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Ted Jensen</span>
+                                        <span class="crole">Remastered By</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">David Byrne</span>
+                                        <span class="crole">Vocals, Guitar</span>
+                                    </div>
+                                                                </div>
+                            </div>
                         
-                                                    <p style="margin-top:16px"><strong>Companies:</strong></p>
-                            <ul style="margin:0; padding-left:20px" class="muted">
-                                                            <li style="margin-bottom:4px">
-                                Sire Records Company
-                                 — Phonographic Copyright (p)                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Sire Records Company
-                                 — Copyright (c)                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Parlophone Records Ltd.
-                                 — Phonographic Copyright (p)                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Parlophone Records Ltd.
-                                 — Copyright (c)                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Rhino Entertainment Company
-                                 — Manufactured For                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Rhino Entertainment Company
-                                 — Marketed By                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Warner Music Group
-                                 — Record Company                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Pantages Theater
-                                 — Recorded At                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Can-Am Recorders
-                                 — Recorded At                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Ocean Way Recording
-                                 — Recorded At                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Right Track Recording
-                                 — Recorded At                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Record Plant Mobile, Los Angeles
-                                 — Recorded By                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Soundworks, New York
-                                 — Mixed At                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Sigma Sound Studios, New York
-                                 — Mixed At                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Sterling Sound
-                                 — Mastered At                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Sterling Sound
-                                 — Remastered At                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Sterling Sound
-                                 — Lacquer Cut At                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                GZ Media
-                                 — Plated At                                                                </li>
-                                                            <li style="margin-bottom:4px">
-                                Precision Record Pressing
-                                 — Pressed By                                                                </li>
-                                                        </ul>
+                                                    <div class="sec">
+                                <div class="eyebrow">Companies</div>
+                                <div>
+                                                                    <div class="credit">
+                                        <span class="cname">Sire Records Company</span>
+                                        <span class="crole">Phonographic Copyright (p)</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Sire Records Company</span>
+                                        <span class="crole">Copyright (c)</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Parlophone Records Ltd.</span>
+                                        <span class="crole">Phonographic Copyright (p)</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Parlophone Records Ltd.</span>
+                                        <span class="crole">Copyright (c)</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Rhino Entertainment Company</span>
+                                        <span class="crole">Manufactured For</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Rhino Entertainment Company</span>
+                                        <span class="crole">Marketed By</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Warner Music Group</span>
+                                        <span class="crole">Record Company</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Pantages Theater</span>
+                                        <span class="crole">Recorded At</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Can-Am Recorders</span>
+                                        <span class="crole">Recorded At</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Ocean Way Recording</span>
+                                        <span class="crole">Recorded At</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Right Track Recording</span>
+                                        <span class="crole">Recorded At</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Record Plant Mobile, Los Angeles</span>
+                                        <span class="crole">Recorded By</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Soundworks, New York</span>
+                                        <span class="crole">Mixed At</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Sigma Sound Studios, New York</span>
+                                        <span class="crole">Mixed At</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Sterling Sound</span>
+                                        <span class="crole">Mastered At</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Sterling Sound</span>
+                                        <span class="crole">Remastered At</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Sterling Sound</span>
+                                        <span class="crole">Lacquer Cut At</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">GZ Media</span>
+                                        <span class="crole">Plated At</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Precision Record Pressing</span>
+                                        <span class="crole">Pressed By</span>
+                                    </div>
+                                                                </div>
+                            </div>
                                             </div>
                 </div>
                        </div>
@@ -848,34 +1130,35 @@
           <div id="tab-status" class="tab-content">
             <div class="card">
                 <div class="meta">
-                    <div style="margin-bottom:16px">
-                        <strong>Discogs Status</strong>
-                        <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
-                                                        <form method="post" action="/release/save" style="margin:0">
-                                <input type="hidden" name="_token" value="" />
-                                <input type="hidden" name="release_id" value="28021260" />
-                                <input type="hidden" name="action" value="want_to_collection" />
-                                <input type="hidden" name="return" value="../index.html" />
-                                <button type="submit" style="background:var(--card);color:var(--accent);border:1px solid #2a2b2f;border-radius:8px;padding:6px 10px;cursor:pointer">Add to Collection</button>
-                            </form>
-                            
-                                                        <form method="post" action="/release/save" style="margin:0">
-                                <input type="hidden" name="_token" value="" />
-                                <input type="hidden" name="release_id" value="28021260" />
-                                <input type="hidden" name="action" value="add_want" />
-                                <input type="hidden" name="return" value="../index.html" />
-                                <button type="submit" class="muted" style="background:transparent;border:1px solid #2a2b2f;border-radius:8px;padding:6px 10px;cursor:pointer;color:inherit">Add to Wantlist</button>
-                            </form>
-                                                    </div>
-                    </div>
-
-                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-                        <strong>My Notes</strong>
+                    <div class="eyebrow">Discogs status</div>
+                    <div class="own">
+                                                <form method="post" action="/release/save" style="margin:0">
+                            <input type="hidden" name="_token" value="" />
+                            <input type="hidden" name="release_id" value="28021260" />
+                            <input type="hidden" name="action" value="want_to_collection" />
+                            <input type="hidden" name="return" value="../index.html" />
+                            <button type="submit" class="status-btn primary">Add to Collection</button>
+                        </form>
+                        
+                                                <form method="post" action="/release/save" style="margin:0">
+                            <input type="hidden" name="_token" value="" />
+                            <input type="hidden" name="release_id" value="28021260" />
+                            <input type="hidden" name="action" value="add_want" />
+                            <input type="hidden" name="return" value="../index.html" />
+                            <button type="submit" class="status-btn">Add to Wantlist</button>
+                        </form>
                                             </div>
 
-                    <div id="notesView" style="margin-top:8px">
-                                                                                                                    </div>
-                                                         </div>
+                    <div class="row-between" style="margin-top:22px">
+                        <div class="eyebrow">My notes</div>
+                                            </div>
+
+                    <div id="notesView">
+                        <div class="kv">
+                                                                                                            </div>
+                                                                    </div>
+
+                                     </div>
             </div>
           </div>
 
@@ -993,7 +1276,7 @@
                     <div style="display:flex; justify-content:space-between; align-items:center; gap:8px">
                       <span><strong>${label}</strong> <span class="muted">(${item.type})</span></span>
                       <div style="display:flex; gap:8px">
-                        <a href="${searchUrl}" class="muted" style="font-size:0.8rem; border:1px solid #2a2b2f; padding:2px 8px; border-radius:4px; text-decoration:none; color:var(--accent)">Live Search</a>
+                        <a href="${searchUrl}" class="muted" style="font-size:0.8rem; border:1px solid var(--border); padding:2px 8px; border-radius:4px; text-decoration:none; color:var(--accent)">Live Search</a>
                       </div>
                     </div>
                   </li>`;
@@ -1071,6 +1354,26 @@
       document.getElementById('mobile-menu').classList.toggle('active');
       this.textContent = document.getElementById('mobile-menu').classList.contains('active') ? '✕' : '☰';
     });
+
+    (function () {
+      var more = document.querySelector('.nav-more');
+      if (!more) return;
+      var trigger = more.querySelector('.nav-more-trigger');
+      function setOpen(open) {
+        more.setAttribute('data-open', open ? 'true' : 'false');
+        trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+      }
+      trigger.addEventListener('click', function (e) {
+        e.stopPropagation();
+        setOpen(more.getAttribute('data-open') !== 'true');
+      });
+      document.addEventListener('click', function (e) {
+        if (!more.contains(e.target)) setOpen(false);
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') setOpen(false);
+      });
+    })();
   </script>
 
   <footer class="site-footer muted" style="text-align:center;margin:24px 0 8px 0;font-size:.9rem;">

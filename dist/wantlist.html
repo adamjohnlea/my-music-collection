@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -8,12 +8,56 @@
     :root {
       --bg: #0b0b0c;
       --card: #16171a;
+      --card-2: #191b1f;
+      --input-bg: #101114;
+      --hover-surface: #1d1f24;
+      --btn-bg: #1f2937;
+      --btn-bg-hover: #232f41;
       --text: #e7e7ea;
       --muted: #a0a3aa;
+      --faint: #6c6f77;
+      --btn-ink: #ffffff;
       --accent: #67e8f9;
       --border: #2a2b2f;
-      --header-bg: rgba(11, 11, 12, 0.8);
-    }
+      --border-soft: #212226;
+      --raised-border: #3a3d44;
+      --up: #34d399;
+      --down: #f87171;
+      --warn: #e0a458;
+      --danger: #ff4444;
+            /* derived — follow the editable tokens above */
+      --accent-hover: color-mix(in srgb, var(--accent) 74%, #fff);
+      --accent-ink: color-mix(in srgb, var(--accent) 22%, #000);
+      --header-bg: color-mix(in srgb, var(--bg) 80%, transparent);
+      --wash: rgba(255,255,255,.05);
+      --raised-bg: linear-gradient(135deg,#222631,#1a1d24);
+      --skeleton-bg: linear-gradient(90deg,#1a1b1f 25%,#22242a 37%,#1a1b1f 63%);
+      --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+          }
+    :root[data-theme="light"] {
+      --bg: #f7f7f8;
+      --card: #ffffff;
+      --card-2: #f1f2f4;
+      --input-bg: #ffffff;
+      --hover-surface: #eceef1;
+      --btn-bg: #e5e7eb;
+      --btn-bg-hover: #d7dbe0;
+      --text: #17181b;
+      --muted: #55585f;
+      --faint: #8a8d94;
+      --btn-ink: #17181b;
+      --accent: #0891b2;
+      --border: #d8dae0;
+      --border-soft: #e6e8ec;
+      --raised-border: #c4c8d0;
+      --up: #059669;
+      --down: #dc2626;
+      --warn: #b45309;
+      --danger: #dc2626;
+            --wash: rgba(0,0,0,.045);
+      --raised-bg: linear-gradient(135deg,#eef1f5,#e3e7ee);
+      --skeleton-bg: linear-gradient(90deg,#eceef1 25%,#f4f5f7 37%,#eceef1 63%);
+          }
     html, body {
       margin: 0;
       padding: 0;
@@ -56,6 +100,7 @@
       justify-content: center;
     }
     .btn-small:hover { border-color: var(--accent); text-decoration: none; }
+    .alert-badge { display:inline-block; min-width:16px; padding:0 5px; font-size:.7rem; line-height:16px; text-align:center; color:#fff; background: var(--accent); border-radius:999px; vertical-align:middle; }
 
     /* Common Header Components */
     .main-header {
@@ -105,7 +150,45 @@
       color: var(--text);
       text-decoration: none;
     }
-    .dropdown-item:hover { background: rgba(255,255,255,0.05); }
+    .dropdown-item:hover { background: var(--wash); }
+
+    /* Nav "More" Dropdown */
+    .nav-more { position: relative; display: inline-block; }
+    .nav-more-trigger {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font: inherit;
+      color: var(--muted);
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .nav-more-trigger:hover { color: var(--text); }
+    .nav-more-caret { font-size: 0.8em; transition: transform 0.15s ease; }
+    .nav-more[data-open="true"] .nav-more-caret { transform: rotate(180deg); }
+    .nav-more-panel {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: calc(100% + 8px);
+      background: var(--card);
+      min-width: 180px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      padding: 8px 0;
+      z-index: 101;
+    }
+    .nav-more[data-open="true"] .nav-more-panel { display: block; }
+    .nav-more-item {
+      display: block;
+      padding: 8px 16px;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .nav-more-item:hover { background: var(--wash); }
 
     /* Mobile Nav / Hamburger */
     .mobile-nav-toggle {
@@ -188,19 +271,19 @@
     
     /* Toolbar */
     .toolbar{display:flex;gap:8px;align-items:center;margin:0;flex-wrap:wrap;flex:1}
-    .search-input{background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:10px;padding:8px 14px;width:100%;font-size:.95rem;height:40px;box-sizing:border-box}
-    .search-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 1px rgba(103,232,249,.2)}
+    .search-input{background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:8px 14px;width:100%;font-size:.95rem;height:40px;box-sizing:border-box}
+    .search-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 20%,transparent)}
     .search-submit{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text);opacity:0.6;cursor:pointer;padding:4px;display:flex;align-items:center;transition:all .2s;z-index:2}
     .search-submit:hover{color:var(--accent);opacity:1;transform:translateY(-50%) scale(1.1)}
     .sort-wrap{display:flex;gap:8px;align-items:center}
-    .sort-select{background:var(--card);color:var(--text);border:1px solid #2a2b2f;border-radius:10px;padding:8px 12px;font-size:.9rem;cursor:pointer}
+    .sort-select{background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-size:.9rem;cursor:pointer}
     .sort-select:focus{outline:none;border-color:var(--accent)}
 
     /* Modern pagination */
     .pagination{display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;margin-top:28px}
-    .page-btn{display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:0 12px;border-radius:12px;border:1px solid #2a2b2f;background:var(--card);color:var(--text);text-decoration:none;font-weight:600}
-    .page-btn:hover{background:#1d1f24;text-decoration:none}
-    .page-btn.is-current{background:linear-gradient(135deg,#222631,#1a1d24);border-color:#3a3d44;box-shadow:0 0 0 1px rgba(103,232,249,.2) inset;color:#fff}
+    .page-btn{display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:0 12px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--text);text-decoration:none;font-weight:600}
+    .page-btn:hover{background:var(--hover-surface);text-decoration:none}
+    .page-btn.is-current{background:var(--raised-bg);border-color:var(--raised-border);box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 20%,transparent) inset;color:var(--btn-ink)}
     .page-btn.is-disabled{opacity:.5;pointer-events:none}
 
     @media (max-width: 768px){
@@ -211,7 +294,7 @@
       .search-input{width:100%}
       .sort-wrap{width:100%}
       .sort-select{width:100%}
-      .pagination{position:sticky;bottom:calc(8px + env(safe-area-inset-bottom));background:rgba(11,11,12,.8);backdrop-filter:blur(8px);padding:8px 12px;border-radius:14px;border:1px solid #2a2b2f;z-index:80}
+      .pagination{position:sticky;bottom:calc(8px + env(safe-area-inset-bottom));background:var(--header-bg);backdrop-filter:blur(8px);padding:8px 12px;border-radius:14px;border:1px solid var(--border);z-index:80}
       .page-btn{min-width:64px;height:44px;font-size:1rem}
     }
   </style>
@@ -225,10 +308,10 @@
         <div class="desktop-nav">
           <a href="./index.html" class="muted">Collection</a>
           <a href="./wantlist.html" class="muted">Wantlist</a>
-          <a href="javascript:void(0)" class="muted" onclick="if(window.surpriseMe)window.surpriseMe();">Surprise Me</a>
           <a href="./stats.html" class="muted">Stats</a>
-          <a href="./about.html" class="muted">About</a>
-        </div>
+                                <a href="javascript:void(0)" class="muted" onclick="if(window.surpriseMe)window.surpriseMe();">Surprise Me</a>
+            <a href="./about.html" class="muted">About</a>
+                  </div>
 
         <button class="mobile-nav-toggle" id="mobile-toggle" aria-label="Toggle menu">☰</button>
       </div>
@@ -238,10 +321,10 @@
   <div class="mobile-menu" id="mobile-menu">
     <a href="./index.html" class="nav-item">Collection</a>
     <a href="./wantlist.html" class="nav-item">Wantlist</a>
-    <a href="javascript:void(0)" class="nav-item" onclick="if(window.surpriseMe)window.surpriseMe();">Surprise Me</a>
+            <a href="javascript:void(0)" class="nav-item" onclick="if(window.surpriseMe)window.surpriseMe();">Surprise Me</a>
     <a href="./stats.html" class="nav-item">Stats</a>
     <a href="./about.html" class="nav-item">About</a>
-  </div>
+              </div>
 
   <div class="wrap">
       <nav class="breadcrumbs">
@@ -301,6 +384,26 @@
       document.getElementById('mobile-menu').classList.toggle('active');
       this.textContent = document.getElementById('mobile-menu').classList.contains('active') ? '✕' : '☰';
     });
+
+    (function () {
+      var more = document.querySelector('.nav-more');
+      if (!more) return;
+      var trigger = more.querySelector('.nav-more-trigger');
+      function setOpen(open) {
+        more.setAttribute('data-open', open ? 'true' : 'false');
+        trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+      }
+      trigger.addEventListener('click', function (e) {
+        e.stopPropagation();
+        setOpen(more.getAttribute('data-open') !== 'true');
+      });
+      document.addEventListener('click', function (e) {
+        if (!more.contains(e.target)) setOpen(false);
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') setOpen(false);
+      });
+    })();
   </script>
 
   <footer class="site-footer muted" style="text-align:center;margin:24px 0 8px 0;font-size:.9rem;">

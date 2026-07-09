@@ -1,0 +1,960 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>R.E.M. — Dead Letter Office</title>
+  <style>
+    :root {
+      --bg: #0b0b0c;
+      --card: #16171a;
+      --card-2: #191b1f;
+      --input-bg: #101114;
+      --hover-surface: #1d1f24;
+      --btn-bg: #1f2937;
+      --btn-bg-hover: #232f41;
+      --text: #e7e7ea;
+      --muted: #a0a3aa;
+      --faint: #6c6f77;
+      --btn-ink: #ffffff;
+      --accent: #67e8f9;
+      --border: #2a2b2f;
+      --border-soft: #212226;
+      --raised-border: #3a3d44;
+      --up: #34d399;
+      --down: #f87171;
+      --warn: #e0a458;
+      --danger: #ff4444;
+            /* derived — follow the editable tokens above */
+      --accent-hover: color-mix(in srgb, var(--accent) 74%, #fff);
+      --accent-ink: color-mix(in srgb, var(--accent) 22%, #000);
+      --header-bg: color-mix(in srgb, var(--bg) 80%, transparent);
+      --wash: rgba(255,255,255,.05);
+      --raised-bg: linear-gradient(135deg,#222631,#1a1d24);
+      --skeleton-bg: linear-gradient(90deg,#1a1b1f 25%,#22242a 37%,#1a1b1f 63%);
+      --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+          }
+    :root[data-theme="light"] {
+      --bg: #f7f7f8;
+      --card: #ffffff;
+      --card-2: #f1f2f4;
+      --input-bg: #ffffff;
+      --hover-surface: #eceef1;
+      --btn-bg: #e5e7eb;
+      --btn-bg-hover: #d7dbe0;
+      --text: #17181b;
+      --muted: #55585f;
+      --faint: #8a8d94;
+      --btn-ink: #17181b;
+      --accent: #0891b2;
+      --border: #d8dae0;
+      --border-soft: #e6e8ec;
+      --raised-border: #c4c8d0;
+      --up: #059669;
+      --down: #dc2626;
+      --warn: #b45309;
+      --danger: #dc2626;
+            --wash: rgba(0,0,0,.045);
+      --raised-bg: linear-gradient(135deg,#eef1f5,#e3e7ee);
+      --skeleton-bg: linear-gradient(90deg,#eceef1 25%,#f4f5f7 37%,#eceef1 63%);
+          }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    .content-wrap {
+      margin-top: 24px;
+      margin-bottom: 24px;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .muted { color: var(--muted); }
+
+    /* Layout Helpers */
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .gap-4 { gap: 16px; }
+    .gap-2 { gap: 8px; }
+
+    /* Common Components */
+    .btn-small {
+      font-size: .8rem;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--card);
+      color: var(--text);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-small:hover { border-color: var(--accent); text-decoration: none; }
+    .alert-badge { display:inline-block; min-width:16px; padding:0 5px; font-size:.7rem; line-height:16px; text-align:center; color:#fff; background: var(--accent); border-radius:999px; vertical-align:middle; }
+
+    /* Common Header Components */
+    .main-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--header-bg);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-content {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    /* Desktop Nav */
+    .desktop-nav { display: flex; align-items: center; gap: 20px; }
+    @media (max-width: 768px) { .desktop-nav { display: none; } }
+
+    /* Account Dropdown */
+    .dropdown { position: relative; display: inline-block; }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background: var(--card);
+      min-width: 160px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      padding: 8px 0;
+      z-index: 101;
+    }
+    .dropdown:hover .dropdown-content { display: block; }
+    .dropdown-item {
+      display: block;
+      padding: 8px 16px;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .dropdown-item:hover { background: var(--wash); }
+
+    /* Nav "More" Dropdown */
+    .nav-more { position: relative; display: inline-block; }
+    .nav-more-trigger {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font: inherit;
+      color: var(--muted);
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .nav-more-trigger:hover { color: var(--text); }
+    .nav-more-caret { font-size: 0.8em; transition: transform 0.15s ease; }
+    .nav-more[data-open="true"] .nav-more-caret { transform: rotate(180deg); }
+    .nav-more-panel {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: calc(100% + 8px);
+      background: var(--card);
+      min-width: 180px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      padding: 8px 0;
+      z-index: 101;
+    }
+    .nav-more[data-open="true"] .nav-more-panel { display: block; }
+    .nav-more-item {
+      display: block;
+      padding: 8px 16px;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .nav-more-item:hover { background: var(--wash); }
+
+    /* Mobile Nav / Hamburger */
+    .mobile-nav-toggle {
+      display: none;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 8px;
+    }
+    @media (max-width: 768px) { .mobile-nav-toggle { display: block; } }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 65px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg);
+      z-index: 99;
+      padding: 20px;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .mobile-menu.active { display: flex; }
+    .mobile-menu .nav-item {
+        display: block;
+        padding: 12px 16px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: var(--text);
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .mobile-menu .nav-item:hover { border-color: var(--accent); }
+
+    /* Breadcrumbs */
+    .breadcrumbs {
+      padding: 12px 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .breadcrumbs a { color: var(--muted); }
+    .breadcrumbs span { margin: 0 8px; opacity: 0.5; }
+
+    /* Utility Bar (Mobile Sticky Search/Sort) */
+    .utility-bar {
+        display: none;
+        position: sticky;
+        top: 65px;
+        z-index: 90;
+        background: var(--bg);
+        padding: 8px 20px;
+        border-bottom: 1px solid var(--border);
+    }
+    @media (max-width: 768px) {
+        .utility-bar.is-visible { display: block; }
+    }
+  </style>
+    <style>
+    :root { --overlay: rgba(0,0,0,.9); }
+    .layout{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+    .card{background:var(--card);border-radius:12px;overflow:hidden}
+    .cover{width:100%;aspect-ratio:1/1;object-fit:cover;background:#222;cursor:zoom-in}
+    .meta{padding:16px}
+    h1{margin:0 0 8px 0;font-size:2rem}
+
+    /* Carousel */
+    .carousel-container { position: relative; width: 100%; overflow: hidden; border-radius: 12px; }
+    .carousel-track { display: flex; transition: transform 0.3s ease-out; }
+    .carousel-slide { min-width: 100%; aspect-ratio: 1/1; }
+    .carousel-slide img { width: 100%; height: 100%; object-fit: cover; }
+    .carousel-dots { display: none; justify-content: center; gap: 8px; margin-top: 12px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); cursor: pointer; opacity: 0.5; }
+    .dot.active { background: var(--accent); opacity: 1; }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-top: 24px; overflow-x: auto; scrollbar-width: none; }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab { padding: 12px 20px; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; white-space: nowrap; }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-content { display: none; padding-top: 20px; }
+    .tab-content.active { display: block; }
+
+    /* --- console design language --- */
+    .num{font-variant-numeric:tabular-nums}
+    .by{color:var(--muted);font-size:1.15rem;margin:0 0 2px}
+    .country{color:var(--faint);font:500 .8rem var(--mono);margin:0}
+    .community{margin:12px 0 0;font:600 .84rem var(--mono);color:var(--muted);font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+    .community b{color:var(--text)}
+    .community .star{color:var(--warn)}
+    .community .sep{color:var(--faint)}
+    .pills{display:flex;gap:7px;flex-wrap:wrap;margin:16px 0}
+    .pill{font:600 .72rem var(--mono);padding:5px 11px;border-radius:999px;border:1px solid var(--border-soft);color:var(--muted)}
+    .pill.style{color:var(--faint)}
+    .labels{color:var(--muted);font-size:.88rem;margin:0 0 4px}
+    .labels b{color:var(--text);font-weight:600}
+    .badge{font:600 .66rem/1 var(--mono);letter-spacing:.05em;text-transform:uppercase;display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border-radius:999px;border:1px solid var(--border-soft);color:var(--muted);white-space:nowrap}
+    .badge .pip{width:6px;height:6px;border-radius:50%;background:currentColor}
+    .badge.good{color:var(--up)}
+    .badge.net{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 30%,transparent)}
+    .badge.warn{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 35%,transparent)}
+    .badge .star{color:var(--warn)}
+    .eyebrow{font:600 .72rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+    .row-between{display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .own{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+    .status-btn{font:600 .72rem var(--mono);letter-spacing:.03em;background:var(--card-2);border:1px solid var(--border-soft);border-radius:999px;padding:6px 11px;cursor:pointer;color:var(--muted)}
+    .status-btn:hover{border-color:var(--border)}
+    .status-btn.primary{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 30%,transparent)}
+    .kv{display:grid;grid-template-columns:auto 1fr;gap:10px 16px;align-items:center;margin-top:10px}
+    .kv .k{font:600 .7rem var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+    .note-text{color:var(--muted);font-size:.92rem;margin-top:14px;white-space:pre-wrap}
+    .valueline{margin-top:16px;padding-top:14px;border-top:1px solid var(--border-soft);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .valueline .big{font-weight:750;font-size:1.3rem;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+    .valueline .asof{color:var(--faint);font:500 .74rem var(--mono);margin-left:auto}
+    #notesForm{gap:14px !important}
+    #notesForm label{font:600 .72rem var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+    #notesForm select,#notesForm textarea{width:100%;background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:9px 10px;font:inherit;font-size:.9rem;box-sizing:border-box}
+    #notesForm .save{background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:10px 18px;cursor:pointer;font-weight:700;font-size:.9rem}
+    /* Tracks / Details / Credits sections */
+    .sec + .sec{margin-top:22px;padding-top:20px;border-top:1px solid var(--border-soft)}
+    .sec .eyebrow + *{margin-top:12px}
+    /* Tracks */
+    .side{font:600 .68rem/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin:2px 0 8px}
+    .track + .side{margin-top:26px}
+    .track{display:grid;grid-template-columns:34px 1fr auto;align-items:baseline;gap:12px;padding:7px 0;border-bottom:1px solid var(--border-soft)}
+    .track:last-child{border-bottom:0}
+    .track .pos{font:600 .8rem var(--mono);color:var(--faint);font-variant-numeric:tabular-nums}
+    .track .tt{font-size:.95rem}
+    .track .dur{font:600 .82rem var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+    /* Details */
+    .fmt-desc{color:var(--faint);font-size:.88rem;margin-left:8px}
+    .notes{color:var(--muted);font-size:.92rem;white-space:pre-wrap;line-height:1.6}
+    .vids{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+    .vids a{display:inline-flex;align-items:center;gap:9px;font-size:.92rem;color:var(--accent)}
+    .vids .play{color:var(--accent);font-size:.7rem}
+    .barcode{display:flex;gap:10px;align-items:baseline;font:600 .84rem var(--mono);color:var(--text);padding:5px 0;font-variant-numeric:tabular-nums}
+    .barcode .bd{color:var(--faint);font-weight:500;font-size:.76rem;text-transform:uppercase;letter-spacing:.04em}
+    /* Credits */
+    .credit{display:grid;grid-template-columns:1fr auto;gap:6px 16px;align-items:baseline;padding:8px 0;border-bottom:1px solid var(--border-soft)}
+    .credit:last-child{border-bottom:0}
+    .credit .cname{font-size:.95rem}
+    .credit .crole{font:600 .74rem var(--mono);color:var(--muted);text-align:right;letter-spacing:.02em}
+    .credit .ctracks{color:var(--faint);font-weight:500}
+    @media (max-width:520px){ .credit{grid-template-columns:1fr} .credit .crole{text-align:left} }
+
+    /* Skeleton Loader */
+    @keyframes skeleton-loading {
+      0% { opacity: 1; }
+      50% { opacity: 0.4; }
+      100% { opacity: 1; }
+    }
+    .skeleton-loader div {
+      animation: skeleton-loading 1.5s infinite ease-in-out;
+    }
+
+    /* Lightbox */
+    .lightbox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:var(--overlay);z-index:1000}
+    .lightbox.open{display:flex}
+    .lb-inner{position:relative;max-width:95vw;max-height:95vh;display:flex;align-items:center;justify-content:center}
+    .lb-img{max-width:95vw;max-height:95vh;object-fit:contain;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+    .lb-close{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:999px;width:40px;height:40px;cursor:pointer;font-size:20px}
+    .lb-nav{position:absolute;top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center}
+    .lb-prev,.lb-next{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:999px;width:44px;height:44px;cursor:pointer;font-size:20px}
+    .lb-prev{left:-60px}
+    .lb-next{right:-60px}
+    .lb-counter{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);color:#fff;background:rgba(0,0,0,.5);padding:4px 10px;border-radius:999px;font-size:.9rem}
+
+    @media (max-width: 800px){
+      .layout{grid-template-columns:1fr; gap: 24px;}
+      .carousel-dots { display: flex; }
+      .lb-prev{left:10px}
+      .lb-next{right:10px}
+      .wrap { margin-top: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="main-header">
+    <div class="wrap">
+      <div class="header-content">
+        <a href="../index.html" class="logo">My Music</a>
+
+        <div class="desktop-nav">
+          <a href="../index.html" class="muted">Collection</a>
+          <a href="../wantlist.html" class="muted">Wantlist</a>
+          <a href="../stats.html" class="muted">Stats</a>
+                                <a href="javascript:void(0)" class="muted" onclick="if(window.surpriseMe)window.surpriseMe();">Surprise Me</a>
+            <a href="../about.html" class="muted">About</a>
+                  </div>
+
+        <button class="mobile-nav-toggle" id="mobile-toggle" aria-label="Toggle menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="../index.html" class="nav-item">Collection</a>
+    <a href="../wantlist.html" class="nav-item">Wantlist</a>
+            <a href="javascript:void(0)" class="nav-item" onclick="if(window.surpriseMe)window.surpriseMe();">Surprise Me</a>
+    <a href="../stats.html" class="nav-item">Stats</a>
+    <a href="../about.html" class="nav-item">About</a>
+              </div>
+
+  <div class="wrap">
+      <nav class="breadcrumbs">
+    <div>
+      <a href="../index.html">Home</a>
+      <span>/</span>
+      <a href="../index.html">Collection</a>
+      <span>/</span>
+      Dead Letter Office
+    </div>
+  </nav>
+  </div>
+
+  
+    <div class="wrap content-wrap">
+    <div style="margin-bottom:24px">
+      <p style="margin:0"><a href="../index.html" style="background:var(--card);border:1px solid var(--border);padding:6px 12px;border-radius:8px;color:var(--text);font-size:.9rem;text-decoration:none">← Back</a></p>
+    </div>
+                <div class="layout">
+        <div>
+          <div class="carousel-container" id="carousel">
+            <div class="carousel-track" id="carousel-track">
+                                                <div class="carousel-slide">
+                    <img class="cover" src="../images/414729/28414edc5660808508c89f20a5b2177e3df859fb.jpg" alt="Dead Letter Office cover" data-idx="0" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/414729/23af5512ecd0a93e3618233a7a61fccc0db659ed.jpg" alt="Dead Letter Office cover" data-idx="1" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/414729/8fc848801b5c118d604d2b7585878e4bf88ba1e3.jpg" alt="Dead Letter Office cover" data-idx="2" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/414729/7164f5e7b9754c7bf7a3f41673b91821a147e242.jpg" alt="Dead Letter Office cover" data-idx="3" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/414729/b0ea470d89e81fe7d2568aa00c1ade7db655dcbc.jpg" alt="Dead Letter Office cover" data-idx="4" />
+                  </div>
+                                  <div class="carousel-slide">
+                    <img class="cover" src="../images/414729/7b08f159b926478e01bcb46c7654d7e72e39e158.jpg" alt="Dead Letter Office cover" data-idx="5" />
+                  </div>
+                                          </div>
+          </div>
+                      <div class="carousel-dots" id="carousel-dots">
+                              <div class="dot active" data-idx="0"></div>
+                              <div class="dot " data-idx="1"></div>
+                              <div class="dot " data-idx="2"></div>
+                              <div class="dot " data-idx="3"></div>
+                              <div class="dot " data-idx="4"></div>
+                              <div class="dot " data-idx="5"></div>
+                          </div>
+            <div class="thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;">
+                              <button class="thumb" data-idx="0" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/414729/28414edc5660808508c89f20a5b2177e3df859fb.jpg" alt="thumb 1" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:1" />
+                </button>
+                              <button class="thumb" data-idx="1" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/414729/23af5512ecd0a93e3618233a7a61fccc0db659ed.jpg" alt="thumb 2" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
+                </button>
+                              <button class="thumb" data-idx="2" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/414729/8fc848801b5c118d604d2b7585878e4bf88ba1e3.jpg" alt="thumb 3" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
+                </button>
+                              <button class="thumb" data-idx="3" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/414729/7164f5e7b9754c7bf7a3f41673b91821a147e242.jpg" alt="thumb 4" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
+                </button>
+                              <button class="thumb" data-idx="4" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/414729/b0ea470d89e81fe7d2568aa00c1ade7db655dcbc.jpg" alt="thumb 5" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
+                </button>
+                              <button class="thumb" data-idx="5" style="border:0;background:transparent;padding:0;cursor:pointer">
+                  <img src="../images/414729/7b08f159b926478e01bcb46c7654d7e72e39e158.jpg" alt="thumb 6" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7" />
+                </button>
+                          </div>
+                  </div>
+        <div>
+          <h1>Dead Letter Office</h1>
+          <p class="by">R.E.M. • 1987</p>
+          <p class="country">US</p>          
+          <div class="pills">
+            <span class="pill">Rock</span>            <span class="pill style">Alternative Rock</span><span class="pill style">Post-Punk</span><span class="pill style">Indie Rock</span><span class="pill style">Folk Rock</span>          </div>
+
+                      <p class="labels">
+              <b>I.R.S. Records</b> (SP-70054), <b>I.R.S. Records</b> (SP 70054)            </p>
+          
+          <div class="tabs" id="release-tabs">
+            <div class="tab active" data-tab="tracks">Tracks</div>
+            <div class="tab" data-tab="details">Details</div>
+            <div class="tab" data-tab="credits">Credits</div>
+            <div class="tab" data-tab="status">Status & Notes</div>
+                      </div>
+
+          <div id="tab-tracks" class="tab-content active">
+                          <div class="card">
+                <div class="meta">
+                                                                                                  <div class="track">
+                      <span class="pos"></span>
+                      <span class="tt">Post Side</span>
+                                          </div>
+                                                                                                    <div class="side">Side A</div>
+                                        <div class="track">
+                      <span class="pos">A1</span>
+                      <span class="tt">Crazy</span>
+                      <span class="dur">3:00</span>                    </div>
+                                                                                                  <div class="track">
+                      <span class="pos">A2</span>
+                      <span class="tt">There She Goes Again</span>
+                      <span class="dur">2:49</span>                    </div>
+                                                                                                  <div class="track">
+                      <span class="pos">A3</span>
+                      <span class="tt">Burning Down</span>
+                      <span class="dur">4:10</span>                    </div>
+                                                                                                  <div class="track">
+                      <span class="pos">A4</span>
+                      <span class="tt">Voice Of Harold</span>
+                      <span class="dur">4:21</span>                    </div>
+                                                                                                  <div class="track">
+                      <span class="pos">A5</span>
+                      <span class="tt">Burning Hell</span>
+                      <span class="dur">3:48</span>                    </div>
+                                                                                                  <div class="track">
+                      <span class="pos">A6</span>
+                      <span class="tt">White Tornado</span>
+                      <span class="dur">1:59</span>                    </div>
+                                                                                                  <div class="track">
+                      <span class="pos">A7</span>
+                      <span class="tt">Toys In The Attic</span>
+                      <span class="dur">2:26</span>                    </div>
+                                                                                                  <div class="track">
+                      <span class="pos"></span>
+                      <span class="tt">Script Side</span>
+                                          </div>
+                                                                                                    <div class="side">Side B</div>
+                                        <div class="track">
+                      <span class="pos">B1</span>
+                      <span class="tt">Windout</span>
+                      <span class="dur">1:57</span>                    </div>
+                                                                                                  <div class="track">
+                      <span class="pos">B2</span>
+                      <span class="tt">Ages Of You</span>
+                      <span class="dur">3:39</span>                    </div>
+                                                                                                  <div class="track">
+                      <span class="pos">B3</span>
+                      <span class="tt">Pale Blue Eyes</span>
+                      <span class="dur">2:49</span>                    </div>
+                                                                                                  <div class="track">
+                      <span class="pos">B4</span>
+                      <span class="tt">Rotary Ten</span>
+                      <span class="dur">2:00</span>                    </div>
+                                                                                                  <div class="track">
+                      <span class="pos">B5</span>
+                      <span class="tt">Bandwagon</span>
+                      <span class="dur">2:12</span>                    </div>
+                                                                                                  <div class="track">
+                      <span class="pos">B6</span>
+                      <span class="tt">Femme Fatale</span>
+                      <span class="dur">2:27</span>                    </div>
+                                                                                                  <div class="track">
+                      <span class="pos">B7</span>
+                      <span class="tt">Walters Theme</span>
+                      <span class="dur">1:35</span>                    </div>
+                                                                                                  <div class="track">
+                      <span class="pos">B8</span>
+                      <span class="tt">King Of The Road</span>
+                      <span class="dur">3:08</span>                    </div>
+                                  </div>
+              </div>
+            
+            <div id="apple-music-player-container" style="margin-top:24px; display:none;">
+              <div id="apple-music-player"></div>
+            </div>
+          </div>
+
+          <div id="tab-details" class="tab-content">
+            <div class="card">
+                <div class="meta">
+                                            <div class="sec">
+                            <div class="eyebrow">Format</div>
+                            <div>
+                                <span class="pill">Vinyl</span><span class="fmt-desc">Electrosound Pressing</span>                            </div>
+                        </div>
+                    
+                    
+                                            <div class="sec">
+                            <div class="eyebrow">Videos</div>
+                            <ul class="vids">
+                                                            <li><a href="https://www.youtube.com/watch?v=oRDzvkxXpBU" target="_blank" rel="noopener"><span class="play">▶</span>Ages Of You</a></li>
+                                                            <li><a href="https://www.youtube.com/watch?v=Go9t68mQOl0" target="_blank" rel="noopener"><span class="play">▶</span>Crazy</a></li>
+                                                            <li><a href="https://www.youtube.com/watch?v=-kkLuSlOE3U" target="_blank" rel="noopener"><span class="play">▶</span>Voice Of Harold</a></li>
+                                                            <li><a href="https://www.youtube.com/watch?v=2YNKbHWlXNQ" target="_blank" rel="noopener"><span class="play">▶</span>King Of The Road</a></li>
+                                                            <li><a href="https://www.youtube.com/watch?v=1raboO1gK_A" target="_blank" rel="noopener"><span class="play">▶</span>Pale Blue Eyes</a></li>
+                                                            <li><a href="https://www.youtube.com/watch?v=oRDzvkxXpBU" target="_blank" rel="noopener"><span class="play">▶</span>Ages Of You</a></li>
+                                                            <li><a href="https://www.youtube.com/watch?v=Go9t68mQOl0" target="_blank" rel="noopener"><span class="play">▶</span>Crazy</a></li>
+                                                            <li><a href="https://www.youtube.com/watch?v=-kkLuSlOE3U" target="_blank" rel="noopener"><span class="play">▶</span>Voice Of Harold</a></li>
+                                                            <li><a href="https://www.youtube.com/watch?v=2YNKbHWlXNQ" target="_blank" rel="noopener"><span class="play">▶</span>King Of The Road</a></li>
+                                                            <li><a href="https://www.youtube.com/watch?v=1raboO1gK_A" target="_blank" rel="noopener"><span class="play">▶</span>Pale Blue Eyes</a></li>
+                                                        </ul>
+                        </div>
+                    
+                                            <div class="sec">
+                            <div class="eyebrow">Barcodes</div>
+                                                            <div class="barcode"><span>0 4479-70054-1</span><span class="bd">Scanned</span></div>
+                                                    </div>
+                    
+                                    </div>
+            </div>
+          </div>
+
+          <div id="tab-credits" class="tab-content">
+                             <div class="card">
+                    <div class="meta">
+                                                    <div class="sec">
+                                <div class="eyebrow">Credits</div>
+                                <div>
+                                                                    <div class="credit">
+                                        <span class="cname">R.A. Miller</span>
+                                        <span class="crole">Artwork [Anthropological Renderings]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Bill Berry</span>
+                                        <span class="crole">Photography By</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Michael Stipe</span>
+                                        <span class="crole">Photography By</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Mike Mills</span>
+                                        <span class="crole">Photography By</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Peter Buck</span>
+                                        <span class="crole">Photography By</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Peter Buck</span>
+                                        <span class="crole">Sleeve Notes</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Ron Scarselli</span>
+                                        <span class="crole">Sleeve [Package Excavation]</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Bill Berry</span>
+                                        <span class="crole">Written-By <span class="ctracks">· A3 to A6, B1, B2, B4, B5, B7</span></span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Michael Stipe</span>
+                                        <span class="crole">Written-By <span class="ctracks">· A3 to A6, B1, B2, B4, B5, B7</span></span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Mike Mills</span>
+                                        <span class="crole">Written-By <span class="ctracks">· A3 to A6, B1, B2, B4, B5, B7</span></span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Peter Buck</span>
+                                        <span class="crole">Written-By <span class="ctracks">· A3 to A6, B1, B2, B4, B5, B7</span></span>
+                                    </div>
+                                                                </div>
+                            </div>
+                        
+                                                    <div class="sec">
+                                <div class="eyebrow">Companies</div>
+                                <div>
+                                                                    <div class="credit">
+                                        <span class="cname">International Record Syndicate, Inc.</span>
+                                        <span class="crole">Phonographic Copyright (p)</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">International Record Syndicate, Inc.</span>
+                                        <span class="crole">Copyright (c)</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">A&amp;M Records, Inc.</span>
+                                        <span class="crole">Distributed By</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">A&amp;M Records, Inc.</span>
+                                        <span class="crole">Manufactured By</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Electrosound Group Midwest, Inc.</span>
+                                        <span class="crole">Pressed By</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Safe Music</span>
+                                        <span class="crole">Published By</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Night Garden Music</span>
+                                        <span class="crole">Published By</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Oakfield Avenue Music</span>
+                                        <span class="crole">Published By</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Daksel Music Corp.</span>
+                                        <span class="crole">Published By</span>
+                                    </div>
+                                                                    <div class="credit">
+                                        <span class="cname">Tree Publishing Co.</span>
+                                        <span class="crole">Published By</span>
+                                    </div>
+                                                                </div>
+                            </div>
+                                            </div>
+                </div>
+                       </div>
+
+          <div id="tab-status" class="tab-content">
+            <div class="card">
+                <div class="meta">
+                    <div class="eyebrow">Discogs status</div>
+                    <div class="own">
+                                                <form method="post" action="/release/save" style="margin:0">
+                            <input type="hidden" name="_token" value="" />
+                            <input type="hidden" name="release_id" value="414729" />
+                            <input type="hidden" name="action" value="want_to_collection" />
+                            <input type="hidden" name="return" value="../index.html" />
+                            <button type="submit" class="status-btn primary">Add to Collection</button>
+                        </form>
+                        
+                                                <form method="post" action="/release/save" style="margin:0">
+                            <input type="hidden" name="_token" value="" />
+                            <input type="hidden" name="release_id" value="414729" />
+                            <input type="hidden" name="action" value="add_want" />
+                            <input type="hidden" name="return" value="../index.html" />
+                            <button type="submit" class="status-btn">Add to Wantlist</button>
+                        </form>
+                                            </div>
+
+                    <div class="row-between" style="margin-top:22px">
+                        <div class="eyebrow">My notes</div>
+                                            </div>
+
+                    <div id="notesView">
+                        <div class="kv">
+                                                                                                            </div>
+                                                                    </div>
+
+                                     </div>
+            </div>
+          </div>
+
+                  </div>
+      </div>
+
+            <!-- Lightbox overlay -->
+      <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog">
+        <div class="lb-inner">
+          <button class="lb-close" aria-label="Close">✕</button>
+          <button class="lb-prev" aria-label="Previous">◀</button>
+          <img class="lb-img" src="" alt="Full-size image" />
+          <button class="lb-next" aria-label="Next">▶</button>
+          <div class="lb-counter">1 / 6</div>
+        </div>
+      </div>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', function(){
+          const images = [
+            '..\/images\/414729\/28414edc5660808508c89f20a5b2177e3df859fb.jpg', '..\/images\/414729\/23af5512ecd0a93e3618233a7a61fccc0db659ed.jpg', '..\/images\/414729\/8fc848801b5c118d604d2b7585878e4bf88ba1e3.jpg', '..\/images\/414729\/7164f5e7b9754c7bf7a3f41673b91821a147e242.jpg', '..\/images\/414729\/b0ea470d89e81fe7d2568aa00c1ade7db655dcbc.jpg', '..\/images\/414729\/7b08f159b926478e01bcb46c7654d7e72e39e158.jpg'          ];
+          const track = document.getElementById('carousel-track');
+          const dots = document.querySelectorAll('.dot');
+          const thumbs = document.querySelectorAll('.thumb');
+          const lb = document.getElementById('lightbox');
+          const lbImg = lb ? lb.querySelector('.lb-img') : null;
+          const lbClose = lb ? lb.querySelector('.lb-close') : null;
+          const lbPrev = lb ? lb.querySelector('.lb-prev') : null;
+          const lbNext = lb ? lb.querySelector('.lb-next') : null;
+          const lbCounter = lb ? lb.querySelector('.lb-counter') : null;
+          let idx = 0;
+
+          function updateCarousel(to){
+            idx = Math.max(0, Math.min(images.length - 1, to));
+            if (track) track.style.transform = `translateX(-${idx * 100}%)`;
+            dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+          }
+
+          function openLightbox(startIdx){
+            if (!lb || !lbImg) return;
+            idx = Math.max(0, Math.min(images.length - 1, startIdx));
+            lbImg.src = images[idx];
+            if (lbCounter) lbCounter.textContent = (idx + 1) + ' / ' + images.length;
+            lb.classList.add('open');
+            lb.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+          }
+          function closeLightbox(){
+            if (!lb) return;
+            lb.classList.remove('open');
+            lb.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+          }
+          function next(){ idx = (idx + 1) % images.length; if (lb.classList.contains('open')) { lbImg.src = images[idx]; lbCounter.textContent = (idx + 1) + ' / ' + images.length; } else { updateCarousel(idx); } }
+          function prev(){ idx = (idx - 1 + images.length) % images.length; if (lb.classList.contains('open')) { lbImg.src = images[idx]; lbCounter.textContent = (idx + 1) + ' / ' + images.length; } else { updateCarousel(idx); } }
+
+          // Carousel dot/thumb clicks
+          dots.forEach(d => d.addEventListener('click', () => updateCarousel(parseInt(d.dataset.idx))));
+          thumbs.forEach(t => t.addEventListener('click', () => updateCarousel(parseInt(t.dataset.idx))));
+
+          // Lightbox trigger on carousel image click
+          document.querySelectorAll('.carousel-slide img').forEach(img => {
+            img.addEventListener('click', () => openLightbox(parseInt(img.dataset.idx)));
+          });
+
+          // Lightbox interactions
+          lbClose?.addEventListener('click', closeLightbox);
+          lbPrev?.addEventListener('click', prev);
+          lbNext?.addEventListener('click', next);
+          lbImg?.addEventListener('click', next);
+          lb?.addEventListener('click', function(e){ if (e.target === lb) closeLightbox(); });
+
+          // Keyboard
+          document.addEventListener('keydown', function(e){
+            if (!lb || !lb.classList.contains('open')) return;
+            if (e.key === 'Escape') closeLightbox();
+            else if (e.key === 'ArrowRight') next();
+            else if (e.key === 'ArrowLeft') prev();
+          });
+
+          // Tabs
+          const tabs = document.querySelectorAll('.tab');
+          const contents = document.querySelectorAll('.tab-content');
+          tabs.forEach(t => {
+            t.addEventListener('click', () => {
+              const target = t.dataset.tab;
+              tabs.forEach(t2 => t2.classList.toggle('active', t2 === t));
+              contents.forEach(c => c.classList.toggle('active', c.id === `tab-${target}`));
+
+              if (target === 'recommendations' && !t.dataset.loaded) {
+                fetchRecommendations();
+                t.dataset.loaded = 'true';
+              }
+            });
+          });
+
+          async function fetchRecommendations() {
+            const container = document.getElementById('recommendations-container');
+            try {
+              const res = await fetch(`/release/414729/recommendations`);
+              const data = await res.json();
+              
+              if (data.error) {
+                container.innerHTML = `<p class="muted">${data.error}</p>`;
+                return;
+              }
+
+              if (data.recommendations && data.recommendations.length > 0) {
+                let html = '<ul style="margin:0; padding-left:20px">';
+                data.recommendations.forEach(item => {
+                  const label = item.type === 'release' ? `${item.artist} — ${item.title}` : item.artist;
+                  const searchUrl = `/?q=${encodeURIComponent('discogs: ' + (item.type === 'artist' ? 'artist:' : '') + item.artist + (item.type === 'release' ? ' title:"' + item.title + '"' : ''))}`;
+                  
+                  html += `<li style="margin-bottom:12px">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px">
+                      <span><strong>${label}</strong> <span class="muted">(${item.type})</span></span>
+                      <div style="display:flex; gap:8px">
+                        <a href="${searchUrl}" class="muted" style="font-size:0.8rem; border:1px solid var(--border); padding:2px 8px; border-radius:4px; text-decoration:none; color:var(--accent)">Live Search</a>
+                      </div>
+                    </div>
+                  </li>`;
+                });
+                html += '</ul>';
+                container.innerHTML = html;
+              } else {
+                container.innerHTML = '<p class="muted">No recommendations found.</p>';
+              }
+            } catch (e) {
+              container.innerHTML = '<p class="muted">Error loading recommendations.</p>';
+            }
+          }
+
+          // Handle tab parameter in URL
+          const urlParams = new URLSearchParams(window.location.search);
+          const activeTab = urlParams.get('tab');
+          if (activeTab) {
+            const tabEl = document.querySelector(`.tab[data-tab="${activeTab}"]`);
+            if (tabEl) tabEl.click();
+          }
+
+          // Swipe support for carousel (basic)
+          let startX = 0;
+          track?.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+          track?.addEventListener('touchend', e => {
+            const diff = startX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) {
+              if (diff > 0) next(); else prev();
+            }
+          });
+
+          // Notes Toggle
+          (function(){
+            const btn = document.getElementById('editToggle');
+            const form = document.getElementById('notesForm');
+            const view = document.getElementById('notesView');
+            if (!btn || !form || !view) return;
+            btn.addEventListener('click', function(){
+                const open = form.style.display === 'none';
+                form.style.display = open ? 'flex' : 'none';
+                view.style.display = open ? 'none' : 'block';
+                btn.textContent = open ? 'Cancel' : 'Edit';
+                if (open) {
+                    // Switch to status tab if not active
+                    document.querySelector('.tab[data-tab="status"]').click();
+                }
+            });
+          })();
+
+          // Apple Music Player
+          (async function loadAppleMusicPlayer() {
+              const container = document.getElementById('apple-music-player-container');
+              const player = document.getElementById('apple-music-player');
+              if (!container || !player) return;
+
+              try {
+                  const res = await fetch(`/release/414729/apple-music-id`);
+                  const data = await res.json();
+
+                  if (data.apple_music_id) {
+                      container.style.display = 'block';
+                      player.innerHTML = `<iframe allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" frameborder="0" height="450" style="width:100%;max-width:660px;overflow:hidden;border-radius:10px;" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="https://embed.music.apple.com/us/album/${data.apple_music_id}"></iframe>`;
+                  }
+              } catch (e) {
+                  console.error('Failed to load Apple Music player:', e);
+              }
+          })();
+        });
+      </script>
+            </div>
+
+    <script>
+    document.getElementById('mobile-toggle')?.addEventListener('click', function() {
+      document.getElementById('mobile-menu').classList.toggle('active');
+      this.textContent = document.getElementById('mobile-menu').classList.contains('active') ? '✕' : '☰';
+    });
+
+    (function () {
+      var more = document.querySelector('.nav-more');
+      if (!more) return;
+      var trigger = more.querySelector('.nav-more-trigger');
+      function setOpen(open) {
+        more.setAttribute('data-open', open ? 'true' : 'false');
+        trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+      }
+      trigger.addEventListener('click', function (e) {
+        e.stopPropagation();
+        setOpen(more.getAttribute('data-open') !== 'true');
+      });
+      document.addEventListener('click', function (e) {
+        if (!more.contains(e.target)) setOpen(false);
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') setOpen(false);
+      });
+    })();
+  </script>
+
+  <footer class="site-footer muted" style="text-align:center;margin:24px 0 8px 0;font-size:.9rem;">
+  Powered by Discogs API & Coffee Since 2026 | Lovingly Crafted in Boise, Idaho
+</footer>
+</body>
+</html>
