@@ -26,7 +26,10 @@ final class SqliteValuationRepositoryTest extends TestCase
         return [
             'scope' => 'collection', 'release_id' => 1, 'instance_id' => 10,
             'condition_used' => 'Very Good Plus (VG+)', 'value' => 18.5,
-            'currency' => 'GBP', 'source' => 'suggestion', 'valued_at' => '2026-07-02T00:00:00+00:00',
+            // "valued now" — kept relative to the current time so the 7-day
+            // staleness window in testStaleReleaseIds never expires (was a
+            // hardcoded date that started failing once 7 days had elapsed).
+            'currency' => 'GBP', 'source' => 'suggestion', 'valued_at' => gmdate('c'),
         ];
     }
 
