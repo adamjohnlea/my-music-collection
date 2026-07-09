@@ -84,8 +84,9 @@ class NavMoreMenuTest extends TestCase
         ]);
 
         $this->assertStringNotContainsString('class="nav-more"', $html);
-        // Flat static row still exposes Surprise Me + About.
-        $this->assertStringContainsString('Surprise Me', $html);
+        // Surprise Me is a dynamic-only feature; the flat static row omits it
+        // and exposes About.
+        $this->assertStringNotContainsString('Surprise Me', $html);
         $this->assertStringContainsString('about.html', $html);
     }
 }

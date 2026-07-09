@@ -233,7 +233,7 @@
             <div class="tab active" data-tab="tracks">Tracks</div>
             <div class="tab" data-tab="details">Details</div>
             <div class="tab" data-tab="credits">Credits</div>
-            <div class="tab" data-tab="status">Status & Notes</div>
+            {% if not static_export %}<div class="tab" data-tab="status">Status & Notes</div>{% endif %}
             {% if auth_user.anthropic_api_key %}
               <div class="tab" data-tab="recommendations">Recommendations</div>
             {% endif %}
@@ -350,6 +350,7 @@
              {% endif %}
           </div>
 
+          {% if not static_export %}
           <div id="tab-status" class="tab-content">
             <div class="card">
                 <div class="meta">
@@ -466,6 +467,7 @@
                 </div>
             </div>
           </div>
+          {% endif %}
 
           {% if auth_user.anthropic_api_key %}
             <div id="tab-recommendations" class="tab-content">

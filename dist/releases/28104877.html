@@ -382,8 +382,7 @@
           <a href="../index.html" class="muted">Collection</a>
           <a href="../wantlist.html" class="muted">Wantlist</a>
           <a href="../stats.html" class="muted">Stats</a>
-                                <a href="javascript:void(0)" class="muted" onclick="if(window.surpriseMe)window.surpriseMe();">Surprise Me</a>
-            <a href="../about.html" class="muted">About</a>
+                                <a href="../about.html" class="muted">About</a>
                   </div>
 
         <button class="mobile-nav-toggle" id="mobile-toggle" aria-label="Toggle menu">☰</button>
@@ -394,8 +393,7 @@
   <div class="mobile-menu" id="mobile-menu">
     <a href="../index.html" class="nav-item">Collection</a>
     <a href="../wantlist.html" class="nav-item">Wantlist</a>
-            <a href="javascript:void(0)" class="nav-item" onclick="if(window.surpriseMe)window.surpriseMe();">Surprise Me</a>
-    <a href="../stats.html" class="nav-item">Stats</a>
+                <a href="../stats.html" class="nav-item">Stats</a>
     <a href="../about.html" class="nav-item">About</a>
               </div>
 
@@ -490,8 +488,7 @@
             <div class="tab active" data-tab="tracks">Tracks</div>
             <div class="tab" data-tab="details">Details</div>
             <div class="tab" data-tab="credits">Credits</div>
-            <div class="tab" data-tab="status">Status & Notes</div>
-                      </div>
+                                  </div>
 
           <div id="tab-tracks" class="tab-content active">
                           <div class="card">
@@ -621,41 +618,7 @@
                 </div>
                        </div>
 
-          <div id="tab-status" class="tab-content">
-            <div class="card">
-                <div class="meta">
-                    <div class="eyebrow">Discogs status</div>
-                    <div class="own">
-                                                <form method="post" action="/release/save" style="margin:0">
-                            <input type="hidden" name="_token" value="" />
-                            <input type="hidden" name="release_id" value="28104877" />
-                            <input type="hidden" name="action" value="want_to_collection" />
-                            <input type="hidden" name="return" value="../index.html" />
-                            <button type="submit" class="status-btn primary">Add to Collection</button>
-                        </form>
-                        
-                                                <form method="post" action="/release/save" style="margin:0">
-                            <input type="hidden" name="_token" value="" />
-                            <input type="hidden" name="release_id" value="28104877" />
-                            <input type="hidden" name="action" value="add_want" />
-                            <input type="hidden" name="return" value="../index.html" />
-                            <button type="submit" class="status-btn">Add to Wantlist</button>
-                        </form>
-                                            </div>
-
-                    <div class="row-between" style="margin-top:22px">
-                        <div class="eyebrow">My notes</div>
-                                            </div>
-
-                    <div id="notesView">
-                        <div class="kv">
-                                                                                                            </div>
-                                                                    </div>
-
-                                     </div>
-            </div>
-          </div>
-
+          
                   </div>
       </div>
 

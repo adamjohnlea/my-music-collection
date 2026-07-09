@@ -238,7 +238,6 @@
           <a href="{{ static_export ? (base_url is same as('') ? (depth > 0 ? '../' : './') ~ 'stats.html' : base_url ~ '/stats.html') : '/stats' }}" class="muted">Stats</a>
           {% if not static_export %}<a href="/alerts" class="muted">Alerts{% if alert_count is defined and alert_count > 0 %} <span class="alert-badge">{{ alert_count }}</span>{% endif %}</a>{% endif %}
           {% if static_export %}
-            <a href="javascript:void(0)" class="muted" onclick="if(window.surpriseMe)window.surpriseMe();">Surprise Me</a>
             <a href="{{ base_url is same as('') ? (depth > 0 ? '../' : './') ~ 'about.html' : base_url ~ '/about.html' }}" class="muted">About</a>
           {% else %}
             <div class="nav-more" data-open="false">
@@ -265,7 +264,7 @@
     <a href="{{ static_export ? (base_url is same as('') ? (depth > 0 ? '../' : './') ~ 'wantlist.html' : base_url ~ '/wantlist.html') : '/?view=wantlist' }}" class="nav-item">Wantlist</a>
     {% if not static_export %}<a href="/alerts" class="nav-item">Alerts{% if alert_count is defined and alert_count > 0 %} <span class="alert-badge">{{ alert_count }}</span>{% endif %}</a>{% endif %}
     {% if not static_export %}<a href="/achievements" class="nav-item">Achievements{% if achievement_count is defined and achievement_count > 0 %} <span class="alert-badge">{{ achievement_count }}</span>{% endif %}</a>{% endif %}
-    <a href="{{ static_export ? 'javascript:void(0)' : '/random' }}" class="nav-item" {% if static_export %}onclick="if(window.surpriseMe)window.surpriseMe();"{% endif %}>Surprise Me</a>
+    {% if not static_export %}<a href="/random" class="nav-item">Surprise Me</a>{% endif %}
     <a href="{{ static_export ? (base_url is same as('') ? (depth > 0 ? '../' : './') ~ 'stats.html' : base_url ~ '/stats.html') : '/stats' }}" class="nav-item">Stats</a>
     <a href="{{ static_export ? (base_url is same as('') ? (depth > 0 ? '../' : './') ~ 'about.html' : base_url ~ '/about.html') : '/about' }}" class="nav-item">About</a>
     {% if not static_export %}<a href="/help" class="nav-item">Help</a>{% endif %}
