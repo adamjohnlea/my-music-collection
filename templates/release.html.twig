@@ -570,19 +570,22 @@
               tabs.forEach(t2 => t2.classList.toggle('active', t2 === t));
               contents.forEach(c => c.classList.toggle('active', c.id === `tab-${target}`));
 
+              {% if auth_user.anthropic_api_key %}
               if (target === 'recommendations' && !t.dataset.loaded) {
                 fetchRecommendations();
                 t.dataset.loaded = 'true';
               }
+              {% endif %}
             });
           });
 
+          {% if auth_user.anthropic_api_key %}
           async function fetchRecommendations() {
             const container = document.getElementById('recommendations-container');
             try {
               const res = await fetch(`/release/{{ release.id }}/recommendations`);
               const data = await res.json();
-              
+
               if (data.error) {
                 container.innerHTML = `<p class="muted">${data.error}</p>`;
                 return;
@@ -593,7 +596,7 @@
                 data.recommendations.forEach(item => {
                   const label = item.type === 'release' ? `${item.artist} — ${item.title}` : item.artist;
                   const searchUrl = `/?q=${encodeURIComponent('discogs: ' + (item.type === 'artist' ? 'artist:' : '') + item.artist + (item.type === 'release' ? ' title:"' + item.title + '"' : ''))}`;
-                  
+
                   html += `<li style="margin-bottom:12px">
                     <div style="display:flex; justify-content:space-between; align-items:center; gap:8px">
                       <span><strong>${label}</strong> <span class="muted">(${item.type})</span></span>
@@ -612,6 +615,7 @@
               container.innerHTML = '<p class="muted">Error loading recommendations.</p>';
             }
           }
+          {% endif %}
 
           // Handle tab parameter in URL
           const urlParams = new URLSearchParams(window.location.search);

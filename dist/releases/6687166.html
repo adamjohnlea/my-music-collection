@@ -632,49 +632,10 @@
               tabs.forEach(t2 => t2.classList.toggle('active', t2 === t));
               contents.forEach(c => c.classList.toggle('active', c.id === `tab-${target}`));
 
-              if (target === 'recommendations' && !t.dataset.loaded) {
-                fetchRecommendations();
-                t.dataset.loaded = 'true';
-              }
-            });
+                          });
           });
 
-          async function fetchRecommendations() {
-            const container = document.getElementById('recommendations-container');
-            try {
-              const res = await fetch(`/release/6687166/recommendations`);
-              const data = await res.json();
-              
-              if (data.error) {
-                container.innerHTML = `<p class="muted">${data.error}</p>`;
-                return;
-              }
-
-              if (data.recommendations && data.recommendations.length > 0) {
-                let html = '<ul style="margin:0; padding-left:20px">';
-                data.recommendations.forEach(item => {
-                  const label = item.type === 'release' ? `${item.artist} — ${item.title}` : item.artist;
-                  const searchUrl = `/?q=${encodeURIComponent('discogs: ' + (item.type === 'artist' ? 'artist:' : '') + item.artist + (item.type === 'release' ? ' title:"' + item.title + '"' : ''))}`;
-                  
-                  html += `<li style="margin-bottom:12px">
-                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px">
-                      <span><strong>${label}</strong> <span class="muted">(${item.type})</span></span>
-                      <div style="display:flex; gap:8px">
-                        <a href="${searchUrl}" class="muted" style="font-size:0.8rem; border:1px solid var(--border); padding:2px 8px; border-radius:4px; text-decoration:none; color:var(--accent)">Live Search</a>
-                      </div>
-                    </div>
-                  </li>`;
-                });
-                html += '</ul>';
-                container.innerHTML = html;
-              } else {
-                container.innerHTML = '<p class="muted">No recommendations found.</p>';
-              }
-            } catch (e) {
-              container.innerHTML = '<p class="muted">Error loading recommendations.</p>';
-            }
-          }
-
+          
           // Handle tab parameter in URL
           const urlParams = new URLSearchParams(window.location.search);
           const activeTab = urlParams.get('tab');
